@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% comment %}
+  Error and access states (UI/UX Completion Gate F3/F4): 400, 403, 404, 500
+  and CSRF failure. The public shell's light application bar with the
+  official logo, one centred result card and the public footer.
+
+  Static-safe: 400 and 500 are rendered by Django without a request context,
+  so this layout uses only `{% static %}`, `{% url %}` and translation tags
+  when `request` is absent: no template tag here touches the database, the
+  session or the user. The language switcher needs a request (its CSRF
+  token and return path), so it is shown only when one exists.
+
+  Blocks: `error_code` (kicker text), `error_icon`, `error_title` (the h1),
+  `error_body`, `error_actions`.
+{% endcomment %}
+
+{% block body_attrs %} class="asc-ui asc-public asc-error-page"{% endblock %}
+
+{% block header %}
+  <header class="asc-appbar asc-appbar-light">
+    <div class="container-xl asc-appbar-inner">
+      <a class="asc-brand" href="{% url 'home' %}">
+        <img src="{% static 'img/brand/asc-logo.svg' %}" width="90" height="40" alt="{% trans 'African Startup Conference' %}">
+      </a>
+      {% if request %}
+        <nav class="asc-appbar-end" aria-label="{% trans 'Language' %}">
+          {% include "partials/language_switcher.html" %}
+        </nav>
+      {% endif %}
+    </div>
+  </header>
+{% endblock %}
+
+{% block main %}
+  <main id="main-content" class="asc-main asc-error-main">
+    <div class="container-xl">
+      <section class="asc-card asc-error" aria-labelledby="asc-error-title">
+        <span class="asc-error-icon">{% block error_icon %}{% include "components/icon.html" with name="alert-triangle" size="lg" %}{% endblock %}</span>
+        <p class="asc-kicker">{% block error_code %}{% endblock %}</p>
+        <h1 id="asc-error-title">{% block error_title %}{% endblock %}</h1>
+        <div class="asc-error-body">{% block error_body %}{% endblock %}</div>
+        <div class="asc-error-actions">{% block error_actions %}<a class="btn btn-primary" href="{% url 'home' %}">{% trans "Go to the start page" %}</a>{% endblock %}</div>
+      </section>
+    </div>
+  </main>
+{% endblock %}
+
+{% block footer %}
+  <footer class="asc-footer">
+    <div class="container-xl d-flex flex-wrap gap-2 justify-content-between">
+      <span>{% trans "ASC 2026 Registration Platform" %}</span>
+      <span>{% trans "African Startup Conference" %}</span>
+      {% include "partials/footer_official.html" %}
+    </div>
+  </footer>
+{% endblock %}

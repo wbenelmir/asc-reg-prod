@@ -1,0 +1,7 @@
+{
+  "description": "Committed PUBLIC ES256 vector for the device self-test (Phase 4 Prompt 2). The private key was generated in memory, used once, and discarded; it exists nowhere.",
+  "alg": "ES256",
+  "spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEfUL4B6-ltPsj5Qq3KWCTzdwkYyahlH8rS3LZovpUw8N426TV8dKqNCyCX362zLl7IRdB58NFsyY_PgfAi_gamw",
+  "message": "ASC-OFFLINE-SELF-TEST-v1|synthetic public vector",
+  "signature": "aSCp0BYUM3ssYGQ4zDieN9I2_WH8PwMQo6Xpg7BHMl2Vpoy-nzQqXhlJsxIVSMLJW_zjVJNjlzKoz6HE7CLP2w"
+}

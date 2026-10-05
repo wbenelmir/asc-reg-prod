@@ -1,0 +1,18 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Entry pass conflict" %}{% endblock %}
+
+{% block content %}
+  <section class="asc-card">
+    <div class="asc-empty">
+      <span class="asc-tile">{% include "components/icon.html" with name="refresh" %}</span>
+      <h1 class="h3">{% trans "This entry pass changed" %}</h1>
+      <div class="asc-notice asc-notice-warning text-start" role="alert">
+        {% include "components/icon.html" with name="alert-triangle" %}
+        <p>{{ message }}</p>
+      </div>
+      <p>{% trans "Reload the credential page to see the current state before trying again." %}</p>
+    </div>
+  </section>
+{% endblock %}

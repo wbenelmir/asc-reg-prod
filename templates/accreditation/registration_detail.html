@@ -1,0 +1,251 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% comment %}
+  Accreditation for one Registration Context: current participant roles,
+  badge type, access profiles and access rules. Every section and command is
+  gated by the permission flags the view computes; form actions and field
+  names are unchanged. Each command is a labelled form (no placeholder-only
+  inputs); revocations use the shared confirmation dialog.
+{% endcomment %}
+{% block title %}{% blocktrans with ref=registration.public_reference %}Accreditation: {{ ref }}{% endblocktrans %}{% endblock %}
+{% block breadcrumbs %}{% url 'registrations:ops-intake-list' as list_url %}{% trans "Registration intake" as list_label %}{% url 'registrations:ops-intake-detail' pk=registration.pk as detail_url %}{% trans "Accreditation" as current %}{% include "components/breadcrumb_trail.html" with parent_label=list_label parent_url=list_url parent2_label=registration.public_reference parent2_url=detail_url current=current %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Accreditation" %}</p>
+      <h1>{% blocktrans with ref=registration.public_reference|ltr_isolate %}Accreditation for {{ ref }}{% endblocktrans %}</h1>
+      <p>{% trans "Operational classifications assigned after registration. The participant never chooses these." %}</p>
+    </div>
+  </div>
+
+  <div class="asc-accreditation">
+      {% if can_view_role %}
+        <section class="asc-card" aria-labelledby="roles-heading">
+          <h2 class="asc-card-title" id="roles-heading">{% include "components/icon.html" with name="user" %}{% trans "Participant roles" %}</h2>
+          {% for assignment in role_assignments %}
+            <div class="asc-assignment">
+              <div class="asc-assignment-head">
+                <p class="asc-assignment-name"><bdi>{{ assignment.role.localized_name }}</bdi></p>
+                <p class="asc-muted mb-0">{% trans "Since" %} <time datetime="{{ assignment.effective_from|date:'c' }}">{{ assignment.effective_from }}</time></p>
+              </div>
+              {% if can_change_role %}
+                <div class="asc-assignment-commands">
+                  <form method="post" class="asc-command" action="{% url 'accreditation:assignment-change' pk=registration.pk kind='PARTICIPANT_ROLE' assignment_pk=assignment.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="expected_version" value="{{ assignment.version }}">
+                    <h3 class="asc-command-title">{% trans "Change role" %}</h3>
+                    <label class="form-label" for="role-change-{{ assignment.pk }}">{% trans "New role" %}</label>
+                    <select id="role-change-{{ assignment.pk }}" name="reference_object_id" required class="form-select">
+                      {% for r in available_roles %}<option value="{{ r.pk }}"{% if r.pk == assignment.role_id %} selected{% endif %}>{{ r.localized_name }}</option>{% endfor %}
+                    </select>
+                    <label class="form-label" for="role-change-reason-{{ assignment.pk }}">{% trans "Reason" %}</label>
+                    <input type="text" id="role-change-reason-{{ assignment.pk }}" name="reason" required maxlength="300" class="form-control">
+                    <button type="submit" class="btn btn-outline-primary"><span>{% trans "Change" %}</span></button>
+                  </form>
+                  <form method="post" class="asc-command" action="{% url 'accreditation:assignment-revoke' pk=registration.pk kind='PARTICIPANT_ROLE' assignment_pk=assignment.pk %}"
+                        data-confirm-title="{% trans 'Revoke this participant role?' %}"
+                        data-confirm="{% trans 'The assignment ends now and stays in the history. Assign it again if needed.' %}"
+                        data-confirm-action="{% trans 'Revoke' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="expected_version" value="{{ assignment.version }}">
+                    <h3 class="asc-command-title">{% trans "Revoke role" %}</h3>
+                    <label class="form-label" for="role-revoke-reason-{{ assignment.pk }}">{% trans "Reason" %}</label>
+                    <input type="text" id="role-revoke-reason-{{ assignment.pk }}" name="reason" required maxlength="300" class="form-control">
+                    {% include "components/confirm_fallback.html" with id="role-revoke-confirm" suffix=assignment.pk %}
+                    <button type="submit" class="btn btn-outline-danger"><span>{% trans "Revoke" %}</span></button>
+                  </form>
+                </div>
+              {% endif %}
+            </div>
+          {% empty %}
+            <p class="asc-muted">{% trans "No current role assignment." %}</p>
+          {% endfor %}
+          {% if can_assign_role %}
+            <form method="post" class="asc-card-form" action="{% url 'accreditation:assignment-assign' pk=registration.pk kind='PARTICIPANT_ROLE' %}">
+              {% csrf_token %}
+              <h3 class="asc-card-form-title">{% trans "Assign role" %}</h3>
+              <div class="asc-form-grid">
+                <div>
+                  <label for="id_role_id" class="form-label">{% trans "Role" %}</label>
+                  <select id="id_role_id" name="reference_object_id" class="form-select" required>
+                    {% for r in available_roles %}<option value="{{ r.pk }}">{{ r.localized_name }}</option>{% endfor %}
+                  </select>
+                </div>
+                <div><button type="submit" class="btn btn-outline-primary"><span>{% trans "Assign role" %}</span></button></div>
+              </div>
+            </form>
+          {% endif %}
+        </section>
+      {% endif %}
+
+      {% if can_view_badge %}
+        <section class="asc-card" aria-labelledby="badge-heading">
+          <h2 class="asc-card-title" id="badge-heading">{% include "components/icon.html" with name="badge" %}{% trans "Badge type" %}</h2>
+          {% if badge_assignment %}
+            <div class="asc-assignment">
+              <div class="asc-assignment-head">
+                <p class="asc-assignment-name"><bdi>{{ badge_assignment.badge_type.localized_name }}</bdi></p>
+                <p class="asc-muted mb-0">{% trans "Since" %} <time datetime="{{ badge_assignment.effective_from|date:'c' }}">{{ badge_assignment.effective_from }}</time></p>
+              </div>
+              {% if can_change_badge %}
+                <div class="asc-assignment-commands">
+                  <form method="post" class="asc-command" action="{% url 'accreditation:assignment-change' pk=registration.pk kind='BADGE_TYPE' assignment_pk=badge_assignment.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="expected_version" value="{{ badge_assignment.version }}">
+                    <h3 class="asc-command-title">{% trans "Change badge type" %}</h3>
+                    <label class="form-label" for="badge-change">{% trans "New badge type" %}</label>
+                    <select id="badge-change" name="reference_object_id" required class="form-select">
+                      {% for b in available_badge_types %}<option value="{{ b.pk }}"{% if b.pk == badge_assignment.badge_type_id %} selected{% endif %}>{{ b.localized_name }}</option>{% endfor %}
+                    </select>
+                    <label class="form-label" for="badge-change-reason">{% trans "Reason" %}</label>
+                    <input type="text" id="badge-change-reason" name="reason" required maxlength="300" class="form-control">
+                    <button type="submit" class="btn btn-outline-primary"><span>{% trans "Change" %}</span></button>
+                  </form>
+                  <form method="post" class="asc-command" action="{% url 'accreditation:assignment-revoke' pk=registration.pk kind='BADGE_TYPE' assignment_pk=badge_assignment.pk %}"
+                        data-confirm-title="{% trans 'Revoke this badge type?' %}"
+                        data-confirm="{% trans 'The assignment ends now and stays in the history. Assign it again if needed.' %}"
+                        data-confirm-action="{% trans 'Revoke' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="expected_version" value="{{ badge_assignment.version }}">
+                    <h3 class="asc-command-title">{% trans "Revoke badge type" %}</h3>
+                    <label class="form-label" for="badge-revoke-reason">{% trans "Reason" %}</label>
+                    <input type="text" id="badge-revoke-reason" name="reason" required maxlength="300" class="form-control">
+                    {% include "components/confirm_fallback.html" with id="badge-revoke-confirm" %}
+                    <button type="submit" class="btn btn-outline-danger"><span>{% trans "Revoke" %}</span></button>
+                  </form>
+                </div>
+              {% endif %}
+            </div>
+          {% else %}
+            <p class="asc-muted">{% trans "No current badge type assignment." %}</p>
+          {% endif %}
+          {% if can_assign_badge and not badge_assignment %}
+            <form method="post" class="asc-card-form" action="{% url 'accreditation:assignment-assign' pk=registration.pk kind='BADGE_TYPE' %}">
+              {% csrf_token %}
+              <h3 class="asc-card-form-title">{% trans "Assign badge type" %}</h3>
+              <div class="asc-form-grid">
+                <div>
+                  <label for="id_badge_id" class="form-label">{% trans "Badge type" %}</label>
+                  <select id="id_badge_id" name="reference_object_id" class="form-select" required>
+                    {% for b in available_badge_types %}<option value="{{ b.pk }}">{{ b.localized_name }}</option>{% endfor %}
+                  </select>
+                </div>
+                <div><button type="submit" class="btn btn-outline-primary"><span>{% trans "Assign badge type" %}</span></button></div>
+              </div>
+            </form>
+          {% endif %}
+        </section>
+      {% endif %}
+
+      {% if can_view_profile or can_view_rule %}
+        <section class="asc-card" aria-labelledby="access-heading">
+          <h2 class="asc-card-title" id="access-heading">{% include "components/icon.html" with name="shield" %}{% trans "Access profiles and rules" %}</h2>
+          {% if can_view_profile %}
+            <h3 class="asc-card-form-title">{% trans "Access profiles" %}</h3>
+            {% for assignment in access_profile_assignments %}
+              <div class="asc-assignment">
+                <div class="asc-assignment-head">
+                  <p class="asc-assignment-name"><bdi>{{ assignment.access_profile.localized_name }}</bdi></p>
+                </div>
+                {% if can_change_profile %}
+                  <div class="asc-assignment-commands">
+                    <form method="post" class="asc-command" action="{% url 'accreditation:assignment-change' pk=registration.pk kind='ACCESS_PROFILE' assignment_pk=assignment.pk %}">
+                      {% csrf_token %}<input type="hidden" name="expected_version" value="{{ assignment.version }}">
+                      <h4 class="asc-command-title">{% trans "Change access profile" %}</h4>
+                      <label class="form-label" for="profile-change-{{ assignment.pk }}">{% trans "New access profile" %}</label>
+                      <select id="profile-change-{{ assignment.pk }}" name="reference_object_id" required class="form-select">{% for p in available_access_profiles %}<option value="{{ p.pk }}"{% if p.pk == assignment.access_profile_id %} selected{% endif %}>{{ p.localized_name }}</option>{% endfor %}</select>
+                      <label class="form-label" for="profile-change-reason-{{ assignment.pk }}">{% trans "Reason" %}</label>
+                      <input type="text" id="profile-change-reason-{{ assignment.pk }}" name="reason" required maxlength="300" class="form-control">
+                      <button type="submit" class="btn btn-outline-primary"><span>{% trans "Change" %}</span></button>
+                    </form>
+                    <form method="post" class="asc-command" action="{% url 'accreditation:assignment-revoke' pk=registration.pk kind='ACCESS_PROFILE' assignment_pk=assignment.pk %}"
+                          data-confirm-title="{% trans 'Revoke this access profile?' %}"
+                          data-confirm="{% trans 'The assignment ends now and stays in the history. Assign it again if needed.' %}"
+                          data-confirm-action="{% trans 'Revoke' %}">
+                      {% csrf_token %}<input type="hidden" name="expected_version" value="{{ assignment.version }}">
+                      <h4 class="asc-command-title">{% trans "Revoke access profile" %}</h4>
+                      <label class="form-label" for="profile-revoke-reason-{{ assignment.pk }}">{% trans "Reason" %}</label>
+                      <input type="text" id="profile-revoke-reason-{{ assignment.pk }}" name="reason" required maxlength="300" class="form-control">
+                      {% include "components/confirm_fallback.html" with id="profile-revoke-confirm" suffix=assignment.pk %}
+                      <button type="submit" class="btn btn-outline-danger"><span>{% trans "Revoke" %}</span></button>
+                    </form>
+                  </div>
+                {% endif %}
+              </div>
+            {% empty %}
+              <p class="asc-muted">{% trans "No current access profile assignment." %}</p>
+            {% endfor %}
+            {% if can_assign_profile and not access_profile_assignments %}
+              <form method="post" class="asc-card-form" action="{% url 'accreditation:assignment-assign' pk=registration.pk kind='ACCESS_PROFILE' %}">
+                {% csrf_token %}
+                <div class="asc-form-grid">
+                  <div>
+                    <label for="id_profile_id" class="form-label">{% trans "Access profile" %}</label>
+                    <select id="id_profile_id" name="reference_object_id" required class="form-select">{% for p in available_access_profiles %}<option value="{{ p.pk }}">{{ p.localized_name }}</option>{% endfor %}</select>
+                  </div>
+                  <div>
+                    <label for="id_profile_reason" class="form-label">{% trans "Reason" %} <span class="asc-optional">{% trans "Optional" %}</span></label>
+                    <input type="text" id="id_profile_reason" name="reason" maxlength="300" class="form-control">
+                  </div>
+                  <div><button type="submit" class="btn btn-outline-primary"><span>{% trans "Assign access profile" %}</span></button></div>
+                </div>
+              </form>
+            {% endif %}
+          {% endif %}
+
+          {% if can_view_rule %}
+            <h3 class="asc-card-form-title mt-3">{% trans "Access rules" %}</h3>
+            {% for assignment in access_rule_assignments %}
+              <div class="asc-assignment">
+                <div class="asc-assignment-head">
+                  <p class="asc-assignment-name"><bdi>{{ assignment.access_rule.localized_name }}</bdi></p>
+                </div>
+                {% if can_change_rule %}
+                  <div class="asc-assignment-commands">
+                    <form method="post" class="asc-command" action="{% url 'accreditation:assignment-change' pk=registration.pk kind='ACCESS_RULE' assignment_pk=assignment.pk %}">
+                      {% csrf_token %}<input type="hidden" name="expected_version" value="{{ assignment.version }}">
+                      <h4 class="asc-command-title">{% trans "Change access rule" %}</h4>
+                      <label class="form-label" for="rule-change-{{ assignment.pk }}">{% trans "New access rule" %}</label>
+                      <select id="rule-change-{{ assignment.pk }}" name="reference_object_id" required class="form-select">{% for rule in available_access_rules %}<option value="{{ rule.pk }}"{% if rule.pk == assignment.access_rule_id %} selected{% endif %}>{{ rule.localized_name }}</option>{% endfor %}</select>
+                      <label class="form-label" for="rule-change-reason-{{ assignment.pk }}">{% trans "Reason" %}</label>
+                      <input type="text" id="rule-change-reason-{{ assignment.pk }}" name="reason" required maxlength="300" class="form-control">
+                      <button type="submit" class="btn btn-outline-primary"><span>{% trans "Change" %}</span></button>
+                    </form>
+                    <form method="post" class="asc-command" action="{% url 'accreditation:assignment-revoke' pk=registration.pk kind='ACCESS_RULE' assignment_pk=assignment.pk %}"
+                          data-confirm-title="{% trans 'Revoke this access rule?' %}"
+                          data-confirm="{% trans 'The assignment ends now and stays in the history. Assign it again if needed.' %}"
+                          data-confirm-action="{% trans 'Revoke' %}">
+                      {% csrf_token %}<input type="hidden" name="expected_version" value="{{ assignment.version }}">
+                      <h4 class="asc-command-title">{% trans "Revoke access rule" %}</h4>
+                      <label class="form-label" for="rule-revoke-reason-{{ assignment.pk }}">{% trans "Reason" %}</label>
+                      <input type="text" id="rule-revoke-reason-{{ assignment.pk }}" name="reason" required maxlength="300" class="form-control">
+                      {% include "components/confirm_fallback.html" with id="rule-revoke-confirm" suffix=assignment.pk %}
+                      <button type="submit" class="btn btn-outline-danger"><span>{% trans "Revoke" %}</span></button>
+                    </form>
+                  </div>
+                {% endif %}
+              </div>
+            {% empty %}
+              <p class="asc-muted">{% trans "No current access rule assignment." %}</p>
+            {% endfor %}
+            {% if can_assign_rule %}
+              <form method="post" class="asc-card-form" action="{% url 'accreditation:assignment-assign' pk=registration.pk kind='ACCESS_RULE' %}">
+                {% csrf_token %}
+                <div class="asc-form-grid">
+                  <div>
+                    <label for="id_rule_id" class="form-label">{% trans "Access rule" %}</label>
+                    <select id="id_rule_id" name="reference_object_id" required class="form-select">{% for rule in available_access_rules %}<option value="{{ rule.pk }}">{{ rule.localized_name }}</option>{% endfor %}</select>
+                  </div>
+                  <div>
+                    <label for="id_rule_reason" class="form-label">{% trans "Reason" %} <span class="asc-optional">{% trans "Optional" %}</span></label>
+                    <input type="text" id="id_rule_reason" name="reason" maxlength="300" class="form-control">
+                  </div>
+                  <div><button type="submit" class="btn btn-outline-primary"><span>{% trans "Assign access rule" %}</span></button></div>
+                </div>
+              </form>
+            {% endif %}
+          {% endif %}
+        </section>
+      {% endif %}
+  </div>
+{% endblock %}

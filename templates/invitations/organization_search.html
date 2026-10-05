@@ -1,0 +1,62 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% block title %}{% trans "Find an organization" %}{% endblock %}
+{% block breadcrumbs %}{% url 'invitations:workspace-dashboard' as parent_url %}{% trans "Organization Workspace" as parent_label %}{% trans "Find an organization" as current %}{% include "components/breadcrumb_trail.html" with parent_label=parent_label parent_url=parent_url current=current %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Organizations" %}</p>
+      <h1>{% trans "Find an organization" %}</h1>
+      <p>{% trans "Search the organizations in your authorized scope for the event that is currently open." %}</p>
+    </div>
+  </div>
+
+  <form method="get" class="asc-card asc-filters" role="search" aria-label="{% trans 'Search organizations' %}">
+    <div class="asc-filters-grid">
+      <div class="asc-filter-search">
+        <label for="org-search-query" class="form-label">{% trans "Organization name" %}</label>
+        <div class="asc-input-icon">
+          {% include "components/icon.html" with name="search" %}
+          <input type="search" id="org-search-query" name="q" class="form-control" value="{{ query }}" autocomplete="off">
+        </div>
+      </div>
+    </div>
+    <div class="asc-filters-actions">
+      <button type="submit" class="btn btn-primary">{% include "components/icon.html" with name="search" %}<span>{% trans "Search" %}</span></button>
+      {% if query %}<a class="btn btn-outline-secondary" href="{% url 'invitations:organization-search' %}">{% trans "Clear search" %}</a>{% endif %}
+    </div>
+  </form>
+
+  {% if query %}
+    <section class="asc-card asc-card-flush" aria-labelledby="org-results-heading">
+      <div class="asc-card-toolbar">
+        <h2 class="asc-card-toolbar-title" id="org-results-heading">{% trans "Matching organizations" %}</h2>
+        <span class="asc-count">{% blocktrans count counter=results|length %}{{ counter }} organization{% plural %}{{ counter }} organizations{% endblocktrans %}</span>
+      </div>
+      {% if results %}
+        <ul class="asc-records">
+          {% for entry in results %}
+            <li class="asc-result-row" data-record>
+              <h3 class="asc-result-row-name"><bdi>{{ entry.organization.official_name }}</bdi></h3>
+              <div class="asc-record-actions">
+                <a href="{% url 'invitations:campaign-create' organization_id=entry.organization.pk %}" class="btn btn-outline-primary" data-record-action>{% trans "New campaign" %}<span class="visually-hidden"> <bdi>{{ entry.organization.official_name }}</bdi></span></a>
+                {% if entry.can_upload_delegation %}
+                  <a href="{% url 'invitations:delegation-upload' organization_id=entry.organization.pk %}" class="btn btn-outline-secondary">{% trans "Upload delegation list" %}<span class="visually-hidden"> <bdi>{{ entry.organization.official_name }}</bdi></span></a>
+                {% endif %}
+                {% if entry.can_register_on_behalf %}
+                  <a href="{% url 'invitations:on-behalf-create' organization_id=entry.organization.pk %}" class="btn btn-outline-secondary">{% trans "Create on-behalf registration" %}<span class="visually-hidden"> <bdi>{{ entry.organization.official_name }}</bdi></span></a>
+                {% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="asc-empty">
+          <span class="asc-tile">{% include "components/icon.html" with name="search" %}</span>
+          <h3>{% trans "No matching organizations found." %}</h3>
+          <p>{% trans "Check the spelling, or try part of the official name. Only organizations in your scope are searched." %}</p>
+        </div>
+      {% endif %}
+    </section>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+
+{% comment %}
+Verification-key management. PUBLIC key material only -- the service
+refuses any PEM carrying a private-key marker, and no private key is ever
+displayed, stored, or archived. Private signing keys live exclusively
+behind the opaque SigningKeyProvider.
+{% endcomment %}
+
+{% block title %}{% trans "Verification keys" %}{% endblock %}
+
+{% block breadcrumbs %}
+  <nav aria-label="{% trans 'Breadcrumb' %}" class="asc-breadcrumbs">
+    <ol>
+      <li><a href="{% url 'registrations:ops-intake-list' %}">{% trans "Operations" %}</a>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><span aria-current="page">{% trans "Verification keys" %}</span></li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="asc-page-head">
+    <h1>{% trans "Verification keys" %}</h1>
+    <p>{% trans "Only public verification keys are stored here. Private signing keys are never held by this application." %}</p>
+  </div>
+
+  <section class="asc-card" aria-labelledby="keys-heading">
+    <h2 class="asc-section-title" id="keys-heading">{% include "components/icon.html" with name="lock" %}{% trans "Published keys" %}</h2>
+    <p class="asc-section-lead">{% trans "Retire a key during a planned rotation. Emergency revocation immediately invalidates every pass signed with that key." %}</p>
+    <div class="asc-table-wrap">
+      <table class="asc-table">
+        <caption class="visually-hidden">{% trans "Published public verification keys" %}</caption>
+        <thead>
+          <tr>
+            <th scope="col">{% trans "Key identifier" %}</th>
+            <th scope="col">{% trans "Algorithm" %}</th>
+            <th scope="col">{% trans "Status" %}</th>
+            <th scope="col">{% trans "Fingerprint" %}</th>
+            <th scope="col">{% trans "Actions" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for key in keys %}
+            <tr>
+              <th scope="row"><bdi dir="ltr" class="asc-code">{{ key.key_id }}</bdi></th>
+              <td><bdi dir="ltr" class="asc-code">{{ key.algorithm }}</bdi></td>
+              <td data-key-status="{{ key.status }}"><span class="asc-chip {% if key.status == 'ACTIVE' %}asc-chip-success{% elif key.status == 'PENDING' %}asc-chip-info{% elif key.status == 'REVOKED' %}asc-chip-danger{% endif %}">{{ key.get_status_display }}</span></td>
+              <td><bdi dir="ltr" class="asc-code">{{ key.public_key_fingerprint|slice:":16" }}</bdi></td>
+              <td>
+                {% comment %}
+                Each control carries its OWN operation identifier. Sharing one
+                across forms is exactly the replay hole the command fingerprint
+                exists to close.
+                {% endcomment %}
+                <div class="asc-row-actions">
+                  {% if key.status == "PENDING" %}
+                    <form method="post" class="asc-inline-form" action="{% url 'badges:verification-key-promote' pk=key.pk %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="operation_id" value="{{ key.promote_operation_id }}">
+                      <button type="submit" class="btn btn-sm btn-primary">{% trans "Promote to active" %}</button>
+                    </form>
+                  {% endif %}
+                  {% if key.status == "ACTIVE" %}
+                    <form method="post" class="asc-inline-form" action="{% url 'badges:verification-key-retire' pk=key.pk %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="operation_id" value="{{ key.retire_operation_id }}">
+                      <label class="form-label mb-0 small" for="retire-reason-{{ key.pk }}">{% trans "Retirement reason" %}</label>
+                      <select class="form-select form-select-sm" id="retire-reason-{{ key.pk }}" name="reason_code" required>
+                        {% for value, text in retire_reason_choices %}<option value="{{ value }}">{{ text }}</option>{% endfor %}
+                      </select>
+                      <button type="submit" class="btn btn-sm btn-outline-secondary">{% trans "Retire key" %}</button>
+                    </form>
+                  {% endif %}
+                  {% if key.status != "REVOKED" %}
+                    <form method="post" class="asc-inline-form" action="{% url 'badges:verification-key-revoke' pk=key.pk %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="operation_id" value="{{ key.revoke_operation_id }}">
+                      <label class="form-label mb-0 small" for="revoke-reason-{{ key.pk }}">{% trans "Emergency revocation reason" %}</label>
+                      <select class="form-select form-select-sm" id="revoke-reason-{{ key.pk }}" name="reason_code" required>
+                        {% for value, text in revoke_reason_choices %}<option value="{{ value }}">{{ text }}</option>{% endfor %}
+                      </select>
+                      <button type="submit" class="btn btn-sm btn-danger">{% trans "Revoke key (emergency)" %}</button>
+                    </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="asc-table-empty">{% trans "No verification key has been published yet." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="asc-card" aria-labelledby="publish-heading">
+    <h2 class="asc-section-title" id="publish-heading">{% include "components/icon.html" with name="send" %}{% trans "Publish a public key" %}</h2>
+    {% include "components/error_summary.html" with form=form %}
+    <form method="post" action="{% url 'badges:verification-keys' %}">
+      {% csrf_token %}
+      {% include "components/field.html" with field=form.key_id %}
+      {% include "components/field.html" with field=form.public_key_pem %}
+      <button type="submit" class="btn btn-primary"><span>{% trans "Publish key" %}</span></button>
+    </form>
+  </section>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% trans "Record decision" %}{% endblock %}
+{% block breadcrumbs %}{% url 'reviews:queue-list' as queue_url %}{% trans "Review queue" as queue_label %}{% url 'reviews:case-detail' pk=case.pk as case_url %}{% trans "Record a Not Approved decision" as current %}{% include "components/breadcrumb_trail.html" with parent_label=queue_label parent_url=queue_url parent2_label=case.registration.public_reference parent2_url=case_url current=current %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Decision" %} · <bdi dir="ltr" class="asc-code">{{ case.registration.public_reference }}</bdi></p>
+      <h1>{% trans "Record a Not Approved decision" %}</h1>
+      <p>{% trans "The participant sees only the outcome and, if you give one, the participant-facing reason. Internal reasons and notes stay internal." %}</p>
+    </div>
+  </div>
+
+  <section class="asc-card asc-form-narrow" aria-labelledby="decision-form-heading">
+    <h2 class="asc-card-title" id="decision-form-heading">{% include "components/icon.html" with name="x-circle" %}{% trans "Decision details" %}</h2>
+    {% include "components/error_summary.html" %}
+    <form method="post" novalidate
+          data-confirm-title="{% trans 'Record a Not Approved decision?' %}"
+          data-confirm="{% trans 'The registration will be marked Not Approved and the participant will see this outcome. It can only be changed by reopening the registration.' %}"
+          data-confirm-action="{% trans 'Record decision' %}">
+      {% csrf_token %}
+      <input type="hidden" name="expected_version" value="{{ case.registration.version }}">
+      {% include "components/field.html" with field=form.internal_reason_code control="ltr" %}
+      {% include "components/field.html" with field=form.internal_note mark_optional=True %}
+      {% include "components/field.html" with field=form.participant_reason_code control="ltr" mark_optional=True %}
+      <div class="asc-actions-row">
+        <button type="submit" class="btn btn-danger">{% include "components/icon.html" with name="x-circle" %}<span>{% trans "Record decision" %}</span></button>
+        <a href="{% url 'reviews:case-detail' pk=case.pk %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

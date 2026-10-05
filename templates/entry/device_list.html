@@ -1,0 +1,88 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% block title %}{% trans "Entry devices" %}{% endblock %}
+
+{% block breadcrumbs %}
+  <nav aria-label="{% trans 'Breadcrumb' %}" class="asc-breadcrumbs">
+    <ol>
+      <li><a href="{% url 'registrations:ops-intake-list' %}">{% trans "Operations" %}</a>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><span><bdi>{{ event.name }}</bdi></span>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><span aria-current="page">{% trans "Entry devices" %}</span></li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <h1>{% trans "Entry devices" %}</h1>
+      <p>{% trans "Enrolled checkpoint browsers for this event: their gate scope, lifetime and last contact." %}</p>
+    </div>
+    {% if may_view_observability %}
+      <a class="btn btn-outline-primary" href="{% url 'entry:observability' event.pk %}">{% include "components/icon.html" with name="list" %}<span>{% trans "Entry observability" %}</span></a>
+    {% endif %}
+  </div>
+
+  <section class="asc-card" aria-labelledby="offline-event-heading" data-offline-event>
+    <h2 class="asc-section-title" id="offline-event-heading">{% include "components/icon.html" with name="cloud-off" %}{% trans "Offline continuity" %}</h2>
+    <p class="mb-2">
+      {% if not offline_globally_enabled %}
+        <span class="asc-chip asc-chip-outline" data-offline-event-state="GLOBAL_OFF">{% trans "Disabled on this platform" %}</span>
+      {% elif offline_effective %}
+        <span class="asc-chip asc-chip-success" data-offline-event-state="ON">{% trans "Enabled for this event" %}</span>
+      {% else %}
+        <span class="asc-chip asc-chip-outline" data-offline-event-state="OFF">{% trans "Disabled for this event" %}</span>
+      {% endif %}
+    </p>
+    <p class="asc-section-lead">{% trans "Offline continuity also requires an offline-capable device scope, deliberate preparation on the device, and a passed self-test. Only signed QR passes can be verified offline." %}</p>
+    {% if may_toggle_offline and offline_globally_enabled %}
+      <form method="post" action="{% url 'entry:event-offline-setting' event.pk %}" class="d-flex flex-wrap gap-2 align-items-end">
+        {% csrf_token %}
+        {% include "components/form_fields.html" with form=offline_setting_form %}
+        <button type="submit" class="btn {% if offline_event_enabled %}btn-outline-danger{% else %}btn-outline-primary{% endif %}"><span>{% if offline_event_enabled %}{% trans "Disable offline continuity" %}{% else %}{% trans "Enable offline continuity" %}{% endif %}</span></button>
+      </form>
+    {% endif %}
+  </section>
+
+  <section class="asc-card" aria-labelledby="devices-heading">
+    <h2 class="asc-section-title" id="devices-heading">{% include "components/icon.html" with name="tablet" %}{% trans "Devices" %}</h2>
+    <div class="asc-table-wrap">
+      <table class="asc-table">
+        <caption class="visually-hidden">{% trans "Entry devices" %}</caption>
+        <thead>
+          <tr>
+            <th scope="col">{% trans "Device" %}</th>
+            <th scope="col">{% trans "Status" %}</th>
+            <th scope="col">{% trans "Expires" %}</th>
+            <th scope="col">{% trans "Last seen" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for device in devices %}
+            <tr>
+              <td><a href="{% url 'entry:device-detail' device.public_id %}"><bdi>{{ device.public_name }}</bdi></a></td>
+              <td>{% include "entry/_device_status.html" with status=device.status label=device.get_status_display %}</td>
+              <td><time datetime="{{ device.expires_at|date:'c' }}">{{ device.expires_at|date:"Y-m-d H:i" }}</time></td>
+              <td>{% if device.last_seen_at %}<time datetime="{{ device.last_seen_at|date:'c' }}">{{ device.last_seen_at|date:"Y-m-d H:i" }}</time>{% else %}—{% endif %}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="4" class="asc-table-empty">{% trans "No entry devices registered." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {% if can_manage %}
+    <section class="asc-card" aria-labelledby="register-heading">
+      <h2 class="asc-section-title" id="register-heading">{% include "components/icon.html" with name="send" %}{% trans "Register a device" %}</h2>
+      <p class="asc-section-lead">{% trans "A one-time activation code is shown once after registration. Enter it on the physical device while signed in as a device administrator." %}</p>
+      {% include "components/error_summary.html" with form=form %}
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% include "components/form_fields.html" with form=form %}
+        <button type="submit" class="btn btn-primary"><span>{% trans "Register device" %}</span></button>
+      </form>
+    </section>
+  {% endif %}
+{% endblock %}

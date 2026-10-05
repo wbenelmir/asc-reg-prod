@@ -1,0 +1,5435 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-22 22:42+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\apps\accounts\forms\__init__.py:11 .\apps\accounts\forms\__init__.py:34
+msgid "Email address"
+msgstr ""
+
+#: .\apps\accounts\forms\__init__.py:18
+msgid "Verification code"
+msgstr ""
+
+#: .\apps\accounts\forms\__init__.py:28
+msgid "Enter the 6-digit code sent to your email."
+msgstr ""
+
+#: .\apps\accounts\forms\__init__.py:37
+msgid "Password"
+msgstr ""
+
+#: .\apps\accounts\middleware.py:43
+msgid "Your operational session has ended. Please sign in again."
+msgstr ""
+
+#: .\apps\accounts\participant_auth.py:115
+msgid "Your session has ended. Please verify your email again to continue."
+msgstr ""
+
+#: .\apps\accounts\views.py:44
+msgid "If this email address is valid, a verification code has been sent."
+msgstr ""
+
+#: .\apps\accounts\views.py:69 .\apps\accounts\views.py:95
+#: .\apps\accounts\views.py:100
+msgid "This code has expired. Request a new one."
+msgstr ""
+
+#: .\apps\accounts\views.py:94
+msgid "That code is not correct. Please try again."
+msgstr ""
+
+#: .\apps\accounts\views.py:97
+msgid "Too many incorrect attempts. Request a new code after a short wait."
+msgstr ""
+
+#: .\apps\accounts\views.py:99
+msgid "This code has already been used."
+msgstr ""
+
+#: .\apps\accounts\views.py:101
+msgid "This code could not be verified. Request a new one."
+msgstr ""
+
+#: .\apps\accounts\views.py:120 .\apps\accounts\views.py:212
+msgid "Your session has been extended."
+msgstr ""
+
+#: .\apps\accounts\views.py:182
+msgid "Incorrect email or password."
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:131
+msgid "Re-entry allowed"
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:132
+msgid "Single entry only"
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:175
+msgid "Allow"
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:176
+#: .\apps\invitations\models\__init__.py:40
+msgid "Deny"
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:180
+#: .\apps\entry\models\__init__.py:159
+msgid "Entry"
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:181
+#: .\apps\entry\models\__init__.py:160
+msgid "Exit"
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:182
+msgid "Entry or exit"
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:252
+#: .\templates\reviews\case_detail.html:179
+msgid "Current"
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:253
+msgid "Superseded"
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:254
+#: .\apps\badges\models\__init__.py:47 .\apps\badges\models\__init__.py:264
+#: .\apps\entry\models\__init__.py:50 .\apps\entry\models\__init__.py:399
+#: .\apps\invitations\models\__init__.py:102
+#: .\apps\invitations\models\__init__.py:202
+msgid "Revoked"
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:255
+#: .\apps\badges\models\__init__.py:265 .\apps\entry\models\__init__.py:51
+#: .\apps\invitations\models\__init__.py:35
+#: .\apps\invitations\models\__init__.py:103
+#: .\apps\invitations\models\__init__.py:201
+msgid "Expired"
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:459
+msgid "Participant role"
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:460
+#: .\templates\accreditation\registration_detail.html:56
+#: .\templates\accreditation\registration_detail.html:83
+#: .\templates\badges\print_batch_detail.html:18
+#: .\templates\badges\registration_badge_issuance.html:39
+#: .\templates\badges\registration_badge_issuance.html:157
+#: .\templates\badges\registration_credential.html:54
+#: .\templates\badges\stock_dashboard.html:61
+#: .\templates\badges\stock_dashboard.html:178
+#: .\templates\badges\stock_dashboard.html:225
+#: .\templates\badges\stock_dashboard.html:260
+#: .\templates\badges\stock_dashboard.html:288
+#: .\templates\entry\result.html:33
+msgid "Badge type"
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:461
+#: .\templates\badges\registration_credential.html:58
+msgid "Access profile"
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:462
+msgid "Access rule"
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:466
+msgid "Previewed"
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:467
+msgid "Executed"
+msgstr ""
+
+#: .\apps\accreditation\models\__init__.py:468
+#: .\apps\badges\models\stock.py:110 .\apps\badges\models\stock.py:216
+#: .\apps\reviews\models\__init__.py:57 .\apps\reviews\models\__init__.py:294
+#: .\templates\reviews\case_detail.html:47
+msgid "Cancelled"
+msgstr ""
+
+#: .\apps\accreditation\views.py:175 .\apps\accreditation\views.py:219
+msgid "Unknown assignment kind."
+msgstr ""
+
+#: .\apps\accreditation\views.py:208
+msgid "A current assignment already exists for this scope."
+msgstr ""
+
+#: .\apps\accreditation\views.py:210 .\apps\accreditation\views.py:212
+msgid "The effective date range is invalid."
+msgstr ""
+
+#: .\apps\accreditation\views.py:248
+msgid "Revocation requires a reason."
+msgstr ""
+
+#: .\apps\accreditation\views.py:260 .\apps\accreditation\views.py:304
+msgid "This assignment changed since you loaded it. Reload and retry."
+msgstr ""
+
+#: .\apps\accreditation\views.py:263
+msgid "This assignment is no longer active."
+msgstr ""
+
+#: .\apps\accreditation\views.py:343
+msgid "You are not authorized to bulk-assign this."
+msgstr ""
+
+#: .\apps\accreditation\views.py:376
+msgid "You are not authorized to execute this bulk operation."
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:39 .\apps\badges\forms\__init__.py:51
+#: .\apps\badges\forms\__init__.py:199 .\apps\badges\forms\__init__.py:261
+#: .\apps\entry\forms\__init__.py:41
+msgid "Invalid operation identifier."
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:131
+msgid "Invalid credential identifier."
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:144
+#: .\templates\badges\participant_pass_print.html:24
+#: .\templates\badges\participant_passes.html:41
+#: .\templates\badges\registration_credential.html:27
+msgid "Fallback reference"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:145
+msgid "Enter the full reference exactly as shown, for example ASC-7K4M-9PQR-3."
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:152
+#: .\templates\badges\verification_keys.html:25
+msgid "Key identifier"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:153
+msgid "Public key (PEM)"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:266
+#: .\templates\badges\stock_dashboard.html:26
+msgid "Code"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:267
+#: .\templates\badges\stock_dashboard.html:30
+msgid "Name (English)"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:268
+#: .\templates\badges\stock_dashboard.html:34
+msgid "Name (French)"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:269
+#: .\templates\badges\stock_dashboard.html:38
+msgid "Name (Arabic)"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:270
+msgid "Location type"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:274
+#: .\templates\badges\print_batch_detail.html:22
+#: .\templates\badges\stock_dashboard.html:233
+msgid "Planned quantity"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:275
+#: .\templates\badges\stock_dashboard.html:237
+msgid "Artwork version"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:277
+msgid "Supplier reference"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:280
+#: .\templates\badges\print_batch_detail.html:31
+#: .\templates\badges\print_batch_detail.html:89
+#: .\templates\badges\stock_dashboard.html:241
+msgid "Destination location"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:291
+#: .\templates\badges\print_batch_detail.html:76
+msgid "Produced quantity"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:292
+#: .\templates\badges\print_batch_detail.html:80
+msgid "Accepted quantity"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:293
+#: .\templates\badges\print_batch_detail.html:84
+msgid "Damaged quantity"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:303
+msgid "Produced quantity must equal accepted plus damaged quantity."
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:311
+#: .\templates\badges\stock_dashboard.html:290
+msgid "Quantity"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:312
+msgid "Note"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:320
+#: .\templates\badges\registration_badge_issuance.html:142
+msgid "Serial number (optional)"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:328
+#: .\templates\badges\registration_badge_issuance.html:69
+msgid "The original badge is being returned to stock"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:352
+msgid "Quantity change"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:359
+msgid "The quantity change cannot be zero."
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:365
+msgid "Counted quantity"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:377
+msgid "Quantity to allocate"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:379
+msgid "Allocation purpose"
+msgstr ""
+
+#: .\apps\badges\forms\__init__.py:381
+#: .\templates\badges\registration_badge_issuance.html:78
+#: .\templates\badges\registration_badge_issuance.html:94
+#: .\templates\badges\registration_badge_issuance.html:104
+#: .\templates\badges\registration_badge_issuance.html:114
+#: .\templates\badges\registration_credential.html:94
+#: .\templates\badges\registration_credential.html:112
+#: .\templates\badges\registration_credential.html:130
+#: .\templates\badges\registration_credential.html:146
+#: .\templates\badges\stock_dashboard.html:204
+msgid "Notes (optional)"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:44
+#: .\apps\invitations\models\__init__.py:199
+#: .\apps\invitations\models\__init__.py:288
+msgid "Pending"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:45 .\apps\badges\models\__init__.py:262
+#: .\apps\badges\models\stock.py:688 .\apps\entry\models\__init__.py:398
+#: .\apps\invitations\models\__init__.py:33
+#: .\apps\invitations\models\__init__.py:100
+#: .\templates\invitations\campaign_detail.html:44
+msgid "Active"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:46
+msgid "Retired"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:58
+msgid "Planned rotation"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:59
+msgid "Superseded by a newer key"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:60
+msgid "Suspected key compromise"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:61
+msgid "Confirmed key compromise"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:62
+msgid "Published in error"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:63
+msgid "Key provider migration"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:64 .\apps\badges\models\__init__.py:299
+#: .\apps\badges\models\stock.py:307 .\apps\badges\models\stock.py:455
+#: .\apps\entry\forms\__init__.py:161 .\apps\entry\models\__init__.py:394
+msgid "Other approved reason"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:261
+msgid "Inactive"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:263 .\apps\entry\models\__init__.py:49
+#: .\apps\invitations\models\__init__.py:34
+#: .\templates\invitations\campaign_detail.html:45
+msgid "Suspended"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:266 .\apps\badges\models\stock.py:282
+msgid "Replaced"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:289
+msgid "Initial issue"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:290
+msgid "Replacement issue"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:291
+msgid "Assignment changed"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:292 .\apps\badges\models\stock.py:304
+msgid "Participant request"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:293 .\apps\entry\forms\__init__.py:157
+#: .\apps\entry\models\__init__.py:391
+msgid "Security concern"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:294 .\apps\badges\models\stock.py:306
+#: .\apps\badges\models\stock.py:454 .\apps\entry\forms\__init__.py:160
+msgid "Administrative error"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:295
+msgid "Lost or compromised"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:296
+msgid "Registration closed"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:297
+msgid "Signing key compromise"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:298
+msgid "Validity period ended"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:481
+msgid "Generate"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:482
+msgid "Activate"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:483
+#: .\templates\entry\device_detail.html:54
+msgid "Suspend"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:484
+#: .\templates\entry\device_detail.html:62
+msgid "Resume"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:485
+#: .\templates\accreditation\registration_detail.html:31
+#: .\templates\accreditation\registration_detail.html:73
+#: .\templates\accreditation\registration_detail.html:109
+#: .\templates\accreditation\registration_detail.html:128
+msgid "Revoke"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:486
+msgid "Replace"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:487
+msgid "Expire"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:488
+msgid "Publish verification key"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:489
+msgid "Promote verification key"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:490
+msgid "Retire verification key"
+msgstr ""
+
+#: .\apps\badges\models\__init__.py:491
+msgid "Revoke verification key"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:37
+msgid "Central store"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:38
+msgid "Checkpoint"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:104 .\apps\invitations\models\__init__.py:32
+#: .\apps\registrations\models\__init__.py:39
+#: .\apps\reviews\models\__init__.py:289
+msgid "Draft"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:105
+msgid "Ready for production"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:106
+msgid "In production"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:107
+msgid "Received"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:108
+msgid "Reconciled"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:109 .\apps\invitations\models\__init__.py:36
+#: .\apps\registrations\models\__init__.py:63
+#: .\apps\reviews\models\__init__.py:293
+#: .\templates\invitations\campaign_detail.html:46
+msgid "Closed"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:215 .\apps\reviews\models\__init__.py:56
+#: .\templates\reviews\case_detail.html:46
+msgid "Completed"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:281
+#: .\templates\badges\registration_badge_issuance.html:47
+#: .\templates\badges\registration_badge_issuance.html:159
+#: .\templates\badges\registration_credential.html:172
+msgid "Issued"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:283
+msgid "Returned"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:284
+msgid "Reported lost"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:285
+msgid "Voided"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:300
+msgid "Initial handover"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:301
+msgid "Wrong badge type issued"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:302
+msgid "Physical badge damaged"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:303
+msgid "Physical badge lost"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:305
+msgid "Returned at end of event"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:442
+msgid "Receive"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:443
+msgid "Transfer out"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:444
+msgid "Transfer in"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:445
+#: .\templates\badges\registration_badge_issuance.html:145
+msgid "Issue"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:446
+msgid "Return"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:447
+msgid "Reasoned adjustment"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:448
+msgid "Reconciliation"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:452
+msgid "Damaged while in stock"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:453
+msgid "Manual count correction"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:689
+msgid "Fully consumed"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:690
+msgid "Released"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:700
+msgid "Checkpoint opening stock"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:701
+msgid "Shift reserve"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:702
+msgid "Delegation collection"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:703
+msgid "Protocol reserve"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:704
+msgid "Operational buffer"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:705
+msgid "Other approved purpose"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:852
+msgid "Create stock location"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:853
+msgid "Create print batch"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:854
+msgid "Change print batch status"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:855
+msgid "Receive print batch"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:856
+msgid "Transfer stock"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:857
+msgid "Allocate stock"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:858
+msgid "Release stock allocation"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:859
+msgid "Issue badge"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:860
+msgid "Replace issued badge"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:861
+msgid "Return issued badge"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:862
+msgid "Mark issued badge lost"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:863
+#: .\templates\badges\registration_badge_issuance.html:116
+msgid "Void issuance"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:864
+msgid "Reasoned stock adjustment"
+msgstr ""
+
+#: .\apps\badges\models\stock.py:865
+msgid "Record stock reconciliation"
+msgstr ""
+
+#: .\apps\badges\views.py:159
+msgid "Your entry pass has been prepared and is not yet active."
+msgstr ""
+
+#: .\apps\badges\views.py:161
+msgid "Your entry pass is active."
+msgstr ""
+
+#: .\apps\badges\views.py:163
+msgid ""
+"Your entry pass is temporarily on hold. Please contact the accreditation "
+"desk."
+msgstr ""
+
+#: .\apps\badges\views.py:166
+msgid ""
+"Your entry pass is no longer valid. Please contact the accreditation desk."
+msgstr ""
+
+#: .\apps\badges\views.py:168
+msgid "Your entry pass validity period has ended."
+msgstr ""
+
+#: .\apps\badges\views.py:175
+msgid "Your entry pass is active, but its validity period has not started yet."
+msgstr ""
+
+#: .\apps\badges\views.py:269 .\apps\badges\views.py:305
+#: .\apps\badges\views.py:427 .\apps\badges\views.py:556
+#: .\apps\badges\views.py:584 .\apps\badges\views.py:932
+#: .\apps\badges\views.py:963 .\apps\badges\views.py:1020
+#: .\apps\badges\views.py:1052 .\apps\badges\views.py:1095
+#: .\apps\badges\views.py:1136 .\apps\badges\views.py:1176
+#: .\apps\badges\views.py:1212 .\apps\badges\views.py:1245
+#: .\apps\badges\views.py:1341 .\apps\badges\views.py:1404
+#: .\apps\entry\views.py:800 .\apps\entry\views.py:829
+#: .\apps\entry\views.py:855
+msgid "Invalid request. Reload the page and try again."
+msgstr ""
+
+#: .\apps\badges\views.py:280
+#, python-format
+msgid ""
+"This registration cannot receive an entry pass yet (reason: %(reason)s). A "
+"current Participant Role, Badge Type and Access Profile assignment are all "
+"required first."
+msgstr ""
+
+#: .\apps\badges\views.py:292 .\apps\badges\views.py:324
+#: .\apps\badges\views.py:448
+msgid "This request was already processed."
+msgstr ""
+
+#: .\apps\badges\views.py:294
+msgid "Entry pass generated."
+msgstr ""
+
+#: .\apps\badges\views.py:310
+msgid "This entry pass changed since you loaded it. Reload and try again."
+msgstr ""
+
+#: .\apps\badges\views.py:317 .\apps\badges\views.py:564
+#: .\apps\badges\views.py:596 .\apps\badges\views.py:629
+#: .\apps\badges\views.py:949 .\apps\badges\views.py:984
+#: .\apps\badges\views.py:1035 .\apps\badges\views.py:1077
+#: .\apps\badges\views.py:1118 .\apps\badges\views.py:1156
+#: .\apps\badges\views.py:1193 .\apps\badges\views.py:1227
+#: .\apps\badges\views.py:1261 .\apps\badges\views.py:1389
+#: .\apps\badges\views.py:1413
+msgid "That operation identifier was already used for a different command."
+msgstr ""
+
+#: .\apps\badges\views.py:346
+msgid "Entry pass activated."
+msgstr ""
+
+#: .\apps\badges\views.py:369
+msgid "Entry pass suspended."
+msgstr ""
+
+#: .\apps\badges\views.py:392
+msgid "Entry pass resumed."
+msgstr ""
+
+#: .\apps\badges\views.py:415
+msgid "Entry pass revoked."
+msgstr ""
+
+#: .\apps\badges\views.py:441
+msgid "This entry pass is no longer the current one. Reload and try again."
+msgstr ""
+
+#: .\apps\badges\views.py:450
+msgid "Entry pass replaced."
+msgstr ""
+
+#: .\apps\badges\views.py:524
+msgid "Verification key published."
+msgstr ""
+
+#: .\apps\badges\views.py:561
+msgid "Verification key promoted."
+msgstr ""
+
+#: .\apps\badges\views.py:593
+msgid "Verification key retired."
+msgstr ""
+
+#: .\apps\badges\views.py:617
+msgid "A reason is required to revoke a verification key."
+msgstr ""
+
+#: .\apps\badges\views.py:626
+msgid "Verification key revoked."
+msgstr ""
+
+#: .\apps\badges\views.py:951
+msgid "Stock location created."
+msgstr ""
+
+#: .\apps\badges\views.py:989
+msgid "Print batch created."
+msgstr ""
+
+#: .\apps\badges\views.py:1031 .\apps\badges\views.py:1073
+msgid "This print batch changed since you loaded it. Reload and try again."
+msgstr ""
+
+#: .\apps\badges\views.py:1040
+msgid "Print batch status updated."
+msgstr ""
+
+#: .\apps\badges\views.py:1082
+msgid "Print batch received into stock."
+msgstr ""
+
+#: .\apps\badges\views.py:1123
+msgid "Stock transferred."
+msgstr ""
+
+#: .\apps\badges\views.py:1161
+msgid "Stock adjustment recorded."
+msgstr ""
+
+#: .\apps\badges\views.py:1198
+msgid "Stock allocated."
+msgstr ""
+
+#: .\apps\badges\views.py:1223
+msgid "This allocation changed since you loaded it. Reload and try again."
+msgstr ""
+
+#: .\apps\badges\views.py:1232
+msgid "Allocation released."
+msgstr ""
+
+#: .\apps\badges\views.py:1266
+msgid "Reconciliation recorded."
+msgstr ""
+
+#: .\apps\badges\views.py:1394
+msgid "Physical badge issued."
+msgstr ""
+
+#: .\apps\badges\views.py:1409
+msgid "This badge issuance changed since you loaded it. Reload and try again."
+msgstr ""
+
+#: .\apps\badges\views.py:1455
+msgid "Physical badge replaced."
+msgstr ""
+
+#: .\apps\badges\views.py:1478
+msgid "Physical badge returned."
+msgstr ""
+
+#: .\apps\badges\views.py:1500
+msgid "Physical badge reported lost."
+msgstr ""
+
+#: .\apps\badges\views.py:1522
+msgid "Badge issuance voided."
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:51
+#: .\templates\entry\_checkpoint_header.html:6
+#: .\templates\entry\monitor.html:14
+msgid "Zone"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:66
+msgid "Scan the Digital Entry Pass QR code"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:73
+#: .\apps\registrations\forms\__init__.py:117
+#: .\templates\registrations\step_identity.html:17
+msgid "Identity document"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:82
+msgid "Number"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:88
+msgid "Passport issuing country (2-letter code)"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:95
+msgid "The issuing country is required for a passport."
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:102
+msgid "Registration reference or pass fallback reference"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:110 .\templates\entry\result.html:31
+#: .\templates\invitations\workspace_dashboard.html:19
+#: .\templates\registrations\ops_intake_detail.html:29
+#: .\templates\registrations\step_review.html:17
+msgid "Name"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:122
+msgid "Invalid selection."
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:139 .\templates\entry\result.html:81
+msgid "Override reason"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:143 .\templates\entry\result.html:85
+msgid "Note (recorded encrypted)"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:156
+msgid "Lost or stolen"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:158
+msgid "Maintenance"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:159
+msgid "Reassigned"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:171
+#: .\templates\entry\_checkpoint_header.html:5
+#: .\templates\entry\checkpoint_setup.html:12
+#: .\templates\entry\device_detail.html:16
+msgid "Gate"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:173 .\templates\entry\device_detail.html:17
+msgid "Permitted zones"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:176
+msgid "Permitted verification methods"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:195
+msgid "Device name"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:199
+msgid "Enrollment expires at"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:202 .\apps\entry\forms\__init__.py:207
+#: .\apps\entry\forms\__init__.py:217 .\apps\reviews\forms.py:91
+#: .\apps\reviews\forms.py:105 .\apps\reviews\forms.py:140
+#: .\templates\accreditation\bulk_preview.html:20
+#: .\templates\accreditation\bulk_preview.html:30
+#: .\templates\accreditation\bulk_result.html:7
+#: .\templates\accreditation\registration_detail.html:24
+#: .\templates\accreditation\registration_detail.html:30
+#: .\templates\accreditation\registration_detail.html:66
+#: .\templates\accreditation\registration_detail.html:72
+#: .\templates\accreditation\registration_detail.html:103
+#: .\templates\accreditation\registration_detail.html:108
+#: .\templates\accreditation\registration_detail.html:122
+#: .\templates\accreditation\registration_detail.html:127
+#: .\templates\accreditation\registration_detail.html:139
+#: .\templates\accreditation\registration_detail.html:146
+#: .\templates\badges\registration_badge_issuance.html:72
+#: .\templates\badges\registration_badge_issuance.html:88
+#: .\templates\badges\registration_credential.html:88
+#: .\templates\badges\registration_credential.html:106
+#: .\templates\badges\registration_credential.html:124
+#: .\templates\badges\registration_credential.html:140
+#: .\templates\entry\monitor.html:45 .\templates\entry\result.html:58
+#: .\templates\exports\workspace.html:35
+#: .\templates\reviews\case_detail.html:27
+#: .\templates\reviews\case_detail.html:147
+msgid "Reason"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:220
+msgid "Details"
+msgstr ""
+
+#: .\apps\entry\forms\__init__.py:226
+msgid "Activation code"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:47
+msgid "Pending enrollment"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:48 .\templates\entry\device_detail.html:10
+msgid "Enrolled"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:57 .\templates\entry\verify.html:12
+msgid "Digital Entry Pass QR"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:58
+msgid "National identity number"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:59
+#: .\apps\registrations\forms\__init__.py:125
+msgid "Passport number"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:60
+#: .\templates\badges\fallback_lookup.html:32
+#: .\templates\badges\registration_badge_issuance.html:17
+#: .\templates\badges\registration_credential.html:22
+#: .\templates\entry\result.html:32 .\templates\entry\verify.html:36
+msgid "Registration reference"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:61 .\templates\entry\verify.html:47
+msgid "Controlled manual search"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:77
+msgid "Allowed"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:78
+msgid "Allowed with advisory"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:79
+msgid "Manual review required"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:80
+msgid "Denied"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:81
+msgid "Stale credential or verification"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:82 .\apps\entry\views.py:141
+msgid "Unsupported credential"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:83 .\apps\entry\models\__init__.py:118
+msgid "Technical error"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:93
+msgid "No reason"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:94
+msgid "Previously admitted"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:95
+msgid "Very recent previous admission"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:96
+msgid "Credential not valid"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:97
+msgid "No matching approved registration"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:98
+msgid "Credential format not supported"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:99
+msgid "Credential belongs to another event"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:100
+msgid "Registration not approved"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:101
+msgid "Security restriction"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:102
+msgid "Security review required"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:103
+msgid "Pass revoked"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:104
+msgid "Pass replaced by a newer version"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:105
+msgid "Pass suspended"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:106
+msgid "Pass not yet activated"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:107
+msgid "Pass validity ended"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:108
+msgid "Pass validity not started"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:109
+msgid "No active pass"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:110
+msgid "Assignment changed since pass issue"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:111
+msgid "No current access assignment"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:112
+msgid "Outside the access time window"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:113
+msgid "Not permitted at this checkpoint"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:114
+msgid "Checkpoint closed for this access profile"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:115
+msgid "Single-entry access already used"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:116
+msgid "Identity reference not verified"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:117
+msgid "Verification expired; verify again"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:143 .\templates\entry\result.html:51
+msgid "Admit"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:144 .\apps\entry\views.py:140
+#: .\templates\entry\result.html:63
+msgid "Do not admit"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:145
+msgid "Redirected"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:151 .\templates\entry\result.html:60
+msgid "Follows the verification result"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:152
+msgid "Person does not match the record"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:153
+msgid "Sent to the review desk"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:154
+msgid "Sent to a permitted checkpoint"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:155
+msgid "Participant left the checkpoint"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:386
+msgid "Deny entry"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:387
+msgid "Require manual review"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:392
+msgid "Identity dispute"
+msgstr ""
+
+#: .\apps\entry\models\__init__.py:393
+msgid "Accreditation hold"
+msgstr ""
+
+#: .\apps\entry\views.py:122
+msgid "This browser is not an enrolled, active entry device."
+msgstr ""
+
+#: .\apps\entry\views.py:123
+msgid "This device has no checkpoint scope."
+msgstr ""
+
+#: .\apps\entry\views.py:124
+msgid "Set up the checkpoint to start verifying."
+msgstr ""
+
+#: .\apps\entry\views.py:125
+msgid "The checkpoint session has ended. Set it up again."
+msgstr ""
+
+#: .\apps\entry\views.py:127
+msgid "This device's scope was changed. Set up the checkpoint again."
+msgstr ""
+
+#: .\apps\entry\views.py:129
+msgid "Your checkpoint session has ended. Start it again."
+msgstr ""
+
+#: .\apps\entry\views.py:130
+msgid "You are no longer authorized at this checkpoint."
+msgstr ""
+
+#: .\apps\entry\views.py:136
+msgid "Verified"
+msgstr ""
+
+#: .\apps\entry\views.py:137
+msgid "Verified — advisory"
+msgstr ""
+
+#: .\apps\entry\views.py:138
+msgid "Manual verification required"
+msgstr ""
+
+#: .\apps\entry\views.py:139
+msgid "Outdated credential or verification"
+msgstr ""
+
+#: .\apps\entry\views.py:142
+msgid "Technical error — verify again"
+msgstr ""
+
+#: .\apps\entry\views.py:188
+msgid "Online"
+msgstr ""
+
+#: .\apps\entry\views.py:366
+msgid "Enter a value to verify."
+msgstr ""
+
+#: .\apps\entry\views.py:371 .\apps\entry\views.py:443
+msgid "This lookup method is not permitted here."
+msgstr ""
+
+#: .\apps\entry\views.py:427
+msgid "Invalid selection. Verify again."
+msgstr ""
+
+#: .\apps\entry\views.py:432
+msgid "This selection has expired. Verify again."
+msgstr ""
+
+#: .\apps\entry\views.py:448
+msgid "Entry recorded: admitted."
+msgstr ""
+
+#: .\apps\entry\views.py:449
+msgid "Entry recorded: not admitted."
+msgstr ""
+
+#: .\apps\entry\views.py:450
+msgid "Entry recorded: redirected."
+msgstr ""
+
+#: .\apps\entry\views.py:459 .\apps\entry\views.py:496
+msgid "Invalid request. Verify again."
+msgstr ""
+
+#: .\apps\entry\views.py:462 .\apps\entry\views.py:499
+msgid "This verification has expired. Verify again."
+msgstr ""
+
+#: .\apps\entry\views.py:473 .\apps\entry\views.py:510
+msgid "The situation changed or the verification expired. Verify again."
+msgstr ""
+
+#: .\apps\entry\views.py:477 .\apps\entry\views.py:514
+msgid "This verification was already used for a different decision."
+msgstr ""
+
+#: .\apps\entry\views.py:479
+msgid "You are not authorized to record entry here."
+msgstr ""
+
+#: .\apps\entry\views.py:481
+msgid "This result does not permit admission."
+msgstr ""
+
+#: .\apps\entry\views.py:485 .\apps\entry\views.py:522
+msgid "This decision was already recorded."
+msgstr ""
+
+#: .\apps\entry\views.py:516
+msgid "You are not authorized to override here."
+msgstr ""
+
+#: .\apps\entry\views.py:518
+msgid "This result cannot be overridden with that reason."
+msgstr ""
+
+#: .\apps\entry\views.py:524
+msgid "Override recorded: admitted."
+msgstr ""
+
+#: .\apps\entry\views.py:575
+msgid "You are not authorized to view this monitor."
+msgstr ""
+
+#: .\apps\entry\views.py:602
+msgid "Your checkpoint session has ended."
+msgstr ""
+
+#: .\apps\entry\views.py:616
+msgid "You are not authorized to enroll entry devices."
+msgstr ""
+
+#: .\apps\entry\views.py:626
+msgid "This activation code cannot be used."
+msgstr ""
+
+#: .\apps\entry\views.py:641
+#, python-format
+msgid "This browser is now enrolled as entry device “%(name)s”. Sign out now."
+msgstr ""
+
+#: .\apps\entry\views.py:712 .\apps\entry\views.py:786
+#: .\apps\entry\views.py:865
+msgid "You are not authorized to manage entry devices."
+msgstr ""
+
+#: .\apps\entry\views.py:784 .\apps\entry\views.py:863
+msgid "This device changed since you loaded it. Reload and retry."
+msgstr ""
+
+#: .\apps\entry\views.py:817
+msgid "Device suspended."
+msgstr ""
+
+#: .\apps\entry\views.py:818
+msgid "Device resumed."
+msgstr ""
+
+#: .\apps\entry\views.py:819
+msgid "Device revoked."
+msgstr ""
+
+#: .\apps\entry\views.py:844
+msgid "Device scope updated. Its open checkpoint sessions were ended."
+msgstr ""
+
+#: .\apps\exports\views.py:69
+msgid "You are not authorized to request an export for this scope."
+msgstr ""
+
+#: .\apps\exports\views.py:92
+msgid "Select an approved export purpose."
+msgstr ""
+
+#: .\apps\exports\views.py:95
+msgid "A reason is required to request an export."
+msgstr ""
+
+#: .\apps\exports\views.py:98
+msgid "Export generated."
+msgstr ""
+
+#: .\apps\invitations\forms\__init__.py:12
+msgid "Campaign name"
+msgstr ""
+
+#: .\apps\invitations\forms\__init__.py:13
+#: .\templates\badges\participant_pass_print.html:26
+#: .\templates\badges\participant_passes.html:43
+#: .\templates\badges\registration_credential.html:62
+msgid "Valid from"
+msgstr ""
+
+#: .\apps\invitations\forms\__init__.py:14
+#: .\templates\badges\participant_pass_print.html:28
+#: .\templates\badges\participant_passes.html:45
+#: .\templates\badges\registration_credential.html:66
+msgid "Valid until"
+msgstr ""
+
+#: .\apps\invitations\forms\__init__.py:15
+#: .\templates\invitations\campaign_detail.html:10
+msgid "Capacity"
+msgstr ""
+
+#: .\apps\invitations\forms\__init__.py:17
+msgid "Default language"
+msgstr ""
+
+#: .\apps\invitations\forms\__init__.py:27
+msgid "The end date must be after the start date."
+msgstr ""
+
+#: .\apps\invitations\forms\__init__.py:32
+msgid "Delegation CSV file"
+msgstr ""
+
+#: .\apps\invitations\forms\__init__.py:39
+msgid "The uploaded file is too large."
+msgstr ""
+
+#: .\apps\invitations\forms\__init__.py:44
+msgid "Participant's email address"
+msgstr ""
+
+#: .\apps\invitations\models\__init__.py:41
+msgid "Offer open registration"
+msgstr ""
+
+#: .\apps\invitations\models\__init__.py:101
+msgid "Rotated"
+msgstr ""
+
+#: .\apps\invitations\models\__init__.py:151
+msgid "Draft created"
+msgstr ""
+
+#: .\apps\invitations\models\__init__.py:152
+#: .\apps\registrations\models\__init__.py:40
+#: .\apps\reviews\models\__init__.py:292
+msgid "Submitted"
+msgstr ""
+
+#: .\apps\invitations\models\__init__.py:200
+msgid "Claimed"
+msgstr ""
+
+#: .\apps\invitations\models\__init__.py:245
+msgid "Uploaded"
+msgstr ""
+
+#: .\apps\invitations\models\__init__.py:246
+msgid "Validated"
+msgstr ""
+
+#: .\apps\invitations\models\__init__.py:247
+msgid "Applying"
+msgstr ""
+
+#: .\apps\invitations\models\__init__.py:248
+#: .\apps\invitations\models\__init__.py:291
+#: .\templates\invitations\delegation_detail.html:10
+msgid "Applied"
+msgstr ""
+
+#: .\apps\invitations\models\__init__.py:249
+#: .\apps\invitations\models\__init__.py:302
+msgid "Failed"
+msgstr ""
+
+#: .\apps\invitations\models\__init__.py:289
+msgid "Valid"
+msgstr ""
+
+#: .\apps\invitations\models\__init__.py:290
+msgid "Invalid"
+msgstr ""
+
+#: .\apps\invitations\models\__init__.py:300
+#: .\apps\reviews\models\__init__.py:52
+msgid "Queued"
+msgstr ""
+
+#: .\apps\invitations\models\__init__.py:301
+#: .\apps\reviews\models\__init__.py:290
+msgid "Sent"
+msgstr ""
+
+#: .\apps\invitations\views.py:55
+#: .\templates\invitations\invitation_unavailable.html:6
+msgid ""
+"This invitation link is not available. It may be invalid, expired, or no "
+"longer active."
+msgstr ""
+
+#: .\apps\invitations\views.py:343 .\apps\invitations\views.py:484
+#: .\apps\invitations\views.py:602
+msgid "No event edition is currently open."
+msgstr ""
+
+#: .\apps\invitations\views.py:443
+msgid "That status change is not allowed from the current status."
+msgstr ""
+
+#: .\apps\invitations\views.py:468
+msgid "This campaign has no active link to rotate."
+msgstr ""
+
+#: .\apps\organizations\models\__init__.py:21
+msgid "Ministry"
+msgstr ""
+
+#: .\apps\organizations\models\__init__.py:22
+msgid "Public body"
+msgstr ""
+
+#: .\apps\organizations\models\__init__.py:23
+msgid "Company"
+msgstr ""
+
+#: .\apps\organizations\models\__init__.py:24
+msgid "Startup"
+msgstr ""
+
+#: .\apps\organizations\models\__init__.py:25
+msgid "Institution"
+msgstr ""
+
+#: .\apps\organizations\models\__init__.py:26
+#: .\apps\reviews\models\__init__.py:313
+msgid "Other"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:18
+msgid "Algerian national identity number (NIN)"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:19
+msgid "Foreign passport"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:103
+msgid "Given name(s)"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:104
+msgid "Family name"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:106
+#: .\templates\registrations\step_review.html:19
+msgid "Date of birth"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:111
+#: .\templates\registrations\ops_intake_detail.html:31
+#: .\templates\registrations\step_review.html:21
+msgid "Nationality"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:114
+#: .\templates\registrations\step_review.html:23
+msgid "Country of residence"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:120
+msgid "National identity number (18 digits)"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:123
+msgid "Enter your 18-digit NIN exactly as printed."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:127
+msgid "Issuing country"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:132
+msgid "Passport expiry date"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:151
+msgid "Passport identity page"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:154
+msgid ""
+"Optional. A photo or scan of the passport identity page only -- JPEG or PNG, "
+"up to the size shown below. Never a full passport, visa, or other document. "
+"Uploading a new file replaces any previous one; there is no separate removal "
+"step in this phase."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:164
+msgid "Enter a date of birth in the past."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:175
+msgid "The NIN path is only available for Algerian nationals."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:179
+msgid "Enter your 18-digit NIN using digits only."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:193
+msgid "The passport identity page is only requested on the passport path."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:197
+msgid "Enter your passport number."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:199
+msgid "Select the issuing country."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:202
+msgid "Enter the passport expiry date."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:205
+msgid "Enter a passport expiry date in the future."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:212
+#: .\apps\registrations\forms\__init__.py:321
+msgid "Upload a JPEG or PNG image."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:218
+msgid "Mobile country code"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:222
+msgid "Mobile number"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:244
+#: .\templates\registrations\step_contact.html:9
+msgid "A mobile number is required for participants registering from Algeria."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:249
+msgid "Select the mobile country code."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:257
+msgid "Enter a valid mobile number for the selected country."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:279
+msgid "Professional organization"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:281
+#: .\templates\registrations\step_review.html:40
+msgid "Organization type"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:283
+#: .\templates\registrations\ops_intake_detail.html:45
+#: .\templates\registrations\step_review.html:42
+msgid "Job title"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:284
+#: .\templates\registrations\step_review.html:44
+msgid "Department"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:286
+msgid "Sector"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:289
+msgid "Organization country"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:292
+msgid "Organization website"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:295
+msgid "Professional profile URL"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:298
+msgid "For example, a LinkedIn profile or personal professional page."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:301
+msgid "Short professional biography"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:306
+msgid "Profile photograph"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:308
+msgid ""
+"JPEG or PNG only. Used only for your professional profile, never public."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:331
+msgid "Areas of interest"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:337
+msgid "What do you hope to achieve at this event?"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:342
+msgid "Accessibility or operational needs"
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:346
+msgid "Optional. Tell us about any support you need to participate fully."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:371
+msgid "I acknowledge the Privacy Notice."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:372
+msgid "I accept the Registration Terms."
+msgstr ""
+
+#: .\apps\registrations\forms\__init__.py:374
+msgid "I would like to receive optional communications about future editions."
+msgstr ""
+
+#: .\apps\registrations\models\__init__.py:31
+msgid "Open"
+msgstr ""
+
+#: .\apps\registrations\models\__init__.py:32
+msgid "Invitation"
+msgstr ""
+
+#: .\apps\registrations\models\__init__.py:33
+msgid "Delegation"
+msgstr ""
+
+#: .\apps\registrations\models\__init__.py:34
+msgid "On behalf"
+msgstr ""
+
+#: .\apps\registrations\models\__init__.py:35
+msgid "On site"
+msgstr ""
+
+#: .\apps\registrations\models\__init__.py:41
+msgid "Under review"
+msgstr ""
+
+#: .\apps\registrations\models\__init__.py:44
+msgid "Additional information required"
+msgstr ""
+
+#: .\apps\registrations\models\__init__.py:46
+#: .\apps\reviews\models\__init__.py:546
+msgid "Approved"
+msgstr ""
+
+#: .\apps\registrations\models\__init__.py:47
+#: .\apps\reviews\models\__init__.py:547
+msgid "Not approved"
+msgstr ""
+
+#: .\apps\registrations\models\__init__.py:48
+msgid "Withdrawn"
+msgstr ""
+
+#: .\apps\registrations\models\__init__.py:56
+msgid "Pending assignment"
+msgstr ""
+
+#: .\apps\registrations\models\__init__.py:57
+#: .\apps\reviews\models\__init__.py:53
+msgid "Assigned"
+msgstr ""
+
+#: .\apps\registrations\models\__init__.py:58
+msgid "Verification pending"
+msgstr ""
+
+#: .\apps\registrations\models\__init__.py:59
+msgid "Duplicate review"
+msgstr ""
+
+#: .\apps\registrations\models\__init__.py:60
+msgid "Review in progress"
+msgstr ""
+
+#: .\apps\registrations\models\__init__.py:61
+msgid "Awaiting applicant"
+msgstr ""
+
+#: .\apps\registrations\models\__init__.py:62
+msgid "Qualification complete"
+msgstr ""
+
+#: .\apps\registrations\views.py:58
+msgid ""
+"Your account is not ready to submit a registration yet. Please contact "
+"support."
+msgstr ""
+
+#: .\apps\registrations\views.py:59
+msgid "Please complete all required identity information before continuing."
+msgstr ""
+
+#: .\apps\registrations\views.py:60
+msgid "Please provide the required contact information before continuing."
+msgstr ""
+
+#: .\apps\registrations\views.py:61
+msgid ""
+"Please complete all required professional information before continuing."
+msgstr ""
+
+#: .\apps\registrations\views.py:62
+msgid "Please select at least one interest and describe your objectives."
+msgstr ""
+
+#: .\apps\registrations\views.py:63
+msgid "Legal notices are not currently available. Please try again shortly."
+msgstr ""
+
+#: .\apps\registrations\views.py:214
+msgid "This file could not be accepted. Please try a different image."
+msgstr ""
+
+msgid "The file could not be checked for safety at the moment. Nothing was saved. Please try again in a few minutes."
+msgstr ""
+
+#: .\apps\registrations\views.py:223
+msgid "Please check the information provided and try again."
+msgstr ""
+
+#: .\apps\registrations\views.py:325
+msgid "This photograph could not be accepted. Please try a different image."
+msgstr ""
+
+#: .\apps\registrations\views.py:438
+msgid "This registration could not be completed. Please contact support."
+msgstr ""
+
+#: .\apps\reviews\forms.py:22
+msgid "Requested evidence document"
+msgstr ""
+
+#: .\apps\reviews\forms.py:26 .\templates\badges\stock_dashboard.html:179
+#: .\templates\communications\operations_messages.html:17
+#: .\templates\exports\workspace.html:28 .\templates\exports\workspace.html:46
+#: .\templates\reviews\information_request_detail.html:8
+msgid "Purpose"
+msgstr ""
+
+#: .\apps\reviews\forms.py:28
+msgid "Message (English)"
+msgstr ""
+
+#: .\apps\reviews\forms.py:31
+msgid "Message (French)"
+msgstr ""
+
+#: .\apps\reviews\forms.py:34
+msgid "Message (Arabic)"
+msgstr ""
+
+#: .\apps\reviews\forms.py:36
+msgid "Deadline"
+msgstr ""
+
+#: .\apps\reviews\forms.py:42 .\apps\reviews\models\__init__.py:396
+msgid "Field correction"
+msgstr ""
+
+#: .\apps\reviews\forms.py:43 .\apps\reviews\models\__init__.py:311
+#: .\apps\reviews\models\__init__.py:397
+msgid "Document upload"
+msgstr ""
+
+#: .\apps\reviews\forms.py:44 .\apps\reviews\models\__init__.py:312
+#: .\apps\reviews\models\__init__.py:398
+msgid "Clarification"
+msgstr ""
+
+#: .\apps\reviews\forms.py:46 .\templates\accreditation\bulk_preview.html:10
+msgid "Kind"
+msgstr ""
+
+#: .\apps\reviews\forms.py:48
+msgid "Field"
+msgstr ""
+
+#: .\apps\reviews\forms.py:50
+msgid "Document type"
+msgstr ""
+
+#: .\apps\reviews\forms.py:52
+msgid "Required"
+msgstr ""
+
+#: .\apps\reviews\forms.py:54
+msgid "Instructions (English)"
+msgstr ""
+
+#: .\apps\reviews\forms.py:57
+msgid "Instructions (French)"
+msgstr ""
+
+#: .\apps\reviews\forms.py:60
+msgid "Instructions (Arabic)"
+msgstr ""
+
+#: .\apps\reviews\forms.py:67
+msgid "A field is required for this item kind."
+msgstr ""
+
+#: .\apps\reviews\forms.py:69
+msgid "A document type is required for this item kind."
+msgstr ""
+
+#: .\apps\reviews\forms.py:77
+msgid "Checklist item"
+msgstr ""
+
+#: .\apps\reviews\forms.py:78 .\templates\entry\monitor.html:16
+#: .\templates\entry\monitor.html:44 .\templates\reviews\case_detail.html:59
+#: .\templates\reviews\case_detail.html:76
+msgid "Result"
+msgstr ""
+
+#: .\apps\reviews\forms.py:80 .\templates\reviews\case_detail.html:85
+msgid "Notes"
+msgstr ""
+
+#: .\apps\reviews\forms.py:85 .\apps\reviews\forms.py:117
+msgid "Internal note"
+msgstr ""
+
+#: .\apps\reviews\forms.py:89
+msgid "Assign to user"
+msgstr ""
+
+#: .\apps\reviews\forms.py:97
+msgid "Select a user to assign this case to."
+msgstr ""
+
+#: .\apps\reviews\forms.py:102 .\templates\reviews\case_detail.html:135
+#: .\templates\reviews\case_detail.html:179
+msgid "Outcome"
+msgstr ""
+
+#: .\apps\reviews\forms.py:115
+msgid "Internal reason code"
+msgstr ""
+
+#: .\apps\reviews\forms.py:120
+msgid "Participant-facing reason code"
+msgstr ""
+
+#: .\apps\reviews\forms.py:146 .\templates\entry\verify.html:52
+#: .\templates\invitations\organization_search.html:9
+#: .\templates\reviews\queue_list.html:8
+msgid "Search"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:31
+msgid "Standard"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:32 .\apps\reviews\models\__init__.py:44
+#: .\templates\registrations\_step_nav.html:4
+#: .\templates\registrations\ops_intake_detail.html:27
+#: .\templates\registrations\step_identity.html:3
+#: .\templates\registrations\step_review.html:11
+msgid "Identity"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:33 .\apps\reviews\models\__init__.py:45
+msgid "Duplicate"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:34 .\apps\reviews\models\__init__.py:46
+msgid "Restricted"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:35 .\apps\reviews\models\__init__.py:47
+msgid "Information response"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:43
+msgid "General"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:48
+msgid "Specialist"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:54
+#: .\templates\reviews\case_detail.html:44
+msgid "In progress"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:55
+#: .\templates\reviews\case_detail.html:45
+msgid "Waiting"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:227
+#: .\templates\reviews\case_detail.html:78
+msgid "Pass"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:228
+#: .\templates\reviews\case_detail.html:79
+msgid "Fail"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:229
+#: .\templates\reviews\case_detail.html:80
+msgid "Not applicable"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:230
+#: .\templates\reviews\case_detail.html:81
+msgid "Needs follow-up"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:291
+msgid "Response in progress"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:295
+msgid "Overdue"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:310
+msgid "Identity correction"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:498
+msgid "Same person, another context"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:499
+msgid "Accidental duplicate"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:500
+msgid "Different person"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:501
+msgid "Insufficient evidence"
+msgstr ""
+
+#: .\apps\reviews\models\__init__.py:502
+msgid "Escalated to restricted specialist"
+msgstr ""
+
+#: .\apps\reviews\views.py:264
+msgid "Select a valid user to assign."
+msgstr ""
+
+#: .\apps\reviews\views.py:279 .\apps\reviews\views.py:303
+msgid "This case changed since you loaded it. Reload and retry."
+msgstr ""
+
+#: .\apps\reviews\views.py:292
+msgid "That status is not valid."
+msgstr ""
+
+#: .\apps\reviews\views.py:316
+msgid "Please correct the checklist entry."
+msgstr ""
+
+#: .\apps\reviews\views.py:328
+msgid "No active checklist is defined for this case type."
+msgstr ""
+
+#: .\apps\reviews\views.py:342
+msgid "That checklist item is not part of the active checklist."
+msgstr ""
+
+#: .\apps\reviews\views.py:358
+msgid "The note could not be saved."
+msgstr ""
+
+#: .\apps\reviews\views.py:370
+msgid "Select a valid outcome."
+msgstr ""
+
+#: .\apps\reviews\views.py:430
+msgid "This Registration already has an active Information Request."
+msgstr ""
+
+#: .\apps\reviews\views.py:481 .\apps\reviews\views.py:505
+#: .\apps\reviews\views.py:524
+msgid "This request changed since you loaded it."
+msgstr ""
+
+#: .\apps\reviews\views.py:495
+msgid "A reason is required to cancel this request."
+msgstr ""
+
+#: .\apps\reviews\views.py:547 .\apps\reviews\views.py:583
+msgid "This registration changed since you loaded it."
+msgstr ""
+
+#: .\apps\reviews\views.py:573
+msgid "Invalid approval request. Reload the case and try again."
+msgstr ""
+
+#: .\apps\reviews\views.py:588
+msgid ""
+"This registration cannot be approved yet: a current Participant Role, Badge "
+"Type, and Access Profile assignment are all required first."
+msgstr ""
+
+#: .\apps\reviews\views.py:690
+msgid "This request is no longer accepting a response."
+msgstr ""
+
+#: .\apps\reviews\views.py:702
+msgid "Please complete every required requested item."
+msgstr ""
+
+#: .\apps\reviews\views.py:720
+msgid "One of the uploaded files could not be accepted."
+msgstr ""
+
+#: .\apps\reviews\views.py:734
+msgid "This request changed since you loaded it. Reload and retry."
+msgstr ""
+
+#: .\apps\reviews\views.py:736
+msgid "Your draft has been saved."
+msgstr ""
+
+#: .\apps\reviews\views.py:744
+msgid "The response is incomplete or no longer valid."
+msgstr ""
+
+#: .\apps\reviews\views.py:766
+msgid "This registration changed since you loaded it. Reload and retry."
+msgstr ""
+
+#: .\apps\reviews\views.py:768
+msgid "Your registration has been withdrawn."
+msgstr ""
+
+#: .\templates\accounts\operational_sign_in.html:3
+#: .\templates\accounts\operational_sign_in.html:5
+msgid "Operational sign-in"
+msgstr ""
+
+#: .\templates\accounts\operational_sign_in.html:14
+msgid "Sign in"
+msgstr ""
+
+#: .\templates\accounts\otp_request.html:3
+#: .\templates\invitations\invitation_unavailable.html:10
+msgid "Start registration"
+msgstr ""
+
+#: .\templates\accounts\otp_request.html:5
+msgid "Start your registration"
+msgstr ""
+
+#: .\templates\accounts\otp_request.html:6
+msgid ""
+"Enter your email address and we will send you a one-time verification code. "
+"No password is needed."
+msgstr ""
+
+#: .\templates\accounts\otp_request.html:13
+msgid "Send verification code"
+msgstr ""
+
+#: .\templates\accounts\otp_verify.html:3
+msgid "Enter verification code"
+msgstr ""
+
+#: .\templates\accounts\otp_verify.html:5
+msgid "Enter your verification code"
+msgstr ""
+
+#: .\templates\accounts\otp_verify.html:7
+#, python-format
+msgid "We sent a 6-digit code to %(email)s. It will expire shortly."
+msgstr ""
+
+#: .\templates\accounts\otp_verify.html:17
+msgid "Verify"
+msgstr ""
+
+#: .\templates\accounts\otp_verify.html:20
+msgid "Use a different email or request a new code"
+msgstr ""
+
+#: .\templates\accreditation\bulk_preview.html:3
+msgid "Bulk accreditation preview"
+msgstr ""
+
+#: .\templates\accreditation\bulk_preview.html:5
+msgid "Bulk accreditation assignment"
+msgstr ""
+
+#: .\templates\accreditation\bulk_preview.html:16
+msgid "Reference object id"
+msgstr ""
+
+#: .\templates\accreditation\bulk_preview.html:23
+msgid "Preview"
+msgstr ""
+
+#: .\templates\accreditation\bulk_preview.html:27
+#: .\templates\accreditation\bulk_preview.html:29
+msgid "Preview results"
+msgstr ""
+
+#: .\templates\accreditation\bulk_preview.html:28
+#, python-format
+msgid "%(count)s registration(s) will be affected."
+msgstr ""
+
+#: .\templates\accreditation\bulk_preview.html:30
+#: .\templates\accreditation\bulk_result.html:7
+msgid "Registration"
+msgstr ""
+
+#: .\templates\accreditation\bulk_preview.html:30
+msgid "Eligible"
+msgstr ""
+
+#: .\templates\accreditation\bulk_preview.html:33
+#: .\templates\accreditation\bulk_result.html:10
+#: .\templates\entry\monitor.html:29 .\templates\reviews\case_detail.html:182
+msgid "Yes"
+msgstr ""
+
+#: .\templates\accreditation\bulk_preview.html:33
+#: .\templates\accreditation\bulk_result.html:10
+#: .\templates\reviews\case_detail.html:182
+msgid "No"
+msgstr ""
+
+#: .\templates\accreditation\bulk_preview.html:39
+msgid "Execute this exact previewed scope"
+msgstr ""
+
+#: .\templates\accreditation\bulk_result.html:3
+msgid "Bulk accreditation result"
+msgstr ""
+
+#: .\templates\accreditation\bulk_result.html:5
+msgid "Bulk accreditation execution result"
+msgstr ""
+
+#: .\templates\accreditation\bulk_result.html:6
+msgid "Execution results"
+msgstr ""
+
+#: .\templates\accreditation\bulk_result.html:7
+msgid "Success"
+msgstr ""
+
+#: .\templates\accreditation\conflict.html:3
+#: .\templates\reviews\conflict.html:3
+msgid "Conflict"
+msgstr ""
+
+#: .\templates\accreditation\conflict.html:5
+#: .\templates\reviews\conflict.html:5
+msgid "This changed since you loaded it"
+msgstr ""
+
+#: .\templates\accreditation\conflict.html:7
+msgid "Back to operations"
+msgstr ""
+
+#: .\templates\accreditation\registration_detail.html:3
+#, python-format
+msgid "Accreditation: %(ref)s"
+msgstr ""
+
+#: .\templates\accreditation\registration_detail.html:5
+#, python-format
+msgid "Accreditation for %(ref)s"
+msgstr ""
+
+#: .\templates\accreditation\registration_detail.html:8
+msgid "Participant roles"
+msgstr ""
+
+#: .\templates\accreditation\registration_detail.html:9
+msgid "Current participant role assignments"
+msgstr ""
+
+#: .\templates\accreditation\registration_detail.html:10
+#: .\templates\accreditation\registration_detail.html:45
+msgid "Role"
+msgstr ""
+
+#: .\templates\accreditation\registration_detail.html:10
+msgid "Since"
+msgstr ""
+
+#: .\templates\accreditation\registration_detail.html:25
+#: .\templates\accreditation\registration_detail.html:67
+#: .\templates\accreditation\registration_detail.html:104
+#: .\templates\accreditation\registration_detail.html:123
+msgid "Change"
+msgstr ""
+
+#: .\templates\accreditation\registration_detail.html:37
+msgid "No current role assignment."
+msgstr ""
+
+#: .\templates\accreditation\registration_detail.html:50
+msgid "Assign role"
+msgstr ""
+
+#: .\templates\accreditation\registration_detail.html:58
+msgid "since"
+msgstr ""
+
+#: .\templates\accreditation\registration_detail.html:77
+msgid "No current badge type assignment."
+msgstr ""
+
+#: .\templates\accreditation\registration_detail.html:88
+msgid "Assign badge type"
+msgstr ""
+
+#: .\templates\accreditation\registration_detail.html:94
+msgid "Access profiles and rules"
+msgstr ""
+
+#: .\templates\accreditation\registration_detail.html:98
+msgid "Profile"
+msgstr ""
+
+#: .\templates\accreditation\registration_detail.html:117
+msgid "Rule"
+msgstr ""
+
+#: .\templates\accreditation\registration_detail.html:140
+msgid "Assign access profile"
+msgstr ""
+
+#: .\templates\accreditation\registration_detail.html:147
+msgid "Assign access rule"
+msgstr ""
+
+#: .\templates\badges\conflict.html:4
+msgid "Entry pass conflict"
+msgstr ""
+
+#: .\templates\badges\conflict.html:7
+msgid "This entry pass changed"
+msgstr ""
+
+#: .\templates\badges\conflict.html:12
+msgid ""
+"Reload the credential page to see the current state before trying again."
+msgstr ""
+
+#: .\templates\badges\fallback_lookup.html:13
+#: .\templates\badges\fallback_lookup.html:16
+msgid "Find an entry pass by reference"
+msgstr ""
+
+#: .\templates\badges\fallback_lookup.html:25 .\templates\entry\verify.html:29
+#: .\templates\entry\verify.html:40
+msgid "Look up"
+msgstr ""
+
+#: .\templates\badges\fallback_lookup.html:30
+msgid "Match found"
+msgstr ""
+
+#: .\templates\badges\fallback_lookup.html:37
+msgid "Open credential"
+msgstr ""
+
+#: .\templates\badges\fallback_lookup.html:40
+msgid ""
+"A reference match is not an entry decision. The full verification decision "
+"still applies."
+msgstr ""
+
+#: .\templates\badges\fallback_lookup.html:43
+msgid "No entry pass matches that reference."
+msgstr ""
+
+#: .\templates\badges\participant_pass_print.html:11
+msgid "Entry pass"
+msgstr ""
+
+#: .\templates\badges\participant_pass_print.html:17
+msgid "ASC 2026 entry pass"
+msgstr ""
+
+#: .\templates\badges\participant_pass_print.html:20
+#: .\templates\badges\registration_credential.html:24
+#: .\templates\communications\operations_messages.html:15
+#: .\templates\entry\checkpoint_setup.html:9
+#: .\templates\entry\device_detail.html:8
+#: .\templates\exports\workspace.html:45
+msgid "Event"
+msgstr ""
+
+#: .\templates\badges\participant_pass_print.html:22
+#: .\templates\badges\print_batch_detail.html:20
+#: .\templates\badges\registration_badge_issuance.html:33
+#: .\templates\badges\registration_badge_issuance.html:158
+#: .\templates\badges\registration_credential.html:43
+#: .\templates\badges\registration_credential.html:171
+#: .\templates\badges\stock_dashboard.html:261
+#: .\templates\badges\verification_keys.html:27
+#: .\templates\communications\operations_messages.html:19
+#: .\templates\entry\device_detail.html:7
+#: .\templates\entry\device_list.html:12
+#: .\templates\exports\workspace.html:47
+#: .\templates\invitations\campaign_detail.html:9
+#: .\templates\invitations\campaign_detail.html:40
+#: .\templates\invitations\delegation_detail.html:8
+#: .\templates\invitations\delegation_detail.html:27
+#: .\templates\invitations\workspace_dashboard.html:21
+#: .\templates\invitations\workspace_dashboard.html:48
+#: .\templates\registrations\confirmation.html:10
+#: .\templates\registrations\workspace.html:19
+#: .\templates\reviews\case_detail.html:9
+#: .\templates\reviews\information_request_detail.html:7
+#: .\templates\reviews\queue_list.html:30
+#: .\templates\reviews\queue_list.html:58
+msgid "Status"
+msgstr ""
+
+#: .\templates\badges\participant_pass_print.html:33
+#: .\templates\badges\participant_passes.html:50
+msgid "Entry pass QR code"
+msgstr ""
+
+#: .\templates\badges\participant_pass_print.html:36
+#: .\templates\badges\participant_passes.html:60
+msgid "QR code for your entry pass. Present it at the entry checkpoint."
+msgstr ""
+
+#: .\templates\badges\participant_pass_print.html:42
+#: .\templates\badges\participant_passes.html:74
+msgid "An entry pass QR code becomes available once your pass is active."
+msgstr ""
+
+#: .\templates\badges\participant_pass_print.html:47
+msgid ""
+"This pass proves credential integrity only. An operator may still ask you to "
+"confirm your identity."
+msgstr ""
+
+#: .\templates\badges\participant_pass_print.html:52
+msgid "Back to my entry passes"
+msgstr ""
+
+#: .\templates\badges\participant_passes.html:19
+#: .\templates\badges\participant_passes.html:22
+msgid "My entry passes"
+msgstr ""
+
+#: .\templates\badges\participant_passes.html:25
+msgid "You do not have an entry pass yet."
+msgstr ""
+
+#: .\templates\badges\participant_passes.html:65
+msgid "Present this QR code at the entry checkpoint. Do not share it."
+msgstr ""
+
+#: .\templates\badges\participant_passes.html:69
+msgid "Print entry pass"
+msgstr ""
+
+#: .\templates\badges\print_batch_detail.html:10
+#: .\templates\badges\print_batch_detail.html:13
+msgid "Print batch"
+msgstr ""
+
+#: .\templates\badges\print_batch_detail.html:16
+#: .\templates\badges\stock_dashboard.html:259
+#: .\templates\communications\operations_messages.html:16
+#: .\templates\entry\candidates.html:13
+#: .\templates\invitations\campaign_detail.html:7
+#: .\templates\invitations\workspace_dashboard.html:18
+#: .\templates\registrations\workspace.html:17
+#: .\templates\reviews\queue_list.html:55
+msgid "Reference"
+msgstr ""
+
+#: .\templates\badges\print_batch_detail.html:25
+msgid "Produced"
+msgstr ""
+
+#: .\templates\badges\print_batch_detail.html:27
+msgid "Accepted"
+msgstr ""
+
+#: .\templates\badges\print_batch_detail.html:29
+msgid "Damaged"
+msgstr ""
+
+#: .\templates\badges\print_batch_detail.html:36
+#: .\templates\badges\registration_credential.html:72
+#: .\templates\badges\stock_dashboard.html:66
+#: .\templates\badges\stock_dashboard.html:183
+#: .\templates\badges\verification_keys.html:29
+#: .\templates\entry\device_detail.html:34
+#: .\templates\invitations\workspace_dashboard.html:22
+#: .\templates\invitations\workspace_dashboard.html:50
+#: .\templates\registrations\ops_intake_list.html:16
+msgid "Actions"
+msgstr ""
+
+#: .\templates\badges\print_batch_detail.html:44
+msgid "Mark ready for production"
+msgstr ""
+
+#: .\templates\badges\print_batch_detail.html:51
+#: .\templates\badges\print_batch_detail.html:67
+msgid "Cancel batch"
+msgstr ""
+
+#: .\templates\badges\print_batch_detail.html:60
+msgid "Start production"
+msgstr ""
+
+#: .\templates\badges\print_batch_detail.html:98
+msgid "Record receipt"
+msgstr ""
+
+#: .\templates\badges\print_batch_detail.html:102
+msgid ""
+"Only the accepted quantity is added to stock. Units recorded as damaged "
+"never enter the ledger."
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:11
+#: .\templates\badges\registration_badge_issuance.html:14
+msgid "Physical badge"
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:19
+msgid "Assigned badge type"
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:22
+msgid "No current badge assignment."
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:27
+msgid "Current issuance"
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:30
+msgid "Current physical badge issuance"
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:43
+#: .\templates\badges\stock_dashboard.html:59
+#: .\templates\badges\stock_dashboard.html:177
+#: .\templates\badges\stock_dashboard.html:287
+msgid "Location"
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:60
+msgid "New badge type"
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:80
+msgid "Replace badge"
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:96
+msgid "Record return"
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:106
+msgid "Report lost"
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:121
+msgid "No physical badge has been issued for this registration."
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:127
+msgid "Issuing location"
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:133
+#: .\templates\badges\stock_dashboard.html:169
+msgid "Current allocations"
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:135
+#: .\templates\badges\stock_dashboard.html:64
+msgid "Available"
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:138
+#: .\templates\badges\stock_dashboard.html:182
+msgid "Remaining"
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:151
+msgid "Issuance history"
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:154
+msgid "All physical badge issuances for this registration"
+msgstr ""
+
+#: .\templates\badges\registration_badge_issuance.html:173
+msgid "No physical badge has ever been issued for this registration."
+msgstr ""
+
+#: .\templates\badges\registration_credential.html:16
+#: .\templates\badges\registration_credential.html:19
+msgid "Digital Entry Pass"
+msgstr ""
+
+#: .\templates\badges\registration_credential.html:31
+msgid ""
+"Stable for this registration. It locates a credential; it never authorizes "
+"entry on its own."
+msgstr ""
+
+#: .\templates\badges\registration_credential.html:37
+msgid "Current credential"
+msgstr ""
+
+#: .\templates\badges\registration_credential.html:40
+msgid "Current credential details"
+msgstr ""
+
+#: .\templates\badges\registration_credential.html:50
+msgid "Credential version"
+msgstr ""
+
+#: .\templates\badges\registration_credential.html:79
+msgid "Activate entry pass"
+msgstr ""
+
+#: .\templates\badges\registration_credential.html:97
+msgid "Suspend entry pass"
+msgstr ""
+
+#: .\templates\badges\registration_credential.html:115
+msgid "Resume entry pass"
+msgstr ""
+
+#: .\templates\badges\registration_credential.html:133
+msgid "Revoke entry pass"
+msgstr ""
+
+#: .\templates\badges\registration_credential.html:149
+msgid "Replace entry pass"
+msgstr ""
+
+#: .\templates\badges\registration_credential.html:154
+msgid "No entry pass has been generated for this registration."
+msgstr ""
+
+#: .\templates\badges\registration_credential.html:159
+msgid "Generate entry pass"
+msgstr ""
+
+#: .\templates\badges\registration_credential.html:164
+msgid "Credential history"
+msgstr ""
+
+#: .\templates\badges\registration_credential.html:167
+msgid "All credential versions for this registration"
+msgstr ""
+
+#: .\templates\badges\registration_credential.html:170
+msgid "Version"
+msgstr ""
+
+#: .\templates\badges\registration_credential.html:186
+msgid "No credential has been issued yet."
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:13
+#: .\templates\badges\stock_dashboard.html:16
+msgid "Badge stock"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:20
+msgid "Stock locations"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:42
+#: .\templates\badges\stock_dashboard.html:60
+#: .\templates\badges\stock_dashboard.html:289
+#: .\templates\reviews\case_detail.html:122
+msgid "Type"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:50
+msgid "Add location"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:56
+msgid "Stock locations and balances"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:62
+msgid "On hand"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:63
+msgid "Allocated"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:104
+msgid "Transfer"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:116
+msgid "+/-"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:123
+msgid "Adjust"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:135
+msgid "Qty"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:142
+msgid "Allocate"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:154
+msgid "Count"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:156
+msgid "Reconcile"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:164
+msgid "No stock locations exist for this event edition yet."
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:171
+msgid ""
+"Allocated stock stays physically at its location but is no longer available "
+"to anyone else."
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:174
+msgid "Currently reserved badge stock"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:180
+msgid "Reserved"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:181
+msgid "Consumed"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:206
+msgid "Release"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:213
+msgid "No stock is currently allocated."
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:219
+#: .\templates\badges\stock_dashboard.html:256
+msgid "Print batches"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:243
+msgid "Choose later"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:250
+msgid "Create batch"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:262
+msgid "Planned"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:276
+msgid "No print batches exist for this event edition yet."
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:281
+msgid "Recent ledger entries"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:283
+msgid "Recent stock ledger entries"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:286
+#: .\templates\reviews\case_detail.html:59
+msgid "Recorded"
+msgstr ""
+
+#: .\templates\badges\stock_dashboard.html:303
+msgid "No stock movement has been recorded yet."
+msgstr ""
+
+#: .\templates\badges\verification_keys.html:11
+#: .\templates\badges\verification_keys.html:14
+msgid "Verification keys"
+msgstr ""
+
+#: .\templates\badges\verification_keys.html:17
+msgid ""
+"Only public verification keys are stored here. Private signing keys are "
+"never held by this application."
+msgstr ""
+
+#: .\templates\badges\verification_keys.html:20
+msgid "Published keys"
+msgstr ""
+
+#: .\templates\badges\verification_keys.html:22
+msgid "Published public verification keys"
+msgstr ""
+
+#: .\templates\badges\verification_keys.html:26
+msgid "Algorithm"
+msgstr ""
+
+#: .\templates\badges\verification_keys.html:28
+msgid "Fingerprint"
+msgstr ""
+
+#: .\templates\badges\verification_keys.html:53
+msgid "Promote to active"
+msgstr ""
+
+#: .\templates\badges\verification_keys.html:64
+msgid "Retirement reason"
+msgstr ""
+
+#: .\templates\badges\verification_keys.html:73
+msgid "Retire key"
+msgstr ""
+
+#: .\templates\badges\verification_keys.html:84
+msgid "Emergency revocation reason"
+msgstr ""
+
+#: .\templates\badges\verification_keys.html:93
+msgid "Revoke key (emergency)"
+msgstr ""
+
+#: .\templates\badges\verification_keys.html:102
+msgid "No verification key has been published yet."
+msgstr ""
+
+#: .\templates\badges\verification_keys.html:108
+msgid "Publish a public key"
+msgstr ""
+
+#: .\templates\badges\verification_keys.html:116
+msgid "Publish key"
+msgstr ""
+
+#: .\templates\base.html:6
+msgid "ASC 2026 Registration"
+msgstr ""
+
+#: .\templates\base.html:15
+msgid "Page updated."
+msgstr ""
+
+#: .\templates\base.html:16
+msgid "Skip to main content"
+msgstr ""
+
+#: .\templates\base.html:19
+msgid "Primary navigation"
+msgstr ""
+
+#: .\templates\base.html:24 .\templates\registrations\workspace.html:3
+#: .\templates\registrations\workspace.html:5
+msgid "My registrations"
+msgstr ""
+
+#: .\templates\base.html:27 .\templates\base.html:34
+msgid "Sign out"
+msgstr ""
+
+#: .\templates\base.html:31
+msgid "Operations"
+msgstr ""
+
+#: .\templates\base.html:62
+msgid "ASC 2026 Registration Platform"
+msgstr ""
+
+#: .\templates\communications\operations_messages.html:3
+#: .\templates\communications\operations_messages.html:5
+msgid "Communication delivery"
+msgstr ""
+
+#: .\templates\communications\operations_messages.html:6
+msgid ""
+"Delivery evidence is shown without recipient addresses or message content."
+msgstr ""
+
+#: .\templates\communications\operations_messages.html:10
+msgid "Messages in your authorized scope"
+msgstr ""
+
+#: .\templates\communications\operations_messages.html:14
+msgid "Created"
+msgstr ""
+
+#: .\templates\communications\operations_messages.html:18
+#: .\templates\partials\language_switcher.html:5
+msgid "Language"
+msgstr ""
+
+#: .\templates\communications\operations_messages.html:20
+msgid "Attempts"
+msgstr ""
+
+#: .\templates\communications\operations_messages.html:35
+msgid "No communication records are visible."
+msgstr ""
+
+#: .\templates\entry\_checkpoint_header.html:3
+msgid "Checkpoint status"
+msgstr ""
+
+#: .\templates\entry\_checkpoint_header.html:4
+#: .\templates\entry\device_detail.html:20
+msgid "Mode"
+msgstr ""
+
+#: .\templates\entry\_checkpoint_header.html:7
+#: .\templates\entry\checkpoint_setup.html:8
+#: .\templates\entry\device_list.html:11
+msgid "Device"
+msgstr ""
+
+#: .\templates\entry\_checkpoint_header.html:8
+msgid "Operator"
+msgstr ""
+
+#: .\templates\entry\_checkpoint_header.html:11
+msgid "End my session"
+msgstr ""
+
+#: .\templates\entry\candidates.html:3 .\templates\entry\candidates.html:7
+msgid "Select the exact registration"
+msgstr ""
+
+#: .\templates\entry\candidates.html:8
+msgid ""
+"Several approved registrations match. Select the one the person is "
+"presenting for; privileges are never combined across registrations."
+msgstr ""
+
+#: .\templates\entry\candidates.html:9
+msgid "More matches exist. Refine the search."
+msgstr ""
+
+#: .\templates\entry\candidates.html:18
+msgid "Select"
+msgstr ""
+
+#: .\templates\entry\candidates.html:23
+#: .\templates\reviews\cancel_registration.html:13
+#: .\templates\reviews\decision_not_approved.html:14
+#: .\templates\reviews\information_request_create.html:30
+#: .\templates\reviews\reopen_registration.html:12
+msgid "Cancel"
+msgstr ""
+
+#: .\templates\entry\checkpoint_setup.html:3
+#: .\templates\entry\checkpoint_setup.html:6
+msgid "Checkpoint set-up"
+msgstr ""
+
+#: .\templates\entry\checkpoint_setup.html:11
+msgid "Venue"
+msgstr ""
+
+#: .\templates\entry\checkpoint_setup.html:16
+msgid "This device has no checkpoint scope. Contact a device administrator."
+msgstr ""
+
+#: .\templates\entry\checkpoint_setup.html:20
+msgid "An open checkpoint session exists on this device"
+msgstr ""
+
+#: .\templates\entry\checkpoint_setup.html:21
+#, python-format
+msgid ""
+"Zone: %(zone)s. Join it with your own operator session, or start a new "
+"checkpoint session below."
+msgstr ""
+
+#: .\templates\entry\checkpoint_setup.html:25
+msgid "Join this checkpoint"
+msgstr ""
+
+#: .\templates\entry\checkpoint_setup.html:33
+msgid "Start checkpoint session"
+msgstr ""
+
+#: .\templates\entry\conflict.html:3 .\templates\entry\conflict.html:6
+msgid "Request not completed"
+msgstr ""
+
+#: .\templates\entry\conflict.html:8
+msgid "Back to the checkpoint"
+msgstr ""
+
+#: .\templates\entry\device_activate.html:3
+msgid "Enroll entry device"
+msgstr ""
+
+#: .\templates\entry\device_activate.html:6
+msgid "Enroll this browser as an entry device"
+msgstr ""
+
+#: .\templates\entry\device_activate.html:7
+msgid ""
+"Enter the one-time activation code shown when the device was registered. The "
+"code expires quickly and can be used once."
+msgstr ""
+
+#: .\templates\entry\device_activate.html:11
+msgid "Enroll device"
+msgstr ""
+
+#: .\templates\entry\device_activation_code.html:3
+#: .\templates\entry\device_activation_code.html:5
+msgid "Device activation code"
+msgstr ""
+
+#: .\templates\entry\device_activation_code.html:6
+#, python-format
+msgid "Activation code for “%(name)s”:"
+msgstr ""
+
+#: .\templates\entry\device_activation_code.html:9
+#, python-format
+msgid ""
+"This code is shown only once, can be used once, and expires in %(minutes)s "
+"minutes. Enter it on the physical device while signed in as a device "
+"administrator. Do not send it by email or chat."
+msgstr ""
+
+#: .\templates\entry\device_activation_code.html:11
+msgid "Back to the device"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:9
+msgid "Device key reference"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:11
+#: .\templates\entry\device_list.html:13 .\templates\exports\workspace.html:49
+msgid "Expires"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:12
+#: .\templates\entry\device_list.html:14
+msgid "Last seen"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:13
+msgid "Browser"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:15
+msgid "Scope version"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:18
+msgid "Verification methods"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:20
+msgid "Online only"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:23
+msgid "Open checkpoint sessions"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:26
+msgid "started"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:26
+msgid "expires"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:28
+msgid "None"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:39
+msgid "Issue a re-enrollment code"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:39
+msgid "Issue a new activation code"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:46
+msgid "Change scope (ends open sessions)"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:48
+msgid "Save new scope version"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:56
+msgid "Suspend device"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:64
+msgid "Resume device"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:69
+msgid "Revoke (permanent)"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:71
+msgid "Revoke device"
+msgstr ""
+
+#: .\templates\entry\device_detail.html:76
+msgid "All devices"
+msgstr ""
+
+#: .\templates\entry\device_list.html:3 .\templates\entry\device_list.html:5
+msgid "Entry devices"
+msgstr ""
+
+#: .\templates\entry\device_list.html:26
+msgid "No entry devices registered."
+msgstr ""
+
+#: .\templates\entry\device_list.html:34
+msgid "Register a device"
+msgstr ""
+
+#: .\templates\entry\device_list.html:35
+msgid ""
+"A one-time activation code is shown once after registration. Enter it on the "
+"physical device while signed in as a device administrator."
+msgstr ""
+
+#: .\templates\entry\device_list.html:39
+msgid "Register device"
+msgstr ""
+
+#: .\templates\entry\monitor.html:3 .\templates\entry\monitor.html:7
+#: .\templates\entry\verify.html:58
+msgid "Checkpoint monitor"
+msgstr ""
+
+#: .\templates\entry\monitor.html:8
+msgid "Recent entry events at this gate"
+msgstr ""
+
+#: .\templates\entry\monitor.html:13 .\templates\entry\monitor.html:42
+msgid "Time"
+msgstr ""
+
+#: .\templates\entry\monitor.html:15 .\templates\entry\monitor.html:43
+msgid "Method"
+msgstr ""
+
+#: .\templates\entry\monitor.html:17 .\templates\entry\result.html:45
+msgid "Decision"
+msgstr ""
+
+#: .\templates\entry\monitor.html:18
+msgid "Override"
+msgstr ""
+
+#: .\templates\entry\monitor.html:32
+msgid "No entry events yet."
+msgstr ""
+
+#: .\templates\entry\monitor.html:37
+msgid "Denied or unresolved attempts"
+msgstr ""
+
+#: .\templates\entry\monitor.html:57
+msgid "No denied attempts."
+msgstr ""
+
+#: .\templates\entry\monitor.html:62
+msgid "Back to verification"
+msgstr ""
+
+#: .\templates\entry\not_enrolled.html:3 .\templates\entry\not_enrolled.html:6
+msgid "Entry device not enrolled"
+msgstr ""
+
+#: .\templates\entry\not_enrolled.html:7
+msgid ""
+"This browser is not an enrolled, active entry device. Entry verification is "
+"only available on enrolled devices."
+msgstr ""
+
+#: .\templates\entry\not_enrolled.html:9
+msgid "Enroll this browser with an activation code"
+msgstr ""
+
+#: .\templates\entry\result.html:12
+msgid "Do not admit. Call the supervisor and follow the restricted procedure."
+msgstr ""
+
+#: .\templates\entry\result.html:15
+msgid "Follow the restricted procedure."
+msgstr ""
+
+#: .\templates\entry\result.html:17
+msgid "Restriction category"
+msgstr ""
+
+#: .\templates\entry\result.html:21
+msgid "Participant"
+msgstr ""
+
+#: .\templates\entry\result.html:23
+msgid "Participant details cleared after inactivity. Verify again if needed."
+msgstr ""
+
+#: .\templates\entry\result.html:26
+msgid "Registered profile photograph"
+msgstr ""
+
+#: .\templates\entry\result.html:28
+msgid "No photograph on file"
+msgstr ""
+
+#: .\templates\entry\result.html:34
+msgid "Identity reference"
+msgstr ""
+
+#: .\templates\entry\result.html:38
+#, python-format
+msgid "Previously admitted at %(time)s through %(gate)s."
+msgstr ""
+
+#: .\templates\entry\result.html:70
+msgid "Send to review desk"
+msgstr ""
+
+#: .\templates\entry\result.html:76
+msgid "Supervisor override"
+msgstr ""
+
+#: .\templates\entry\result.html:77
+msgid ""
+"Only approved, reason-coded overrides are offered. The override, your "
+"identity, the original result, and this checkpoint are recorded."
+msgstr ""
+
+#: .\templates\entry\result.html:87
+msgid "Admit by override"
+msgstr ""
+
+#: .\templates\entry\result.html:93
+msgid "Clear and verify next"
+msgstr ""
+
+#: .\templates\entry\verify.html:3 .\templates\entry\verify.html:7
+msgid "Verify entry"
+msgstr ""
+
+#: .\templates\entry\verify.html:8
+msgid ""
+"A generic physical badge alone is not proof of identity. Always verify a "
+"Digital Entry Pass or an approved identity reference."
+msgstr ""
+
+#: .\templates\entry\verify.html:16
+msgid "Verify QR"
+msgstr ""
+
+#: .\templates\entry\verify.html:23
+msgid "NIN or passport number"
+msgstr ""
+
+#: .\templates\entry\verify.html:48
+msgid ""
+"Searches are limited to this event, return a few candidates only, and are "
+"audited."
+msgstr ""
+
+#: .\templates\exports\workspace.html:3 .\templates\exports\workspace.html:5
+msgid "Controlled exports"
+msgstr ""
+
+#: .\templates\exports\workspace.html:7
+msgid ""
+"Every export is scoped to your own authorized event and organization, "
+"requires an approved purpose and a reason, and expires automatically."
+msgstr ""
+
+#: .\templates\exports\workspace.html:13
+#: .\templates\invitations\workspace_registrations.html:12
+#: .\templates\registrations\ops_intake_detail.html:11
+#: .\templates\registrations\ops_intake_list.html:12
+msgid "Event edition"
+msgstr ""
+
+#: .\templates\exports\workspace.html:15
+msgid "Select an event"
+msgstr ""
+
+#: .\templates\exports\workspace.html:22
+msgid "Organization (optional)"
+msgstr ""
+
+#: .\templates\exports\workspace.html:25
+msgid "Leave blank to include every organization in your scope."
+msgstr ""
+
+#: .\templates\exports\workspace.html:30
+msgid "Select a purpose"
+msgstr ""
+
+#: .\templates\exports\workspace.html:38
+msgid "Generate export"
+msgstr ""
+
+#: .\templates\exports\workspace.html:41 .\templates\exports\workspace.html:42
+msgid "Your recent exports"
+msgstr ""
+
+#: .\templates\exports\workspace.html:48
+#: .\templates\invitations\delegation_detail.html:9
+#: .\templates\invitations\workspace_dashboard.html:49
+msgid "Rows"
+msgstr ""
+
+#: .\templates\exports\workspace.html:50
+msgid "Action"
+msgstr ""
+
+#: .\templates\exports\workspace.html:67
+msgid "Download"
+msgstr ""
+
+#: .\templates\exports\workspace.html:70
+msgid "Not available"
+msgstr ""
+
+#: .\templates\exports\workspace.html:75
+msgid "No exports yet."
+msgstr ""
+
+#: .\templates\invitations\campaign_create.html:3
+#: .\templates\invitations\campaign_create.html:5
+msgid "New invitation campaign"
+msgstr ""
+
+#: .\templates\invitations\campaign_create.html:6
+#: .\templates\invitations\delegation_upload.html:6
+#: .\templates\invitations\on_behalf_create.html:6
+#, python-format
+msgid "For organization: %(name)s"
+msgstr ""
+
+#: .\templates\invitations\campaign_create.html:15
+msgid "Create campaign"
+msgstr ""
+
+#: .\templates\invitations\campaign_detail.html:8
+#: .\templates\invitations\delegation_detail.html:7
+#: .\templates\invitations\workspace_dashboard.html:20
+#: .\templates\invitations\workspace_dashboard.html:47
+msgid "Organization"
+msgstr ""
+
+#: .\templates\invitations\campaign_detail.html:10
+msgid "Unlimited"
+msgstr ""
+
+#: .\templates\invitations\campaign_detail.html:15
+msgid "Share this link now. It will not be shown again:"
+msgstr ""
+
+#: .\templates\invitations\campaign_detail.html:20
+msgid "Active link"
+msgstr ""
+
+#: .\templates\invitations\campaign_detail.html:22
+msgid "Status:"
+msgstr ""
+
+#: .\templates\invitations\campaign_detail.html:26
+msgid "Rotate link"
+msgstr ""
+
+#: .\templates\invitations\campaign_detail.html:30
+msgid "No active link."
+msgstr ""
+
+#: .\templates\invitations\campaign_detail.html:34
+msgid "Issue link"
+msgstr ""
+
+#: .\templates\invitations\campaign_detail.html:48
+#: .\templates\reviews\case_detail.html:37
+msgid "Change status"
+msgstr ""
+
+#: .\templates\invitations\claim_conflict.html:3
+msgid "Claim could not be completed"
+msgstr ""
+
+#: .\templates\invitations\claim_conflict.html:5
+msgid "This claim could not be completed"
+msgstr ""
+
+#: .\templates\invitations\claim_conflict.html:6
+msgid ""
+"This registration could not be linked to your account. Please contact "
+"support for assistance."
+msgstr ""
+
+#: .\templates\invitations\claim_unavailable.html:3
+msgid "Claim link unavailable"
+msgstr ""
+
+#: .\templates\invitations\claim_unavailable.html:5
+msgid "This claim link is not available"
+msgstr ""
+
+#: .\templates\invitations\claim_unavailable.html:6
+msgid ""
+"This claim link is not available. It may be invalid, expired, or already "
+"used."
+msgstr ""
+
+#: .\templates\invitations\claim_unavailable.html:7
+msgid ""
+"Please contact the person or organization who invited you, or contact "
+"support."
+msgstr ""
+
+#: .\templates\invitations\delegation_detail.html:3
+#: .\templates\invitations\delegation_detail.html:5
+msgid "Delegation batch"
+msgstr ""
+
+#: .\templates\invitations\delegation_detail.html:9
+msgid "valid of"
+msgstr ""
+
+#: .\templates\invitations\delegation_detail.html:16
+msgid "Apply valid rows"
+msgstr ""
+
+#: .\templates\invitations\delegation_detail.html:22
+msgid "Delegation row results"
+msgstr ""
+
+#: .\templates\invitations\delegation_detail.html:25
+msgid "Row"
+msgstr ""
+
+#: .\templates\invitations\delegation_detail.html:26
+msgid "Email"
+msgstr ""
+
+#: .\templates\invitations\delegation_detail.html:28
+msgid "Error codes"
+msgstr ""
+
+#: .\templates\invitations\delegation_detail.html:40
+msgid "No rows."
+msgstr ""
+
+#: .\templates\invitations\delegation_upload.html:3
+#: .\templates\invitations\delegation_upload.html:5
+#: .\templates\invitations\organization_search.html:19
+msgid "Upload delegation list"
+msgstr ""
+
+#: .\templates\invitations\delegation_upload.html:12
+msgid "Upload and validate"
+msgstr ""
+
+#: .\templates\invitations\invitation_unavailable.html:3
+msgid "Invitation unavailable"
+msgstr ""
+
+#: .\templates\invitations\invitation_unavailable.html:5
+msgid "This invitation is not available"
+msgstr ""
+
+#: .\templates\invitations\invitation_unavailable.html:9
+msgid "You can still register directly."
+msgstr ""
+
+#: .\templates\invitations\invitation_unavailable.html:13
+msgid ""
+"Registration is not currently open. Please contact support for assistance."
+msgstr ""
+
+#: .\templates\invitations\on_behalf_create.html:3
+#: .\templates\invitations\on_behalf_create.html:5
+#: .\templates\invitations\organization_search.html:22
+msgid "Create on-behalf registration"
+msgstr ""
+
+#: .\templates\invitations\on_behalf_create.html:9
+msgid ""
+"Share this claim link with the participant now. It will not be shown again:"
+msgstr ""
+
+#: .\templates\invitations\on_behalf_create.html:17
+msgid "Create draft"
+msgstr ""
+
+#: .\templates\invitations\organization_search.html:3
+#: .\templates\invitations\organization_search.html:5
+#: .\templates\invitations\workspace_dashboard.html:7
+msgid "Find an organization"
+msgstr ""
+
+#: .\templates\invitations\organization_search.html:7
+msgid "Organization name"
+msgstr ""
+
+#: .\templates\invitations\organization_search.html:17
+msgid "New campaign"
+msgstr ""
+
+#: .\templates\invitations\organization_search.html:27
+msgid "No matching organizations found."
+msgstr ""
+
+#: .\templates\invitations\workspace_dashboard.html:3
+#: .\templates\invitations\workspace_dashboard.html:5
+msgid "Organization Workspace"
+msgstr ""
+
+#: .\templates\invitations\workspace_dashboard.html:9
+#: .\templates\invitations\workspace_registrations.html:3
+#: .\templates\invitations\workspace_registrations.html:5
+msgid "Registration contexts"
+msgstr ""
+
+#: .\templates\invitations\workspace_dashboard.html:12
+msgid "Invitation campaigns"
+msgstr ""
+
+#: .\templates\invitations\workspace_dashboard.html:15
+msgid "Campaigns you are authorized to view"
+msgstr ""
+
+#: .\templates\invitations\workspace_dashboard.html:32
+#: .\templates\invitations\workspace_dashboard.html:59
+#: .\templates\registrations\ops_intake_list.html:28
+#: .\templates\registrations\workspace.html:44
+msgid "View"
+msgstr ""
+
+#: .\templates\invitations\workspace_dashboard.html:35
+msgid "No campaigns are currently visible to you."
+msgstr ""
+
+#: .\templates\invitations\workspace_dashboard.html:41
+msgid "Delegation batches"
+msgstr ""
+
+#: .\templates\invitations\workspace_dashboard.html:44
+msgid "Delegation batches you are authorized to view"
+msgstr ""
+
+#: .\templates\invitations\workspace_dashboard.html:62
+msgid "No delegation batches are currently visible to you."
+msgstr ""
+
+#: .\templates\invitations\workspace_registrations.html:8
+msgid "Registration contexts visible to your organization scope"
+msgstr ""
+
+#: .\templates\invitations\workspace_registrations.html:11
+#: .\templates\registrations\ops_intake_list.html:11
+msgid "Registration Reference"
+msgstr ""
+
+#: .\templates\invitations\workspace_registrations.html:13
+#: .\templates\registrations\ops_intake_detail.html:17
+msgid "Source"
+msgstr ""
+
+#: .\templates\invitations\workspace_registrations.html:14
+#: .\templates\registrations\ops_intake_detail.html:13
+#: .\templates\registrations\ops_intake_list.html:13
+msgid "Applicant status"
+msgstr ""
+
+#: .\templates\invitations\workspace_registrations.html:26
+msgid "No registration contexts are currently visible to you."
+msgstr ""
+
+#: .\templates\partials\error_summary.html:4
+msgid "Please fix the following:"
+msgstr ""
+
+#: .\templates\partials\language_switcher.html:19
+msgid "Go"
+msgstr ""
+
+#: .\templates\partials\session_warning.html:8
+msgid "Your session is about to end due to inactivity."
+msgstr ""
+
+#: .\templates\partials\session_warning.html:9
+msgid ""
+"Your session will end soon. Please save your work; signing in again will be "
+"required."
+msgstr ""
+
+#: .\templates\partials\session_warning.html:15
+#: .\templates\partials\session_warning.html:32
+msgid "Stay signed in"
+msgstr ""
+
+#: .\templates\partials\session_warning.html:25
+msgid "Your operational session is about to end due to inactivity."
+msgstr ""
+
+#: .\templates\partials\session_warning.html:26
+msgid ""
+"Your operational session will end soon. Please save your work; signing in "
+"again will be required."
+msgstr ""
+
+#: .\templates\registrations\_step_nav.html:2
+msgid "Registration progress"
+msgstr ""
+
+#: .\templates\registrations\_step_nav.html:5
+#: .\templates\registrations\step_contact.html:3
+msgid "Contact"
+msgstr ""
+
+#: .\templates\registrations\_step_nav.html:6
+msgid "Professional"
+msgstr ""
+
+#: .\templates\registrations\_step_nav.html:7
+msgid "Interests"
+msgstr ""
+
+#: .\templates\registrations\_step_nav.html:8
+#: .\templates\registrations\step_review.html:3
+msgid "Review"
+msgstr ""
+
+#: .\templates\registrations\_step_nav.html:9
+#: .\templates\registrations\step_notices.html:3
+msgid "Notices"
+msgstr ""
+
+#: .\templates\registrations\confirmation.html:3
+msgid "Registration confirmed"
+msgstr ""
+
+#: .\templates\registrations\confirmation.html:5
+msgid "Thank you for registering"
+msgstr ""
+
+#: .\templates\registrations\confirmation.html:7
+msgid "Your Registration Reference is"
+msgstr ""
+
+#: .\templates\registrations\confirmation.html:12
+msgid "A confirmation email has been sent to your registered email address."
+msgstr ""
+
+#: .\templates\registrations\confirmation.html:14
+msgid "Your confirmation email is queued and will be sent shortly."
+msgstr ""
+
+#: .\templates\registrations\confirmation.html:16
+msgid ""
+"Your registration succeeded, but the confirmation email could not be sent. "
+"Keep your Registration Reference and contact support if needed."
+msgstr ""
+
+#: .\templates\registrations\confirmation.html:18
+msgid ""
+"Your registration succeeded. Keep your Registration Reference; email "
+"confirmation is not currently available."
+msgstr ""
+
+#: .\templates\registrations\confirmation.html:20
+msgid "Go to my registrations"
+msgstr ""
+
+#: .\templates\registrations\no_open_event.html:3
+#: .\templates\registrations\no_open_event.html:5
+msgid "Registration is not currently open"
+msgstr ""
+
+#: .\templates\registrations\no_open_event.html:6
+msgid ""
+"There is no event edition open for registration right now. Please check back "
+"later."
+msgstr ""
+
+#: .\templates\registrations\ops_intake_detail.html:5
+msgid "Back to intake list"
+msgstr ""
+
+#: .\templates\registrations\ops_intake_detail.html:9
+msgid "Overview"
+msgstr ""
+
+#: .\templates\registrations\ops_intake_detail.html:15
+#: .\templates\registrations\ops_intake_list.html:14
+msgid "Processing state"
+msgstr ""
+
+#: .\templates\registrations\ops_intake_detail.html:19
+#: .\templates\registrations\ops_intake_list.html:15
+msgid "Submitted at"
+msgstr ""
+
+#: .\templates\registrations\ops_intake_detail.html:41
+#: .\templates\registrations\step_professional.html:3
+#: .\templates\registrations\step_professional.html:6
+#: .\templates\registrations\step_review.html:32
+msgid "Professional information"
+msgstr ""
+
+#: .\templates\registrations\ops_intake_detail.html:43
+#: .\templates\registrations\step_review.html:38
+msgid "Professional Organization"
+msgstr ""
+
+#: .\templates\registrations\ops_intake_list.html:3
+#: .\templates\registrations\ops_intake_list.html:5
+msgid "Registration intake"
+msgstr ""
+
+#: .\templates\registrations\ops_intake_list.html:8
+msgid "Registrations you are authorized to view"
+msgstr ""
+
+#: .\templates\registrations\ops_intake_list.html:32
+msgid "No registrations are currently visible to you."
+msgstr ""
+
+#: .\templates\registrations\step_contact.html:6
+msgid "Contact information"
+msgstr ""
+
+#: .\templates\registrations\step_contact.html:11
+msgid "A mobile number is optional for international participants."
+msgstr ""
+
+#: .\templates\registrations\step_contact.html:20
+#: .\templates\registrations\step_identity.html:66
+#: .\templates\registrations\step_interests.html:21
+#: .\templates\registrations\step_professional.html:18
+msgid "Continue"
+msgstr ""
+
+#: .\templates\registrations\step_identity.html:6
+msgid "Identity and personal information"
+msgstr ""
+
+#: .\templates\registrations\step_identity.html:32
+msgid "If you hold an Algerian national identity number"
+msgstr ""
+
+#: .\templates\registrations\step_identity.html:37
+msgid "If you hold a foreign passport"
+msgstr ""
+
+#: .\templates\registrations\step_identity.html:44
+msgid ""
+"We ask for a photo or scan of the passport identity page only, to help "
+"confirm the details you entered above -- never a full passport, visa, or any "
+"other document."
+msgstr ""
+
+#: .\templates\registrations\step_identity.html:47
+#, python-format
+msgid ""
+"Accepted file types: JPEG or PNG. Maximum size: "
+"%(passport_identity_page_max_size_mb)s MB."
+msgstr ""
+
+#: .\templates\registrations\step_identity.html:50
+msgid ""
+"Your file is checked for safety before it is stored. It is never made "
+"public, and it is never included in exported reports."
+msgstr ""
+
+#: .\templates\registrations\step_identity.html:54
+msgid ""
+"A passport identity page is already on file. Uploading a new one replaces "
+"it; there is no separate removal step in this phase."
+msgstr ""
+
+#: .\templates\registrations\step_identity.html:58
+msgid ""
+"Uploading a new file always replaces any previous one; there is no separate "
+"removal step in this phase."
+msgstr ""
+
+#: .\templates\registrations\step_interests.html:3
+#: .\templates\registrations\step_interests.html:6
+#: .\templates\registrations\step_review.html:56
+msgid "Interests and objectives"
+msgstr ""
+
+#: .\templates\registrations\step_notices.html:6
+msgid "Privacy Notice and Terms"
+msgstr ""
+
+#: .\templates\registrations\step_notices.html:10
+msgid ""
+"Legal notices are not currently available in your language. Please try again "
+"shortly."
+msgstr ""
+
+#: .\templates\registrations\step_notices.html:15
+msgid "Privacy Notice"
+msgstr ""
+
+#: .\templates\registrations\step_notices.html:22
+msgid "Registration Terms"
+msgstr ""
+
+#: .\templates\registrations\step_notices.html:34
+msgid "Submit registration"
+msgstr ""
+
+#: .\templates\registrations\step_professional.html:10
+msgid ""
+"A profile photograph is already on file. Upload a new one only if you want "
+"to replace it."
+msgstr ""
+
+#: .\templates\registrations\step_review.html:6
+msgid "Review your information"
+msgstr ""
+
+#: .\templates\registrations\step_review.html:7
+msgid "Check your answers before continuing to the required notices."
+msgstr ""
+
+#: .\templates\registrations\step_review.html:12
+#: .\templates\registrations\step_review.html:33
+#: .\templates\registrations\step_review.html:57
+msgid "Edit"
+msgstr ""
+
+#: .\templates\registrations\step_review.html:48
+msgid "Profile photograph on file."
+msgstr ""
+
+#: .\templates\registrations\step_review.html:71
+msgid "Continue to notices"
+msgstr ""
+
+#: .\templates\registrations\workspace.html:7
+msgid "You have no registrations yet."
+msgstr ""
+
+#: .\templates\registrations\workspace.html:8
+msgid "Start a registration"
+msgstr ""
+
+#: .\templates\registrations\workspace.html:21
+msgid "Badge"
+msgstr ""
+
+#: .\templates\registrations\workspace.html:24
+msgid "Last updated"
+msgstr ""
+
+#: .\templates\registrations\workspace.html:28
+msgid "Action required"
+msgstr ""
+
+#: .\templates\registrations\workspace.html:30
+msgid "Provide additional information"
+msgstr ""
+
+#: .\templates\registrations\workspace.html:38
+msgid "Continue registration"
+msgstr ""
+
+#: .\templates\registrations\workspace.html:50
+msgid "Withdraw this registration? This cannot be undone."
+msgstr ""
+
+#: .\templates\registrations\workspace.html:53
+msgid "Withdraw"
+msgstr ""
+
+#: .\templates\reviews\cancel_registration.html:3
+msgid "Cancel registration"
+msgstr ""
+
+#: .\templates\reviews\cancel_registration.html:5
+#, python-format
+msgid "Cancel %(ref)s"
+msgstr ""
+
+#: .\templates\reviews\cancel_registration.html:6
+msgid ""
+"This affects only this Registration Context. It is not a Person-level "
+"restriction."
+msgstr ""
+
+#: .\templates\reviews\cancel_registration.html:12
+msgid "Confirm cancellation"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:3
+#, python-format
+msgid "Review case: %(ref)s"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:5
+#, python-format
+msgid "Review case for %(ref)s"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:7
+#: .\templates\reviews\queue_list.html:12
+#: .\templates\reviews\queue_list.html:56
+msgid "Case type"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:8
+#: .\templates\reviews\queue_list.html:21
+#: .\templates\reviews\queue_list.html:57
+msgid "Queue"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:10
+msgid "Public status"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:11
+msgid "Internal status"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:12
+msgid "Current assignment"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:13
+#: .\templates\reviews\queue_list.html:43
+msgid "Unassigned"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:18
+msgid "Assign or reassign"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:23
+msgid "Operational user id"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:30
+msgid "Assign"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:42
+msgid "New status"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:50
+msgid "Update status"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:57
+msgid "Checklist"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:58
+msgid "Checklist evidence"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:59
+msgid "Item"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:64
+msgid "No checklist evidence recorded yet."
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:72
+msgid "Item code"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:89
+msgid "Record result"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:98
+msgid "Internal notes"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:99
+msgid "Never visible to the participant."
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:104
+msgid "No internal notes yet."
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:110
+msgid "Add an internal note"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:112
+msgid "Save note"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:120
+#: .\templates\reviews\case_detail.html:121
+msgid "Duplicate candidates"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:122
+msgid "Masked identifier"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:127
+msgid "No resolvable candidate evidence."
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:143
+msgid "Candidate identifier id (optional)"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:151
+msgid "Resolve"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:159
+msgid "Additional Information Requests"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:164
+#, python-format
+msgid "Request #%(seq)s — %(status)s"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:168
+msgid "No Information Requests yet."
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:172
+#: .\templates\reviews\information_request_create.html:3
+msgid "New Information Request"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:177
+#: .\templates\reviews\case_detail.html:178
+msgid "Decision history"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:179
+msgid "#"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:179
+msgid "Decided"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:184
+msgid "No decision recorded yet."
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:192
+msgid "Record Approved decision"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:194
+msgid "Record Not Approved decision"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:200
+msgid "Registration actions"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:203
+msgid "Reopen"
+msgstr ""
+
+#: .\templates\reviews\case_detail.html:206
+msgid "Cancel operationally"
+msgstr ""
+
+#: .\templates\reviews\conflict.html:7
+msgid "Back to the review queue"
+msgstr ""
+
+#: .\templates\reviews\decision_not_approved.html:3
+#: .\templates\reviews\decision_not_approved.html:13
+msgid "Record decision"
+msgstr ""
+
+#: .\templates\reviews\decision_not_approved.html:5
+msgid "Record a Not Approved decision"
+msgstr ""
+
+#: .\templates\reviews\information_request_create.html:5
+msgid "New Additional Information Request"
+msgstr ""
+
+#: .\templates\reviews\information_request_create.html:14
+#: .\templates\reviews\information_request_detail.html:11
+msgid "Requested items"
+msgstr ""
+
+#: .\templates\reviews\information_request_create.html:18
+#, python-format
+msgid "Item %(n)s"
+msgstr ""
+
+#: .\templates\reviews\information_request_create.html:29
+msgid "Create request"
+msgstr ""
+
+#: .\templates\reviews\information_request_detail.html:3
+#: .\templates\reviews\information_request_detail.html:5
+#, python-format
+msgid "Information Request #%(seq)s"
+msgstr ""
+
+#: .\templates\reviews\information_request_detail.html:9
+msgid "Message"
+msgstr ""
+
+#: .\templates\reviews\information_request_detail.html:18
+msgid "A response has been submitted."
+msgstr ""
+
+#: .\templates\reviews\information_request_detail.html:24
+msgid "Send to participant"
+msgstr ""
+
+#: .\templates\reviews\information_request_detail.html:31
+msgid "Close reviewed response"
+msgstr ""
+
+#: .\templates\reviews\information_request_detail.html:38
+msgid "Cancellation reason"
+msgstr ""
+
+#: .\templates\reviews\information_request_detail.html:40
+msgid "Cancel request"
+msgstr ""
+
+#: .\templates\reviews\participant_information_request.html:3
+#: .\templates\reviews\participant_information_request.html:5
+msgid "Additional information needed"
+msgstr ""
+
+#: .\templates\reviews\participant_information_request.html:8
+msgid "Your response has been submitted. Thank you."
+msgstr ""
+
+#: .\templates\reviews\participant_information_request.html:16
+msgid "Upload file"
+msgstr ""
+
+#: .\templates\reviews\participant_information_request.html:19
+msgid "Your answer"
+msgstr ""
+
+#: .\templates\reviews\participant_information_request.html:24
+msgid "Save draft"
+msgstr ""
+
+#: .\templates\reviews\participant_information_request.html:25
+msgid "Submit response"
+msgstr ""
+
+#: .\templates\reviews\participant_information_request.html:28
+msgid "This request is no longer accepting responses."
+msgstr ""
+
+#: .\templates\reviews\queue_list.html:3 .\templates\reviews\queue_list.html:5
+msgid "Review queue"
+msgstr ""
+
+#: .\templates\reviews\queue_list.html:6
+msgid "Filter the review queue"
+msgstr ""
+
+#: .\templates\reviews\queue_list.html:9
+msgid "Reference or name"
+msgstr ""
+
+#: .\templates\reviews\queue_list.html:14
+#: .\templates\reviews\queue_list.html:23
+#: .\templates\reviews\queue_list.html:32
+#: .\templates\reviews\queue_list.html:41
+msgid "Any"
+msgstr ""
+
+#: .\templates\reviews\queue_list.html:39
+msgid "Assignment"
+msgstr ""
+
+#: .\templates\reviews\queue_list.html:42
+msgid "Assigned to me"
+msgstr ""
+
+#: .\templates\reviews\queue_list.html:47
+msgid "Apply filters"
+msgstr ""
+
+#: .\templates\reviews\queue_list.html:51
+msgid "Review cases"
+msgstr ""
+
+#: .\templates\reviews\queue_list.html:52
+msgid "Review cases matching the current filters"
+msgstr ""
+
+#: .\templates\reviews\queue_list.html:59
+msgid "Priority"
+msgstr ""
+
+#: .\templates\reviews\queue_list.html:60
+msgid "Opened"
+msgstr ""
+
+#: .\templates\reviews\queue_list.html:74
+msgid "No review cases match the current filters."
+msgstr ""
+
+#: .\templates\reviews\queue_list.html:79
+msgid "Queue pages"
+msgstr ""
+
+#: .\templates\reviews\queue_list.html:82
+msgid "Previous"
+msgstr ""
+
+#: .\templates\reviews\queue_list.html:84
+#, python-format
+msgid "Page %(number)s of %(count)s"
+msgstr ""
+
+#: .\templates\reviews\queue_list.html:86
+msgid "Next"
+msgstr ""
+
+#: .\templates\reviews\reopen_registration.html:3
+msgid "Reopen registration"
+msgstr ""
+
+#: .\templates\reviews\reopen_registration.html:5
+#, python-format
+msgid "Reopen %(ref)s"
+msgstr ""
+
+#: .\templates\reviews\reopen_registration.html:11
+msgid "Reopen for review"
+msgstr ""
+
+msgid "Registrations"
+msgstr ""
+
+msgid "Reviews"
+msgstr ""
+
+msgid "Organizations"
+msgstr ""
+
+msgid "Bulk accreditation"
+msgstr ""
+
+msgid "Pass lookup"
+msgstr ""
+
+msgid "Communications"
+msgstr ""
+
+msgid "Exports"
+msgstr ""
+
+msgid "Authorized personnel only"
+msgstr ""
+
+msgid "Sign in with the staff account you were given."
+msgstr ""
+
+msgid "ASC 2026"
+msgstr ""
+
+msgid "Each area opens only with the permissions assigned to your account."
+msgstr ""
+
+msgid "Sessions end after a period of inactivity. You are warned before that happens."
+msgstr ""
+
+msgid "Sign out when you leave a shared device."
+msgstr ""
+
+msgid "Participant registration"
+msgstr ""
+
+msgid "Already registered? Use the same email address to open your registrations."
+msgstr ""
+
+msgid "Optional"
+msgstr ""
+
+msgid "Operations sections"
+msgstr ""
+
+msgid "Sections"
+msgstr ""
+
+msgid "Pages"
+msgstr ""
+
+#, python-format
+msgid "Step %(number)s of %(total)s"
+msgstr ""
+
+msgid "(completed)"
+msgstr ""
+
+msgid "(current step)"
+msgstr ""
+
+msgid "Sign in with a one-time code sent to your email. No password is needed."
+msgstr ""
+
+msgid "Registration takes six short steps. Your progress is saved after each one."
+msgstr ""
+
+msgid "Identity document numbers are stored encrypted."
+msgstr ""
+
+msgid "Back"
+msgstr ""
+
+msgid "Registration submitted"
+msgstr ""
+
+msgid "Your registration is now with the organizers. You can follow its status in your workspace."
+msgstr ""
+
+msgid "The most recent registrations in your authorized scope, newest first."
+msgstr ""
+
+#, python-format
+msgid "%(counter)s registration"
+msgid_plural "%(counter)s registrations"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Not submitted"
+msgstr ""
+
+msgid "Only the 200 most recent registrations are listed."
+msgstr ""
+
+msgid "Registrations appear here once they exist in an event or organization you are authorized for."
+msgstr ""
+
+msgid "Enter your name exactly as it appears on your identity document."
+msgstr ""
+
+msgid "Personal information"
+msgstr ""
+
+msgid "Which document will you use?"
+msgstr ""
+
+msgid "For Algerian nationals. 18 digits."
+msgstr ""
+
+msgid "For any nationality."
+msgstr ""
+
+msgid "Choose the topics that interest you and tell us what you hope to achieve."
+msgstr ""
+
+msgid "Objectives and needs"
+msgstr ""
+
+msgid "Read both documents, then confirm below to submit your registration."
+msgstr ""
+
+msgid "Your confirmation"
+msgstr ""
+
+msgid "Tell us about the organization you represent at the event."
+msgstr ""
+
+msgid "Your role"
+msgstr ""
+
+msgid "Not provided yet."
+msgstr ""
+
+msgid "Your registrations for ASC events, with their current status and any action needed from you."
+msgstr ""
+
+msgid "Review case"
+msgstr ""
+
+msgid "Current status"
+msgstr ""
+
+msgid "Case summary"
+msgstr ""
+
+msgid "Case actions"
+msgstr ""
+
+msgid "Record the outcome of this review."
+msgstr ""
+
+msgid "Review cases in your authorized scope, highest priority first."
+msgstr ""
+
+msgid "Clear filters"
+msgstr ""
+
+#, python-format
+msgid "%(counter)s case"
+msgid_plural "%(counter)s cases"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Select…"
+msgstr ""
+
+msgid "Select what to assign"
+msgstr ""
+
+msgid "Assignment type"
+msgstr ""
+
+msgid "Select what to assign."
+msgstr ""
+
+msgid "Only the items you may assign in bulk are listed."
+msgstr ""
+
+msgid "Select an item from the list."
+msgstr ""
+
+msgid "Select an item"
+msgstr ""
+
+msgid "Select an item of the chosen type."
+msgstr ""
+
+msgid "Operational reporting"
+msgstr ""
+
+msgid "Event logistics planning"
+msgstr ""
+
+msgid "Organization delegation oversight"
+msgstr ""
+
+msgid "Registration confirmation"
+msgstr ""
+
+msgid "Additional information request"
+msgstr ""
+
+msgid "Information response confirmation"
+msgstr ""
+
+msgid "Decision status"
+msgstr ""
+
+msgid "Account access"
+msgstr ""
+
+msgid "Delegation claim"
+msgstr ""
+
+msgctxt "export status"
+msgid "Pending"
+msgstr ""
+
+msgctxt "export status"
+msgid "Ready"
+msgstr ""
+
+msgctxt "export status"
+msgid "Expired"
+msgstr ""
+
+msgctxt "message status"
+msgid "Queued"
+msgstr ""
+
+msgctxt "message status"
+msgid "Sending"
+msgstr ""
+
+msgctxt "message status"
+msgid "Sent"
+msgstr ""
+
+msgctxt "message status"
+msgid "Delivered"
+msgstr ""
+
+msgctxt "message status"
+msgid "Deferred"
+msgstr ""
+
+msgctxt "message status"
+msgid "Failed"
+msgstr ""
+
+msgctxt "message status"
+msgid "Bounced"
+msgstr ""
+
+msgctxt "message status"
+msgid "Undeliverable"
+msgstr ""
+
+msgctxt "message status"
+msgid "Suppressed"
+msgstr ""
+
+msgctxt "message status"
+msgid "Cancelled"
+msgstr ""
+
+msgid "English"
+msgstr ""
+
+msgid "French"
+msgstr ""
+
+msgid "Arabic"
+msgstr ""
+
+msgid "Email is missing"
+msgstr ""
+
+msgid "Email is not valid"
+msgstr ""
+
+msgid "Given names are missing"
+msgstr ""
+
+msgid "Family name is missing"
+msgstr ""
+
+msgid "A value looks like a spreadsheet formula"
+msgstr ""
+
+msgid "A column appears twice"
+msgstr ""
+
+msgid "A column is not allowed"
+msgstr ""
+
+msgid "A column is not recognised"
+msgstr ""
+
+msgid "A required column is missing"
+msgstr ""
+
+msgid "Registration not found in your scope"
+msgstr ""
+
+msgid "Belongs to a different event"
+msgstr ""
+
+msgid "Already has this assignment"
+msgstr ""
+
+msgid "Changed since the preview"
+msgstr ""
+
+msgid "Can no longer receive this assignment"
+msgstr ""
+
+msgid "Identity details are plausible"
+msgstr ""
+
+msgid "Contact details are plausible"
+msgstr ""
+
+msgid "Professional information is complete"
+msgstr ""
+
+msgid "Interests are complete"
+msgstr ""
+
+msgid "Identity document is legible"
+msgstr ""
+
+msgid "Name matches the identity document"
+msgstr ""
+
+msgid "Date of birth matches the identity document"
+msgstr ""
+
+msgid "Photo matches the identity document"
+msgstr ""
+
+msgid "Duplicate evidence reviewed"
+msgstr ""
+
+msgid "Restriction evidence reviewed"
+msgstr ""
+
+msgid "Escalation is justified"
+msgstr ""
+
+msgid "Response is complete"
+msgstr ""
+
+msgid "Response is consistent"
+msgstr ""
+
+msgctxt "registration field"
+msgid "Given names"
+msgstr ""
+
+msgctxt "registration field"
+msgid "Family name"
+msgstr ""
+
+msgctxt "registration field"
+msgid "Date of birth"
+msgstr ""
+
+msgctxt "registration field"
+msgid "Nationality"
+msgstr ""
+
+msgctxt "registration field"
+msgid "Country of residence"
+msgstr ""
+
+msgctxt "registration field"
+msgid "Mobile number"
+msgstr ""
+
+msgctxt "registration field"
+msgid "Organization name"
+msgstr ""
+
+msgctxt "registration field"
+msgid "Job title"
+msgstr ""
+
+msgctxt "registration field"
+msgid "Department"
+msgstr ""
+
+msgctxt "registration field"
+msgid "Sector"
+msgstr ""
+
+msgctxt "registration field"
+msgid "Professional profile URL"
+msgstr ""
+
+msgid "Select an event."
+msgstr ""
+
+msgid "Select an event from the list."
+msgstr ""
+
+msgid "Every organization in your scope"
+msgstr ""
+
+msgid "Leave as is to include every organization in your scope."
+msgstr ""
+
+msgid "Select an organization from the list."
+msgstr ""
+
+msgid "Leave empty for no limit."
+msgstr ""
+
+msgid "A .csv file with the columns email, given_names, family_name and, optionally, notes."
+msgstr ""
+
+msgid "Select a field"
+msgstr ""
+
+msgid "Select a document type"
+msgstr ""
+
+msgid "Assign to"
+msgstr ""
+
+msgid "Select a person"
+msgstr ""
+
+msgid "Only people who may open this review case are listed."
+msgstr ""
+
+msgid "Select a person to assign this case to."
+msgstr ""
+
+msgid "Select a person from the list."
+msgstr ""
+
+msgid "Matching record"
+msgstr ""
+
+msgid "No specific record"
+msgstr ""
+
+msgid "Optional. Only the candidate records found for this case are listed."
+msgstr ""
+
+msgid "Select a matching record from the list."
+msgstr ""
+
+msgid "Request not understood"
+msgstr ""
+
+msgid "Error 400"
+msgstr ""
+
+msgid "The request could not be understood"
+msgstr ""
+
+msgid "The page received a request it could not process. Go back, reload the page and try again."
+msgstr ""
+
+msgid "Access denied"
+msgstr ""
+
+msgid "Error 403"
+msgstr ""
+
+msgid "You do not have access to this page"
+msgstr ""
+
+msgid "Your account is signed in, but it does not have the permission this page requires."
+msgstr ""
+
+msgid "If you need access for your work, ask the person who manages your operations account."
+msgstr ""
+
+msgid "Go to your operations home"
+msgstr ""
+
+msgid "Go to the start page"
+msgstr ""
+
+msgid "Page not found"
+msgstr ""
+
+msgid "Error 404"
+msgstr ""
+
+msgid "This page does not exist, is no longer available, or is not available to your account."
+msgstr ""
+
+msgid "Check the address, or go back and follow a link from the previous page."
+msgstr ""
+
+msgid "Something went wrong"
+msgstr ""
+
+msgid "Error 500"
+msgstr ""
+
+msgid "An unexpected error prevented this page from loading. Try again in a few minutes."
+msgstr ""
+
+msgid "If the problem continues, contact support and mention the time it happened."
+msgstr ""
+
+msgid "Assign one role, badge type, access profile or access rule to every approved registration in your scope. Nothing changes until you execute the preview."
+msgstr ""
+
+msgid "What to assign"
+msgstr ""
+
+msgid "There is nothing you can assign in bulk."
+msgstr ""
+
+msgid "Active roles, badge types, access profiles and access rules appear here for the events where you may bulk-assign them."
+msgstr ""
+
+#, python-format
+msgid "%(counter)s registration will be affected"
+msgid_plural "%(counter)s registrations will be affected"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Unknown registration"
+msgstr ""
+
+msgid "Not eligible"
+msgstr ""
+
+msgid "No approved registrations in your scope for this event."
+msgstr ""
+
+msgid "Execute this bulk assignment?"
+msgstr ""
+
+#, python-format
+msgid "The assignment will be recorded for %(counter)s registration, exactly as previewed."
+msgid_plural "The assignment will be recorded for %(counter)s registrations, exactly as previewed."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Execute"
+msgstr ""
+
+msgid "I have checked the preview."
+msgstr ""
+
+msgid "Each registration was re-checked at execution time. Rows that changed since the preview were skipped."
+msgstr ""
+
+msgid "Execution summary"
+msgstr ""
+
+msgid "Not assigned"
+msgstr ""
+
+msgid "No registration was part of this operation."
+msgstr ""
+
+msgid "Start another bulk assignment"
+msgstr ""
+
+msgid "Back to the accreditation"
+msgstr ""
+
+msgid "Accreditation"
+msgstr ""
+
+msgid "Operational classifications assigned after registration. The participant never chooses these."
+msgstr ""
+
+msgid "Change role"
+msgstr ""
+
+msgid "New role"
+msgstr ""
+
+msgid "Revoke this participant role?"
+msgstr ""
+
+msgid "The assignment ends now and stays in the history. Assign it again if needed."
+msgstr ""
+
+msgid "Revoke role"
+msgstr ""
+
+msgid "Change badge type"
+msgstr ""
+
+msgid "Revoke this badge type?"
+msgstr ""
+
+msgid "Revoke badge type"
+msgstr ""
+
+msgid "Access profiles"
+msgstr ""
+
+msgid "Change access profile"
+msgstr ""
+
+msgid "New access profile"
+msgstr ""
+
+msgid "Revoke this access profile?"
+msgstr ""
+
+msgid "Revoke access profile"
+msgstr ""
+
+msgid "No current access profile assignment."
+msgstr ""
+
+msgid "Access rules"
+msgstr ""
+
+msgid "Change access rule"
+msgstr ""
+
+msgid "New access rule"
+msgstr ""
+
+msgid "Revoke this access rule?"
+msgstr ""
+
+msgid "Revoke access rule"
+msgstr ""
+
+msgid "No current access rule assignment."
+msgstr ""
+
+#, python-format
+msgid "%(counter)s message"
+msgid_plural "%(counter)s messages"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Messages appear here once the platform sends email in your scope."
+msgstr ""
+
+msgid "Confirm this action"
+msgstr ""
+
+msgid "Go back"
+msgstr ""
+
+msgid "I understand that this cannot be undone."
+msgstr ""
+
+msgid "Nothing was changed"
+msgstr ""
+
+msgid "Someone else, or another tab, may have updated this record. Reload it to see its current state before trying again."
+msgstr ""
+
+#, python-format
+msgid "Filter the choices for %(label)s"
+msgstr ""
+
+msgid "Type to filter the list"
+msgstr ""
+
+msgid "Choices shown:"
+msgstr ""
+
+msgid "Form expired"
+msgstr ""
+
+msgid "Your form could not be sent"
+msgstr ""
+
+msgid "For your security, a form is only accepted from the page that showed it, while your session is active. It may have expired, or your browser may be blocking cookies."
+msgstr ""
+
+msgid "Go back, reload the page and submit the form again. Nothing was saved from this attempt."
+msgstr ""
+
+msgid "Request an export"
+msgstr ""
+
+msgid "Exports contain a minimized set of fields: never identity document numbers, contact details or internal review notes."
+msgstr ""
+
+msgid "There is no data you can export yet."
+msgstr ""
+
+msgid "Events appear here once registrations exist in your export scope."
+msgstr ""
+
+#, python-format
+msgid "%(counter)s export"
+msgid_plural "%(counter)s exports"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Exports you request appear here until they expire."
+msgstr ""
+
+msgid "A campaign groups the invitation links you share with one organization for the event that is currently open."
+msgstr ""
+
+msgid "Campaign details"
+msgstr ""
+
+msgid "Invitation campaign"
+msgstr ""
+
+msgid "Copy the link into your message to the organization. Anyone with this link can start a registration for this campaign."
+msgstr ""
+
+msgid "Campaign summary"
+msgstr ""
+
+msgid "Campaign actions"
+msgstr ""
+
+msgid "The link itself is never stored. Rotate it to issue a new one and stop the old one working."
+msgstr ""
+
+msgid "Rotate the invitation link?"
+msgstr ""
+
+msgid "The current link stops working immediately. People who have not used it yet will need the new link."
+msgstr ""
+
+msgid "The current link stops working immediately."
+msgstr ""
+
+msgid "Change the campaign status?"
+msgstr ""
+
+msgid "Suspending or closing a campaign stops its link from starting new registrations."
+msgstr ""
+
+msgid "Registration claim"
+msgstr ""
+
+msgid "Your existing registrations are unchanged."
+msgstr ""
+
+msgid "Batch summary"
+msgstr ""
+
+msgid "Apply the valid rows"
+msgstr ""
+
+msgid "Each valid row receives a personal claim invitation by email. Invalid rows are skipped."
+msgstr ""
+
+msgid "Apply the valid rows?"
+msgstr ""
+
+msgid "A claim invitation is sent to every valid row. This cannot be undone from this page."
+msgstr ""
+
+#, python-format
+msgid "%(counter)s row"
+msgid_plural "%(counter)s rows"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Problems found"
+msgstr ""
+
+#, python-format
+msgid "Row %(number)s"
+msgstr ""
+
+msgid "The uploaded file contained no data rows."
+msgstr ""
+
+msgid "The file is checked first. Nothing is created until you review the results and apply the valid rows."
+msgstr ""
+
+msgid "Delegation file"
+msgstr ""
+
+msgid "Email addresses are stored encrypted and shown masked. Values that look like spreadsheet formulas are rejected."
+msgstr ""
+
+msgid "Start a draft for a participant. They complete and submit it themselves after claiming it with the link."
+msgstr ""
+
+msgid "The link works only for the email address you entered."
+msgstr ""
+
+msgid "Search the organizations in your authorized scope for the event that is currently open."
+msgstr ""
+
+msgid "Search organizations"
+msgstr ""
+
+msgid "Clear search"
+msgstr ""
+
+msgid "Matching organizations"
+msgstr ""
+
+#, python-format
+msgid "%(counter)s organization"
+msgid_plural "%(counter)s organizations"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Check the spelling, or try part of the official name. Only organizations in your scope are searched."
+msgstr ""
+
+msgid "Invitation campaigns and delegation lists for the organizations in your authorized scope."
+msgstr ""
+
+#, python-format
+msgid "%(counter)s campaign"
+msgid_plural "%(counter)s campaigns"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Find an organization to create its first invitation campaign."
+msgstr ""
+
+#, python-format
+msgid "%(counter)s batch"
+msgid_plural "%(counter)s batches"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Valid rows"
+msgstr ""
+
+#, python-format
+msgid "%(valid)s of %(total)s"
+msgstr ""
+
+msgid "Upload a delegation list from an organization's search result."
+msgstr ""
+
+msgid "Registrations that originate from the organizations in your scope, newest first."
+msgstr ""
+
+msgid "Registrations appear here once an invitation, delegation or on-behalf registration is used."
+msgstr ""
+
+msgid "Withdraw this registration?"
+msgstr ""
+
+msgid "The registration will be withdrawn and will no longer be reviewed. This cannot be undone."
+msgstr ""
+
+msgid "Withdraw registration"
+msgstr ""
+
+msgid "Operational cancellation"
+msgstr ""
+
+msgid "The registration will stop being processed. Its history and audit trail are kept."
+msgstr ""
+
+msgid "Cancel this registration?"
+msgstr ""
+
+msgid "The registration will be cancelled operationally and will stop being processed. This cannot be undone from this page."
+msgstr ""
+
+msgid "Keep the registration"
+msgstr ""
+
+msgid "Back to my registrations"
+msgstr ""
+
+msgid "The participant sees only the outcome and, if you give one, the participant-facing reason. Internal reasons and notes stay internal."
+msgstr ""
+
+msgid "Decision details"
+msgstr ""
+
+msgid "Record a Not Approved decision?"
+msgstr ""
+
+msgid "The registration will be marked Not Approved and the participant will see this outcome. It can only be changed by reopening the registration."
+msgstr ""
+
+msgid "The request is saved as a draft. The participant sees it only after you send it from the next page."
+msgstr ""
+
+msgid "Message to the participant"
+msgstr ""
+
+msgid "Write the message in English. French and Arabic versions are shown to participants who use those languages; English is used when a version is missing."
+msgstr ""
+
+msgid "A field correction or clarification needs a field; a document upload needs a document type."
+msgstr ""
+
+msgid "Request"
+msgstr ""
+
+#, python-format
+msgid "%(counter)s item"
+msgid_plural "%(counter)s items"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "No requested items."
+msgstr ""
+
+msgid "Request actions"
+msgstr ""
+
+msgid "The participant is notified and can respond from their workspace."
+msgstr ""
+
+msgid "Cancel this information request?"
+msgstr ""
+
+msgid "The participant can no longer respond to this request. This cannot be undone."
+msgstr ""
+
+msgid "Message from the review team"
+msgstr ""
+
+msgid "Please respond by"
+msgstr ""
+
+msgid "The review team will continue reviewing your registration."
+msgstr ""
+
+msgid "Your response"
+msgstr ""
+
+msgid "A JPEG or PNG image."
+msgstr ""
+
+msgid "Saving a draft keeps your typed answers; files are attached only when you submit."
+msgstr ""
+
+msgid "Open case"
+msgstr ""
+
+msgid "Reopening returns this Registration Context to review in a new review case. The earlier decision stays in the history."
+msgstr ""
+
+msgid "Reason for reopening"
+msgstr ""
+
+msgid "Select a kind"
+msgstr ""
+
+msgid "Leave the organization as is to include every organization in your scope."
+msgstr ""
+
+msgid "Add at least one requested item."
+msgstr ""
+
+msgid "This registration is not, or is no longer, approved. No entry pass can be issued or used for it."
+msgstr ""
+
+msgid "This registration has no current Participant Role assignment. Assign one before generating an entry pass."
+msgstr ""
+
+msgid "This registration has no current Badge Type assignment. Assign one before generating an entry pass."
+msgstr ""
+
+msgid "This registration has no current Access Profile assignment. Assign one before generating an entry pass."
+msgstr ""
+
+msgid "The Badge Type assignment belongs to another event edition."
+msgstr ""
+
+msgid "A current Participant Role, Badge Type and Access Profile assignment are all required first."
+msgstr ""
+
+msgid "This registration is not eligible for an entry pass."
+msgstr ""
+
+msgid "This registration already has a current entry pass."
+msgstr ""
+
+msgid "This entry pass can no longer be activated or resumed: its validity period has ended."
+msgstr ""
+
+msgid "This registration has no current entry pass to replace."
+msgstr ""
+
+msgid "This action is not possible in the entry pass's current state. Reload the page and check its status."
+msgstr ""
+
+msgid "The entry pass could not be issued because the signing key or the event configuration is not ready. Contact the credential key custodian."
+msgstr ""
+
+msgid "Too many fallback reference lookups. Wait a few minutes before trying again."
+msgstr ""
+
+msgid "The key identifier must be the letter v followed by one to four digits, such as v2."
+msgstr ""
+
+msgid "A verification key must be a PEM-encoded EC public key on the NIST P-256 curve, containing public key material only."
+msgstr ""
+
+msgid "A verification key with this identifier already exists."
+msgstr ""
+
+msgid "This operation is not possible in the verification key's current status."
+msgstr ""
+
+msgid "The signing service does not hold this key yet. Configure the signing key before promoting it."
+msgstr ""
+
+msgid "Choose a reason from the list."
+msgstr ""
+
+msgid "This verification key operation was refused."
+msgstr ""
+
+msgid "This entry pass operation could not be completed. Reload the page and try again."
+msgstr ""
+
+msgid "There is not enough available stock of this Badge Type at this location."
+msgstr ""
+
+msgid "The Badge Type does not match this registration's current assignment. Reload the page."
+msgstr ""
+
+msgid "These records belong to different event editions."
+msgstr ""
+
+msgid "This registration is no longer approved, so no physical badge can be issued or replaced for it."
+msgstr ""
+
+msgid "A stock location with this code already exists for this event."
+msgstr ""
+
+msgid "This record changed since you loaded it. Reload and try again."
+msgstr ""
+
+msgid "This action is not possible in the record's current state. Reload the page and check it."
+msgstr ""
+
+msgid "This stock operation could not be completed. Reload the page and try again."
+msgstr ""
+
+msgid "The request could not be completed. Reload the page and try again. If the problem continues, contact the operations desk."
+msgstr ""
+
+msgid "Enter the two-letter issuing country code, for example FR."
+msgstr ""
+
+msgid "Choose a future expiry for the device."
+msgstr ""
+
+msgid "The device expiry exceeds the maximum enrollment period."
+msgstr ""
+
+msgid "A device cannot stay enrolled after its event edition has ended."
+msgstr ""
+
+msgid "The gate and the zones must be active and belong to the same venue of this event."
+msgstr ""
+
+msgid "Choose at least one valid verification method."
+msgstr ""
+
+msgid "Enter an operational name for the device."
+msgstr ""
+
+msgid "A reason is required."
+msgstr ""
+
+msgid "The device configuration is not valid."
+msgstr ""
+
+msgid "This device has expired."
+msgstr ""
+
+msgid "This change is not possible in the device's current state. Reload the page."
+msgstr ""
+
+msgid "This gate or zone is outside this device's scope."
+msgstr ""
+
+msgid "This checkpoint is not active."
+msgstr ""
+
+msgid "This checkpoint cannot be opened on this device."
+msgstr ""
+
+msgid "You are not authorized to perform this action here."
+msgstr ""
+
+msgid "This entry operation could not be completed. Reload the page and try again."
+msgstr ""

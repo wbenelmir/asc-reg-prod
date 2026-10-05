@@ -1,0 +1,847 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ASC 2026 Entry Device API",
+    "version": "1.1.0",
+    "description": "Device API boundary for enrolled-device offline preparation (Phase 4 Prompt 2, ADR-0023, binding decision P2-A) and offline operation synchronization (Phase 4 Prompt 3, ADR-0024, docs/security/offline_sync_contract.md). Hand-maintained and contract-tested by apps/entry/tests/test_offline_api.py and test_offline_sync_api.py; no schema generator is used. Every endpoint is POST, JSON, CSRF-protected (X-CSRFToken), Cache-Control: no-store, and -- except the quarantine boundary -- authenticated by the HttpOnly device cookie (Path=/entry/). Signed calls also carry X-ASC-Device-Nonce and X-ASC-Device-Signature: an ES256 raw r||s signature, by the device's registered non-extractable signing key, over 'ASC-DEVICE-PROOF-v1\\n' + purpose + '\\n' + nonce + '\\n' + hex(SHA-256(body)). Every response from an identified device carries X-ASC-Next-Nonce (single use). Version 1.1.0 adds /offline/sync/ and /offline/sync/quarantine/ (additive; every 1.0.0 path is unchanged)."
+  },
+  "servers": [
+    {
+      "url": "/entry/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "deviceCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "asc_entry_device"
+      },
+      "operationalSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "sessionid"
+      }
+    },
+    "parameters": {
+      "Nonce": {
+        "name": "X-ASC-Device-Nonce",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "Signature": {
+        "name": "X-ASC-Device-Signature",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "Csrf": {
+        "name": "X-CSRFToken",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message",
+              "correlation_id"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string",
+                "description": "Safe, localized; never an exception text."
+              },
+              "correlation_id": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Directive": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "BLOCK",
+              "PURGE_PACKAGE",
+              "LOCK_OPERATIONS",
+              "REVOKE_GRANTS",
+              "EMERGENCY_WIPE"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "grants": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "order": {
+            "type": "string",
+            "description": "Compact JWS, typ ASC-OWIPE, verified against the pinned package keys."
+          }
+        }
+      },
+      "Heartbeat": {
+        "type": "object",
+        "required": [
+          "server_time",
+          "nonce",
+          "report_accepted",
+          "device",
+          "offline",
+          "directives"
+        ],
+        "properties": {
+          "server_time": {
+            "type": "integer"
+          },
+          "nonce": {
+            "type": "string"
+          },
+          "report_accepted": {
+            "type": "boolean"
+          },
+          "device": {
+            "type": "object",
+            "required": [
+              "public_id",
+              "name",
+              "status",
+              "expires_at",
+              "event",
+              "gate"
+            ]
+          },
+          "offline": {
+            "type": "object",
+            "required": [
+              "available",
+              "unavailable_reason",
+              "scope_version",
+              "sensitivity",
+              "prepared",
+              "prepared_at",
+              "self_tested_at",
+              "ready",
+              "latest_package_version"
+            ]
+          },
+          "directives": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Directive"
+            }
+          }
+        }
+      },
+      "Provisioned": {
+        "type": "object",
+        "required": [
+          "device",
+          "trust_anchors"
+        ],
+        "properties": {
+          "device": {
+            "type": "string"
+          },
+          "trust_anchors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "kid",
+                "spki"
+              ]
+            }
+          }
+        }
+      },
+      "Envelope": {
+        "type": "object",
+        "required": [
+          "manifest",
+          "ciphertext"
+        ],
+        "properties": {
+          "manifest": {
+            "type": "string",
+            "description": "Compact JWS (ES256, typ ASC-OPKG or ASC-ODELTA) over the canonical manifest."
+          },
+          "ciphertext": {
+            "type": "string",
+            "description": "base64url AES-256-GCM ciphertext; readable only by the device."
+          }
+        }
+      },
+      "SelfTestResult": {
+        "type": "object",
+        "required": [
+          "ready"
+        ],
+        "properties": {
+          "ready": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Grant": {
+        "type": "object",
+        "required": [
+          "grant",
+          "grant_id",
+          "expires_at"
+        ],
+        "properties": {
+          "grant": {
+            "type": "string",
+            "description": "Compact JWS, typ ASC-OGRANT."
+          },
+          "grant_id": {
+            "type": "string"
+          },
+          "expires_at": {
+            "type": "integer"
+          }
+        }
+      },
+      "Recorded": {
+        "type": "object",
+        "required": [
+          "recorded"
+        ],
+        "properties": {
+          "recorded": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PackageBuilding": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "package_version",
+          "retry_after_seconds"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "BUILDING"
+            ]
+          },
+          "package_version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The version reserved for the open build."
+          },
+          "retry_after_seconds": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "SignedOperation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation_id",
+          "sequence",
+          "op",
+          "signature"
+        ],
+        "properties": {
+          "operation_id": {
+            "type": "string",
+            "description": "The client operation id: a canonical lowercase UUID version 4 (crypto.randomUUID). Globally unique; the idempotency key."
+          },
+          "sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Local store sequence.",
+            "maximum": 9007199254740991
+          },
+          "op": {
+            "type": "string",
+            "description": "Exact canonical operation JSON, at most 8192 UTF-8 bytes. See offline_sync_contract.md. Unknown fields are rejected; malformed content retains only digest metadata."
+          },
+          "signature": {
+            "type": "string",
+            "description": "base64url raw ES256 (r||s) over the UTF-8 bytes of `op`, by a signing key registered to the device."
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Override note only (the operation carries its salted SHA-256 digest). Stored encrypted; never inside the operation body."
+          }
+        }
+      },
+      "SyncBatch": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "store",
+          "operations"
+        ],
+        "properties": {
+          "store": {
+            "type": "string",
+            "description": "The local store id (22 base64url)."
+          },
+          "operations": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/SignedOperation"
+            },
+            "description": "In the device's sequence order; bounded by ENTRY_OFFLINE_SYNC_BATCH_SIZE and ENTRY_OFFLINE_SYNC_BATCH_BYTES."
+          }
+        },
+        "description": "Bounded operations in strictly increasing device-local sequence order. UNORDERED_BATCH is refused before intake."
+      },
+      "QuarantineBatch": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "device",
+          "store",
+          "operations"
+        ],
+        "properties": {
+          "device": {
+            "type": "string",
+            "description": "The revoked device's public id."
+          },
+          "store": {
+            "type": "string"
+          },
+          "operations": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/SignedOperation"
+            }
+          }
+        }
+      },
+      "Acknowledgement": {
+        "type": "object",
+        "required": [
+          "operation_id",
+          "sequence",
+          "status",
+          "outcome",
+          "conflict_type",
+          "durable",
+          "replayed",
+          "ack"
+        ],
+        "properties": {
+          "operation_id": {
+            "type": "string"
+          },
+          "sequence": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "APPLIED",
+              "CONFLICT",
+              "RECONCILIATION_REQUIRED",
+              "SECURITY_CONFLICT",
+              "REJECTED",
+              "QUARANTINED",
+              "PENDING",
+              "NOT_PROCESSED"
+            ],
+            "description": "The six final statuses are durable; PENDING and NOT_PROCESSED are not (the device keeps the record and uploads it again)."
+          },
+          "outcome": {
+            "type": "string",
+            "description": "Stable machine-readable outcome code."
+          },
+          "conflict_type": {
+            "type": "string",
+            "description": "Reconciliation case type, or ''."
+          },
+          "durable": {
+            "type": "boolean"
+          },
+          "replayed": {
+            "type": "boolean",
+            "description": "True for a repeated operation id with identical bytes: the ORIGINAL durable outcome is returned; nothing is written again."
+          },
+          "ack": {
+            "type": "string",
+            "description": "Durable only: compact JWS (ES256, typ ASC-OACK) signed with the package-signing family, verified by the device against its PINNED keys before it marks the record acknowledged. Empty when not durable."
+          }
+        }
+      },
+      "SyncResult": {
+        "type": "object",
+        "required": [
+          "server_time",
+          "acknowledgements"
+        ],
+        "properties": {
+          "server_time": {
+            "type": "integer"
+          },
+          "acknowledgements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Acknowledgement"
+            },
+            "description": "One per submitted operation, in order. The batch stops at the first operation without a durable outcome; the rest are NOT_PROCESSED."
+          }
+        }
+      }
+    },
+    "responses": {
+      "Error400": {
+        "description": "Malformed request or failed proof",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Error401": {
+        "description": "No enrolled device matches the credential",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Error403": {
+        "description": "CSRF failure or insufficient permission",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Error409": {
+        "description": "Offline preparation unavailable",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Error429": {
+        "description": "Download or upload budget exhausted",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/offline/heartbeat/": {
+      "post": {
+        "summary": "Passive health check: server time, next nonce, directives; optional signed state report (counts only).",
+        "security": [
+          {
+            "deviceCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Heartbeat"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          }
+        }
+      }
+    },
+    "/offline/provision/": {
+      "post": {
+        "summary": "Register the device's two new public keys (proof signed by the new signing key); returns the package-verification keys to pin.",
+        "security": [
+          {
+            "deviceCookie": [],
+            "operationalSession": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Provisioned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Provisioned"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          }
+        }
+      }
+    },
+    "/offline/package/": {
+      "post": {
+        "summary": "The newest READY immutable package version: stored bytes, byte-identical on retry; 204 when have_version already equals it; 202 BUILDING (with Retry-After) while the device's one open build runs. The request never builds a package itself.",
+        "security": [
+          {
+            "deviceCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Package",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "No servable package yet: the device's one open build is pending or running. Ask again after Retry-After seconds.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PackageBuilding"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Already up to date"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error429"
+          }
+        }
+      }
+    },
+    "/offline/delta/": {
+      "post": {
+        "summary": "A new signed, encrypted critical delta for the named package. Advances only critical_delta_cutoff_at.",
+        "security": [
+          {
+            "deviceCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error429"
+          }
+        }
+      }
+    },
+    "/offline/self-test/": {
+      "post": {
+        "summary": "Self-test report by a signed-in device administrator; OFFLINE_READY only when every required check passed on the current package.",
+        "security": [
+          {
+            "deviceCookie": [],
+            "operationalSession": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recorded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SelfTestResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          }
+        }
+      }
+    },
+    "/offline/grant/": {
+      "post": {
+        "summary": "A signed operator offline grant, issued online to the operator of a live checkpoint session on an OFFLINE_READY device.",
+        "security": [
+          {
+            "deviceCookie": [],
+            "operationalSession": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Issued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Grant"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          }
+        }
+      }
+    },
+    "/offline/wipe-report/": {
+      "post": {
+        "summary": "Evidence metadata (counts, sequence range, chain head) a device reports immediately before executing an emergency wipe.",
+        "security": [
+          {
+            "deviceCookie": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Recorded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Recorded"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          }
+        }
+      }
+    },
+    "/offline/sync/": {
+      "post": {
+        "summary": "Ordered, idempotent upload of signed offline operations (purpose sync). Any device status: uploads of a device that is not operational are QUARANTINED, never applied.",
+        "security": [
+          {
+            "deviceCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Nonce"
+          },
+          {
+            "$ref": "#/components/parameters/Signature"
+          },
+          {
+            "$ref": "#/components/parameters/Csrf"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncBatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Per-operation acknowledgements",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error429"
+          }
+        }
+      }
+    },
+    "/offline/sync/quarantine/": {
+      "post": {
+        "summary": "Quarantine ingestion for a REVOKED device (binding decision P2-F): no device cookie; every operation must verify against a signing key registered to the named device. Nothing unattributable is stored; nothing is ever applied. Until an operation signature verifies, the request is unauthenticated: it never spends the device's upload budget; its refusal is audited at most once per device, reason and budget window, also under concurrency (a transaction-scoped PostgreSQL advisory lock per device and reason serializes the existence check and the insert; the lock is only ever tried, so a request that finds it held is refused exactly as before, without waiting and without an audit row); and verification stops at the first operation no registered key verifies, so only the verified prefix of the batch is acknowledged (Prompt 3 corrections 4 and 5, R-02).",
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Csrf"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuarantineBatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Per-operation acknowledgements (QUARANTINED or REJECTED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error429"
+          }
+        }
+      }
+    }
+  }
+}

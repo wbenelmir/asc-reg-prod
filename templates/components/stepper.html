@@ -1,0 +1,39 @@
+{% load i18n %}
+{% comment %}
+  Registration wizard progress (Finder add-listing step sidebar, adapted).
+  `steps` comes from `registration_ui.wizard_stepper`: each step has a number,
+  label, url, and state (done / current / available / upcoming). Done and
+  available steps are links (each step is an ordinary GET page), the current step carries
+  aria-current="step", upcoming steps are plain text. State is conveyed by
+  text for assistive technology and by marker + icon visually, never by
+  colour alone.
+{% endcomment %}
+<nav class="asc-stepper" aria-labelledby="asc-stepper-count">
+  <p class="asc-stepper-count" id="asc-stepper-count">{% blocktrans with number=current_number total=steps|length %}Step {{ number }} of {{ total }}{% endblocktrans %}{% for step in steps %}{% if step.state == "current" %}<span class="asc-stepper-now" aria-hidden="true"> · {{ step.label }}</span>{% endif %}{% endfor %}</p>
+  {# P4-4: an SVG width attribute, not an inline style, so the enforced CSP needs no 'unsafe-inline'. #}
+  <svg class="asc-stepper-bar" viewBox="0 0 100 4" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect width="{{ progress_percent }}" height="4"></rect></svg>
+  <ol>
+    {% for step in steps %}
+      <li class="asc-step asc-step-{{ step.state }}"{% if step.state == "current" %} aria-current="step"{% endif %}>
+        {% if step.state == "done" %}
+          <a href="{{ step.url }}">
+            <span class="asc-step-marker">{% include "components/icon.html" with name="check" size="sm" %}</span>
+            <span class="asc-step-label">{{ step.label }}</span>
+            <span class="visually-hidden">{% trans "(completed)" %}</span>
+          </a>
+        {% elif step.state == "available" %}
+          <a href="{{ step.url }}">
+            <span class="asc-step-marker">{{ step.number }}</span>
+            <span class="asc-step-label">{{ step.label }}</span>
+          </a>
+        {% else %}
+          <span class="asc-step-item">
+            <span class="asc-step-marker">{{ step.number }}</span>
+            <span class="asc-step-label">{{ step.label }}</span>
+            {% if step.state == "current" %}<span class="visually-hidden">{% trans "(current step)" %}</span>{% endif %}
+          </span>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+</nav>

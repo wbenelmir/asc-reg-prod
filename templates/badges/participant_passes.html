@@ -1,0 +1,117 @@
+{% extends "layouts/base_workspace.html" %}
+{% load i18n %}
+
+{% comment %}
+Participant-facing pass surface (UI/UX §7.3, §10.2).
+
+Shows only the authenticated participant's OWN current credential for each
+registration context: one card per context, one clear status carried by
+text, icon and colour, and -- when and only when the credential is ACTIVE --
+a usable QR image. Per UI/UX §7.3 the card also shows the context's
+Registration Reference, the participant's own display name, the validity,
+and the instruction that identity may still be checked.
+
+No internal reason, reviewer identity, assignment history, signing-key
+detail, or previous credential version appears here. The QR payload itself
+carries no personal data (docs/security/qr_contract.md).
+
+Codes (event code, references) are isolated with <bdi dir="ltr">; only the
+QR graphic's own wrapper is dir="ltr" so it never mirrors in RTL, while the
+caption beside it keeps the page direction.
+{% endcomment %}
+
+{% block title %}{% trans "My entry passes" %}{% endblock %}
+
+{% block content %}
+  <div class="asc-page-head">
+    <h1>{% trans "My entry passes" %}</h1>
+    <p>{% trans "Show the QR code of the right registration at the entry checkpoint. Keep it private." %}</p>
+  </div>
+
+  {% if not passes %}
+    <section class="asc-card">
+      <div class="asc-empty">
+        <span class="asc-tile">{% include "components/icon.html" with name="qr" %}</span>
+        <h2>{% trans "You do not have an entry pass yet." %}</h2>
+        <p>{% trans "An entry pass appears here after your registration is approved and your pass is issued." %}</p>
+        <a class="btn btn-outline-primary mt-2" href="{% url 'registrations:workspace' %}">{% trans "View my registrations" %}</a>
+      </div>
+    </section>
+  {% endif %}
+
+  {% for item in passes %}
+    {% with status=item.credential.status %}
+    <section class="asc-card asc-pass mb-4" aria-labelledby="pass-heading-{{ forloop.counter }}">
+      <div class="asc-pass-body">
+        <p class="text-body-secondary mb-1 small">{% trans "Registration context" %}</p>
+        <h2 class="h4 mb-2" id="pass-heading-{{ forloop.counter }}">
+          <bdi>{{ item.registration.event_edition.name }}</bdi>
+          <bdi dir="ltr" class="asc-chip asc-chip-outline asc-code ms-1">{{ item.registration.event_edition.code }}</bdi>
+        </h2>
+
+        <p class="mb-3" data-pass-status="{{ status }}">
+          {% if status == "ACTIVE" and item.has_usable_qr %}
+            <span class="asc-chip asc-chip-success">{% include "components/icon.html" with name="check-circle" size="sm" %}<strong>{{ item.status_message }}</strong></span>
+          {% elif status == "INACTIVE" or status == "SUSPENDED" %}
+            <span class="asc-chip asc-chip-warning">{% include "components/icon.html" with name="clock" size="sm" %}<strong>{{ item.status_message }}</strong></span>
+          {% elif status == "REVOKED" %}
+            <span class="asc-chip asc-chip-danger">{% include "components/icon.html" with name="x-circle" size="sm" %}<strong>{{ item.status_message }}</strong></span>
+          {% else %}
+            <span class="asc-chip">{% include "components/icon.html" with name="info" size="sm" %}<strong>{{ item.status_message }}</strong></span>
+          {% endif %}
+        </p>
+
+        <dl class="asc-dl">
+          {% if item.registration.person.display_name %}
+            <dt>{% trans "Participant" %}</dt>
+            <dd><bdi>{{ item.registration.person.display_name }}</bdi></dd>
+          {% endif %}
+          <dt>{% trans "Registration reference" %}</dt>
+          <dd><bdi dir="ltr" class="asc-code">{{ item.registration.public_reference }}</bdi></dd>
+          <dt>{% trans "Fallback reference" %}</dt>
+          <dd><bdi dir="ltr" class="asc-code">{{ item.fallback_reference_display }}</bdi></dd>
+          <dt>{% trans "Valid from" %}</dt>
+          <dd>{{ item.valid_from }}</dd>
+          <dt>{% trans "Valid until" %}</dt>
+          <dd>{{ item.valid_until }}</dd>
+        </dl>
+
+        <div class="asc-notice asc-notice-neutral mt-3">
+          {% include "components/icon.html" with name="id-card" %}
+          <p>{% trans "Your identity may still be checked at entry. Bring the identity document you registered with." %}</p>
+        </div>
+
+        {% if item.has_usable_qr %}
+          <a class="btn btn-outline-secondary mt-3"
+             href="{% url 'badges:participant-pass-print' public_id=item.public_id %}">
+            {% include "components/icon.html" with name="badge" %}<span>{% trans "Print entry pass" %}</span>
+          </a>
+        {% elif item.may_become_active %}
+          <p class="form-text mt-3 mb-0">
+            {% trans "An entry pass QR code becomes available once your pass is active." %}
+          </p>
+        {% endif %}
+      </div>
+
+      {% if item.has_usable_qr %}
+        {% comment %}
+        The image endpoint reconstructs the credential server-side. The URL
+        carries only the pass's random public identifier, never the
+        credential value itself.
+        {% endcomment %}
+        <div class="asc-pass-qr">
+          {# dir="ltr" on the symbol's own wrapper only: the QR never mirrors, while the caption keeps the page direction. #}
+          <div class="pass-qr" dir="ltr">
+            <img src="{{ item.qr_image_url }}"
+                 alt="{% trans 'QR code for your entry pass. Present it at the entry checkpoint.' %}"
+                 width="320" height="320"
+                 data-pass-qr="{{ item.public_id }}">
+          </div>
+          <p>{% trans "Present this QR code at the entry checkpoint. Do not share it." %}</p>
+        </div>
+      {% endif %}
+      <div class="asc-motif" aria-hidden="true"></div>
+    </section>
+    {% endwith %}
+  {% endfor %}
+{% endblock %}

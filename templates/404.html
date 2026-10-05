@@ -1,0 +1,19 @@
+{% extends "layouts/base_error.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% trans "Page not found" %}{% endblock %}
+{% block error_icon %}{% include "components/icon.html" with name="search" size="lg" %}{% endblock %}
+{% block error_code %}{% trans "Error 404" %}{% endblock %}
+{% block error_title %}{% trans "Page not found" %}{% endblock %}
+{% block error_body %}
+  <p>{% trans "This page does not exist, is no longer available, or is not available to your account." %}</p>
+  <p>{% trans "Check the address, or go back and follow a link from the previous page." %}</p>
+{% endblock %}
+{% block error_actions %}
+  {% if request.user.is_authenticated %}
+    <a class="btn btn-primary" href="{% operations_home_url %}">{% trans "Go to your operations home" %}</a>
+  {% elif participant_authenticated %}
+    <a class="btn btn-primary" href="{% url 'registrations:workspace' %}">{% trans "Go to my registrations" %}</a>
+  {% else %}
+    <a class="btn btn-primary" href="{% url 'home' %}">{% trans "Go to the start page" %}</a>
+  {% endif %}
+{% endblock %}

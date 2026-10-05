@@ -1,0 +1,97 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% trans "Delegation batch" %}{% endblock %}
+{% block breadcrumbs %}{% url 'invitations:workspace-dashboard' as parent_url %}{% trans "Organization Workspace" as parent_label %}{% trans "Delegation batch" as current %}{% include "components/breadcrumb_trail.html" with parent_label=parent_label parent_url=parent_url current=current %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker"><bdi>{{ batch.organization.official_name }}</bdi></p>
+      <h1>{% trans "Delegation batch" %}</h1>
+      <ul class="asc-chip-list mt-2" aria-label="{% trans 'Current status' %}">
+        <li>{% status_chip "delegation_batch" batch.status batch.get_status_display %}</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="asc-kpis mb-3" role="group" aria-label="{% trans 'Batch summary' %}">
+    <div class="asc-kpi">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="list" size="sm" %}{% trans "Rows" %}</span>
+      <span class="asc-kpi-value">{{ batch.row_count }}</span>
+    </div>
+    <div class="asc-kpi asc-kpi-success">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="check" size="sm" %}{% trans "Valid" %}</span>
+      <span class="asc-kpi-value">{{ batch.valid_row_count }}</span>
+    </div>
+    <div class="asc-kpi asc-kpi-info">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="check-circle" size="sm" %}{% trans "Applied" %}</span>
+      <span class="asc-kpi-value">{{ batch.applied_row_count }}</span>
+    </div>
+  </div>
+
+  {% if batch.status == "VALIDATED" and can_apply %}
+    <section class="asc-card" aria-labelledby="apply-heading">
+      <h2 class="asc-card-title" id="apply-heading">{% include "components/icon.html" with name="send" %}{% trans "Apply the valid rows" %}</h2>
+      <p class="asc-section-lead">{% trans "Each valid row receives a personal claim invitation by email. Invalid rows are skipped." %}</p>
+      <form method="post" action="{% url 'invitations:delegation-apply' pk=batch.pk %}"
+            data-confirm-tone="primary"
+            data-confirm-title="{% trans 'Apply the valid rows?' %}"
+            data-confirm="{% trans 'A claim invitation is sent to every valid row. This cannot be undone from this page.' %}"
+            data-confirm-action="{% trans 'Apply valid rows' %}">
+        {% csrf_token %}
+        {% include "components/confirm_fallback.html" with id="delegation-apply-confirm" %}
+        <button type="submit" class="btn btn-primary"><span>{% trans "Apply valid rows" %}</span></button>
+      </form>
+    </section>
+  {% endif %}
+
+  <section class="asc-card asc-card-flush" aria-labelledby="delegation-rows-heading">
+    <div class="asc-card-toolbar">
+      <h2 class="asc-card-toolbar-title" id="delegation-rows-heading">{% trans "Delegation row results" %}</h2>
+      <span class="asc-count">{% blocktrans count counter=rows|length %}{{ counter }} row{% plural %}{{ counter }} rows{% endblocktrans %}</span>
+    </div>
+    {% if rows %}
+      <div class="asc-table-wrap asc-wide-only">
+        <table class="asc-table" aria-labelledby="delegation-rows-heading">
+          <thead>
+            <tr>
+              <th scope="col" class="asc-num">{% trans "Row" %}</th>
+              <th scope="col">{% trans "Email" %}</th>
+              <th scope="col">{% trans "Status" %}</th>
+              <th scope="col">{% trans "Problems found" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in rows %}
+              <tr>
+                <th scope="row" class="asc-num">{{ entry.row.row_number }}</th>
+                <td>{% if entry.masked_email %}<bdi dir="ltr" class="asc-code">{{ entry.masked_email }}</bdi>{% else %}<span class="asc-muted">—</span>{% endif %}</td>
+                <td>{% status_chip "delegation_row" entry.row.status entry.row.get_status_display %}</td>
+                <td>{% for code in entry.row.error_codes %}<span class="d-block">{{ code|code_label:"delegation_error" }}</span>{% empty %}<span class="asc-muted">{% trans "None" %}</span>{% endfor %}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <ul class="asc-records asc-narrow-only" aria-labelledby="delegation-rows-heading">
+        {% for entry in rows %}
+          <li class="asc-record" data-record>
+            <div class="asc-record-head">
+              <h3 class="asc-record-title">{% blocktrans with number=entry.row.row_number %}Row {{ number }}{% endblocktrans %}</h3>
+              {% if entry.masked_email %}<p class="asc-record-meta"><bdi dir="ltr" class="asc-code">{{ entry.masked_email }}</bdi></p>{% endif %}
+            </div>
+            <dl class="asc-record-fields">
+              <div><dt>{% trans "Status" %}</dt><dd>{% status_chip "delegation_row" entry.row.status entry.row.get_status_display %}</dd></div>
+              <div><dt>{% trans "Problems found" %}</dt><dd>{% for code in entry.row.error_codes %}<span class="d-block">{{ code|code_label:"delegation_error" }}</span>{% empty %}<span class="asc-muted">{% trans "None" %}</span>{% endfor %}</dd></div>
+            </dl>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="asc-empty">
+        <span class="asc-tile">{% include "components/icon.html" with name="inbox" %}</span>
+        <h3>{% trans "No rows." %}</h3>
+        <p>{% trans "The uploaded file contained no data rows." %}</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

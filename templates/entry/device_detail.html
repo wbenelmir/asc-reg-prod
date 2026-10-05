@@ -1,0 +1,170 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% block title %}{{ device.public_name }}{% endblock %}
+
+{% block breadcrumbs %}
+  <nav aria-label="{% trans 'Breadcrumb' %}" class="asc-breadcrumbs">
+    <ol>
+      <li><a href="{% url 'registrations:ops-intake-list' %}">{% trans "Operations" %}</a>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><a href="{% url 'entry:device-list' device.event_edition_id %}">{% trans "Entry devices" %}</a>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><span aria-current="page"><bdi>{{ device.public_name }}</bdi></span></li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="asc-page-head">
+    <h1><bdi>{{ device.public_name }}</bdi></h1>
+    <p>{% include "entry/_device_status.html" with status=device.status label=device.get_status_display %} <bdi>{{ device.event_edition.name }}</bdi></p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <section class="asc-card" aria-labelledby="device-heading">
+        <h2 class="asc-card-title" id="device-heading">{% include "components/icon.html" with name="tablet" %}{% trans "Device" %}</h2>
+        <dl class="asc-dl">
+          <dt>{% trans "Device key reference" %}</dt><dd><bdi dir="ltr" class="asc-code">{{ device.device_key_id|default:"—" }}</bdi></dd>
+          <dt>{% trans "Enrolled" %}</dt><dd>{{ device.enrolled_at|date:"Y-m-d H:i"|default:"—" }}</dd>
+          <dt>{% trans "Expires" %}</dt><dd>{{ device.expires_at|date:"Y-m-d H:i" }}</dd>
+          <dt>{% trans "Last seen" %}</dt><dd>{{ device.last_seen_at|date:"Y-m-d H:i"|default:"—" }}</dd>
+          <dt>{% trans "Browser" %}</dt><dd class="fw-normal"><bdi dir="ltr">{{ device.platform_summary|default:"—" }}</bdi></dd>
+          <dt>{% trans "Mode" %}</dt><dd>{% if device.status == "OFFLINE_READY" %}{% trans "Online, offline ready" %}{% else %}{% trans "Online only" %}{% endif %}</dd>
+        </dl>
+      </section>
+      <section class="asc-card" aria-labelledby="offline-heading" data-offline-readiness>
+        <h2 class="asc-card-title" id="offline-heading">{% include "components/icon.html" with name="cloud-off" %}{% trans "Offline readiness" %}</h2>
+        {% if offline.unavailable_code %}
+          <p class="asc-notice asc-notice-neutral d-block mb-3" data-offline-unavailable="{{ offline.unavailable_code }}">{{ offline.unavailable_label }}</p>
+        {% endif %}
+        <dl class="asc-dl">
+          <dt>{% trans "Scope permits offline" %}</dt><dd>{% if offline.scope_capable %}{% trans "Yes" %} ({{ offline.sensitivity }}){% else %}{% trans "No" %}{% endif %}</dd>
+          <dt>{% trans "Last preparation" %}</dt><dd>{{ offline.prepared_at|date:"Y-m-d H:i"|default:"—" }}</dd>
+          <dt>{% trans "Last self-test" %}</dt><dd>{{ offline.self_test_at|date:"Y-m-d H:i"|default:"—" }}</dd>
+          {% if offline.blocked_at %}<dt>{% trans "Offline use blocked" %}</dt><dd>{{ offline.blocked_at|date:"Y-m-d H:i" }}</dd>{% endif %}
+          <dt>{% trans "Device keys" %}</dt>
+          <dd>{% for key in offline.keys %}<span class="d-block fw-normal">{{ key.purpose }} v{{ key.version }} <bdi dir="ltr" class="asc-code">{{ key.fingerprint }}</bdi></span>{% empty %}—{% endfor %}</dd>
+          {% if offline.package %}
+            <dt>{% trans "Offline package" %}</dt><dd>v<bdi dir="ltr">{{ offline.package.version }}</bdi> — {{ offline.package.status }} ({{ offline.package.sensitivity }})</dd>
+            <dt>{% trans "Package data cutoff" %}</dt><dd>{{ offline.package.data_cutoff_at|date:"Y-m-d H:i" }}</dd>
+            <dt>{% trans "Hard expiry" %}</dt><dd>{{ offline.package.expires_at|date:"Y-m-d H:i" }} <span class="asc-chip {% if offline.package.band == 'FRESH' %}asc-chip-success{% elif offline.package.band == 'AGING' %}asc-chip-info{% else %}asc-chip-warning{% endif %}" data-offline-band="{{ offline.package.band }}">{% if offline.package.band == "FRESH" %}{% trans "Fresh" %}{% elif offline.package.band == "AGING" %}{% trans "Ageing" %}{% elif offline.package.band == "STALE" %}{% trans "Stale" %}{% else %}{% trans "Expired" %}{% endif %}</span></dd>
+            <dt>{% trans "Contexts in the package" %}</dt><dd>{{ offline.package.entries }}</dd>
+            <dt>{% trans "Downloads" %}</dt><dd>{{ offline.package.downloads }}</dd>
+          {% endif %}
+          {% if offline.delta %}<dt>{% trans "Last critical update" %}</dt><dd>v<bdi dir="ltr">{{ offline.delta.version }}</bdi> — {{ offline.delta.cutoff|date:"Y-m-d H:i" }}</dd>{% endif %}
+          <dt>{% trans "Last device report" %}</dt>
+          <dd>{% if offline.reported.at %}{{ offline.reported.at|date:"Y-m-d H:i" }} — {% blocktrans with pending=offline.reported.pending|default:0 locked=offline.reported.locked|default:0 %}{{ pending }} pending, {{ locked }} locked{% endblocktrans %}{% else %}—{% endif %}</dd>
+          {% if offline.wipe_order %}<dt>{% trans "Emergency wipe ordered" %}</dt><dd>{{ offline.wipe_order.created_at|date:"Y-m-d H:i" }} <bdi dir="ltr" class="asc-code">{{ offline.wipe_order.public_id }}</bdi></dd>{% endif %}
+        </dl>
+      </section>
+      <section class="asc-card" aria-labelledby="sync-heading" data-offline-sync>
+        <h2 class="asc-card-title" id="sync-heading">{% include "components/icon.html" with name="refresh" %}{% trans "Offline synchronization" %}</h2>
+        <dl class="asc-dl">
+          <dt>{% trans "Last successful synchronization" %}</dt><dd>{{ offline.sync.last_sync_at|date:"Y-m-d H:i"|default:"—" }}</dd>
+          <dt>{% trans "Uploaded" %}</dt><dd><bdi dir="ltr">{{ offline.sync.counts.uploaded }}</bdi></dd>
+          <dt>{% trans "Accepted" %}</dt><dd><bdi dir="ltr">{{ offline.sync.counts.accepted }}</bdi></dd>
+          <dt>{% trans "Duplicate uploads" %}</dt><dd><bdi dir="ltr">{{ offline.sync.counts.duplicate }}</bdi></dd>
+          <dt>{% trans "Rejected" %}</dt><dd><bdi dir="ltr">{{ offline.sync.counts.rejected }}</bdi></dd>
+          <dt>{% trans "Conflicts" %}</dt><dd><bdi dir="ltr">{{ offline.sync.counts.conflict }}</bdi></dd>
+          <dt>{% trans "Quarantined" %}</dt><dd><bdi dir="ltr">{{ offline.sync.counts.quarantined }}</bdi></dd>
+          <dt>{% trans "Open reconciliation cases" %}</dt><dd><bdi dir="ltr">{{ offline.sync.open_cases }}</bdi></dd>
+        </dl>
+        {% if offline.sync.may_open_queue %}
+          <a class="btn btn-outline-primary" href="{% url 'entry:reconciliation-queue' device.event_edition_id %}"><span>{% trans "Open the reconciliation queue" %}</span></a>
+        {% endif %}
+      </section>
+      <section class="asc-card" aria-labelledby="scope-heading">
+        <h2 class="asc-card-title" id="scope-heading">{% include "components/icon.html" with name="shield" %}{% trans "Device scope" %}</h2>
+        {% if scope %}
+          <dl class="asc-dl">
+            <dt>{% trans "Scope version" %}</dt><dd>{{ scope.scope_version }}</dd>
+            <dt>{% trans "Gate" %}</dt><dd><bdi>{{ scope.gate.localized_name }}</bdi> <bdi dir="ltr" class="asc-chip asc-chip-outline asc-code ms-1">{{ scope.gate.code }}</bdi></dd>
+            <dt>{% trans "Permitted zones" %}</dt>
+            <dd><ul class="asc-chip-list">{% for zone in scope.permitted_zones.all %}<li class="asc-chip asc-chip-outline"><bdi dir="ltr" class="asc-code">{{ zone.code }}</bdi></li>{% endfor %}</ul></dd>
+            <dt>{% trans "Verification methods" %}</dt>
+            <dd><ul class="asc-chip-list">{% for label in scope_method_labels %}<li class="asc-chip asc-chip-outline">{{ label }}</li>{% endfor %}</ul></dd>
+          </dl>
+        {% else %}
+          <p class="text-body-secondary mb-0">{% trans "This device has no checkpoint scope." %}</p>
+        {% endif %}
+      </section>
+      <section class="asc-card" aria-labelledby="sessions-heading">
+        <h2 class="asc-card-title" id="sessions-heading">{% include "components/icon.html" with name="clock" %}{% trans "Open checkpoint sessions" %}</h2>
+        <ul class="list-unstyled d-grid gap-2 mb-0">
+          {% for session in open_sessions %}
+            <li><bdi dir="ltr" class="asc-code">{{ session.gate.code }} / {{ session.zone.code }}</bdi> — {% trans "started" %} {{ session.started_at|date:"Y-m-d H:i" }}, {% trans "expires" %} {{ session.expires_at|date:"H:i" }}</li>
+          {% empty %}
+            <li class="text-body-secondary">{% trans "None" %}</li>
+          {% endfor %}
+        </ul>
+      </section>
+    </div>
+
+    <div class="col-lg-6">
+      {% if can_manage %}
+        <section class="asc-card" aria-labelledby="actions-heading">
+          <h2 class="asc-card-title" id="actions-heading">{% include "components/icon.html" with name="refresh" %}{% trans "Actions" %}</h2>
+          <div class="d-grid gap-4">
+            {% if device.status == "PENDING_ENROLLMENT" or device.status == "ENROLLED" or device.status == "OFFLINE_READY" %}
+              <form method="post" action="{% url 'entry:device-activation-code' device.public_id %}">
+                {% csrf_token %}
+                <input type="hidden" name="expected_version" value="{{ device.version }}">
+                <button type="submit" class="btn btn-outline-primary"><span>{% if device.status == "ENROLLED" or device.status == "OFFLINE_READY" %}{% trans "Issue a re-enrollment code" %}{% else %}{% trans "Issue a new activation code" %}{% endif %}</span></button>
+              </form>
+            {% endif %}
+
+            {% if device.status != "REVOKED" and device.status != "EXPIRED" %}
+              <form method="post" action="{% url 'entry:device-rescope' device.public_id %}" novalidate>
+                {% csrf_token %}
+                <h3 class="h6">{% trans "Change scope (ends open sessions)" %}</h3>
+                {% include "components/form_fields.html" with form=scope_form %}
+                <button type="submit" class="btn btn-outline-primary"><span>{% trans "Save new scope version" %}</span></button>
+              </form>
+
+              {% if device.status == "ENROLLED" or device.status == "OFFLINE_READY" %}
+                <form method="post" action="{% url 'entry:device-block-offline' device.public_id %}" data-block-offline>
+                  {% csrf_token %}
+                  <h3 class="h6">{% trans "Block offline use" %}</h3>
+                  <p class="small text-body-secondary">{% trans "Revokes this device's offline data and operator authorizations and requires it to be prepared again. Online operation continues. Nothing on the device is deleted: its unacknowledged records become locked and upload-only." %}</p>
+                  {% include "components/form_fields.html" with form=block_offline_form %}
+                  <button type="submit" class="btn btn-outline-warning"><span>{% trans "Block offline use" %}</span></button>
+                </form>
+                <form method="post" action="{% url 'entry:device-suspend' device.public_id %}">
+                  {% csrf_token %}
+                  <h3 class="h6">{% trans "Suspend" %}</h3>
+                  {% include "components/form_fields.html" with form=suspend_form %}
+                  <button type="submit" class="btn btn-warning"><span>{% trans "Suspend device" %}</span></button>
+                </form>
+              {% endif %}
+              {% if device.status == "SUSPENDED" %}
+                <form method="post" action="{% url 'entry:device-resume' device.public_id %}">
+                  {% csrf_token %}
+                  <h3 class="h6">{% trans "Resume" %}</h3>
+                  {% include "components/form_fields.html" with form=resume_form %}
+                  <button type="submit" class="btn btn-success"><span>{% trans "Resume device" %}</span></button>
+                </form>
+              {% endif %}
+              <form method="post" action="{% url 'entry:device-revoke' device.public_id %}" class="asc-notice asc-notice-danger d-block">
+                {% csrf_token %}
+                <h3 class="h6">{% trans "Revoke (permanent)" %}</h3>
+                {% include "components/form_fields.html" with form=revoke_form %}
+                <button type="submit" class="btn btn-danger"><span>{% trans "Revoke device" %}</span></button>
+              </form>
+            {% endif %}
+          </div>
+        </section>
+      {% else %}
+        <div class="asc-notice asc-notice-neutral">
+          {% include "components/icon.html" with name="lock" %}
+          <p>{% trans "You can view this device but not change it." %}</p>
+        </div>
+      {% endif %}
+      {% if may_order_emergency_wipe %}
+        <section class="asc-card" aria-labelledby="wipe-link-heading">
+          <h2 class="asc-card-title" id="wipe-link-heading">{% include "components/icon.html" with name="alert-octagon" %}{% trans "Emergency wipe" %}</h2>
+          <p>{% trans "Security authority only. Destroys the device's local data, including records not yet uploaded." %}</p>
+          <a class="btn btn-outline-danger" href="{% url 'entry:device-emergency-wipe' device.public_id %}"><span>{% trans "Open the emergency wipe order" %}</span></a>
+        </section>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

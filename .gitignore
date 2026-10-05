@@ -1,0 +1,78 @@
+# ASC 2026 Registration Platform -- files that must never be committed.
+# A rule here does not remove a file that is already tracked; see
+# docs/deployment/github_handoff.md.
+
+# Secrets and real environment files. Only the placeholder example is tracked.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+
+# Virtual environments
+.venv/
+venv/
+
+# Python, test and tooling caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Local runtime state: private document storage, the local mail sink, and the
+# browser and performance test artifacts. May hold uploaded documents and
+# synthetic personal data; never tracked (ADR-0013).
+var/
+/media/
+/uploads/
+
+# Local databases, logs, process files and temporary output
+*.sqlite3
+*.db
+*.log
+logs/
+*.pid
+celerybeat-schedule*
+tmp/
+/tmp/
+
+# Generated static files and build artifacts
+staticfiles/
+build/
+dist/
+*.egg-info/
+
+# Archives (review and update packages, licensed font packages)
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.zip.SHA256SUMS.txt
+
+# Review exports and tool-specific working files
+review_exports/
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+.cursor/
+.codex/
+.aider*
+
+# Licensed reference material (never redistributed)
+reference/finder/
+reference/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini

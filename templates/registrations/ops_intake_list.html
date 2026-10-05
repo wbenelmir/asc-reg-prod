@@ -1,0 +1,85 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% trans "Registration intake" %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <h1>{% trans "Registration intake" %}</h1>
+      <p>{% trans "The most recent registrations in your authorized scope, newest first." %}</p>
+    </div>
+  </div>
+
+  <form method="get" class="asc-card asc-card-form mb-3" role="search" data-intake-reference-search>
+    <label for="id_intake_reference" class="form-label">{% trans "Find by registration reference" %}</label>
+    <div class="asc-actions-row">
+      <input type="text" id="id_intake_reference" name="reference" value="{{ reference }}" maxlength="32" class="form-control" dir="ltr" autocomplete="off" spellcheck="false">
+      <button type="submit" class="btn btn-outline-primary">{% trans "Find" %}</button>
+      {% if reference %}<a class="btn btn-outline-secondary" href="{% url 'registrations:ops-intake-list' %}">{% trans "Show all" %}</a>{% endif %}
+    </div>
+  </form>
+
+  <section class="asc-card asc-card-flush" aria-labelledby="intake-table-caption">
+    <div class="asc-card-toolbar">
+      <h2 class="asc-card-toolbar-title" id="intake-table-caption">{% trans "Registrations you are authorized to view" %}</h2>
+      <span class="asc-count">{% blocktrans count counter=registrations|length %}{{ counter }} registration{% plural %}{{ counter }} registrations{% endblocktrans %}</span>
+    </div>
+    {% if registrations %}
+      {# Wide screens: a real table. Phones: the same rows as stacked records (UI checkpoint 1 correction); only one is displayed. #}
+      <div class="asc-table-wrap asc-wide-only">
+        <table class="asc-table" aria-labelledby="intake-table-caption">
+          <thead>
+            <tr>
+              <th scope="col">{% trans "Registration Reference" %}</th>
+              <th scope="col">{% trans "Event edition" %}</th>
+              <th scope="col">{% trans "Applicant status" %}</th>
+              <th scope="col">{% trans "Processing state" %}</th>
+              <th scope="col">{% trans "Submitted at" %}</th>
+              <th scope="col"><span class="visually-hidden">{% trans "Actions" %}</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for registration in registrations %}
+              <tr>
+                <th scope="row"><bdi dir="ltr" class="asc-code">{{ registration.public_reference }}</bdi></th>
+                <td><bdi dir="ltr" class="asc-code">{{ registration.event_edition.code }}</bdi></td>
+                <td>{% status_chip "registration" registration.public_status registration.get_public_status_display %}</td>
+                <td>{% status_chip "processing" registration.internal_status registration.get_internal_status_display %}</td>
+                <td>{% if registration.submitted_at %}<time datetime="{{ registration.submitted_at|date:'c' }}">{{ registration.submitted_at }}</time>{% else %}<span class="asc-muted">{% trans "Not submitted" %}</span>{% endif %}</td>
+                <td class="asc-cell-action">
+                  <a class="btn btn-sm btn-outline-primary" href="{% url 'registrations:ops-intake-detail' pk=registration.pk %}">{% trans "View" %}<span class="visually-hidden"> <bdi dir="ltr">{{ registration.public_reference }}</bdi></span></a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <ul class="asc-records asc-narrow-only" aria-labelledby="intake-table-caption">
+        {% for registration in registrations %}
+          <li class="asc-record" data-record>
+            <div class="asc-record-head">
+              <h3 class="asc-record-title"><bdi dir="ltr" class="asc-code">{{ registration.public_reference }}</bdi></h3>
+              <p class="asc-record-meta">{% trans "Event edition" %}{% trans ":" context "label separator" %} <bdi dir="ltr" class="asc-code">{{ registration.event_edition.code }}</bdi></p>
+            </div>
+            <dl class="asc-record-fields">
+              <div><dt>{% trans "Applicant status" %}</dt><dd>{% status_chip "registration" registration.public_status registration.get_public_status_display %}</dd></div>
+              <div><dt>{% trans "Processing state" %}</dt><dd>{% status_chip "processing" registration.internal_status registration.get_internal_status_display %}</dd></div>
+              <div class="asc-record-wide"><dt>{% trans "Submitted at" %}</dt><dd>{% if registration.submitted_at %}<time datetime="{{ registration.submitted_at|date:'c' }}">{{ registration.submitted_at }}</time>{% else %}<span class="asc-muted">{% trans "Not submitted" %}</span>{% endif %}</dd></div>
+            </dl>
+            <div class="asc-record-actions">
+              <a class="btn btn-outline-primary" href="{% url 'registrations:ops-intake-detail' pk=registration.pk %}" data-record-action>{% trans "View" %}<span class="visually-hidden"> <bdi dir="ltr">{{ registration.public_reference }}</bdi></span></a>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+      {% if registrations|length >= 200 %}
+        <p class="asc-card-foot">{% include "components/icon.html" with name="info" size="sm" %} {% trans "Only the 200 most recent registrations are listed." %}</p>
+      {% endif %}
+    {% else %}
+      <div class="asc-empty">
+        <span class="asc-tile">{% include "components/icon.html" with name="list" %}</span>
+        <h3>{% trans "No registrations are currently visible to you." %}</h3>
+        <p>{% trans "Registrations appear here once they exist in an event or organization you are authorized for." %}</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% load i18n %}
+{% comment %}
+  Session-expiry warnings (Prompt 5 correction pass §4). Hidden (`d-none`)
+  until the client-side timer in base.html reveals them (`d-flex`); the ids,
+  data attributes and the d-none/d-flex contract are relied on by that script
+  and by the browser suite. Styled as a tone-coded design-system banner:
+  icon + text, never colour alone.
+{% endcomment %}
+{% if participant_authenticated and participant_session_inactivity_deadline_epoch_ms %}
+  <div class="asc-session-banner d-none"
+       role="alert" aria-live="assertive" id="participant-session-warning"
+       data-inactivity-deadline="{{ participant_session_inactivity_deadline_epoch_ms }}"
+       data-absolute-deadline="{{ participant_session_absolute_deadline_epoch_ms }}"
+       data-warning-seconds="{{ participant_session_warning_seconds }}"
+       data-inactivity-text="{% trans 'Your session is about to end due to inactivity.' %}"
+       data-absolute-text="{% trans 'Your session will end soon. Please save your work; signing in again will be required.' %}">
+    <div class="container-xl asc-session-banner-inner">
+      {% include "components/icon.html" with name="clock" %}
+      <span data-role="warning-text"></span>
+      <form method="post" action="{% url 'accounts:participant-session-extend' %}"
+            class="m-0" id="participant-session-extend-form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="btn btn-sm btn-outline-warning">{% trans "Stay signed in" %}</button>
+      </form>
+    </div>
+  </div>
+{% endif %}
+{% if operational_authenticated and operational_session_inactivity_deadline_epoch_ms %}
+  <div class="asc-session-banner d-none"
+       role="alert" aria-live="assertive" id="operational-session-warning"
+       data-inactivity-deadline="{{ operational_session_inactivity_deadline_epoch_ms }}"
+       data-absolute-deadline="{{ operational_session_absolute_deadline_epoch_ms }}"
+       data-warning-seconds="{{ operational_session_warning_seconds }}"
+       data-inactivity-text="{% trans 'Your operational session is about to end due to inactivity.' %}"
+       data-absolute-text="{% trans 'Your operational session will end soon. Please save your work; signing in again will be required.' %}">
+    <div class="container-xl asc-session-banner-inner">
+      {% include "components/icon.html" with name="clock" %}
+      <span data-role="warning-text"></span>
+      <form method="post" action="{% url 'accounts:operational-session-extend' %}"
+            class="m-0" id="operational-session-extend-form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="btn btn-sm btn-outline-warning">{% trans "Stay signed in" %}</button>
+      </form>
+    </div>
+  </div>
+{% endif %}

@@ -1,0 +1,98 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% block title %}{{ campaign.name }}{% endblock %}
+{% block breadcrumbs %}{% url 'invitations:workspace-dashboard' as parent_url %}{% trans "Organization Workspace" as parent_label %}{% include "components/breadcrumb_trail.html" with parent_label=parent_label parent_url=parent_url current=campaign.public_reference current_code=True %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Invitation campaign" %} · <bdi dir="ltr" class="asc-code">{{ campaign.public_reference }}</bdi></p>
+      <h1><bdi>{{ campaign.name }}</bdi></h1>
+      <ul class="asc-chip-list mt-2" aria-label="{% trans 'Current status' %}">
+        <li>{% status_chip "campaign" campaign.status campaign.get_status_display %}</li>
+      </ul>
+    </div>
+  </div>
+
+  {% if issued_url %}
+    <div class="asc-notice asc-notice-success mb-3" role="status">
+      {% include "components/icon.html" with name="check-circle" %}
+      <div>
+        <strong>{% trans "Share this link now. It will not be shown again:" %}</strong>
+        <div class="asc-secret">
+          <code class="asc-secret-value" dir="ltr">{{ issued_url }}</code>
+          <p class="small mb-0">{% trans "Copy the link into your message to the organization. Anyone with this link can start a registration for this campaign." %}</p>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="asc-detail-layout">
+    <div class="asc-detail-main">
+      <section class="asc-card" aria-labelledby="campaign-summary-heading">
+        <h2 class="asc-card-title" id="campaign-summary-heading">{% include "components/icon.html" with name="info" %}{% trans "Campaign summary" %}</h2>
+        <dl class="asc-dl">
+          <dt>{% trans "Reference" %}</dt><dd><bdi dir="ltr" class="asc-code">{{ campaign.public_reference }}</bdi></dd>
+          <dt>{% trans "Organization" %}</dt><dd><bdi>{{ campaign.organization.official_name }}</bdi></dd>
+          <dt>{% trans "Event edition" %}</dt><dd><bdi>{{ campaign.event_edition.name }}</bdi></dd>
+          <dt>{% trans "Status" %}</dt><dd>{{ campaign.get_status_display }}</dd>
+          <dt>{% trans "Capacity" %}</dt><dd>{% if campaign.capacity is not None %}{{ campaign.capacity }}{% else %}{% trans "Unlimited" %}{% endif %}</dd>
+          <dt>{% trans "Default language" %}</dt><dd>{{ campaign.language|code_label:"language" }}</dd>
+          {% if campaign.valid_from %}<dt>{% trans "Valid from" %}</dt><dd><time datetime="{{ campaign.valid_from|date:'c' }}">{{ campaign.valid_from }}</time></dd>{% endif %}
+          {% if campaign.valid_until %}<dt>{% trans "Valid until" %}</dt><dd><time datetime="{{ campaign.valid_until|date:'c' }}">{{ campaign.valid_until }}</time></dd>{% endif %}
+        </dl>
+      </section>
+    </div>
+
+    <aside class="asc-detail-aside" aria-label="{% trans 'Campaign actions' %}">
+      <section class="asc-card" aria-labelledby="link-heading">
+        <h2 class="asc-card-title" id="link-heading">{% include "components/icon.html" with name="globe" %}{% trans "Active link" %}</h2>
+        {% if active_link %}
+          <p class="mb-2">{% status_chip "invitation_link" active_link.status active_link.get_status_display %}</p>
+          <p class="asc-section-lead">{% trans "The link itself is never stored. Rotate it to issue a new one and stop the old one working." %}</p>
+          {% if can_rotate_link %}
+            <form method="post" action="{% url 'invitations:campaign-rotate-link' pk=campaign.pk %}"
+                  data-confirm-tone="primary"
+                  data-confirm-title="{% trans 'Rotate the invitation link?' %}"
+                  data-confirm="{% trans 'The current link stops working immediately. People who have not used it yet will need the new link.' %}"
+                  data-confirm-action="{% trans 'Rotate link' %}">
+              {% csrf_token %}
+              {% trans "The current link stops working immediately." as fallback_label %}
+              {% include "components/confirm_fallback.html" with id="rotate-link-confirm" label=fallback_label %}
+              <button type="submit" class="btn btn-outline-primary">{% include "components/icon.html" with name="refresh" %}<span>{% trans "Rotate link" %}</span></button>
+            </form>
+          {% endif %}
+        {% else %}
+          <p class="asc-section-lead">{% trans "No active link." %}</p>
+          {% if can_issue_link %}
+            <form method="post" action="{% url 'invitations:campaign-issue-link' pk=campaign.pk %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary"><span>{% trans "Issue link" %}</span></button>
+            </form>
+          {% endif %}
+        {% endif %}
+      </section>
+
+      {% if can_change_status %}
+        <section class="asc-card" aria-labelledby="campaign-status-heading">
+          <h2 class="asc-card-title" id="campaign-status-heading">{% include "components/icon.html" with name="refresh" %}{% trans "Change status" %}</h2>
+          <form method="post" action="{% url 'invitations:campaign-change-status' pk=campaign.pk %}"
+                data-confirm-tone="primary"
+                data-confirm-title="{% trans 'Change the campaign status?' %}"
+                data-confirm="{% trans 'Suspending or closing a campaign stops its link from starting new registrations.' %}"
+                data-confirm-action="{% trans 'Change status' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="id_new_status" class="form-label">{% trans "New status" %}</label>
+              <select id="id_new_status" name="new_status" class="form-select">
+                <option value="ACTIVE">{% trans "Active" %}</option>
+                <option value="SUSPENDED">{% trans "Suspended" %}</option>
+                <option value="CLOSED">{% trans "Closed" %}</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-outline-primary"><span>{% trans "Change status" %}</span></button>
+          </form>
+        </section>
+      {% endif %}
+    </aside>
+  </div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% block title %}{% trans "New Information Request" %}{% endblock %}
+{% block breadcrumbs %}{% url 'reviews:queue-list' as queue_url %}{% trans "Review queue" as queue_label %}{% url 'reviews:case-detail' pk=case.pk as case_url %}{% trans "New Information Request" as current %}{% include "components/breadcrumb_trail.html" with parent_label=queue_label parent_url=queue_url parent2_label=case.registration.public_reference parent2_url=case_url current=current %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Additional Information Requests" %} · <bdi dir="ltr" class="asc-code">{{ case.registration.public_reference }}</bdi></p>
+      <h1>{% trans "New Additional Information Request" %}</h1>
+      <p>{% trans "The request is saved as a draft. The participant sees it only after you send it from the next page." %}</p>
+    </div>
+  </div>
+
+  {% if form.errors or formset.total_error_count %}
+    {# One summary for the request and every item (a single focus target). #}
+    <div class="asc-notice asc-notice-danger mb-3" role="alert" tabindex="-1" id="error-summary">
+      {% include "components/icon.html" with name="alert-octagon" %}
+      <div>
+        <strong>{% trans "Check the highlighted field and try again." %}</strong>
+        <ul class="mb-0 mt-1 ps-3">
+          {% for field in form %}{% for error in field.errors %}<li><a href="#{{ field.id_for_label }}"><bdi>{{ field.label }}</bdi></a>{% trans ":" context "label separator" %} <bdi>{{ error }}</bdi></li>{% endfor %}{% endfor %}
+          {% for error in form.non_field_errors %}<li><bdi>{{ error }}</bdi></li>{% endfor %}
+          {% for item_form in formset %}
+            {% for field in item_form %}{% for error in field.errors %}<li><a href="#{{ field.id_for_label }}">{% blocktrans with n=forloop.parentloop.parentloop.counter %}Item {{ n }}{% endblocktrans %} · <bdi>{{ field.label }}</bdi></a>{% trans ":" context "label separator" %} <bdi>{{ error }}</bdi></li>{% endfor %}{% endfor %}
+            {% for error in item_form.non_field_errors %}<li><bdi>{{ error }}</bdi></li>{% endfor %}
+          {% endfor %}
+          {% for error in formset.non_form_errors %}<li><bdi>{{ error }}</bdi></li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <section class="asc-card" aria-labelledby="request-message-heading">
+      <h2 class="asc-card-title" id="request-message-heading">{% include "components/icon.html" with name="mail" %}{% trans "Message to the participant" %}</h2>
+      <p class="asc-section-lead">{% trans "Write the message in English. French and Arabic versions are shown to participants who use those languages; English is used when a version is missing." %}</p>
+      <div class="asc-form-grid asc-form-grid-top">
+        {% include "components/field.html" with field=form.purpose %}
+        {% include "components/field.html" with field=form.deadline_at control="ltr" mark_optional=True %}
+      </div>
+      {% include "components/field.html" with field=form.message_en %}
+      {% include "components/field.html" with field=form.message_fr mark_optional=True %}
+      {% include "components/field.html" with field=form.message_ar mark_optional=True %}
+    </section>
+
+    <section class="asc-card" aria-labelledby="request-items-heading">
+      <h2 class="asc-card-title" id="request-items-heading">{% include "components/icon.html" with name="list" %}{% trans "Requested items" %}</h2>
+      {{ formset.management_form }}
+      {% for item_form in formset %}
+        <fieldset class="asc-fieldset">
+          <legend>{% blocktrans with n=forloop.counter %}Item {{ n }}{% endblocktrans %}{% if not forloop.first %} <span class="asc-optional">{% trans "Optional" %}</span>{% endif %}</legend>
+          <div class="asc-form-grid asc-form-grid-top">
+            {% include "components/field.html" with field=item_form.kind %}
+            {% include "components/field.html" with field=item_form.field_code %}
+            {% include "components/field.html" with field=item_form.document_type %}
+          </div>
+          {% include "components/field.html" with field=item_form.is_required %}
+          {% include "components/field.html" with field=item_form.instructions_en mark_optional=True %}
+          {% include "components/field.html" with field=item_form.instructions_fr mark_optional=True %}
+          {% include "components/field.html" with field=item_form.instructions_ar mark_optional=True %}
+        </fieldset>
+      {% endfor %}
+      <p class="form-text mb-0">{% trans "A field correction or clarification needs a field; a document upload needs a document type." %}</p>
+    </section>
+
+    <div class="asc-actions-row">
+      <button type="submit" class="btn btn-primary"><span>{% trans "Create request" %}</span></button>
+      <a href="{% url 'reviews:case-detail' pk=case.pk %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
+    </div>
+  </form>
+{% endblock %}

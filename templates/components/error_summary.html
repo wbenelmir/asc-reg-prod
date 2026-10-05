@@ -1,0 +1,16 @@
+{% load i18n %}
+{# Error summary with links to each invalid field (UI/UX §12.1). Receives focus on load (base.html script, id="error-summary"). Pass values_not_kept=True only where the form never echoes a submitted value (NonEchoTextInput). #}
+{% if form.errors %}
+  <div class="asc-notice asc-notice-danger mb-3" role="alert" tabindex="-1" id="error-summary">
+    {% include "components/icon.html" with name="alert-octagon" %}
+    <div>
+      <strong>{% trans "Check the highlighted field and try again." %}</strong>
+      <ul class="mb-0 mt-1 ps-3">
+        {# Label and message are separately isolated: a label with parentheses, a code, or a Latin fragment must not reorder its neighbours in RTL (UI checkpoint correction 3). #}
+        {% for field in form %}{% for error in field.errors %}<li><a href="#{{ field.id_for_label }}"><bdi>{{ field.label }}</bdi></a>{% trans ":" context "label separator" %} <bdi>{{ error }}</bdi></li>{% endfor %}{% endfor %}
+        {% for error in form.non_field_errors %}<li><bdi>{{ error }}</bdi></li>{% endfor %}
+      </ul>
+      {% if values_not_kept %}<p class="small mt-1">{% trans "For your security, the value you entered was not kept. Enter it again." %}</p>{% endif %}
+    </div>
+  </div>
+{% endif %}

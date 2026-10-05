@@ -1,0 +1,52 @@
+{% load i18n asc_ui %}
+{% comment %}
+  One labelled form field: label, optional help, control, and an error linked
+  by aria-describedby (asc_control merges the ids, whatever the form class).
+  Options (all optional, passed with `include … with`):
+    wrapper_class  – outer class, default "mb-3"
+    mark_optional  – show an "Optional" tag on non-required fields
+    control        – asc_control options, e.g. "ltr" for codes and numbers
+  A single checkbox renders input-then-label (UI/UX §14.3 checkbox).
+{% endcomment %}
+{% with control_options=control|default:"" %}
+{% if field.field.widget.input_type == "checkbox" and not field.field.widget.allow_multiple_selected %}
+  <div class="{{ wrapper_class|default:'mb-3' }}">
+    <div class="asc-checkbox">
+      {{ field|asc_control:control_options }}
+      <label for="{{ field.id_for_label }}" class="form-check-label"><bdi>{{ field.label }}</bdi>{% if mark_optional and not field.field.required %} <span class="asc-optional">{% trans "Optional" %}</span>{% endif %}</label>
+    </div>
+    {% if field.help_text %}<div id="{{ field.auto_id }}_help" class="form-text">{{ field.help_text }}</div>{% endif %}
+    {% if field.errors %}
+      <div id="{{ field.auto_id }}_error" class="asc-field-error">
+        {% include "components/icon.html" with name="alert-octagon" size="sm" %}
+        <bdi>{% for error in field.errors %}{{ error }}{% if not forloop.last %} {% endif %}{% endfor %}</bdi>
+      </div>
+    {% endif %}
+  </div>
+{% elif field.field.widget.is_day_month_year %}
+  {# Day / Month / Year (UX-1, S-08): one group, one legend, three labelled parts. #}
+  <fieldset class="{{ wrapper_class|default:'mb-3' }} asc-date-group"{% if field.errors %} aria-describedby="{{ field.auto_id }}_error"{% endif %}>
+    <legend class="form-label fs-6"><bdi>{{ field.label }}</bdi>{% if mark_optional and not field.field.required %} <span class="asc-optional">{% trans "Optional" %}</span>{% endif %}</legend>
+    {% if field.help_text %}<div id="{{ field.auto_id }}_help" class="form-text mt-0 mb-1">{{ field.help_text }}</div>{% endif %}
+    {{ field|asc_control:"ltr" }}
+    {% if field.errors %}
+      <div id="{{ field.auto_id }}_error" class="asc-field-error">
+        {% include "components/icon.html" with name="alert-octagon" size="sm" %}
+        <bdi>{% for error in field.errors %}{{ error }}{% if not forloop.last %} {% endif %}{% endfor %}</bdi>
+      </div>
+    {% endif %}
+  </fieldset>
+{% else %}
+  <div class="{{ wrapper_class|default:'mb-3' }}">
+    <label for="{{ field.id_for_label }}" class="form-label"><bdi>{{ field.label }}</bdi>{% if mark_optional and not field.field.required %} <span class="asc-optional">{% trans "Optional" %}</span>{% endif %}</label>
+    {% if field.help_text %}<div id="{{ field.auto_id }}_help" class="form-text mt-0 mb-1">{{ field.help_text }}</div>{% endif %}
+    {{ field|asc_control:control_options }}
+    {% if field.errors %}
+      <div id="{{ field.auto_id }}_error" class="asc-field-error">
+        {% include "components/icon.html" with name="alert-octagon" size="sm" %}
+        <bdi>{% for error in field.errors %}{{ error }}{% if not forloop.last %} {% endif %}{% endfor %}</bdi>
+      </div>
+    {% endif %}
+  </div>
+{% endif %}
+{% endwith %}

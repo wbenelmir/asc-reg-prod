@@ -1,0 +1,34 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% trans "Cancel registration" %}{% endblock %}
+{% block breadcrumbs %}{% url 'registrations:ops-intake-list' as list_url %}{% trans "Registration intake" as list_label %}{% url 'registrations:ops-intake-detail' pk=registration.pk as detail_url %}{% trans "Cancel registration" as current %}{% include "components/breadcrumb_trail.html" with parent_label=list_label parent_url=list_url parent2_label=registration.public_reference parent2_url=detail_url current=current %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Registration actions" %}</p>
+      <h1>{% blocktrans with ref=registration.public_reference|ltr_isolate %}Cancel {{ ref }}{% endblocktrans %}</h1>
+      <p>{% trans "This affects only this Registration Context. It is not a Person-level restriction." %}</p>
+    </div>
+  </div>
+
+  <section class="asc-card asc-form-narrow" aria-labelledby="cancel-form-heading">
+    <h2 class="asc-card-title" id="cancel-form-heading">{% include "components/icon.html" with name="ban" %}{% trans "Operational cancellation" %}</h2>
+    <div class="asc-notice asc-notice-danger mb-3">
+      {% include "components/icon.html" with name="alert-triangle" %}
+      <p>{% trans "The registration will stop being processed. Its history and audit trail are kept." %}</p>
+    </div>
+    {% include "components/error_summary.html" %}
+    <form method="post" novalidate
+          data-confirm-title="{% trans 'Cancel this registration?' %}"
+          data-confirm="{% trans 'The registration will be cancelled operationally and will stop being processed. This cannot be undone from this page.' %}"
+          data-confirm-action="{% trans 'Confirm cancellation' %}">
+      {% csrf_token %}
+      <input type="hidden" name="expected_version" value="{{ registration.version }}">
+      {% include "components/field.html" with field=form.reason %}
+      <div class="asc-actions-row">
+        <button type="submit" class="btn btn-danger">{% include "components/icon.html" with name="ban" %}<span>{% trans "Confirm cancellation" %}</span></button>
+        <a href="{% url 'registrations:ops-intake-detail' pk=registration.pk %}" class="btn btn-outline-secondary">{% trans "Keep the registration" %}</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

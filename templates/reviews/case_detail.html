@@ -1,0 +1,264 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% blocktrans with ref=registration.public_reference %}Review case: {{ ref }}{% endblocktrans %}{% endblock %}
+{% block breadcrumbs %}{% url 'reviews:queue-list' as queue_url %}{% trans "Review queue" as queue_label %}{% include "components/breadcrumb_trail.html" with parent_label=queue_label parent_url=queue_url current=registration.public_reference current_code=True %}{% endblock %}
+{% block content %}
+  {% comment %}
+    Complex operational page pattern: header with status chips, a main
+    column of evidence sections and an aside of commands. Every section and
+    command is still gated by the permission flags the view computes; this
+    template only arranges them. Field names, ids and form actions are
+    unchanged.
+  {% endcomment %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Review case" %} · {{ case.get_case_type_display }}</p>
+      <h1>{% blocktrans with ref=registration.public_reference|ltr_isolate %}Review case for {{ ref }}{% endblocktrans %}</h1>
+      <ul class="asc-chip-list mt-2" aria-label="{% trans 'Current status' %}">
+        <li>{% status_chip "review_case" case.status case.get_status_display %}</li>
+        <li>{% status_chip "registration" registration.public_status registration.get_public_status_display %}</li>
+        <li>{% status_chip "processing" registration.internal_status registration.get_internal_status_display %}</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="asc-detail-layout">
+    <div class="asc-detail-main">
+      <section class="asc-card" aria-labelledby="summary-heading">
+        <h2 class="asc-card-title" id="summary-heading">{% include "components/icon.html" with name="info" %}{% trans "Case summary" %}</h2>
+        <dl class="asc-dl" data-case-summary>
+          <dt>{% trans "Case type" %}</dt><dd>{{ case.get_case_type_display }}</dd>
+          <dt>{% trans "Queue" %}</dt><dd>{{ case.get_queue_code_display }}</dd>
+          <dt>{% trans "Status" %}</dt><dd>{{ case.get_status_display }}</dd>
+          <dt>{% trans "Public status" %}</dt><dd>{{ registration.get_public_status_display }}</dd>
+          <dt>{% trans "Internal status" %}</dt><dd>{{ registration.get_internal_status_display }}</dd>
+          {% if identity_case %}
+            <dt>{% trans "Identity verification" %}</dt>
+            <dd data-identity-status="{{ identity_case.status }}">{% status_chip "identity" identity_case.status identity_case.get_status_display %} <a href="{% url 'identity:case' pk=identity_case.pk %}">{% trans "Open identity review" %}</a></dd>
+          {% endif %}
+          <dt>{% trans "Current assignment" %}</dt>
+          <dd>{% if current_assignment %}<bdi>{{ current_assignment.assigned_user|default:current_assignment.assigned_group }}</bdi>{% else %}<span class="asc-muted">{% trans "Unassigned" %}</span>{% endif %}</dd>
+        </dl>
+      </section>
+
+      {% if can_view_checklist %}
+        <section class="asc-card asc-card-flush" aria-labelledby="checklist-heading">
+          <div class="asc-card-toolbar">
+            <h2 class="asc-card-toolbar-title" id="checklist-heading">{% include "components/icon.html" with name="check-circle" %}{% trans "Checklist" %}</h2>
+          </div>
+          <div class="asc-table-wrap">
+            <table class="asc-table" aria-label="{% trans 'Checklist evidence' %}">
+              <thead><tr><th scope="col">{% trans "Item" %}</th><th scope="col">{% trans "Result" %}</th><th scope="col">{% trans "Recorded" %}</th></tr></thead>
+              <tbody>
+                {% for result in checklist_results %}
+                  <tr><td>{{ result.item_code|code_label:"checklist_item" }}</td><td>{{ result.get_result_display }}</td><td><time datetime="{{ result.recorded_at|date:'c' }}">{{ result.recorded_at }}</time></td></tr>
+                {% empty %}
+                  <tr><td colspan="3" class="asc-table-empty">{% trans "No checklist evidence recorded yet." %}</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% if can_add_checklist %}
+            <form method="post" action="{% url 'reviews:case-checklist-result' pk=case.pk %}" class="asc-card-form">
+              {% csrf_token %}
+              <h3 class="asc-card-form-title">{% trans "Record result" %}</h3>
+              <div class="asc-form-grid">
+                <div>
+                  <label for="id_item_code" class="form-label">{% trans "Checklist item" %}</label>
+                  <select id="id_item_code" name="item_code" class="form-select" required>
+                    <option value="">{% trans "Select an item" %}</option>
+                    {% for value, label in checklist_item_choices %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+                  </select>
+                  {% if not checklist_item_choices %}<p class="form-text mb-0">{% trans "No active checklist is defined for this case type." %}</p>{% endif %}
+                </div>
+                <div>
+                  <label for="id_result" class="form-label">{% trans "Result" %}</label>
+                  <select id="id_result" name="result" class="form-select">
+                    <option value="PASS">{% trans "Pass" %}</option>
+                    <option value="FAIL">{% trans "Fail" %}</option>
+                    <option value="NOT_APPLICABLE">{% trans "Not applicable" %}</option>
+                    <option value="NEEDS_FOLLOW_UP">{% trans "Needs follow-up" %}</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="id_notes" class="form-label">{% trans "Notes" %}</label>
+                  <input type="text" id="id_notes" name="notes" class="form-control">
+                </div>
+                <div>
+                  <button type="submit" class="btn btn-outline-primary">{% trans "Record result" %}</button>
+                </div>
+              </div>
+            </form>
+          {% endif %}
+        </section>
+      {% endif %}
+
+      {% if can_view_notes %}
+        <section class="asc-card" aria-labelledby="notes-heading">
+          <h2 class="asc-card-title" id="notes-heading">{% include "components/icon.html" with name="lock" %}{% trans "Internal notes" %}</h2>
+          <p class="asc-section-lead">{% trans "Never visible to the participant." %}</p>
+          <ul class="asc-timeline">
+            {% for note in internal_notes %}
+              <li>
+                <p class="mb-1"><bdi>{{ note.note_encrypted }}</bdi></p>
+                <p class="asc-timeline-meta"><bdi>{{ note.created_by }}</bdi> · <time datetime="{{ note.created_at|date:'c' }}">{{ note.created_at }}</time></p>
+              </li>
+            {% empty %}
+              <li class="asc-timeline-empty">{% trans "No internal notes yet." %}</li>
+            {% endfor %}
+          </ul>
+          {% if can_add_notes %}
+            <form method="post" action="{% url 'reviews:case-add-note' pk=case.pk %}" class="mt-3">
+              {% csrf_token %}
+              <label for="id_note_text" class="form-label">{% trans "Add an internal note" %}</label>
+              <textarea id="id_note_text" name="note_text" class="form-control mb-2" rows="3" required></textarea>
+              <button type="submit" class="btn btn-outline-primary">{% trans "Save note" %}</button>
+            </form>
+          {% endif %}
+        </section>
+      {% endif %}
+
+      {% if case.case_type == "DUPLICATE" and can_view_duplicates %}
+        <section class="asc-card asc-card-flush" aria-labelledby="duplicate-heading">
+          <div class="asc-card-toolbar">
+            <h2 class="asc-card-toolbar-title" id="duplicate-heading">{% include "components/icon.html" with name="layers" %}{% trans "Duplicate candidates" %}</h2>
+          </div>
+          <div class="asc-table-wrap">
+            <table class="asc-table" aria-label="{% trans 'Duplicate candidates' %}">
+              <thead><tr><th scope="col">{% trans "Masked identifier" %}</th><th scope="col">{% trans "Type" %}</th></tr></thead>
+              <tbody>
+                {% for candidate in duplicate_candidates %}
+                  <tr><td><bdi dir="ltr" class="asc-code">{{ candidate.masked_value }}</bdi></td><td>{{ candidate.get_identifier_type_display }}</td></tr>
+                {% empty %}
+                  <tr><td colspan="2" class="asc-table-empty">{% trans "No resolvable candidate evidence." %}</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% if can_resolve_duplicates %}
+            <form method="post" action="{% url 'reviews:case-resolve-duplicate' pk=case.pk %}" class="asc-card-form">
+              {% csrf_token %}
+              <h3 class="asc-card-form-title">{% trans "Resolve" %}</h3>
+              <div class="asc-form-grid">
+                {% include "components/field.html" with field=duplicate_form.outcome wrapper_class="" %}
+                {% include "components/field.html" with field=duplicate_form.candidate_identifier_id wrapper_class="" %}
+                {% include "components/field.html" with field=duplicate_form.reason wrapper_class="" %}
+                <div>
+                  <button type="submit" class="btn btn-outline-primary">{% trans "Resolve" %}</button>
+                </div>
+              </div>
+            </form>
+          {% endif %}
+        </section>
+      {% endif %}
+
+      <section class="asc-card" aria-labelledby="requests-heading">
+        <h2 class="asc-card-title" id="requests-heading">{% include "components/icon.html" with name="mail" %}{% trans "Additional Information Requests" %}</h2>
+        <ul class="asc-link-list">
+          {% for information_request in information_requests %}
+            <li>
+              <a href="{% url 'reviews:information-request-detail' pk=information_request.pk %}">
+                {% blocktrans with seq=information_request.sequence status=information_request.get_status_display %}Request #{{ seq }} — {{ status }}{% endblocktrans %}
+                {% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}
+              </a>
+            </li>
+          {% empty %}
+            <li class="asc-link-list-empty">{% trans "No Information Requests yet." %}</li>
+          {% endfor %}
+        </ul>
+        {% if can_create_request %}
+          <a href="{% url 'reviews:case-create-information-request' pk=case.pk %}" class="btn btn-outline-primary mt-3">{% trans "New Information Request" %}</a>
+        {% endif %}
+      </section>
+
+      <section class="asc-card asc-card-flush" aria-labelledby="decisions-heading">
+        <div class="asc-card-toolbar">
+          <h2 class="asc-card-toolbar-title" id="decisions-heading">{% include "components/icon.html" with name="clock" %}{% trans "Decision history" %}</h2>
+        </div>
+        <div class="asc-table-wrap">
+          <table class="asc-table" aria-label="{% trans 'Decision history' %}">
+            <thead><tr><th scope="col" class="asc-num">{% trans "#" %}</th><th scope="col">{% trans "Outcome" %}</th><th scope="col">{% trans "Current" %}</th><th scope="col">{% trans "Decided" %}</th></tr></thead>
+            <tbody>
+              {% for decision in decisions %}
+                <tr>
+                  <td class="asc-num">{{ decision.sequence }}</td>
+                  <td>{{ decision.get_outcome_display }}{% if decision.internal_reason_code == "IDENTITY_REJECTED" %} <span class="asc-muted" data-decision-origin="identity">· {% trans "identity rejected" %}</span>{% endif %}</td>
+                  <td>{% if decision.is_current %}{% trans "Yes" %}{% else %}{% trans "No" %}{% endif %}</td>
+                  <td><time datetime="{{ decision.decided_at|date:'c' }}">{{ decision.decided_at }}</time></td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="4" class="asc-table-empty">{% trans "No decision recorded yet." %}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <aside class="asc-detail-aside" aria-label="{% trans 'Case actions' %}">
+      {% if can_decide %}
+        <section class="asc-card asc-action-panel" aria-labelledby="decide-heading">
+          <h2 class="asc-card-title" id="decide-heading">{% include "components/icon.html" with name="user-check" %}{% trans "Decision" %}</h2>
+          <p class="asc-section-lead">{% trans "Record the outcome of this review." %}</p>
+          {% if identity_clearance and not identity_clearance.cleared %}
+            {# IDV-Q1: approval requires a current, valid, verified identity (enforced by the service). #}
+            <p class="asc-notice asc-notice-warning" role="status" data-identity-clearance="{{ identity_clearance.code }}">{% include "components/icon.html" with name="alert-triangle" %}<span>{{ identity_clearance.message }}</span></p>
+          {% endif %}
+          <form method="post" action="{% url 'reviews:case-decision-approve' pk=case.pk %}" class="mb-2">
+            {% csrf_token %}
+            <input type="hidden" name="expected_version" value="{{ registration.version }}">
+            <button type="submit" class="btn btn-success asc-btn-block">{% include "components/icon.html" with name="check-circle" %}<span>{% trans "Record Approved decision" %}</span></button>
+          </form>
+          <a href="{% url 'reviews:case-decision' pk=case.pk %}" class="btn btn-outline-danger asc-btn-block">{% include "components/icon.html" with name="x-circle" %}<span>{% trans "Record Not Approved decision" %}</span></a>
+        </section>
+      {% endif %}
+
+      {% if can_assign %}
+        <section class="asc-card" aria-labelledby="assign-heading">
+          <h2 class="asc-card-title" id="assign-heading">{% include "components/icon.html" with name="user" %}{% trans "Assign or reassign" %}</h2>
+          <form method="post" action="{% url 'reviews:case-assign' pk=case.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="expected_version" value="{{ case.version }}">
+            {% include "components/picker.html" with field=assignment_form.assigned_user_id %}
+            {% include "components/field.html" with field=assignment_form.reason %}
+            <button type="submit" class="btn btn-outline-primary">{% trans "Assign" %}</button>
+          </form>
+        </section>
+      {% endif %}
+
+      {% if can_change_status %}
+        <section class="asc-card" aria-labelledby="status-heading">
+          <h2 class="asc-card-title" id="status-heading">{% include "components/icon.html" with name="refresh" %}{% trans "Change status" %}</h2>
+          <form method="post" action="{% url 'reviews:case-change-status' pk=case.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="expected_version" value="{{ case.version }}">
+            <div class="mb-3">
+              <label for="id_new_status" class="form-label">{% trans "New status" %}</label>
+              <select id="id_new_status" name="new_status" class="form-select">
+                <option value="IN_PROGRESS">{% trans "In progress" %}</option>
+                <option value="WAITING">{% trans "Waiting" %}</option>
+                <option value="COMPLETED">{% trans "Completed" %}</option>
+                <option value="CANCELLED">{% trans "Cancelled" %}</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-outline-primary">{% trans "Update status" %}</button>
+          </form>
+        </section>
+      {% endif %}
+
+      {% if can_reopen or can_cancel %}
+        <section class="asc-card" aria-labelledby="actions-heading">
+          <h2 class="asc-card-title" id="actions-heading">{% include "components/icon.html" with name="alert-triangle" %}{% trans "Registration actions" %}</h2>
+          <div class="asc-stack-actions">
+            {% if can_reopen %}
+              <a href="{% url 'reviews:registration-reopen' pk=registration.pk %}" class="btn btn-outline-secondary">{% trans "Reopen" %}</a>
+            {% endif %}
+            {% if can_cancel %}
+              <a href="{% url 'reviews:registration-cancel' pk=registration.pk %}" class="btn btn-outline-danger">{% trans "Cancel operationally" %}</a>
+            {% endif %}
+          </div>
+        </section>
+      {% endif %}
+    </aside>
+  </div>
+{% endblock %}

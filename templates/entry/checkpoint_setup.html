@@ -1,0 +1,57 @@
+{% extends "layouts/base_entry.html" %}
+{% load i18n %}
+{% block title %}{% trans "Checkpoint set-up" %}{% endblock %}
+{% block content %}
+{% comment %}
+  Checkpoint set-up (Flow §10.3): confirm the device's gate, choose the zone,
+  start or join a shift. The device scope is fixed by the device
+  administrator; nothing here can widen it.
+{% endcomment %}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-7">
+    <section class="asc-card" aria-labelledby="setup-heading">
+      <div class="asc-card-lead">
+        <span class="asc-tile">{% include "components/icon.html" with name="gate" %}</span>
+        <div>
+          <h1 class="h3 mb-1" id="setup-heading">{% trans "Checkpoint set-up" %}</h1>
+          <p class="text-body-secondary mb-0">{% trans "Confirm where this device is, then start your checkpoint session." %}</p>
+        </div>
+      </div>
+      <dl class="asc-dl mb-4">
+        <dt>{% trans "Device" %}</dt><dd><bdi>{{ device.public_name }}</bdi></dd>
+        <dt>{% trans "Event" %}</dt><dd><bdi>{{ device.event_edition.name }}</bdi></dd>
+        {% if scope %}
+          <dt>{% trans "Venue" %}</dt><dd><bdi>{{ scope.venue.localized_name }}</bdi></dd>
+          <dt>{% trans "Gate" %}</dt><dd><bdi>{{ scope.gate.localized_name }}</bdi> <bdi dir="ltr" class="asc-chip asc-chip-outline asc-code ms-1">{{ scope.gate.code }}</bdi></dd>
+        {% endif %}
+      </dl>
+      {% if not scope %}
+        <div class="asc-notice asc-notice-warning" role="alert">
+          {% include "components/icon.html" with name="alert-triangle" %}
+          <p>{% trans "This device has no checkpoint scope. Contact a device administrator." %}</p>
+        </div>
+      {% else %}
+        {% if open_session %}
+          <div class="asc-notice mb-4" role="status">
+            {% include "components/icon.html" with name="info" %}
+            <div>
+              <p><strong>{% trans "An open checkpoint session exists on this device" %}</strong>{% blocktrans with zone=open_session.zone.localized_name %}Zone: {{ zone }}. Join it with your own operator session, or start a new checkpoint session below.{% endblocktrans %}</p>
+              <form method="post" class="mt-2">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="join">
+                <button type="submit" class="btn btn-outline-primary"><span>{% trans "Join this checkpoint" %}</span></button>
+              </form>
+            </div>
+          </div>
+        {% endif %}
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <input type="hidden" name="action" value="start">
+          {% include "components/form_fields.html" with form=form %}
+          <button type="submit" class="btn btn-primary asc-btn-xl asc-btn-block">{% include "components/icon.html" with name="check-circle" %}<span>{% trans "Start checkpoint session" %}</span></button>
+        </form>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

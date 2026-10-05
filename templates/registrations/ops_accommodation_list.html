@@ -1,0 +1,41 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% comment %}
+  Accessibility support requests (UX-3, M21, D-10). Visible only with
+  `registrations.coordinate_accommodation_support`, scoped, never cached, and
+  every view is audited without content. The information serves only to
+  arrange support; it never feeds a registration decision (S-15).
+{% endcomment %}
+{% block title %}{% trans "Accessibility support" %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head">
+    <h1>{% trans "Accessibility support" %}</h1>
+    <p>{% trans "Support requested by participants in your scope. Use it only to arrange support at the event. Do not copy it into other tools, lists or messages." %}</p>
+  </div>
+  <section class="asc-card asc-card-flush" aria-labelledby="accommodation-caption">
+    <div class="asc-card-toolbar">
+      <h2 class="asc-card-toolbar-title" id="accommodation-caption">{% trans "Requests" %}</h2>
+    </div>
+    {% if requests %}
+      <ul class="asc-records" aria-labelledby="accommodation-caption">
+        {% for item in requests %}
+          <li class="asc-record" data-record>
+            <div class="asc-record-head">
+              <h3 class="asc-record-title"><bdi dir="ltr" class="asc-code">{{ item.registration.public_reference }}</bdi></h3>
+              <p class="asc-record-meta">{% trans "Event edition" %}{% trans ":" context "label separator" %} <bdi dir="ltr" class="asc-code">{{ item.registration.event_edition.code }}</bdi></p>
+            </div>
+            <dl class="asc-record-fields">
+              <div class="asc-record-wide"><dt>{% trans "Support requested" %}</dt><dd>
+                {% if item.category_labels %}<ul class="asc-chip-list">{% for label in item.category_labels %}<li class="asc-chip asc-chip-outline"><bdi>{{ label }}</bdi></li>{% endfor %}</ul>{% else %}{% trans "No category selected." %}{% endif %}
+              </dd></div>
+              {% if item.note_encrypted %}<div class="asc-record-wide"><dt>{% trans "Note" %}</dt><dd><bdi>{{ item.note_encrypted }}</bdi></dd></div>{% endif %}
+              {% if item.legacy_text %}<div class="asc-record-wide"><dt>{% trans "Earlier free text (before this form)" %}</dt><dd><bdi>{{ item.legacy_text }}</bdi></dd></div>{% endif %}
+            </dl>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="asc-table-empty">{% trans "No accessibility support request in your scope." %}</p>
+    {% endif %}
+  </section>
+{% endblock %}

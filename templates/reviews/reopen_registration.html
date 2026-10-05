@@ -1,0 +1,32 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% comment %}
+  Reopen is a dedicated confirmation page with a required reason: it opens a
+  new review case and is itself reversible by a later decision, so no extra
+  dialog is added (UI/UX Completion Gate F6 inventory).
+{% endcomment %}
+{% block title %}{% trans "Reopen registration" %}{% endblock %}
+{% block breadcrumbs %}{% url 'registrations:ops-intake-list' as list_url %}{% trans "Registration intake" as list_label %}{% url 'registrations:ops-intake-detail' pk=registration.pk as detail_url %}{% trans "Reopen registration" as current %}{% include "components/breadcrumb_trail.html" with parent_label=list_label parent_url=list_url parent2_label=registration.public_reference parent2_url=detail_url current=current %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Registration actions" %}</p>
+      <h1>{% blocktrans with ref=registration.public_reference|ltr_isolate %}Reopen {{ ref }}{% endblocktrans %}</h1>
+      <p>{% trans "Reopening returns this Registration Context to review in a new review case. The earlier decision stays in the history." %}</p>
+    </div>
+  </div>
+
+  <section class="asc-card asc-form-narrow" aria-labelledby="reopen-form-heading">
+    <h2 class="asc-card-title" id="reopen-form-heading">{% include "components/icon.html" with name="refresh" %}{% trans "Reason for reopening" %}</h2>
+    {% include "components/error_summary.html" %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="expected_version" value="{{ registration.version }}">
+      {% include "components/field.html" with field=form.reason %}
+      <div class="asc-actions-row">
+        <button type="submit" class="btn btn-primary"><span>{% trans "Reopen for review" %}</span></button>
+        <a href="{% url 'registrations:ops-intake-detail' pk=registration.pk %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

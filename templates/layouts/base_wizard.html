@@ -1,0 +1,28 @@
+{% extends "layouts/base_workspace.html" %}
+{% load i18n %}
+{% comment %}
+  Registration wizard layout (UI/UX §6.3–§6.8), adapted from Finder's
+  add-listing flow: a step list beside the form on large screens, a compact
+  numbered progress strip above it on small ones, and one card holding the
+  step's form with Back / Continue at its foot.
+
+  `#main-content` keeps hx-boost, as on the legacy chrome (UI/UX gate F2).
+  Child blocks: `stepper` ({% wizard_stepper registration "<step>" %}),
+  `wizard_title`, `wizard_lead`, `wizard_body`.
+{% endcomment %}
+
+{% block main_attrs %} hx-boost="true"{% endblock %}
+
+{% block content %}
+  <div class="asc-wizard">
+    <div class="asc-wizard-aside">{% block stepper %}{% endblock %}</div>
+    <div class="asc-wizard-main">
+      <div class="asc-page-head asc-wizard-head">
+        <p class="asc-kicker">{% trans "Registration" %}{% if registration.event_edition.name %} · <bdi>{{ registration.event_edition.name }}</bdi>{% endif %}</p>
+        <h1>{% block wizard_title %}{% endblock %}</h1>
+        {% block wizard_lead %}{% endblock %}
+      </div>
+      {% block wizard_body %}{% endblock %}
+    </div>
+  </div>
+{% endblock %}

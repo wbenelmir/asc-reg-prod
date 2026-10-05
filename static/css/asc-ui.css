@@ -1,0 +1,4231 @@
+/*
+ * ASC 2026 design system (Phase 3 Prompt 5). Project-owned.
+ *
+ * Scope: every rule is namespaced under `body.asc-ui`, so only pages that
+ * opt in through a `templates/layouts/` shell are affected. Pages still on
+ * the legacy `base.html` chrome render exactly as before.
+ *
+ * Visual reference: the Finder Bootstrap template (reference/finder/,
+ * licensed, read-only). Adapted, not copied: its neutral grey scale, border
+ * and radius tokens, soft card elevation, borderless list-group navigation,
+ * pill tabs and form-label weight are re-expressed here as ASC tokens on top
+ * of the project's vendored Bootstrap 5.3.8. Finder's marketplace red,
+ * Inter font and icon font are NOT used. See docs/design/finder_inventory.md.
+ *
+ * Brand: UI/UX §13.2 colour roles (navy header, deep blue interaction,
+ * cyan/green as decoration only). Semantic colours are chosen for WCAG 2.2
+ * AA contrast independently of the logo palette; the ratios are recorded
+ * in docs/design/design_system.md and asserted by the browser suite.
+ *
+ * Direction: only logical properties (margin-inline, inset-inline,
+ * border-inline-start, text-align: start) are used, so one rule set serves
+ * LTR and RTL; direction-specific rules are limited to icon mirroring.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Fonts                                                               */
+/* ------------------------------------------------------------------ */
+
+/* Thmanyah Sans: Arabic only (developer decision 2026-09-23). Self-hosted
+   from static/vendor/thmanyah/ under the developer-held extended license;
+   `font-display: swap` keeps text visible while the file loads. */
+@font-face {
+  font-family: "Thmanyah Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../vendor/thmanyah/thmanyahsans-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Thmanyah Sans";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../vendor/thmanyah/thmanyahsans-Medium.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Thmanyah Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../vendor/thmanyah/thmanyahsans-Bold.woff2") format("woff2");
+}
+
+/* ------------------------------------------------------------------ */
+/* Tokens                                                              */
+/* ------------------------------------------------------------------ */
+
+body.asc-ui {
+  /* Brand (UI/UX §13.2) */
+  --asc-navy: #102b3a;
+  --asc-navy-strong: #0a1d28;
+  --asc-navy-line: rgba(255, 255, 255, 0.12);
+  --asc-blue: #326eb5;          /* 5.2:1 on white: interactive colour */
+  --asc-blue-strong: #255896;   /* hover / pressed */
+  --asc-blue-subtle: #eaf1fa;
+  --asc-cyan: #029cbc;          /* decorative only (3.3:1, not for text) */
+  --asc-cyan-light: #63c5e3;    /* decorative, focus ring on navy */
+  --asc-green: #65b54d;         /* decorative only */
+
+  /* Neutral scale (adapted from Finder's grey ramp) */
+  --asc-heading: #111827;
+  --asc-text: #3f4652;          /* 9.5:1 on white */
+  --asc-text-muted: #5f6673;    /* 5.8:1 on white, 5.4:1 on --asc-canvas */
+  --asc-canvas: #f5f7fa;
+  --asc-surface: #ffffff;
+  --asc-surface-sunken: #eef1f6;
+  --asc-border: #dfe4ea;
+  --asc-border-strong: #b9c2cd;
+
+  /* Semantic tones: -fg text/icon, -bg subtle surface, -edge accent,
+     -solid filled button (white text). Every -fg passes 4.5:1 on its -bg;
+     every -solid passes 4.5:1 with white. */
+  --asc-success-fg: #11663a;
+  --asc-success-bg: #eaf6ef;
+  --asc-success-edge: #1f8f55;
+  --asc-success-solid: #177245;
+  --asc-success-solid-hover: #115a36;
+
+  --asc-info-fg: #1d4f8c;
+  --asc-info-bg: #eaf1fa;
+  --asc-info-edge: #326eb5;
+
+  --asc-warning-fg: #7a3d00;
+  --asc-warning-bg: #fff4e0;
+  --asc-warning-edge: #d97706;
+  --asc-warning-solid: #a3470b;
+  --asc-warning-solid-hover: #843908;
+
+  --asc-danger-fg: #9b1c14;
+  --asc-danger-bg: #fdecea;
+  --asc-danger-edge: #d92d20;
+  --asc-danger-solid: #b42318;
+  --asc-danger-solid-hover: #912018;
+
+  --asc-neutral-fg: #3f4652;
+  --asc-neutral-bg: #eef1f6;
+  --asc-neutral-edge: #6c727f;
+
+  /* Typography */
+  --asc-font-latin: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "Noto Sans", "Liberation Sans", sans-serif;
+  --asc-font-arabic: "Thmanyah Sans", "Segoe UI", "Noto Sans Arabic", Tahoma, "Arial", sans-serif;
+  --asc-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* 8-pixel spacing rhythm (UI/UX §13.4) */
+  --asc-space-1: 0.5rem;
+  --asc-space-2: 1rem;
+  --asc-space-3: 1.5rem;
+  --asc-space-4: 2rem;
+  --asc-space-5: 3rem;
+
+  /* Shape and elevation (Finder: 0.5rem base radius, soft grey shadows) */
+  --asc-radius-sm: 0.375rem;
+  --asc-radius: 0.5rem;
+  --asc-radius-lg: 0.75rem;
+  --asc-radius-pill: 50rem;
+  --asc-shadow-sm: 0 0.375rem 1.5rem rgba(103, 111, 123, 0.08);
+  --asc-shadow: 0 0.5rem 2rem -0.25rem rgba(103, 111, 123, 0.14);
+
+  /* Interaction */
+  --asc-focus: #1b5faa;
+  --asc-focus-on-dark: var(--asc-cyan-light);
+  --asc-target: 2.75rem;        /* 44px minimum practical target */
+  --asc-target-lg: 3.5rem;      /* 56px checkpoint actions */
+  --asc-motion: 160ms;
+
+  /* Layers */
+  --asc-z-appbar: 1020;
+  --asc-z-toast: 1080;
+
+  /* Bootstrap bridge: Bootstrap components read these variables. */
+  --bs-body-font-family: var(--asc-font-latin);
+  --bs-body-color: var(--asc-text);
+  --bs-body-bg: var(--asc-canvas);
+  --bs-emphasis-color: var(--asc-heading);
+  --bs-secondary-color: var(--asc-text-muted);
+  --bs-heading-color: var(--asc-heading);
+  --bs-border-color: var(--asc-border);
+  --bs-border-radius: var(--asc-radius);
+  --bs-border-radius-sm: var(--asc-radius-sm);
+  --bs-border-radius-lg: var(--asc-radius-lg);
+  --bs-link-color: var(--asc-blue);
+  --bs-link-color-rgb: 50, 110, 181;
+  --bs-link-hover-color: var(--asc-blue-strong);
+  --bs-link-hover-color-rgb: 37, 88, 150;
+  --bs-primary: var(--asc-blue);
+  --bs-primary-rgb: 50, 110, 181;
+  --bs-focus-ring-color: rgba(27, 95, 170, 0.35);
+
+  font-family: var(--asc-font-latin);
+  color: var(--asc-text);
+  background-color: var(--asc-canvas);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+body.asc-ui:lang(ar),
+body.asc-ui :lang(ar) {
+  --bs-body-font-family: var(--asc-font-arabic);
+  font-family: var(--asc-font-arabic);
+}
+
+/* Arabic script needs more vertical room for its ascenders/descenders. */
+body.asc-ui:lang(ar) {
+  line-height: 1.75;
+}
+
+body.asc-ui h1,
+body.asc-ui h2,
+body.asc-ui h3,
+body.asc-ui .h1,
+body.asc-ui .h2,
+body.asc-ui .h3,
+body.asc-ui .h4,
+body.asc-ui .h5 {
+  color: var(--asc-heading);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+body.asc-ui:lang(ar) h1,
+body.asc-ui:lang(ar) h2,
+body.asc-ui:lang(ar) h3,
+body.asc-ui:lang(ar) .h1,
+body.asc-ui:lang(ar) .h2,
+body.asc-ui:lang(ar) .h3,
+body.asc-ui:lang(ar) .h4,
+body.asc-ui:lang(ar) .h5 {
+  letter-spacing: 0;          /* never track Arabic: it breaks joining */
+  line-height: 1.4;
+}
+
+/* ------------------------------------------------------------------ */
+/* Focus: always visible, never suppressed (UI/UX §12.1)              */
+/* ------------------------------------------------------------------ */
+
+body.asc-ui a:focus-visible,
+body.asc-ui button:focus-visible,
+body.asc-ui input:focus-visible,
+body.asc-ui select:focus-visible,
+body.asc-ui textarea:focus-visible,
+body.asc-ui summary:focus-visible,
+body.asc-ui [tabindex]:focus-visible {
+  outline: 3px solid var(--asc-focus) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+
+body.asc-ui .asc-appbar a:focus-visible,
+body.asc-ui .asc-appbar button:focus-visible,
+body.asc-ui .asc-appbar select:focus-visible {
+  outline-color: var(--asc-focus-on-dark) !important;
+}
+
+body.asc-ui .form-control:focus,
+body.asc-ui .form-select:focus {
+  border-color: var(--asc-focus);
+}
+
+body.asc-ui .skip-link {
+  inset-inline-start: 1rem;
+  left: auto;
+  z-index: 2000;
+  background: var(--asc-surface);
+  color: var(--asc-heading);
+  font-weight: 700;
+}
+
+/* The shadow only while the link is shown: parked above the viewport, a
+   shadow would still bleed into the top of the page. */
+body.asc-ui .skip-link:focus {
+  box-shadow: var(--asc-shadow);
+}
+
+/* ------------------------------------------------------------------ */
+/* Icons                                                               */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-icon {
+  width: 1.25em;
+  height: 1.25em;
+  flex-shrink: 0;
+  vertical-align: -0.25em;
+}
+
+.asc-ui .asc-icon-sm {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+}
+
+.asc-ui .asc-icon-lg {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* Directional icons only (arrows, sign-out). Logos, QR codes and
+   non-directional symbols never mirror (UI/UX §11.3). */
+[dir="rtl"] .asc-ui .asc-icon-flip,
+[dir="rtl"] body.asc-ui .asc-icon-flip {
+  transform: scaleX(-1);
+}
+
+/* ------------------------------------------------------------------ */
+/* Application bar (navy header, UI/UX §13.4)                          */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-appbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--asc-z-appbar);
+  background: var(--asc-navy);
+  color: #fff;
+  border-bottom: 1px solid var(--asc-navy-strong);
+}
+
+.asc-ui .asc-appbar-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--asc-space-2);
+  min-height: 4rem;
+  padding-block: 0.5rem;
+}
+
+.asc-ui .asc-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #fff;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+/* The logo keeps its 537:240 proportions: height is fixed, width follows. */
+.asc-ui .asc-brand img {
+  display: block;
+  height: 2.5rem;
+  width: auto;
+}
+
+.asc-ui .asc-space-label {
+  display: inline-block;
+  padding-inline-start: 0.75rem;
+  border-inline-start: 1px solid var(--asc-navy-line);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.asc-ui .asc-appbar-end {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-inline-start: auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.asc-ui .asc-appbar .form-select {
+  min-height: var(--asc-target);
+  background-color: transparent;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.35);
+  /* Bootstrap draws its chevron in dark grey; redraw it light for navy. */
+  --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+.asc-ui .asc-appbar .form-select option {
+  color: var(--asc-heading);
+  background: #fff;
+}
+
+.asc-ui .asc-appbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--asc-target);
+  padding: 0.5rem 0.875rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--asc-radius);
+  background: transparent;
+  color: #fff;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color var(--asc-motion) ease-in-out;
+}
+
+.asc-ui .asc-appbar-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.asc-ui .asc-operator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.92);
+  max-width: 16rem;
+}
+
+.asc-ui .asc-operator span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ */
+/* Connection indicator (UI/UX §9.7, §14.2 "Connection and Sync")      */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-conn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--asc-target);
+  padding: 0.375rem 0.875rem;
+  border-radius: var(--asc-radius-pill);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  background: #e7f6ee;
+  color: var(--asc-success-fg);
+}
+
+.asc-ui .asc-conn-dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.55);
+}
+
+.asc-ui .asc-conn[data-state="checking"] {
+  background: #eef1f6;
+  color: var(--asc-neutral-fg);
+}
+
+.asc-ui .asc-conn[data-state="degraded"] {
+  background: var(--asc-warning-bg);
+  color: var(--asc-warning-fg);
+}
+
+.asc-ui .asc-conn[data-state="offline"],
+.asc-ui .asc-conn[data-state="session-ended"] {
+  background: var(--asc-danger-bg);
+  color: var(--asc-danger-fg);
+}
+
+.asc-ui .asc-conn [data-conn-icon] {
+  display: none;
+}
+
+.asc-ui .asc-conn[data-state="online"] [data-conn-icon="online"],
+.asc-ui .asc-conn[data-state="checking"] [data-conn-icon="online"],
+.asc-ui .asc-conn[data-state="degraded"] [data-conn-icon="degraded"],
+.asc-ui .asc-conn[data-state="offline"] [data-conn-icon="offline"],
+.asc-ui .asc-conn[data-state="session-ended"] [data-conn-icon="session-ended"] {
+  display: inline-block;
+}
+
+/* ------------------------------------------------------------------ */
+/* Checkpoint identity strip and entry sub-navigation                  */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-context {
+  background: var(--asc-surface);
+  border-bottom: 1px solid var(--asc-border);
+}
+
+.asc-ui .asc-context-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.5rem 1.5rem;
+  padding-block: 0.75rem;
+}
+
+.asc-ui .asc-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
+}
+
+.asc-ui .asc-meta-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--asc-radius);
+  background: var(--asc-blue-subtle);
+  color: var(--asc-blue);
+  flex-shrink: 0;
+}
+
+.asc-ui .asc-meta-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--asc-text-muted);
+  line-height: 1.2;
+}
+
+.asc-ui:lang(ar) .asc-meta-label,
+.asc-ui :lang(ar) .asc-meta-label {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.8125rem;
+}
+
+.asc-ui .asc-meta-value {
+  display: block;
+  font-weight: 600;
+  color: var(--asc-heading);
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.asc-ui .asc-subnav {
+  background: var(--asc-surface);
+  border-bottom: 1px solid var(--asc-border);
+}
+
+.asc-ui .asc-subnav ul {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0.5rem 0;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.asc-ui .asc-subnav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--asc-target);
+  padding: 0.5rem 1rem;
+  border-radius: var(--asc-radius-pill);
+  color: var(--asc-text);
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--asc-motion) ease-in-out, color var(--asc-motion) ease-in-out;
+}
+
+.asc-ui .asc-subnav a:hover {
+  background: var(--asc-surface-sunken);
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-subnav a[aria-current="page"] {
+  background: var(--asc-blue-subtle);
+  color: var(--asc-info-fg);
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------------------ */
+/* Page frame                                                          */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-main {
+  padding-block: var(--asc-space-3) var(--asc-space-5);
+}
+
+.asc-ui .asc-page-head {
+  margin-bottom: var(--asc-space-3);
+}
+
+.asc-ui .asc-page-head h1 {
+  margin-bottom: 0.25rem;
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+}
+
+.asc-ui .asc-page-head p {
+  margin: 0;
+  color: var(--asc-text-muted);
+  max-width: 48rem;
+}
+
+.asc-ui .asc-footer {
+  border-top: 1px solid var(--asc-border);
+  background: var(--asc-surface);
+  color: var(--asc-text-muted);
+  font-size: 0.875rem;
+  padding-block: 1rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Cards (Finder card: 1px hairline, soft shadow, generous padding)    */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-card {
+  background: var(--asc-surface);
+  border: 1px solid var(--asc-border);
+  border-radius: var(--asc-radius-lg);
+  box-shadow: var(--asc-shadow-sm);
+  padding: var(--asc-space-3);
+}
+
+.asc-ui .asc-card + .asc-card {
+  margin-top: var(--asc-space-3);
+}
+
+.asc-ui .asc-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin: 0 0 var(--asc-space-2);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-card-title .asc-icon {
+  color: var(--asc-blue);
+}
+
+.asc-ui .asc-card-lead {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--asc-space-2);
+  margin-bottom: var(--asc-space-3);
+}
+
+.asc-ui .asc-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--asc-radius-lg);
+  background: var(--asc-blue-subtle);
+  color: var(--asc-blue);
+  flex-shrink: 0;
+}
+
+.asc-ui .asc-tile .asc-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Forms (Finder: 500-weight heading-colour labels, 0.5rem radius)     */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .form-label {
+  font-weight: 600;
+  color: var(--asc-heading);
+  margin-bottom: 0.375rem;
+}
+
+.asc-ui .form-control,
+.asc-ui .form-select {
+  min-height: var(--asc-target);
+  /* Bootstrap 5.3 paints controls with --bs-body-bg (our canvas grey);
+     fields must read as white, writable surfaces. */
+  background-color: var(--asc-surface);
+  border-color: var(--asc-border-strong);
+  border-radius: var(--asc-radius);
+  color: var(--asc-heading);
+}
+
+.asc-ui .form-control::placeholder {
+  /* 4.98:1 on the white field surface (UX-1, S-06: at least 4.5:1). */
+  color: #69707d;
+  opacity: 1;
+}
+
+.asc-ui .form-text {
+  color: var(--asc-text-muted);
+}
+
+.asc-ui .asc-field-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.375rem;
+  margin-top: 0.375rem;
+  color: var(--asc-danger-fg);
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
+
+.asc-ui .form-control[aria-invalid="true"],
+.asc-ui .form-select[aria-invalid="true"] {
+  border-color: var(--asc-danger-edge);
+  border-width: 2px;
+}
+
+/* Scanner field: large, high-contrast, direction-isolated (a token is
+   always LTR, even inside an Arabic page). */
+.asc-ui .asc-scan-field {
+  position: relative;
+}
+
+.asc-ui .asc-scan-field .asc-icon {
+  position: absolute;
+  inset-inline-start: 1rem;
+  top: 50%;
+  width: 1.75rem;
+  height: 1.75rem;
+  transform: translateY(-50%);
+  color: var(--asc-text-muted);
+  pointer-events: none;
+}
+
+.asc-ui .asc-scan-field .form-control {
+  min-height: 4rem;
+  padding-inline-start: 3.5rem;
+  font-size: 1.25rem;
+  font-family: var(--asc-font-mono);
+  border-width: 2px;
+  text-align: start;       /* direction comes from the input's dir="ltr" */
+}
+
+[dir="rtl"] .asc-ui .asc-scan-field .form-control {
+  text-align: right;
+}
+
+.asc-ui .asc-scan-field .form-control:focus {
+  border-color: var(--asc-blue);
+  background: #fbfdff;
+}
+
+.asc-ui .asc-scan-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--asc-text-muted);
+}
+
+.asc-ui .asc-scan-status[data-ready="true"] {
+  color: var(--asc-success-fg);
+}
+
+.asc-ui .asc-scan-status-dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  background: var(--asc-border-strong);
+}
+
+.asc-ui .asc-scan-status[data-ready="true"] .asc-scan-status-dot {
+  background: var(--asc-success-edge);
+}
+
+.asc-ui kbd {
+  display: inline-block;
+  min-width: 1.75rem;
+  padding: 0.125rem 0.4rem;
+  border: 1px solid var(--asc-border-strong);
+  border-bottom-width: 2px;
+  border-radius: var(--asc-radius-sm);
+  background: var(--asc-surface);
+  color: var(--asc-heading);
+  font-family: var(--asc-font-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ------------------------------------------------------------------ */
+/* Buttons                                                             */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: var(--asc-target);
+  font-weight: 600;
+  border-radius: var(--asc-radius);
+}
+
+.asc-ui .btn-primary {
+  --bs-btn-bg: var(--asc-blue);
+  --bs-btn-border-color: var(--asc-blue);
+  --bs-btn-hover-bg: var(--asc-blue-strong);
+  --bs-btn-hover-border-color: var(--asc-blue-strong);
+  --bs-btn-active-bg: var(--asc-blue-strong);
+  --bs-btn-active-border-color: var(--asc-blue-strong);
+  --bs-btn-disabled-bg: var(--asc-blue);
+  --bs-btn-disabled-border-color: var(--asc-blue);
+}
+
+.asc-ui .btn-outline-primary {
+  --bs-btn-color: var(--asc-blue);
+  --bs-btn-border-color: var(--asc-blue);
+  --bs-btn-hover-bg: var(--asc-blue);
+  --bs-btn-hover-border-color: var(--asc-blue);
+  --bs-btn-active-bg: var(--asc-blue-strong);
+  --bs-btn-active-border-color: var(--asc-blue-strong);
+}
+
+.asc-ui .btn-outline-secondary {
+  --bs-btn-color: var(--asc-text);
+  --bs-btn-border-color: var(--asc-border-strong);
+  --bs-btn-hover-color: var(--asc-heading);
+  --bs-btn-hover-bg: var(--asc-surface-sunken);
+  --bs-btn-hover-border-color: var(--asc-border-strong);
+  --bs-btn-active-color: var(--asc-heading);
+  --bs-btn-active-bg: var(--asc-border);
+  --bs-btn-active-border-color: var(--asc-border-strong);
+  background: var(--asc-surface);
+}
+
+.asc-ui .btn-success {
+  --bs-btn-bg: var(--asc-success-solid);
+  --bs-btn-border-color: var(--asc-success-solid);
+  --bs-btn-hover-bg: var(--asc-success-solid-hover);
+  --bs-btn-hover-border-color: var(--asc-success-solid-hover);
+  --bs-btn-active-bg: var(--asc-success-solid-hover);
+  --bs-btn-active-border-color: var(--asc-success-solid-hover);
+}
+
+.asc-ui .btn-danger {
+  --bs-btn-bg: var(--asc-danger-solid);
+  --bs-btn-border-color: var(--asc-danger-solid);
+  --bs-btn-hover-bg: var(--asc-danger-solid-hover);
+  --bs-btn-hover-border-color: var(--asc-danger-solid-hover);
+  --bs-btn-active-bg: var(--asc-danger-solid-hover);
+  --bs-btn-active-border-color: var(--asc-danger-solid-hover);
+}
+
+.asc-ui .btn-warning {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--asc-warning-solid);
+  --bs-btn-border-color: var(--asc-warning-solid);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--asc-warning-solid-hover);
+  --bs-btn-hover-border-color: var(--asc-warning-solid-hover);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--asc-warning-solid-hover);
+  --bs-btn-active-border-color: var(--asc-warning-solid-hover);
+}
+
+.asc-ui .btn-outline-warning {
+  --bs-btn-color: var(--asc-warning-fg);
+  --bs-btn-border-color: var(--asc-warning-edge);
+  --bs-btn-hover-color: var(--asc-warning-fg);
+  --bs-btn-hover-bg: var(--asc-warning-bg);
+  --bs-btn-hover-border-color: var(--asc-warning-edge);
+  --bs-btn-active-color: var(--asc-warning-fg);
+  --bs-btn-active-bg: #ffe8bf;
+  --bs-btn-active-border-color: var(--asc-warning-edge);
+  background: var(--asc-surface);
+}
+
+/* Checkpoint-sized action (UI/UX §11.2 target size; tablet-first entry). */
+.asc-ui .asc-btn-xl {
+  min-height: var(--asc-target-lg);
+  padding: 0.75rem 1.5rem;
+  font-size: 1.125rem;
+}
+
+.asc-ui .asc-btn-block {
+  width: 100%;
+}
+
+.asc-ui .asc-btn-hint {
+  font-weight: 500;
+  font-size: 0.8125rem;
+  opacity: 0.9;
+}
+
+/* ------------------------------------------------------------------ */
+/* Status chips (UI/UX §14.2 "Status Label")                          */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--asc-radius-pill);
+  border: 1px solid transparent;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  background: var(--asc-neutral-bg);
+  color: var(--asc-neutral-fg);
+}
+
+.asc-ui .asc-chip-success { background: var(--asc-success-bg); color: var(--asc-success-fg); }
+.asc-ui .asc-chip-info { background: var(--asc-info-bg); color: var(--asc-info-fg); }
+.asc-ui .asc-chip-warning { background: var(--asc-warning-bg); color: var(--asc-warning-fg); }
+.asc-ui .asc-chip-danger { background: var(--asc-danger-bg); color: var(--asc-danger-fg); }
+.asc-ui .asc-chip-outline { background: var(--asc-surface); border-color: var(--asc-border-strong); }
+
+.asc-ui .asc-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Verification result (UI/UX §9.5, §14.4 "Verification Result")      */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-result {
+  --tone-fg: var(--asc-neutral-fg);
+  --tone-bg: var(--asc-neutral-bg);
+  --tone-edge: var(--asc-neutral-edge);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--asc-space-2) var(--asc-space-3);
+  align-items: center;
+  margin-bottom: var(--asc-space-3);
+  padding: var(--asc-space-3);
+  background: var(--tone-bg);
+  color: var(--tone-fg);
+  border: 1px solid color-mix(in srgb, var(--tone-edge) 35%, transparent);
+  border-inline-start: 0.5rem solid var(--tone-edge);
+  border-radius: var(--asc-radius-lg);
+}
+
+.asc-ui .asc-result-success { --tone-fg: var(--asc-success-fg); --tone-bg: var(--asc-success-bg); --tone-edge: var(--asc-success-edge); }
+.asc-ui .asc-result-info { --tone-fg: var(--asc-info-fg); --tone-bg: var(--asc-info-bg); --tone-edge: var(--asc-info-edge); }
+.asc-ui .asc-result-warning { --tone-fg: var(--asc-warning-fg); --tone-bg: var(--asc-warning-bg); --tone-edge: var(--asc-warning-edge); }
+.asc-ui .asc-result-danger { --tone-fg: var(--asc-danger-fg); --tone-bg: var(--asc-danger-bg); --tone-edge: var(--asc-danger-edge); }
+.asc-ui .asc-result-neutral { --tone-fg: var(--asc-neutral-fg); --tone-bg: var(--asc-neutral-bg); --tone-edge: var(--asc-neutral-edge); }
+
+.asc-ui .asc-result-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: var(--asc-surface);
+  color: var(--tone-edge);
+  box-shadow: 0 0 0 0.375rem color-mix(in srgb, var(--tone-edge) 18%, transparent);
+}
+
+.asc-ui .asc-result-icon .asc-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.asc-ui .asc-result-kicker {
+  display: block;
+  margin-bottom: 0.125rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--tone-fg);
+  opacity: 0.92;
+}
+
+.asc-ui .asc-result h1 {
+  margin: 0;
+  color: var(--tone-fg);
+  font-size: clamp(1.75rem, 1.35rem + 1.6vw, 2.5rem);
+  line-height: 1.15;
+}
+
+.asc-ui .asc-result-reason {
+  margin: 0.375rem 0 0;
+  font-size: 1.1875rem;
+  font-weight: 600;
+  color: var(--tone-fg);
+}
+
+.asc-ui .asc-result-note {
+  margin: 0.25rem 0 0;
+  color: var(--tone-fg);
+}
+
+.asc-ui .asc-result-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  padding-top: var(--asc-space-2);
+  border-top: 1px solid color-mix(in srgb, var(--tone-edge) 25%, transparent);
+}
+
+.asc-ui .asc-result-actions .asc-hint {
+  color: var(--tone-fg);
+}
+
+/* ------------------------------------------------------------------ */
+/* Participant card and definition lists                               */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-person {
+  display: flex;
+  gap: var(--asc-space-3);
+  align-items: flex-start;
+}
+
+.asc-ui .asc-photo {
+  width: 9rem;
+  height: 11.25rem;           /* 4:5, fixed so the layout never shifts */
+  object-fit: cover;
+  border-radius: var(--asc-radius);
+  border: 1px solid var(--asc-border);
+  background: var(--asc-surface-sunken);
+  flex-shrink: 0;
+}
+
+.asc-ui .asc-photo-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  color: var(--asc-text-muted);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.asc-ui .asc-dl {
+  display: grid;
+  grid-template-columns: minmax(8rem, max-content) 1fr;
+  gap: 0.625rem 1.25rem;
+  margin: 0;
+  align-content: start;
+}
+
+.asc-ui .asc-dl dt {
+  font-weight: 500;
+  color: var(--asc-text-muted);
+}
+
+.asc-ui .asc-dl dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--asc-heading);
+  overflow-wrap: anywhere;
+}
+
+.asc-ui .asc-dl .asc-dd-lead {
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+.asc-ui .asc-dl-stacked {
+  grid-template-columns: 1fr;
+  gap: 0.125rem;
+}
+
+.asc-ui .asc-dl-stacked dd {
+  margin-bottom: 0.75rem;
+}
+
+/* Dynamic values inside translated text (UI/UX §11.3; UI checkpoint
+   correction 2). Direction comes from markup, never from CSS on a whole
+   component: names and free text use <bdi> (direction from their own first
+   strong character); inherently left-to-right codes -- registration
+   references, gate codes, identity hints -- use <bdi dir="ltr" class="asc-code">. */
+.asc-ui bdi {
+  unicode-bidi: isolate;
+}
+
+.asc-ui .asc-code {
+  font-family: var(--asc-font-mono);
+  font-size: 0.95em;
+  letter-spacing: 0.02em;
+}
+
+/* ------------------------------------------------------------------ */
+/* Inline notices, banners, empty states                               */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-notice {
+  --tone-fg: var(--asc-info-fg);
+  --tone-bg: var(--asc-info-bg);
+  --tone-edge: var(--asc-info-edge);
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.875rem 1rem;
+  border-radius: var(--asc-radius);
+  background: var(--tone-bg);
+  color: var(--tone-fg);
+  border-inline-start: 0.25rem solid var(--tone-edge);
+}
+
+.asc-ui .asc-notice > .asc-icon {
+  margin-top: 0.125rem;
+}
+
+.asc-ui .asc-notice p {
+  margin: 0;
+}
+
+.asc-ui .asc-notice strong {
+  display: block;
+}
+
+.asc-ui .asc-notice-success { --tone-fg: var(--asc-success-fg); --tone-bg: var(--asc-success-bg); --tone-edge: var(--asc-success-edge); }
+.asc-ui .asc-notice-warning { --tone-fg: var(--asc-warning-fg); --tone-bg: var(--asc-warning-bg); --tone-edge: var(--asc-warning-edge); }
+.asc-ui .asc-notice-danger { --tone-fg: var(--asc-danger-fg); --tone-bg: var(--asc-danger-bg); --tone-edge: var(--asc-danger-edge); }
+.asc-ui .asc-notice-neutral { --tone-fg: var(--asc-neutral-fg); --tone-bg: var(--asc-neutral-bg); --tone-edge: var(--asc-neutral-edge); }
+
+.asc-ui .asc-notice + .asc-notice {
+  margin-top: 0.75rem;
+}
+
+.asc-ui .asc-banner-region:empty {
+  display: none;
+}
+
+.asc-ui .asc-banner-region {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: var(--asc-space-3);
+}
+
+.asc-ui .asc-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: var(--asc-space-4) var(--asc-space-2);
+  text-align: center;
+  color: var(--asc-text-muted);
+}
+
+.asc-ui .asc-empty .asc-tile {
+  background: var(--asc-surface-sunken);
+  color: var(--asc-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.asc-ui .asc-empty h2,
+.asc-ui .asc-empty h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-empty p {
+  margin: 0;
+  max-width: 32rem;
+}
+
+.asc-ui .asc-steps {
+  margin: 0;
+  padding-inline-start: 1.25rem;
+}
+
+.asc-ui .asc-steps li + li {
+  margin-top: 0.375rem;
+}
+
+/* Flash messages rendered by the layout (Django messages framework). */
+.asc-ui .asc-flash {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: var(--asc-space-3);
+}
+
+/* ------------------------------------------------------------------ */
+/* Pill tabs (Finder nav-pills) for alternative lookup methods          */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.375rem;
+  margin: 0 0 var(--asc-space-3);
+  padding: 0.25rem;
+  overflow-x: auto;
+  list-style: none;
+  background: var(--asc-surface-sunken);
+  border-radius: var(--asc-radius-pill);
+}
+
+.asc-ui .asc-tabs .nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--asc-target);
+  padding: 0.5rem 1rem;
+  border: 0;
+  border-radius: var(--asc-radius-pill);
+  background: transparent;
+  color: var(--asc-text);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.asc-ui .asc-tabs .nav-link:hover {
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-tabs .nav-link.active {
+  background: var(--asc-surface);
+  color: var(--asc-info-fg);
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.12);
+}
+
+/* ------------------------------------------------------------------ */
+/* Section divider with the ASC diagonal motif (UI/UX §13.4, sparingly) */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-motif {
+  height: 0.1875rem;
+  background: repeating-linear-gradient(
+    115deg,
+    var(--asc-cyan) 0 0.3rem,
+    transparent 0.3rem 0.55rem,
+    var(--asc-green) 0.55rem 0.85rem,
+    transparent 0.85rem 1.1rem,
+    var(--asc-cyan-light) 1.1rem 1.4rem,
+    transparent 1.4rem 1.65rem
+  );
+  opacity: 0.55;
+}
+
+/* ------------------------------------------------------------------ */
+/* Responsive behaviour                                                */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 991.98px) {
+  .asc-ui .asc-appbar {
+    position: static;           /* keep vertical space for the scanner */
+  }
+}
+
+@media (max-width: 767.98px) {
+  .asc-ui .asc-card {
+    padding: var(--asc-space-2);
+  }
+
+  .asc-ui .asc-card + .asc-card {
+    margin-top: var(--asc-space-2);
+  }
+
+  .asc-ui .asc-brand img {
+    height: 2rem;
+  }
+
+  .asc-ui .asc-appbar-inner {
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .asc-ui .asc-appbar-end {
+    width: 100%;
+    justify-content: space-between;
+    margin-inline-start: 0;
+    gap: 0.5rem;
+  }
+
+  .asc-ui .asc-context-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 0.75rem;
+    padding-block: 0.5rem;
+  }
+
+  /* Keep the scanner near the top: compact identity strip; the scope chips
+     span the strip and wrap onto whole rows, so no method is ever clipped
+     or hidden behind a scroll (UI checkpoint correction 1). */
+  .asc-ui .asc-meta-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .asc-ui .asc-meta-scope {
+    grid-column: 1 / -1;
+  }
+
+  .asc-ui .asc-meta-scope > span:last-child {
+    min-width: 0;
+  }
+
+  .asc-ui .asc-meta-scope .asc-chip-list {
+    flex-wrap: wrap;
+  }
+
+  .asc-ui .asc-tabs {
+    flex-wrap: wrap;
+    border-radius: var(--asc-radius-lg);
+  }
+
+  .asc-ui .asc-tabs .nav-item {
+    flex: 1 1 auto;
+  }
+
+  .asc-ui .asc-tabs .nav-link {
+    width: 100%;
+    justify-content: center;
+    border-radius: var(--asc-radius);
+  }
+
+  .asc-ui .asc-result {
+    grid-template-columns: 1fr;
+    padding: var(--asc-space-2);
+  }
+
+  .asc-ui .asc-result-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  .asc-ui .asc-result-icon .asc-icon {
+    width: 2.125rem;
+    height: 2.125rem;
+  }
+
+  .asc-ui .asc-result-actions .btn {
+    width: 100%;
+  }
+
+  .asc-ui .asc-person {
+    flex-direction: column;
+  }
+
+  .asc-ui .asc-photo {
+    width: 7.5rem;
+    height: 9.375rem;
+  }
+
+  .asc-ui .asc-dl {
+    grid-template-columns: 1fr;
+    gap: 0.125rem;
+  }
+
+  .asc-ui .asc-dl dd {
+    margin-bottom: 0.625rem;
+  }
+
+  .asc-ui .asc-operator {
+    display: none;
+  }
+}
+
+@media (max-width: 339.98px) {
+  .asc-ui .asc-context-inner {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 399.98px) {
+  .asc-ui .asc-space-label {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .asc-ui * {
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@media print {
+  .asc-ui .asc-appbar,
+  .asc-ui .asc-subnav,
+  .asc-ui .asc-footer {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Light application bar and top navigation (participant workspace)    */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-appbar-light {
+  background: var(--asc-surface);
+  color: var(--asc-heading);
+  border-bottom: 1px solid var(--asc-border);
+}
+
+.asc-ui .asc-appbar-light .asc-appbar-btn {
+  color: var(--asc-heading);
+  border-color: var(--asc-border-strong);
+}
+
+.asc-ui .asc-appbar-light .asc-appbar-btn:hover {
+  background: var(--asc-surface-sunken);
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-appbar-light .form-select {
+  color: var(--asc-heading);
+  border-color: var(--asc-border-strong);
+  --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+.asc-ui .asc-appbar-light a:focus-visible,
+.asc-ui .asc-appbar-light button:focus-visible,
+.asc-ui .asc-appbar-light select:focus-visible {
+  outline-color: var(--asc-focus) !important;
+}
+
+.asc-ui .asc-topnav ul {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.asc-ui .asc-topnav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--asc-target);
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--asc-radius-pill);
+  color: var(--asc-text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.asc-ui .asc-topnav a:hover {
+  background: var(--asc-surface-sunken);
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-topnav a[aria-current="page"] {
+  background: var(--asc-blue-subtle);
+  color: var(--asc-info-fg);
+}
+
+/* ------------------------------------------------------------------ */
+/* Breadcrumbs and page header with actions                            */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  margin: 0 0 var(--asc-space-2);
+  padding: 0;
+  list-style: none;
+  font-size: 0.9375rem;
+}
+
+.asc-ui .asc-breadcrumbs li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--asc-text-muted);
+}
+
+.asc-ui .asc-breadcrumbs a {
+  color: var(--asc-blue);
+}
+
+.asc-ui .asc-breadcrumbs [aria-current="page"] {
+  color: var(--asc-heading);
+  font-weight: 600;
+}
+
+.asc-ui .asc-page-head-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--asc-space-2);
+  margin-bottom: var(--asc-space-3);
+}
+
+.asc-ui .asc-page-head-row .asc-page-head {
+  margin-bottom: 0;
+}
+
+.asc-ui .asc-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin: 0 0 0.25rem;
+  font-size: 1.25rem;
+}
+
+.asc-ui .asc-section-title .asc-icon {
+  color: var(--asc-blue);
+}
+
+.asc-ui .asc-section-lead {
+  margin: 0 0 var(--asc-space-2);
+  color: var(--asc-text-muted);
+}
+
+/* ------------------------------------------------------------------ */
+/* KPI tiles (quantities, never participant data)                      */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--asc-space-2);
+  margin-bottom: var(--asc-space-3);
+}
+
+.asc-ui .asc-kpi {
+  padding: var(--asc-space-2) var(--asc-space-3);
+  background: var(--asc-surface);
+  border: 1px solid var(--asc-border);
+  border-radius: var(--asc-radius-lg);
+  box-shadow: var(--asc-shadow-sm);
+}
+
+.asc-ui .asc-kpi-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--asc-text-muted);
+}
+
+.asc-ui .asc-kpi-value {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--asc-heading);
+  font-variant-numeric: tabular-nums;
+}
+
+.asc-ui .asc-kpi-note {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--asc-text-muted);
+}
+
+.asc-ui .asc-kpi-warning { border-top: 0.25rem solid var(--asc-warning-edge); }
+.asc-ui .asc-kpi-danger { border-top: 0.25rem solid var(--asc-danger-edge); }
+.asc-ui .asc-kpi-success { border-top: 0.25rem solid var(--asc-success-edge); }
+.asc-ui .asc-kpi-info { border-top: 0.25rem solid var(--asc-info-edge); }
+
+/* ------------------------------------------------------------------ */
+/* Data tables (Finder table: hairline rows, muted header)             */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-table-wrap {
+  position: relative;   /* contains absolutely positioned (visually hidden)
+                           labels, which would otherwise escape the scroller
+                           and widen the whole page on narrow screens */
+  overflow-x: auto;
+}
+
+.asc-ui .asc-table {
+  --bs-table-bg: transparent;
+  width: 100%;
+  margin-bottom: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.asc-ui .asc-table > thead th {
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid var(--asc-border-strong);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--asc-text-muted);
+  text-align: start;
+  white-space: nowrap;
+  background: var(--asc-surface);
+}
+
+.asc-ui .asc-table > tbody > tr > * {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--asc-border);
+  vertical-align: middle;
+  text-align: start;
+}
+
+.asc-ui .asc-table > tbody > tr:hover > * {
+  background: #fafbfd;
+}
+
+.asc-ui .asc-table > tbody > tr:last-child > * {
+  border-bottom: 0;
+}
+
+.asc-ui .asc-table .asc-num {
+  text-align: end;
+  white-space: nowrap;
+}
+
+.asc-ui .asc-table-empty {
+  padding: var(--asc-space-3) 0.75rem !important;
+  color: var(--asc-text-muted);
+  text-align: center !important;
+}
+
+.asc-ui .asc-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.asc-ui .asc-inline-form {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0.25rem;
+  border: 1px solid var(--asc-border);
+  border-radius: var(--asc-radius);
+  background: var(--asc-surface);
+}
+
+.asc-ui .asc-inline-form .form-control,
+.asc-ui .asc-inline-form .form-select,
+.asc-ui .asc-inline-form .btn {
+  min-height: var(--asc-target);
+}
+
+.asc-ui .asc-inline-form .form-select {
+  width: auto;
+}
+
+.asc-ui .asc-input-qty {
+  width: 6rem;
+}
+
+.asc-ui .asc-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--asc-space-2);
+  align-items: end;
+}
+
+/* ------------------------------------------------------------------ */
+/* Digital Entry Pass card (participant, UI/UX §7.3)                   */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-pass {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  overflow: hidden;
+  padding: 0;
+}
+
+.asc-ui .asc-pass-body {
+  padding: var(--asc-space-3);
+}
+
+.asc-ui .asc-pass-qr {
+  padding: var(--asc-space-3);
+  background: var(--asc-surface-sunken);
+  border-inline-start: 1px solid var(--asc-border);
+  text-align: center;
+}
+
+.asc-ui .asc-pass-qr img {
+  display: block;
+  width: 17rem;
+  height: 17rem;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0.75rem;
+  background: #fff;
+  border-radius: var(--asc-radius);
+  image-rendering: pixelated;
+}
+
+.asc-ui .asc-pass-qr p {
+  margin: 0.75rem auto 0;
+  max-width: 17rem;
+  font-size: 0.875rem;
+  color: var(--asc-text-muted);
+}
+
+.asc-ui .asc-pass > .asc-motif {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 767.98px) {
+  .asc-ui .asc-pass {
+    grid-template-columns: 1fr;
+  }
+
+  .asc-ui .asc-pass-qr {
+    border-inline-start: 0;
+    border-top: 1px solid var(--asc-border);
+  }
+
+  .asc-ui .asc-topnav {
+    order: 3;
+    width: 100%;
+  }
+
+  .asc-ui .asc-topnav ul {
+    flex-wrap: wrap;
+  }
+
+  .asc-ui .asc-kpi-value {
+    font-size: 1.5rem;
+  }
+}
+
+/* Multiple-choice checkbox groups (components/form_fields.html). */
+.asc-ui .asc-checks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 0.5rem;
+}
+
+.asc-ui .asc-check {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-height: var(--asc-target);
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--asc-border);
+  border-radius: var(--asc-radius);
+  background: var(--asc-surface);
+  cursor: pointer;
+}
+
+.asc-ui .asc-check input {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+  accent-color: var(--asc-blue);
+}
+
+.asc-ui .asc-check:has(input:checked) {
+  border-color: var(--asc-blue);
+  background: var(--asc-blue-subtle);
+}
+
+.asc-ui .asc-code-display {
+  display: inline-block;
+  padding: 0.75rem 1.25rem;
+  border: 2px dashed var(--asc-border-strong);
+  border-radius: var(--asc-radius-lg);
+  background: var(--asc-surface);
+  font-family: var(--asc-font-mono);
+  font-size: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--asc-heading);
+}
+
+/* Candidate selection rows (entry/candidates.html). */
+.asc-ui .asc-candidate {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding: var(--asc-space-2);
+  border: 1px solid var(--asc-border);
+  border-radius: var(--asc-radius-lg);
+  background: var(--asc-surface);
+}
+
+.asc-ui .asc-candidate:hover {
+  border-color: var(--asc-border-strong);
+}
+
+/* Narrow screens: administrative tables stay tables (UI/UX §11.2) inside a
+   horizontal scroller whose edge shadows show that more columns exist; row
+   actions keep a usable width instead of stacking one control per line. */
+@media (max-width: 767.98px) {
+  .asc-ui .asc-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .asc-ui .asc-kpi {
+    padding: 0.875rem 1rem;
+  }
+
+  .asc-ui .asc-row-actions {
+    min-width: 26rem;
+  }
+
+  .asc-ui .asc-table-wrap {
+    background:
+      linear-gradient(to right, var(--asc-surface) 30%, rgba(255, 255, 255, 0)) left center / 2.5rem 100% no-repeat local,
+      linear-gradient(to left, var(--asc-surface) 30%, rgba(255, 255, 255, 0)) right center / 2.5rem 100% no-repeat local,
+      radial-gradient(farthest-side at 0 50%, rgba(17, 24, 39, 0.16), rgba(17, 24, 39, 0)) left center / 0.75rem 100% no-repeat scroll,
+      radial-gradient(farthest-side at 100% 50%, rgba(17, 24, 39, 0.16), rgba(17, 24, 39, 0)) right center / 0.75rem 100% no-repeat scroll;
+  }
+
+  .asc-ui .asc-table > thead th {
+    background: transparent;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .asc-ui .asc-row-actions {
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    min-width: max-content;
+  }
+}
+
+/* ================================================================== */
+/* UI/UX Completion Gate — Checkpoint 1                                */
+/* Shared foundation for the public/auth shell, the registration       */
+/* wizard, the operations section bar, list/detail patterns and the     */
+/* remaining component states. Same rules as above: logical properties */
+/* only, tokens only, no rule depends on a shell body class (boosted   */
+/* navigation keeps the previous <body> attributes; gate finding F2).  */
+/* ================================================================== */
+
+/* ------------------------------------------------------------------ */
+/* Small text roles                                                    */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-kicker {
+  margin: 0 0 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--asc-blue-strong);
+}
+
+.asc-ui .asc-muted {
+  color: var(--asc-text-muted);
+}
+
+.asc-ui .asc-optional {
+  display: inline-block;
+  margin-inline-start: 0.375rem;
+  padding: 0 0.5rem;
+  border-radius: var(--asc-radius-pill);
+  background: var(--asc-surface-sunken);
+  color: var(--asc-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.6;
+  vertical-align: 0.1em;
+}
+
+.asc-ui .asc-count {
+  color: var(--asc-text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.asc-ui .asc-reference {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--asc-heading);
+}
+
+/* Single checkbox: input then label, with a comfortable target. */
+.asc-ui .asc-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-height: var(--asc-target);
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--asc-border);
+  border-radius: var(--asc-radius);
+  background: var(--asc-surface);
+}
+
+.asc-ui .asc-checkbox .form-check-input {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0.15rem 0 0;
+  border-color: var(--asc-border-strong);
+}
+
+.asc-ui .asc-checkbox .form-check-label {
+  color: var(--asc-heading);
+  font-weight: 500;
+}
+
+.asc-ui .asc-checkbox:has(.form-check-input:checked) {
+  border-color: var(--asc-blue);
+  background: var(--asc-blue-subtle);
+}
+
+.asc-ui .asc-checkbox:has([aria-invalid="true"]) {
+  border-color: var(--asc-danger-edge);
+}
+
+.asc-ui .form-check-input:checked {
+  background-color: var(--asc-blue);
+  border-color: var(--asc-blue);
+}
+
+/* Danger outline buttons in ASC tones (6.57:1 on white). */
+.asc-ui .btn-outline-danger {
+  --bs-btn-color: var(--asc-danger-solid);
+  --bs-btn-border-color: var(--asc-danger-solid);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--asc-danger-solid);
+  --bs-btn-hover-border-color: var(--asc-danger-solid);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--asc-danger-solid-hover);
+  --bs-btn-active-border-color: var(--asc-danger-solid-hover);
+  background: var(--asc-surface);
+}
+
+.asc-ui .asc-btn-lg {
+  min-height: 3rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 1rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Session warning banner (partials/session_warning.html)              */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-session-banner {
+  background: var(--asc-warning-bg);
+  color: var(--asc-warning-fg);
+  border-bottom: 1px solid color-mix(in srgb, var(--asc-warning-edge) 45%, transparent);
+}
+
+.asc-ui .asc-session-banner-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.875rem;
+  padding-block: 0.625rem;
+  font-weight: 600;
+}
+
+.asc-ui .asc-session-banner-inner form {
+  margin-inline-start: auto;
+}
+
+/* ------------------------------------------------------------------ */
+/* Public and authentication shell (Finder split-screen sign-in)       */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-auth-main {
+  padding-block: var(--asc-space-4) var(--asc-space-5);
+}
+
+.asc-ui .asc-auth {
+  display: grid;
+  grid-template-columns: minmax(0, 28rem) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: stretch;
+}
+
+.asc-ui .asc-auth-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding-block: var(--asc-space-3);
+}
+
+.asc-ui .asc-auth-head h1 {
+  margin-bottom: 0.5rem;
+  font-size: clamp(1.625rem, 1.3rem + 1vw, 2rem);
+}
+
+.asc-ui .asc-auth-head p:last-child {
+  color: var(--asc-text-muted);
+  margin-bottom: var(--asc-space-3);
+}
+
+.asc-ui .asc-auth-card {
+  padding: var(--asc-space-3);
+  background: var(--asc-surface);
+  border: 1px solid var(--asc-border);
+  border-radius: var(--asc-radius-lg);
+  box-shadow: var(--asc-shadow-sm);
+}
+
+.asc-ui .asc-auth-card .asc-btn-block {
+  margin-top: 0.5rem;
+}
+
+.asc-ui .asc-auth-note {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: var(--asc-space-2) 0 0;
+  color: var(--asc-text-muted);
+  font-size: 0.9375rem;
+}
+
+.asc-ui .asc-auth-note a {
+  font-weight: 600;
+}
+
+/* The Privacy Notice link under the start form (UXR-C1, UXR-F02). */
+.asc-ui .asc-form-note {
+  margin: 0.5rem 0 0;
+  color: var(--asc-text-muted);
+  font-size: 0.875rem;
+}
+
+.asc-ui .asc-form-note a {
+  font-weight: 600;
+}
+
+.asc-ui .asc-auth-aside {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 30rem;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(50, 110, 181, 0.45), transparent 60%),
+    var(--asc-navy);
+  color: #fff;
+}
+
+.asc-ui .asc-auth-aside-body {
+  position: relative;
+  z-index: 1;
+  padding: clamp(1.5rem, 3vw, 3rem);
+}
+
+.asc-ui .asc-auth-kicker {
+  margin: 0 0 0.5rem;
+  color: var(--asc-cyan-light);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.asc-ui:lang(ar) .asc-auth-kicker,
+.asc-ui :lang(ar) .asc-auth-kicker {
+  letter-spacing: 0;
+}
+
+.asc-ui .asc-auth-aside-title {
+  margin: 0 0 var(--asc-space-3);
+  color: #fff;
+  font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.5rem);
+  line-height: 1.15;
+}
+
+.asc-ui .asc-auth-facts {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-width: 30rem;
+}
+
+.asc-ui .asc-auth-facts li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 1rem;
+}
+
+.asc-ui .asc-auth-facts .asc-icon {
+  margin-top: 0.15rem;
+  color: var(--asc-cyan-light);
+}
+
+/* The ASC diagonal motif, larger, in the panel's upper corner. Decorative. */
+.asc-ui .asc-auth-aside-motif {
+  position: absolute;
+  inset-block-start: 2rem;
+  inset-inline-end: -3rem;
+  width: 22rem;
+  height: 14rem;
+  background: repeating-linear-gradient(
+    115deg,
+    var(--asc-cyan) 0 0.55rem,
+    transparent 0.55rem 1.1rem,
+    var(--asc-green) 1.1rem 1.65rem,
+    transparent 1.65rem 2.2rem,
+    var(--asc-cyan-light) 2.2rem 2.75rem,
+    transparent 2.75rem 3.3rem
+  );
+  opacity: 0.22;
+  mask-image: linear-gradient(to bottom, #000 40%, transparent);
+  pointer-events: none;
+}
+
+[dir="rtl"] .asc-ui .asc-auth-aside-motif,
+[dir="rtl"] body.asc-ui .asc-auth-aside-motif {
+  transform: scaleX(-1);
+}
+
+@media (max-width: 991.98px) {
+  .asc-ui .asc-auth {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 32rem;
+    margin-inline: auto;
+  }
+
+  .asc-ui .asc-auth-aside {
+    display: none;
+  }
+
+  .asc-ui .asc-auth-main {
+    padding-block: var(--asc-space-3) var(--asc-space-4);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .asc-ui .asc-auth-card {
+    padding: var(--asc-space-2);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Registration wizard (Finder add-listing flow)                        */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-wizard {
+  display: grid;
+  grid-template-columns: 15.5rem minmax(0, 1fr);
+  gap: var(--asc-space-4);
+  align-items: start;
+}
+
+.asc-ui .asc-wizard-aside {
+  position: sticky;
+  top: 5.5rem;
+}
+
+.asc-ui .asc-wizard-main {
+  min-width: 0;
+}
+
+.asc-ui .asc-wizard-head {
+  margin-bottom: var(--asc-space-3);
+}
+
+.asc-ui .asc-wizard-form {
+  padding: var(--asc-space-4);
+}
+
+.asc-ui .asc-wizard-form-compact {
+  margin-top: var(--asc-space-3);
+  padding-block: var(--asc-space-2);
+}
+
+.asc-ui .asc-wizard-form-compact .asc-form-actions {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.asc-ui .asc-form-section {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.asc-ui .asc-form-section + .asc-form-section {
+  margin-top: var(--asc-space-3);
+  padding-top: var(--asc-space-3);
+  border-top: 1px solid var(--asc-border);
+}
+
+.asc-ui .asc-form-section-title {
+  float: none;
+  width: auto;
+  margin: 0 0 var(--asc-space-2);
+  padding: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--asc-heading);
+  line-height: 1.3;
+}
+
+.asc-ui .asc-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--asc-space-2);
+}
+
+.asc-ui .asc-grid-phone {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+}
+
+/* Radio cards (Finder btn-check option cards), native radio kept visible. */
+.asc-ui .asc-choice-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.asc-ui .asc-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-height: 4.5rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--asc-border-strong);
+  border-radius: var(--asc-radius-lg);
+  background: var(--asc-surface);
+  cursor: pointer;
+  transition: border-color var(--asc-motion) ease-in-out, background-color var(--asc-motion) ease-in-out;
+}
+
+.asc-ui .asc-choice:hover {
+  border-color: var(--asc-blue);
+}
+
+.asc-ui .asc-choice .form-check-input {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0.125rem 0 0;
+  border-color: var(--asc-border-strong);
+}
+
+.asc-ui .asc-choice:has(input:checked) {
+  border-color: var(--asc-blue);
+  background: var(--asc-blue-subtle);
+  box-shadow: inset 0 0 0 1px var(--asc-blue);
+}
+
+.asc-ui .asc-choice:has(input:focus-visible) {
+  outline: 3px solid var(--asc-focus);
+  outline-offset: 2px;
+}
+
+.asc-ui .asc-choice:has([aria-invalid="true"]) {
+  border-color: var(--asc-danger-edge);
+}
+
+.asc-ui .asc-choice-body {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.asc-ui .asc-choice-title {
+  font-weight: 700;
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-choice-text {
+  color: var(--asc-text-muted);
+  font-size: 0.9375rem;
+}
+
+/* A conditional group revealed by a choice (identity document panels). */
+.asc-ui .asc-subpanel {
+  margin: 0 0 var(--asc-space-2);
+  padding: var(--asc-space-2) var(--asc-space-3) var(--asc-space-3);
+  border: 1px solid var(--asc-border);
+  border-inline-start: 0.25rem solid var(--asc-blue);
+  border-radius: var(--asc-radius);
+  background: #fbfcfe;
+  min-width: 0;
+}
+
+.asc-ui .asc-subpanel > legend {
+  float: none;
+  width: auto;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-upload-block {
+  margin-top: var(--asc-space-2);
+  padding-top: var(--asc-space-2);
+  border-top: 1px dashed var(--asc-border-strong);
+}
+
+.asc-ui .asc-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: var(--asc-space-3);
+  padding-top: var(--asc-space-3);
+  border-top: 1px solid var(--asc-border);
+}
+
+.asc-ui .asc-form-actions > .btn-primary,
+.asc-ui .asc-form-actions > .btn-success {
+  margin-inline-start: auto;
+}
+
+/* Legal text: a focusable, labelled scroll region. */
+.asc-ui .asc-legal {
+  max-height: 14rem;
+  overflow-y: auto;
+  padding: var(--asc-space-2);
+  border: 1px solid var(--asc-border);
+  border-radius: var(--asc-radius);
+  background: var(--asc-canvas);
+  font-size: 0.9375rem;
+}
+
+.asc-ui .asc-legal > :last-child {
+  margin-bottom: 0;
+}
+
+/* Public legal information page (UXR-C1, UXR-F02): the full documents,
+   readable width, no inner scroll region. */
+.asc-ui .asc-legal-page {
+  max-width: 50rem;
+  margin-inline: auto;
+}
+
+.asc-ui .asc-legal-toc ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--asc-space-1) var(--asc-space-3);
+  padding: 0;
+  margin: 0 0 var(--asc-space-3);
+  list-style: none;
+}
+
+.asc-ui .asc-legal-document {
+  margin-bottom: var(--asc-space-3);
+}
+
+.asc-ui .asc-legal-text {
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+.asc-ui .asc-legal-text > :last-child {
+  margin-bottom: 0;
+}
+
+.asc-ui .asc-confirmations > .mb-3:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Stepper (Finder step sidebar: check, current, pending circle). */
+.asc-ui .asc-stepper-now {
+  display: none;
+  color: var(--asc-heading);
+}
+
+@media (max-width: 575.98px) {
+  .asc-ui .asc-stepper-now {
+    display: inline;
+  }
+}
+
+.asc-ui .asc-stepper {
+  padding: var(--asc-space-2);
+  background: var(--asc-surface);
+  border: 1px solid var(--asc-border);
+  border-radius: var(--asc-radius-lg);
+  box-shadow: var(--asc-shadow-sm);
+}
+
+.asc-ui .asc-stepper-count {
+  margin: 0 0 0.5rem;
+  padding-inline: 0.5rem;
+  color: var(--asc-text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* P4-4: an SVG whose rect width is the progress, so no inline style is needed. */
+.asc-ui .asc-stepper-bar {
+  display: block;
+  width: calc(100% - 1rem);
+  height: 0.25rem;
+  margin: 0 0.5rem 0.75rem;
+  border-radius: var(--asc-radius-pill);
+  background: var(--asc-surface-sunken);
+  overflow: hidden;
+}
+
+.asc-ui .asc-stepper-bar rect {
+  fill: var(--asc-blue);
+}
+
+/* The bar fills from the start edge in right-to-left pages too. */
+[dir="rtl"] .asc-ui .asc-stepper-bar {
+  transform: scaleX(-1);
+}
+
+.asc-ui .asc-stepper ol {
+  display: grid;
+  gap: 0.125rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.asc-ui .asc-step > a,
+.asc-ui .asc-step > .asc-step-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: var(--asc-target);
+  padding: 0.375rem 0.5rem;
+  border-radius: var(--asc-radius);
+  color: var(--asc-text);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.asc-ui .asc-step > a:hover {
+  background: var(--asc-surface-sunken);
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-step-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.875rem;
+  height: 1.875rem;
+  border: 2px solid var(--asc-border-strong);
+  border-radius: 50%;
+  background: var(--asc-surface);
+  color: var(--asc-text-muted);
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.asc-ui .asc-step-done .asc-step-marker {
+  border-color: var(--asc-blue);
+  background: var(--asc-blue);
+  color: #fff;
+}
+
+.asc-ui .asc-step-available .asc-step-marker {
+  border-color: var(--asc-blue);
+  color: var(--asc-blue-strong);
+}
+
+.asc-ui .asc-step-current > .asc-step-item {
+  background: var(--asc-blue-subtle);
+  color: var(--asc-info-fg);
+  font-weight: 700;
+}
+
+.asc-ui .asc-step-current .asc-step-marker {
+  border-color: var(--asc-blue-strong);
+  background: var(--asc-blue-strong);
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(50, 110, 181, 0.2);
+}
+
+.asc-ui .asc-step-upcoming > .asc-step-item {
+  color: var(--asc-text-muted);
+}
+
+@media (max-width: 991.98px) {
+  .asc-ui .asc-wizard {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--asc-space-2);
+  }
+
+  .asc-ui .asc-wizard-aside {
+    position: static;
+  }
+
+  /* Compact numbered strip: all six markers in one row. Labels stay in the
+     accessibility tree; below 576px the current label moves to the count line. */
+  .asc-ui .asc-stepper {
+    padding: 0.75rem;
+  }
+
+  .asc-ui .asc-stepper ol {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.25rem;
+  }
+
+  .asc-ui .asc-step > a,
+  .asc-ui .asc-step > .asc-step-item {
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25rem;
+    min-height: 3.25rem;
+    padding: 0.25rem;
+    text-align: center;
+  }
+
+  .asc-ui .asc-step-current > .asc-step-item {
+    background: transparent;
+  }
+
+  .asc-ui .asc-step-label {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .asc-ui .asc-stepper ol {
+    position: relative;   /* contains the visually hidden labels */
+  }
+
+  .asc-ui .asc-step .asc-step-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+}
+
+@media (max-width: 767.98px) {
+  .asc-ui .asc-wizard-form {
+    padding: var(--asc-space-2);
+  }
+
+  .asc-ui .asc-grid-2,
+  .asc-ui .asc-grid-phone,
+  .asc-ui .asc-choice-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .asc-ui .asc-subpanel {
+    padding-inline: var(--asc-space-2);
+  }
+
+  .asc-ui .asc-form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .asc-ui .asc-form-actions > .btn {
+    width: 100%;
+    margin-inline-start: 0;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Review summary, confirmation, participant registration list         */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-summary-stack {
+  display: grid;
+  gap: var(--asc-space-2);
+}
+
+.asc-ui .asc-summary-stack > .asc-card + .asc-card {
+  margin-top: 0;
+}
+
+.asc-ui .asc-summary-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: var(--asc-space-2);
+}
+
+.asc-ui .asc-summary-head h2 {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.asc-ui .asc-summary-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: var(--asc-target);
+  padding-inline: 0.5rem;
+  font-weight: 600;
+}
+
+.asc-ui .asc-summary-missing {
+  margin: 0;
+  color: var(--asc-text-muted);
+}
+
+.asc-ui .asc-summary-text {
+  white-space: pre-line;
+}
+
+.asc-ui .asc-narrow {
+  max-width: 44rem;
+  margin-inline: auto;
+}
+
+.asc-ui .asc-confirmation {
+  margin-bottom: var(--asc-space-3);
+}
+
+.asc-ui .asc-reg-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr));
+  gap: var(--asc-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.asc-ui .asc-reg-list > .asc-card + .asc-card {
+  margin-top: 0;
+}
+
+.asc-ui .asc-reg-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--asc-space-2);
+}
+
+.asc-ui .asc-reg-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.asc-ui .asc-reg-card-title {
+  margin: 0 0 0.25rem;
+  font-size: 1.125rem;
+}
+
+.asc-ui .asc-reg-card-ref {
+  margin: 0;
+  color: var(--asc-text-muted);
+  font-size: 0.9375rem;
+}
+
+.asc-ui .asc-reg-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: var(--asc-space-2);
+  border-top: 1px solid var(--asc-border);
+}
+
+.asc-ui .asc-reg-card-danger {
+  margin-inline-start: auto !important;
+}
+
+.asc-ui .asc-dl-compact {
+  gap: 0.25rem 1rem;
+  font-size: 0.9375rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Operations section bar (Finder list-group / navbar links)           */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-sectionnav {
+  background: var(--asc-surface);
+  border-bottom: 1px solid var(--asc-border);
+}
+
+.asc-ui .asc-sectionnav-toggle {
+  display: none;
+}
+
+.asc-ui .asc-sectionnav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0.5rem 0;
+  list-style: none;
+}
+
+.asc-ui .asc-sectionnav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--asc-target);
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--asc-radius-pill);
+  color: var(--asc-text);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--asc-motion) ease-in-out, color var(--asc-motion) ease-in-out;
+}
+
+.asc-ui .asc-sectionnav a .asc-icon {
+  color: var(--asc-text-muted);
+}
+
+.asc-ui .asc-sectionnav a:hover {
+  background: var(--asc-surface-sunken);
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-sectionnav a[aria-current="page"] {
+  background: var(--asc-blue-subtle);
+  color: var(--asc-info-fg);
+}
+
+.asc-ui .asc-sectionnav a[aria-current="page"] .asc-icon {
+  color: var(--asc-blue);
+}
+
+@media (max-width: 767.98px) {
+  .asc-ui .asc-sectionnav-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: var(--asc-target);
+    padding-block: 0.25rem;
+    font-weight: 700;
+    color: var(--asc-heading);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .asc-ui .asc-sectionnav-toggle::-webkit-details-marker {
+    display: none;
+  }
+
+  .asc-ui .asc-sectionnav-current {
+    margin-inline-start: auto;
+    padding: 0.125rem 0.625rem;
+    border-radius: var(--asc-radius-pill);
+    background: var(--asc-blue-subtle);
+    color: var(--asc-info-fg);
+    font-size: 0.875rem;
+  }
+
+  .asc-ui .asc-sectionnav ul {
+    display: grid;
+    grid-template-columns: 1fr;
+    padding-top: 0;
+  }
+
+  .asc-ui .asc-sectionnav a {
+    width: 100%;
+    border-radius: var(--asc-radius);
+    white-space: normal;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* List pages: card toolbar, filters, pagination                        */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-card-flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+.asc-ui .asc-card-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: var(--asc-space-2) var(--asc-space-3);
+  border-bottom: 1px solid var(--asc-border);
+}
+
+.asc-ui .asc-card-toolbar-title {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+
+.asc-ui .asc-card-toolbar-title .asc-icon {
+  color: var(--asc-blue);
+}
+
+.asc-ui .asc-card-flush .asc-table > thead th:first-child,
+.asc-ui .asc-card-flush .asc-table > tbody > tr > :first-child {
+  padding-inline-start: var(--asc-space-3);
+}
+
+.asc-ui .asc-card-flush .asc-table > thead th:last-child,
+.asc-ui .asc-card-flush .asc-table > tbody > tr > :last-child {
+  padding-inline-end: var(--asc-space-3);
+}
+
+.asc-ui .asc-card-flush .asc-empty {
+  padding-inline: var(--asc-space-3);
+}
+
+.asc-ui .asc-card-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.75rem var(--asc-space-3);
+  border-top: 1px solid var(--asc-border);
+  color: var(--asc-text-muted);
+  font-size: 0.9375rem;
+}
+
+.asc-ui .asc-card-foot:not(:has(*)) {
+  display: none;
+}
+
+.asc-ui .asc-card-foot > .asc-pagination {
+  width: 100%;
+}
+
+.asc-ui .asc-card-form {
+  padding: var(--asc-space-2) var(--asc-space-3) var(--asc-space-3);
+  border-top: 1px solid var(--asc-border);
+  background: var(--asc-canvas);
+}
+
+.asc-ui .asc-card-form-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.asc-ui .asc-table > tbody > tr > th[scope="row"] {
+  font-weight: 600;
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-cell-action {
+  width: 1%;
+  white-space: nowrap;
+  text-align: end !important;
+}
+
+.asc-ui .asc-filters {
+  margin-bottom: var(--asc-space-3);
+  padding: var(--asc-space-2) var(--asc-space-3);
+}
+
+.asc-ui .asc-filters-grid {
+  display: grid;
+  grid-template-columns: minmax(14rem, 2fr) repeat(4, minmax(9rem, 1fr));
+  gap: 0.75rem var(--asc-space-2);
+  align-items: end;
+}
+
+.asc-ui .asc-filters-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: var(--asc-space-2);
+}
+
+.asc-ui .asc-input-icon {
+  position: relative;
+}
+
+.asc-ui .asc-input-icon > .asc-icon {
+  position: absolute;
+  inset-inline-start: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--asc-text-muted);
+  pointer-events: none;
+}
+
+.asc-ui .asc-input-icon > .form-control {
+  padding-inline-start: 2.75rem;
+}
+
+.asc-ui .asc-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.asc-ui .asc-pagination-status {
+  margin: 0;
+  color: var(--asc-text-muted);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 1199.98px) {
+  .asc-ui .asc-filters-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .asc-ui .asc-filter-search {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .asc-ui .asc-filters-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767.98px) {
+  .asc-ui .asc-filters {
+    padding: var(--asc-space-2);
+  }
+
+  .asc-ui .asc-card-toolbar,
+  .asc-ui .asc-card-foot,
+  .asc-ui .asc-card-form {
+    padding-inline: var(--asc-space-2);
+  }
+
+  .asc-ui .asc-card-flush .asc-table > thead th:first-child,
+  .asc-ui .asc-card-flush .asc-table > tbody > tr > :first-child {
+    padding-inline-start: var(--asc-space-2);
+  }
+}
+
+@media (max-width: 399.98px) {
+  .asc-ui .asc-filters-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Detail pages                                                         */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: var(--asc-space-3);
+  align-items: start;
+}
+
+.asc-ui .asc-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(17rem, 22rem);
+  gap: var(--asc-space-3);
+  align-items: start;
+}
+
+.asc-ui .asc-detail-main,
+.asc-ui .asc-detail-aside {
+  display: grid;
+  gap: var(--asc-space-3);
+  min-width: 0;
+}
+
+.asc-ui .asc-detail-grid > .asc-card + .asc-card,
+.asc-ui .asc-detail-main > .asc-card + .asc-card,
+.asc-ui .asc-detail-aside > .asc-card + .asc-card {
+  margin-top: 0;
+}
+
+.asc-ui .asc-action-panel {
+  border-top: 0.25rem solid var(--asc-blue);
+}
+
+.asc-ui .asc-stack-actions {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.asc-ui .asc-timeline {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.asc-ui .asc-timeline > li {
+  padding-inline-start: 1rem;
+  border-inline-start: 2px solid var(--asc-border);
+}
+
+.asc-ui .asc-timeline-meta {
+  margin: 0;
+  color: var(--asc-text-muted);
+  font-size: 0.875rem;
+}
+
+.asc-ui .asc-timeline > .asc-timeline-empty,
+.asc-ui .asc-link-list > .asc-link-list-empty {
+  padding: 0;
+  border: 0;
+  color: var(--asc-text-muted);
+}
+
+.asc-ui .asc-link-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.asc-ui .asc-link-list > li + li {
+  border-top: 1px solid var(--asc-border);
+}
+
+.asc-ui .asc-link-list a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: var(--asc-target);
+  padding-block: 0.5rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.asc-ui .asc-link-list a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 1199.98px) {
+  .asc-ui .asc-detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Stacked below the evidence (DOM and focus order kept), two per row
+     where they fit. */
+  .asc-ui .asc-detail-aside {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Checkpoint 1 visual-review corrections                              */
+/* ------------------------------------------------------------------ */
+
+/* Footer at the bottom of short pages (auth, confirmation, empty states). */
+body.asc-ui {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+body.asc-ui > main {
+  flex: 1 0 auto;
+}
+
+/* A fieldset legend styled as a field label, not Bootstrap's legend size. */
+.asc-ui legend.form-label {
+  float: none;
+  width: auto;
+  margin-bottom: 0.375rem;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Codes never break inside a table cell; the table scrolls instead. */
+.asc-ui .asc-table .asc-code {
+  white-space: nowrap;
+}
+
+/* Light application bars (public, participant): on phones the controls stay
+   beside the logo instead of taking a row of their own. */
+@media (max-width: 767.98px) {
+  .asc-ui .asc-appbar-light .asc-appbar-end {
+    width: auto;
+    margin-inline-start: auto;
+  }
+}
+
+/* ================================================================== */
+/* UI/UX Completion Gate — Stage 3                                     */
+/* Responsive records, error pages, the shared confirmation dialog,     */
+/* the filterable picker and the remaining migrated page patterns.      */
+/* Same rules: logical properties, tokens, no shell body-class hooks.   */
+/* ================================================================== */
+
+/* Arabic: every used weight (400, 500, 700) has its own supplied file, so
+   the browser must never fake a bold or an italic from another face. */
+body.asc-ui:lang(ar),
+body.asc-ui :lang(ar) {
+  font-synthesis: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Responsive records (UI checkpoint 1 correction)                   */
+/* A list page renders its rows twice: a real table from 768 px and a   */
+/* list of stacked records below it. Only one is ever displayed, and    */
+/* `display: none` removes the other from the accessibility tree and    */
+/* the focus order, so nothing is announced or reached twice. Core      */
+/* reference, status and action information never needs horizontal     */
+/* scrolling on a phone.                                                */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 767.98px) {
+  .asc-ui .asc-wide-only {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .asc-ui .asc-narrow-only {
+    display: none !important;
+  }
+}
+
+.asc-ui .asc-records {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.asc-ui .asc-record {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--asc-border);
+  min-width: 0;
+}
+
+.asc-ui .asc-record:last-child {
+  border-bottom: 0;
+}
+
+.asc-ui .asc-record-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+  min-width: 0;
+}
+
+.asc-ui .asc-record-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--asc-heading);
+  overflow-wrap: anywhere;
+}
+
+.asc-ui .asc-record-meta {
+  margin: 0;
+  color: var(--asc-text-muted);
+  font-size: 0.875rem;
+}
+
+.asc-ui .asc-record-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.625rem;
+  margin: 0;
+}
+
+.asc-ui .asc-record-fields > div {
+  display: grid;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.asc-ui .asc-record-fields dt {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--asc-text-muted);
+}
+
+.asc-ui .asc-record-fields dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* A long translated status wraps inside its record instead of being cut. */
+.asc-ui .asc-record .asc-chip {
+  max-width: 100%;
+  white-space: normal;
+  text-align: start;
+}
+
+.asc-ui .asc-record .asc-chip > .asc-icon {
+  flex-shrink: 0;
+}
+
+.asc-ui .asc-record-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.asc-ui .asc-record-actions > .btn,
+.asc-ui .asc-record-actions > form {
+  flex: 1 1 10rem;
+}
+
+.asc-ui .asc-record-actions > form {
+  margin: 0;
+}
+
+.asc-ui .asc-record-actions > form > .btn {
+  width: 100%;
+}
+
+/* Two short fields side by side where the record is wide enough. */
+@media (min-width: 480px) {
+  .asc-ui .asc-record-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .asc-ui .asc-record-fields > .asc-record-wide {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Error and access pages (layouts/base_error.html)                    */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-error-main {
+  display: flex;
+  align-items: center;
+  padding-block: var(--asc-space-5);
+}
+
+.asc-ui .asc-error-main > .container-xl {
+  width: 100%;
+}
+
+.asc-ui .asc-error {
+  max-width: 38rem;
+  margin-inline: auto;
+  padding: var(--asc-space-4);
+}
+
+.asc-ui .asc-error h1 {
+  margin: 0 0 var(--asc-space-2);
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+}
+
+.asc-ui .asc-error-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: var(--asc-space-2);
+  border-radius: var(--asc-radius-lg);
+  background: var(--asc-surface-sunken);
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-error-body p {
+  margin: 0 0 0.75rem;
+}
+
+.asc-ui .asc-error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: var(--asc-space-3);
+}
+
+.asc-ui .asc-error-actions > form {
+  margin: 0;
+}
+
+@media (max-width: 575.98px) {
+  .asc-ui .asc-error-main {
+    padding-block: var(--asc-space-3);
+  }
+
+  .asc-ui .asc-error {
+    padding: var(--asc-space-3) var(--asc-space-2);
+  }
+
+  .asc-ui .asc-error-actions > .btn,
+  .asc-ui .asc-error-actions > form,
+  .asc-ui .asc-error-actions > form > .btn {
+    width: 100%;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Shared confirmation dialog (components/confirm_dialog.html)          */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-dialog {
+  width: min(32rem, calc(100vw - 2rem));
+  max-width: none;
+  padding: 0;
+  border: 1px solid var(--asc-border);
+  border-radius: var(--asc-radius-lg);
+  background: var(--asc-surface);
+  color: var(--asc-text);
+  box-shadow: 0 1.5rem 3rem -0.5rem rgba(10, 29, 40, 0.35);
+}
+
+.asc-ui .asc-dialog::backdrop {
+  background: rgba(10, 29, 40, 0.55);
+}
+
+.asc-ui .asc-dialog-body {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: var(--asc-space-3);
+}
+
+.asc-ui .asc-dialog-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--asc-radius);
+  background: var(--asc-danger-bg);
+  color: var(--asc-danger-fg);
+}
+
+.asc-ui .asc-dialog[data-tone="primary"] .asc-dialog-icon {
+  background: var(--asc-info-bg);
+  color: var(--asc-info-fg);
+}
+
+.asc-ui .asc-dialog-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+}
+
+.asc-ui .asc-dialog-message {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.asc-ui .asc-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem var(--asc-space-3);
+  border-top: 1px solid var(--asc-border);
+  background: var(--asc-canvas);
+  border-end-start-radius: var(--asc-radius-lg);
+  border-end-end-radius: var(--asc-radius-lg);
+}
+
+@media (max-width: 575.98px) {
+  .asc-ui .asc-dialog-body {
+    padding: var(--asc-space-2);
+  }
+
+  .asc-ui .asc-dialog-actions {
+    padding: 1rem var(--asc-space-2);
+  }
+
+  .asc-ui .asc-dialog-actions > .btn {
+    flex: 1 1 100%;
+  }
+}
+
+/* Without JavaScript a destructive form shows an explicit consent box. */
+.asc-ui .asc-confirm-fallback {
+  margin-bottom: 0.75rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Filterable picker (components/picker.html)                            */
+/* A native select stays the control; a filter box is added by script   */
+/* when the permitted list is long. Choices come only from the server.   */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-picker-filter {
+  margin-bottom: 0.5rem;
+}
+
+.asc-ui .asc-picker-status {
+  margin-top: 0.375rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* One-time secret panel (issued invitation or claim link)              */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-secret {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.asc-ui .asc-secret-value {
+  display: block;
+  padding: 0.75rem;
+  border: 1px dashed var(--asc-success-edge);
+  border-radius: var(--asc-radius);
+  background: var(--asc-surface);
+  color: var(--asc-heading);
+  font-family: var(--asc-font-mono);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  user-select: all;
+}
+
+/* ------------------------------------------------------------------ */
+/* Form sections and repeated item groups                               */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-fieldset {
+  margin: 0 0 var(--asc-space-2);
+  padding: var(--asc-space-2);
+  border: 1px solid var(--asc-border);
+  border-radius: var(--asc-radius);
+  background: #fbfcfe;
+  min-width: 0;
+}
+
+.asc-ui .asc-fieldset > legend {
+  float: none;
+  width: auto;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-form-narrow {
+  max-width: 44rem;
+}
+
+/* Field grids without an inline button align their labels, so a help text
+   or an error under one field never pushes its neighbours' labels down. */
+.asc-ui .asc-form-grid-top {
+  align-items: start;
+}
+
+.asc-ui .asc-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: var(--asc-space-2);
+}
+
+.asc-ui .asc-actions-row > form {
+  margin: 0;
+}
+
+@media (max-width: 575.98px) {
+  .asc-ui .asc-actions-row > .btn,
+  .asc-ui .asc-actions-row > form,
+  .asc-ui .asc-actions-row > form > .btn {
+    width: 100%;
+  }
+}
+
+/* A search result row: name and its commands, wrapping on phones. */
+.asc-ui .asc-result-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 1rem;
+  border-bottom: 1px solid var(--asc-border);
+}
+
+.asc-ui .asc-result-row:last-child {
+  border-bottom: 0;
+}
+
+.asc-ui .asc-result-row-name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--asc-heading);
+  overflow-wrap: anywhere;
+}
+
+/* An assignment inside an accreditation card: current value, commands. */
+.asc-ui .asc-assignment {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--asc-border);
+}
+
+.asc-ui .asc-assignment:first-child {
+  padding-top: 0;
+}
+
+.asc-ui .asc-assignment:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.asc-ui .asc-assignment-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+}
+
+.asc-ui .asc-assignment-name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-assignment-commands {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 0.75rem;
+}
+
+.asc-ui .asc-command {
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+  margin: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--asc-border);
+  border-radius: var(--asc-radius);
+  background: #fbfcfe;
+}
+
+.asc-ui .asc-command-title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-command .form-label {
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.asc-ui .asc-command .btn {
+  justify-self: start;
+}
+
+@media (max-width: 575.98px) {
+  .asc-ui .asc-command .btn {
+    justify-self: stretch;
+  }
+}
+
+/* Phase 4 Prompt 2: offline readiness shell -- permitted/forbidden actions
+   list. Text states the verdict; the chip tone only reinforces it. */
+.asc-ui .asc-offline-actions li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--asc-border, #dee2e6);
+}
+.asc-ui .asc-offline-actions li:last-child { border-bottom: 0; }
+.asc-ui #offline-state-chip { font-size: 1rem; padding: 0.35rem 0.75rem; }
+
+/* Phase 4 Prompt 3: offline verification in the device shell. Reuses the
+   verification-result tones (.asc-result-*); the heading is an h2 because
+   the shell keeps its single h1. Decisions stack on phones. */
+.asc-ui .asc-result h2.asc-result-heading {
+  margin: 0;
+  color: var(--tone-fg);
+  font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.125rem);
+  line-height: 1.15;
+}
+.asc-ui .asc-offline-result .asc-offline-person {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+.asc-ui .asc-offline-decisions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+.asc-ui .asc-offline-decisions .asc-offline-field {
+  min-width: 14rem;
+}
+.asc-ui .asc-offline-override {
+  grid-column: 1 / -1;
+  padding: var(--asc-space-2);
+  border: 1px dashed color-mix(in srgb, var(--tone-edge) 45%, transparent);
+  border-radius: var(--asc-radius);
+}
+.asc-ui .asc-offline-steps { margin: 0; padding-inline-start: 1.25rem; }
+.asc-ui .asc-offline-steps li { margin-bottom: 0.35rem; }
+@media (max-width: 575.98px) {
+  .asc-ui .asc-offline-decisions .btn,
+  .asc-ui .asc-offline-decisions .asc-offline-field { width: 100%; }
+}
+
+
+/* ------------------------------------------------------------------ */
+/* UX-1 shared controls: one-time code, digit counter, date parts,     */
+/* search-and-select, official footer links                            */
+/* Adapted from Finder's input radius, hairline border and focus       */
+/* treatment; see docs/design/finder_inventory.md (UX-1).              */
+/* ------------------------------------------------------------------ */
+
+/* One-time code (decision S-01). One input, six cells drawn with layered
+   gradients. The digits are ASCII and always left to right, so the cell
+   row keeps its order inside the Arabic page while the label and the help
+   text follow the page direction. Cells appear only once the script adds
+   `.asc-otp-input`; without it the input is an ordinary field. */
+.asc-ui .form-control.asc-otp-input {
+  --asc-otp-cell: 3rem;
+  --asc-otp-gap: 0.5rem;
+  --asc-otp-length: 6;
+  --asc-otp-active: 0;
+  /* Room for every glyph plus its trailing letter-spacing, and the leading
+     padding: the text then never overflows, so the box never scrolls a digit
+     out of its cell. */
+  width: calc(
+    var(--asc-otp-length) * (var(--asc-otp-cell) + var(--asc-otp-gap)) +
+      (var(--asc-otp-cell) - 1ch) / 2
+  );
+  max-width: 100%;
+  min-height: calc(var(--asc-otp-cell) + 0.5rem);
+  padding: 0 0 0 calc((var(--asc-otp-cell) - 1ch) / 2);
+  font-family: var(--asc-font-mono);
+  font-size: 1.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: calc(var(--asc-otp-cell) + var(--asc-otp-gap) - 1ch);
+  text-align: left;
+  direction: ltr;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  background-image:
+    linear-gradient(90deg, var(--asc-blue) 0 100%),
+    repeating-linear-gradient(
+      90deg,
+      var(--asc-surface-sunken) 0 var(--asc-otp-cell),
+      transparent var(--asc-otp-cell) calc(var(--asc-otp-cell) + var(--asc-otp-gap))
+    );
+  background-repeat: no-repeat;
+  background-size:
+    var(--asc-otp-cell) 3px,
+    100% 100%;
+  background-position:
+    calc(var(--asc-otp-active) * (var(--asc-otp-cell) + var(--asc-otp-gap))) 100%,
+    0 0;
+  caret-color: var(--asc-blue);
+}
+
+.asc-ui .form-control.asc-otp-input::placeholder {
+  letter-spacing: normal;
+}
+
+.asc-ui .form-control.asc-otp-input[aria-invalid="true"] {
+  border: 0;
+  background-image:
+    linear-gradient(90deg, var(--asc-danger-edge) 0 100%),
+    repeating-linear-gradient(
+      90deg,
+      var(--asc-danger-bg) 0 var(--asc-otp-cell),
+      transparent var(--asc-otp-cell) calc(var(--asc-otp-cell) + var(--asc-otp-gap))
+    );
+}
+
+@media (max-width: 26rem) {
+  .asc-ui .form-control.asc-otp-input {
+    --asc-otp-cell: 2.25rem;
+    --asc-otp-gap: 0.25rem;
+    font-size: 1.5rem;
+  }
+}
+
+/* Digit counter: "12 / 18", left to right, tabular figures. */
+.asc-ui .asc-digits-input {
+  font-family: var(--asc-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.asc-ui .asc-digit-counter {
+  margin: 0.25rem 0 0;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.asc-ui .asc-digit-counter.is-complete {
+  color: var(--asc-success-fg);
+  font-weight: 600;
+}
+
+.asc-ui .asc-digit-counter.is-over {
+  color: var(--asc-danger-fg);
+  font-weight: 600;
+}
+
+/* Day / Month / Year (decision S-08): three labelled numeric fields. The
+   DOM order is Day, Month, Year in every language; the flex row follows
+   the page direction, so Arabic reads right to left while each field keeps
+   left-to-right digits. */
+.asc-ui .asc-date-group {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.asc-ui .asc-date-parts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.asc-ui .asc-date-part {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.asc-ui .asc-date-part-label {
+  color: var(--asc-text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.asc-ui .asc-date-part-input {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.asc-ui .asc-date-part-day,
+.asc-ui .asc-date-part-month {
+  width: 4.5rem;
+}
+
+.asc-ui .asc-date-part-year {
+  width: 6.5rem;
+}
+
+/* Search-and-select (decision S-07). The native select stays in the page,
+   hidden, and is what is submitted. Logical properties only, so the caret
+   and the clear button sit at the end of the box in both directions. */
+.asc-ui .asc-combobox {
+  position: relative;
+}
+
+.asc-ui .asc-combobox-input {
+  padding-inline-end: 4.75rem;
+  text-overflow: ellipsis;
+}
+
+.asc-ui .asc-combobox-toggle,
+.asc-ui .asc-combobox-clear {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--asc-radius-sm);
+  background: transparent;
+  color: var(--asc-text-muted);
+}
+
+.asc-ui .asc-combobox-toggle {
+  inset-inline-end: 0.25rem;
+}
+
+.asc-ui .asc-combobox-clear {
+  inset-inline-end: 2.5rem;
+}
+
+.asc-ui .asc-combobox-toggle:hover,
+.asc-ui .asc-combobox-clear:hover {
+  background: var(--asc-surface-sunken);
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-combobox-list {
+  position: absolute;
+  z-index: 1010;
+  inset-inline: 0;
+  top: calc(100% + 0.25rem);
+  max-height: min(18rem, 50vh);
+  margin: 0;
+  padding: 0.25rem;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--asc-surface);
+  border: 1px solid var(--asc-border-strong);
+  border-radius: var(--asc-radius);
+  box-shadow: var(--asc-shadow);
+}
+
+.asc-ui .asc-combobox-list[hidden] {
+  display: none;
+}
+
+.asc-ui .asc-combobox-option {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--asc-radius-sm);
+  color: var(--asc-heading);
+  cursor: pointer;
+}
+
+.asc-ui .asc-combobox-option[data-active] {
+  background: var(--asc-blue-subtle);
+  outline: 2px solid var(--asc-focus);
+  outline-offset: -2px;
+}
+
+.asc-ui .asc-combobox-option[aria-selected="true"] {
+  font-weight: 600;
+  color: var(--asc-blue-strong);
+}
+
+.asc-ui .asc-combobox-option[aria-selected="true"]::after {
+  content: "\2713";
+  margin-inline-start: auto;
+  padding-inline-start: 0.75rem;
+}
+
+.asc-ui .asc-combobox-empty {
+  padding: 0.75rem;
+  color: var(--asc-text-muted);
+}
+
+/* Official destinations in the footer (decision S-13). Links only; the host
+   name is an isolated left-to-right value next to the localized name. */
+.asc-ui .asc-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+}
+
+.asc-ui .asc-footer-links a {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  min-height: 1.5rem;
+  color: var(--asc-blue-strong);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.asc-ui .asc-footer-links a:hover {
+  color: var(--asc-navy);
+}
+
+.asc-ui .asc-footer-legal {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+  color: var(--asc-blue-strong);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.asc-ui .asc-footer-host {
+  color: var(--asc-text-muted);
+  font-weight: 400;
+  font-size: 0.8125rem;
+}
+
+/* Official institutional lines (FOOTER-02): the ministry, then the smaller,
+   subordinate directorate line. A full row of their own that wraps on narrow
+   screens. The block is French and left-to-right (`dir="ltr"`, so its words
+   and parentheses keep their order); on an Arabic page it is still aligned to
+   the page's reading side, the right. */
+.asc-ui .asc-footer-institution {
+  flex: 1 1 100%;
+  min-width: 0;
+  text-align: left;
+  /* French text: the Latin stack, also on Arabic pages (Thmanyah is Arabic only). */
+  font-family: var(--asc-font-latin);
+}
+
+[dir="rtl"] .asc-ui .asc-footer-institution,
+[dir="rtl"] body.asc-ui .asc-footer-institution {
+  text-align: right;
+}
+
+.asc-ui .asc-footer-institution p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.asc-ui .asc-footer-ministry {
+  color: var(--asc-heading);
+  font-weight: 600;
+}
+
+.asc-ui .asc-footer-institution .asc-footer-directorate {
+  margin-top: 0.125rem;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 575.98px) {
+  .asc-ui .asc-footer-links {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .asc-ui .asc-footer-links a,
+  .asc-ui .asc-footer-legal {
+    min-height: 2.75rem;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* UX-4 / UX-C2 automatic security check: the vendored ALTCHA widget */
+/* ------------------------------------------------------------------ */
+
+/* The widget is themed only through its documented CSS custom properties,
+   with the existing tokens (AA on the card surface). Logical properties keep
+   it correct in RTL; the widget itself follows the page direction. */
+.asc-ui .asc-human-check-box {
+  margin: 0 0 0.75rem;
+}
+
+.asc-ui altcha-widget {
+  --altcha-max-width: 100%;
+  --altcha-border-radius: 0.5rem;
+  --altcha-border-color: var(--asc-border-strong);
+  --altcha-color-base: var(--asc-surface);
+  --altcha-color-base-content: var(--asc-text);
+  --altcha-color-primary: var(--asc-blue);
+  --altcha-color-primary-content: #ffffff;
+  --altcha-color-success: var(--asc-success-solid);
+  --altcha-color-success-content: #ffffff;
+  --altcha-color-error: var(--asc-danger-solid);
+  --altcha-color-error-content: #ffffff;
+  --altcha-checkbox-outline-color: var(--asc-blue);
+  --altcha-spinner-color: var(--asc-blue);
+  display: block;
+  font-family: inherit;
+}
+
+/* A failure line under the widget, empty unless the check cannot run. */
+.asc-ui .asc-human-check {
+  margin: 0.5rem 0 0;
+  color: var(--asc-danger-fg);
+  font-size: 0.875rem;
+}
+
+.asc-ui .asc-human-check:empty {
+  display: none;
+}
+
+/* UX-3 long-text counter (`textarea[data-asc-char-counter]`). */
+.asc-ui .asc-char-counter {
+  margin: 0.25rem 0 0;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.asc-ui .asc-char-counter.is-near {
+  color: var(--asc-warning-fg);
+  font-weight: 600;
+}
+
+.asc-ui .asc-char-counter.is-over {
+  color: var(--asc-danger-fg);
+  font-weight: 600;
+}
+
+/* UX-2 grouped interest topics and removable chips (`[data-asc-topic-picker]`). */
+.asc-ui .asc-topic-filter {
+  margin-bottom: 0.75rem;
+  max-width: 24rem;
+}
+
+.asc-ui .asc-topic-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.asc-ui .asc-topic-chips[hidden] {
+  display: none;
+}
+
+.asc-ui .asc-topic-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  padding: 0.25rem 0.875rem;
+  border: 1px solid var(--asc-blue);
+  border-radius: var(--asc-radius-pill);
+  background: var(--asc-blue-subtle);
+  color: var(--asc-blue-strong);
+  font-weight: 600;
+}
+
+.asc-ui .asc-topic-chip:hover {
+  background: var(--asc-surface);
+}
+
+.asc-ui .asc-topic-group {
+  margin-bottom: 1rem;
+}
+
+.asc-ui .asc-topic-group[hidden],
+.asc-ui [data-topic][hidden] {
+  display: none;
+}
+
+.asc-ui .asc-topic-group-title {
+  margin: 0 0 0.5rem;
+  color: var(--asc-heading);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* UX-2 verified footer contact (C-07). */
+.asc-ui .asc-footer-contact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1rem;
+  width: 100%;
+}
+
+.asc-ui .asc-footer-contact a {
+  color: var(--asc-blue-strong);
+  text-underline-offset: 0.2em;
+}
+
+.asc-ui .asc-footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (max-width: 575.98px) {
+  .asc-ui .asc-footer-contact a,
+  .asc-ui .asc-footer-social a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* IDV-3 identity review (templates/identity/)                          */
+/* ------------------------------------------------------------------ */
+
+/* Submitted facts beside the evidence on wide screens; stacked, facts
+   first, on smaller ones. The viewer stays in view while scrolling. */
+.asc-ui .asc-idv-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--asc-space-3);
+  align-items: start;
+}
+
+.asc-ui .asc-idv-facts {
+  display: grid;
+  gap: var(--asc-space-3);
+  min-width: 0;
+}
+
+.asc-ui .asc-idv-viewer {
+  position: sticky;
+  top: var(--asc-space-2);
+  min-width: 0;
+}
+
+.asc-ui .asc-idv-compare .asc-idv-diff > th,
+.asc-ui .asc-idv-compare .asc-idv-diff > td {
+  background: var(--asc-danger-bg);
+  color: var(--asc-danger-fg);
+}
+
+.asc-ui .asc-idv-action {
+  border-top: 1px solid var(--asc-border);
+  padding-block: 0.75rem;
+}
+
+.asc-ui .asc-idv-action:first-of-type {
+  border-top: 0;
+}
+
+.asc-ui .asc-idv-action > summary,
+.asc-ui .asc-idv-history > summary,
+.asc-ui .asc-idv-shortcuts > summary {
+  min-height: var(--asc-target);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.asc-ui .asc-idv-action > form {
+  margin-top: 0.75rem;
+}
+
+.asc-ui .asc-idv-action-danger > summary {
+  color: var(--asc-danger-fg);
+}
+
+/* Chips and controls wrap rather than clip or scroll (UI checkpoint 1 rule). */
+.asc-ui .asc-idv-docs,
+.asc-ui .asc-idv-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 var(--asc-space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.asc-ui .asc-idv-zoom-level {
+  min-width: 3.5rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.asc-ui .asc-idv-stage {
+  position: relative;
+  min-height: 24rem;
+  max-height: 75vh;
+  overflow: auto;
+  padding: var(--asc-space-2);
+  background: var(--asc-surface-sunken);
+  border-radius: var(--asc-radius);
+}
+
+.asc-ui .asc-idv-stage:focus-visible {
+  outline: 3px solid var(--asc-blue);
+  outline-offset: 2px;
+}
+
+.asc-ui .asc-idv-state {
+  margin: 0 0 var(--asc-space-1);
+  color: var(--asc-text-muted);
+}
+
+.asc-ui .asc-idv-image {
+  display: block;
+  max-width: none;
+  height: auto;
+  margin-inline: auto;
+  transform-origin: center center;
+  user-select: none;
+}
+
+/* Zoom by layout width, so a zoomed image scrolls inside the stage. */
+.asc-ui .asc-idv-z0 { width: 100%; }
+.asc-ui .asc-idv-z1 { width: 125%; }
+.asc-ui .asc-idv-z2 { width: 150%; }
+.asc-ui .asc-idv-z3 { width: 200%; }
+.asc-ui .asc-idv-z4 { width: 300%; }
+
+.asc-ui .asc-idv-r0 { rotate: 0deg; }
+.asc-ui .asc-idv-r90 { rotate: 90deg; }
+.asc-ui .asc-idv-r180 { rotate: 180deg; }
+.asc-ui .asc-idv-r270 { rotate: 270deg; }
+
+.asc-ui .asc-idv-tabs {
+  flex-wrap: wrap;
+  overflow-x: visible;
+  border-radius: var(--asc-radius-lg);
+}
+
+@media (max-width: 1199.98px) {
+  .asc-ui .asc-idv-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .asc-ui .asc-idv-viewer {
+    position: static;
+  }
+
+  .asc-ui .asc-idv-stage {
+    min-height: 16rem;
+  }
+}
+
+/* A visible open/closed marker for the action and history disclosures (the
+   flex summary drops the browser's own triangle); "+" and "−" read the same
+   in both directions. */
+.asc-ui .asc-idv-action > summary::after,
+.asc-ui .asc-idv-history > summary::after,
+.asc-ui .asc-idv-shortcuts > summary::after {
+  content: "+";
+  margin-inline-start: auto;
+  font-weight: 700;
+  color: var(--asc-text-muted);
+}
+
+.asc-ui .asc-idv-action[open] > summary::after,
+.asc-ui .asc-idv-history[open] > summary::after,
+.asc-ui .asc-idv-shortcuts[open] > summary::after {
+  content: "\2212";
+}
+
+.asc-ui .asc-idv-action > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* IDV-C1: the private queue search (R-IDV-05) and the official-name note (R-IDV-02). */
+.asc-ui .asc-idv-search .asc-filter-search {
+  max-width: 48rem;
+}
+
+.asc-ui .asc-idv-search-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.asc-ui .asc-idv-search-row > .asc-input-icon {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.asc-ui .asc-idv-search-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  width: 100%;
+}
+
+.asc-ui .asc-idv-names-note {
+  margin: 0 var(--asc-space-3) var(--asc-space-2);
+}

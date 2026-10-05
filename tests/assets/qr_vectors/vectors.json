@@ -1,0 +1,119 @@
+{
+  "description": "Deterministic PUBLIC test vectors for the ASC 2026 Digital Entry Pass signed QR contract. Contains public key material, canonical byte forms, a precomputed signature, and expected outcomes only. No private key is present, and none may ever be added. ECDSA signatures are not reproducible byte-for-byte on re-signing (the nonce k is random), so these vectors pin the canonical signing input, the payload hash, and the verification outcome of the committed signature -- never a regenerated signature.",
+  "algorithm": "ES256",
+  "key_id": "v1",
+  "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE63aHsUWyOly+CmhibjeBHlNrO6Np\n6dpHafPeOaJSjovFVFGiPAzJ7iVuYYQJfqTDrp9W/nwJygluEkshmei9Fw==\n-----END PUBLIC KEY-----\n",
+  "canonical": {
+    "protected_header_bytes": "{\"alg\":\"ES256\",\"kid\":\"v1\",\"typ\":\"ASC-PASS\"}",
+    "payload_bytes": "{\"apc\":\"EXHIBITOR\",\"bai\":\"Bai0000000000000000000\",\"btc\":\"STANDARD\",\"cv\":3,\"eid\":\"ASC2026\",\"exp\":1800000000,\"jti\":\"Jti0000000000000000000\",\"n\":\"Nonce00000000000\",\"nbf\":1700000000,\"pid\":\"Pid0000000000000000000\",\"v\":1}",
+    "signing_input": "eyJhbGciOiJFUzI1NiIsImtpZCI6InYxIiwidHlwIjoiQVNDLVBBU1MifQ.eyJhcGMiOiJFWEhJQklUT1IiLCJiYWkiOiJCYWkwMDAwMDAwMDAwMDAwMDAwMDAwIiwiYnRjIjoiU1RBTkRBUkQiLCJjdiI6MywiZWlkIjoiQVNDMjAyNiIsImV4cCI6MTgwMDAwMDAwMCwianRpIjoiSnRpMDAwMDAwMDAwMDAwMDAwMDAwMCIsIm4iOiJOb25jZTAwMDAwMDAwMDAwIiwibmJmIjoxNzAwMDAwMDAwLCJwaWQiOiJQaWQwMDAwMDAwMDAwMDAwMDAwMDAwIiwidiI6MX0",
+    "payload_hash_sha256": "55e33b51027626400492d01d787d5f35802fe4235ad00ed5882627626fcad162",
+    "claims": {
+      "apc": "EXHIBITOR",
+      "bai": "Bai0000000000000000000",
+      "btc": "STANDARD",
+      "cv": 3,
+      "eid": "ASC2026",
+      "exp": 1800000000,
+      "jti": "Jti0000000000000000000",
+      "n": "Nonce00000000000",
+      "nbf": 1700000000,
+      "pid": "Pid0000000000000000000",
+      "v": 1
+    }
+  },
+  "cases": [
+    {
+      "name": "valid",
+      "description": "Correctly signed credential with the canonical claim set.",
+      "signature_valid": true,
+      "expected_structural_result": "CREDENTIAL_NOT_FOUND",
+      "note": "Signature verification succeeds; the outcome then depends on server state, so a verifier with no matching credential row correctly reports CREDENTIAL_NOT_FOUND.",
+      "compact_jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6InYxIiwidHlwIjoiQVNDLVBBU1MifQ.eyJhcGMiOiJFWEhJQklUT1IiLCJiYWkiOiJCYWkwMDAwMDAwMDAwMDAwMDAwMDAwIiwiYnRjIjoiU1RBTkRBUkQiLCJjdiI6MywiZWlkIjoiQVNDMjAyNiIsImV4cCI6MTgwMDAwMDAwMCwianRpIjoiSnRpMDAwMDAwMDAwMDAwMDAwMDAwMCIsIm4iOiJOb25jZTAwMDAwMDAwMDAwIiwibmJmIjoxNzAwMDAwMDAwLCJwaWQiOiJQaWQwMDAwMDAwMDAwMDAwMDAwMDAwIiwidiI6MX0.husjTz9heNrMXEDFzQu8hBuVi-6OvhfpJt1olA5X2b1n0LuTjEntbCKpHex5IKh45ArrUb_Fpa1FLkTxXUETAQ"
+    },
+    {
+      "name": "tampered_payload",
+      "description": "Claim `cv` incremented after signing.",
+      "signature_valid": false,
+      "expected_structural_result": "INVALID_SIGNATURE",
+      "compact_jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6InYxIiwidHlwIjoiQVNDLVBBU1MifQ.eyJhcGMiOiJFWEhJQklUT1IiLCJiYWkiOiJCYWkwMDAwMDAwMDAwMDAwMDAwMDAwIiwiYnRjIjoiU1RBTkRBUkQiLCJjdiI6NCwiZWlkIjoiQVNDMjAyNiIsImV4cCI6MTgwMDAwMDAwMCwianRpIjoiSnRpMDAwMDAwMDAwMDAwMDAwMDAwMCIsIm4iOiJOb25jZTAwMDAwMDAwMDAwIiwibmJmIjoxNzAwMDAwMDAwLCJwaWQiOiJQaWQwMDAwMDAwMDAwMDAwMDAwMDAwIiwidiI6MX0.husjTz9heNrMXEDFzQu8hBuVi-6OvhfpJt1olA5X2b1n0LuTjEntbCKpHex5IKh45ArrUb_Fpa1FLkTxXUETAQ"
+    },
+    {
+      "name": "tampered_signature",
+      "description": "First signature character altered.",
+      "signature_valid": false,
+      "expected_structural_result": "INVALID_SIGNATURE",
+      "compact_jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6InYxIiwidHlwIjoiQVNDLVBBU1MifQ.eyJhcGMiOiJFWEhJQklUT1IiLCJiYWkiOiJCYWkwMDAwMDAwMDAwMDAwMDAwMDAwIiwiYnRjIjoiU1RBTkRBUkQiLCJjdiI6MywiZWlkIjoiQVNDMjAyNiIsImV4cCI6MTgwMDAwMDAwMCwianRpIjoiSnRpMDAwMDAwMDAwMDAwMDAwMDAwMCIsIm4iOiJOb25jZTAwMDAwMDAwMDAwIiwibmJmIjoxNzAwMDAwMDAwLCJwaWQiOiJQaWQwMDAwMDAwMDAwMDAwMDAwMDAwIiwidiI6MX0.BusjTz9heNrMXEDFzQu8hBuVi-6OvhfpJt1olA5X2b1n0LuTjEntbCKpHex5IKh45ArrUb_Fpa1FLkTxXUETAQ"
+    },
+    {
+      "name": "alg_none",
+      "description": "Header declares the unsecured `none` algorithm.",
+      "signature_valid": false,
+      "expected_structural_result": "MALFORMED",
+      "compact_jws": "eyJhbGciOiJub25lIiwia2lkIjoidjEiLCJ0eXAiOiJBU0MtUEFTUyJ9.eyJhcGMiOiJFWEhJQklUT1IiLCJiYWkiOiJCYWkwMDAwMDAwMDAwMDAwMDAwMDAwIiwiYnRjIjoiU1RBTkRBUkQiLCJjdiI6MywiZWlkIjoiQVNDMjAyNiIsImV4cCI6MTgwMDAwMDAwMCwianRpIjoiSnRpMDAwMDAwMDAwMDAwMDAwMDAwMCIsIm4iOiJOb25jZTAwMDAwMDAwMDAwIiwibmJmIjoxNzAwMDAwMDAwLCJwaWQiOiJQaWQwMDAwMDAwMDAwMDAwMDAwMDAwIiwidiI6MX0.husjTz9heNrMXEDFzQu8hBuVi-6OvhfpJt1olA5X2b1n0LuTjEntbCKpHex5IKh45ArrUb_Fpa1FLkTxXUETAQ"
+    },
+    {
+      "name": "alg_hs256",
+      "description": "Algorithm-confusion attempt using a symmetric algorithm.",
+      "signature_valid": false,
+      "expected_structural_result": "MALFORMED",
+      "compact_jws": "eyJhbGciOiJIUzI1NiIsImtpZCI6InYxIiwidHlwIjoiQVNDLVBBU1MifQ.eyJhcGMiOiJFWEhJQklUT1IiLCJiYWkiOiJCYWkwMDAwMDAwMDAwMDAwMDAwMDAwIiwiYnRjIjoiU1RBTkRBUkQiLCJjdiI6MywiZWlkIjoiQVNDMjAyNiIsImV4cCI6MTgwMDAwMDAwMCwianRpIjoiSnRpMDAwMDAwMDAwMDAwMDAwMDAwMCIsIm4iOiJOb25jZTAwMDAwMDAwMDAwIiwibmJmIjoxNzAwMDAwMDAwLCJwaWQiOiJQaWQwMDAwMDAwMDAwMDAwMDAwMDAwIiwidiI6MX0.husjTz9heNrMXEDFzQu8hBuVi-6OvhfpJt1olA5X2b1n0LuTjEntbCKpHex5IKh45ArrUb_Fpa1FLkTxXUETAQ"
+    },
+    {
+      "name": "crit_header",
+      "description": "Header carries a `crit` member.",
+      "signature_valid": false,
+      "expected_structural_result": "MALFORMED",
+      "compact_jws": "eyJhbGciOiJFUzI1NiIsImNyaXQiOlsiYjY0Il0sImtpZCI6InYxIiwidHlwIjoiQVNDLVBBU1MifQ.eyJhcGMiOiJFWEhJQklUT1IiLCJiYWkiOiJCYWkwMDAwMDAwMDAwMDAwMDAwMDAwIiwiYnRjIjoiU1RBTkRBUkQiLCJjdiI6MywiZWlkIjoiQVNDMjAyNiIsImV4cCI6MTgwMDAwMDAwMCwianRpIjoiSnRpMDAwMDAwMDAwMDAwMDAwMDAwMCIsIm4iOiJOb25jZTAwMDAwMDAwMDAwIiwibmJmIjoxNzAwMDAwMDAwLCJwaWQiOiJQaWQwMDAwMDAwMDAwMDAwMDAwMDAwIiwidiI6MX0.husjTz9heNrMXEDFzQu8hBuVi-6OvhfpJt1olA5X2b1n0LuTjEntbCKpHex5IKh45ArrUb_Fpa1FLkTxXUETAQ"
+    },
+    {
+      "name": "extra_header_member",
+      "description": "Header carries an unsupported `x5u` member.",
+      "signature_valid": false,
+      "expected_structural_result": "MALFORMED",
+      "compact_jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6InYxIiwidHlwIjoiQVNDLVBBU1MiLCJ4NXUiOiJodHRwczovL2V4YW1wbGUudGVzdCJ9.eyJhcGMiOiJFWEhJQklUT1IiLCJiYWkiOiJCYWkwMDAwMDAwMDAwMDAwMDAwMDAwIiwiYnRjIjoiU1RBTkRBUkQiLCJjdiI6MywiZWlkIjoiQVNDMjAyNiIsImV4cCI6MTgwMDAwMDAwMCwianRpIjoiSnRpMDAwMDAwMDAwMDAwMDAwMDAwMCIsIm4iOiJOb25jZTAwMDAwMDAwMDAwIiwibmJmIjoxNzAwMDAwMDAwLCJwaWQiOiJQaWQwMDAwMDAwMDAwMDAwMDAwMDAwIiwidiI6MX0.husjTz9heNrMXEDFzQu8hBuVi-6OvhfpJt1olA5X2b1n0LuTjEntbCKpHex5IKh45ArrUb_Fpa1FLkTxXUETAQ"
+    },
+    {
+      "name": "wrong_typ",
+      "description": "Header declares `typ` of JWT rather than ASC-PASS.",
+      "signature_valid": false,
+      "expected_structural_result": "MALFORMED",
+      "compact_jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6InYxIiwidHlwIjoiSldUIn0.eyJhcGMiOiJFWEhJQklUT1IiLCJiYWkiOiJCYWkwMDAwMDAwMDAwMDAwMDAwMDAwIiwiYnRjIjoiU1RBTkRBUkQiLCJjdiI6MywiZWlkIjoiQVNDMjAyNiIsImV4cCI6MTgwMDAwMDAwMCwianRpIjoiSnRpMDAwMDAwMDAwMDAwMDAwMDAwMCIsIm4iOiJOb25jZTAwMDAwMDAwMDAwIiwibmJmIjoxNzAwMDAwMDAwLCJwaWQiOiJQaWQwMDAwMDAwMDAwMDAwMDAwMDAwIiwidiI6MX0.husjTz9heNrMXEDFzQu8hBuVi-6OvhfpJt1olA5X2b1n0LuTjEntbCKpHex5IKh45ArrUb_Fpa1FLkTxXUETAQ"
+    },
+    {
+      "name": "unknown_kid",
+      "description": "Header names a key identifier that is not published.",
+      "signature_valid": false,
+      "expected_structural_result": "UNKNOWN_KEY",
+      "compact_jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6InY5IiwidHlwIjoiQVNDLVBBU1MifQ.eyJhcGMiOiJFWEhJQklUT1IiLCJiYWkiOiJCYWkwMDAwMDAwMDAwMDAwMDAwMDAwIiwiYnRjIjoiU1RBTkRBUkQiLCJjdiI6MywiZWlkIjoiQVNDMjAyNiIsImV4cCI6MTgwMDAwMDAwMCwianRpIjoiSnRpMDAwMDAwMDAwMDAwMDAwMDAwMCIsIm4iOiJOb25jZTAwMDAwMDAwMDAwIiwibmJmIjoxNzAwMDAwMDAwLCJwaWQiOiJQaWQwMDAwMDAwMDAwMDAwMDAwMDAwIiwidiI6MX0.husjTz9heNrMXEDFzQu8hBuVi-6OvhfpJt1olA5X2b1n0LuTjEntbCKpHex5IKh45ArrUb_Fpa1FLkTxXUETAQ"
+    },
+    {
+      "name": "padded_base64url",
+      "description": "Header segment carries base64 padding.",
+      "signature_valid": false,
+      "expected_structural_result": "MALFORMED",
+      "compact_jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6InYxIiwidHlwIjoiQVNDLVBBU1MifQ=.eyJhcGMiOiJFWEhJQklUT1IiLCJiYWkiOiJCYWkwMDAwMDAwMDAwMDAwMDAwMDAwIiwiYnRjIjoiU1RBTkRBUkQiLCJjdiI6MywiZWlkIjoiQVNDMjAyNiIsImV4cCI6MTgwMDAwMDAwMCwianRpIjoiSnRpMDAwMDAwMDAwMDAwMDAwMDAwMCIsIm4iOiJOb25jZTAwMDAwMDAwMDAwIiwibmJmIjoxNzAwMDAwMDAwLCJwaWQiOiJQaWQwMDAwMDAwMDAwMDAwMDAwMDAwIiwidiI6MX0.husjTz9heNrMXEDFzQu8hBuVi-6OvhfpJt1olA5X2b1n0LuTjEntbCKpHex5IKh45ArrUb_Fpa1FLkTxXUETAQ"
+    },
+    {
+      "name": "truncated_segments",
+      "description": "Only two compact segments are present.",
+      "signature_valid": false,
+      "expected_structural_result": "MALFORMED",
+      "compact_jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6InYxIiwidHlwIjoiQVNDLVBBU1MifQ.eyJhcGMiOiJFWEhJQklUT1IiLCJiYWkiOiJCYWkwMDAwMDAwMDAwMDAwMDAwMDAwIiwiYnRjIjoiU1RBTkRBUkQiLCJjdiI6MywiZWlkIjoiQVNDMjAyNiIsImV4cCI6MTgwMDAwMDAwMCwianRpIjoiSnRpMDAwMDAwMDAwMDAwMDAwMDAwMCIsIm4iOiJOb25jZTAwMDAwMDAwMDAwIiwibmJmIjoxNzAwMDAwMDAwLCJwaWQiOiJQaWQwMDAwMDAwMDAwMDAwMDAwMDAwIiwidiI6MX0"
+    },
+    {
+      "name": "extra_claim",
+      "description": "Payload carries a claim outside the fixed eleven.",
+      "signature_valid": false,
+      "expected_structural_result": "INVALID_SIGNATURE",
+      "compact_jws": "eyJhbGciOiJFUzI1NiIsImtpZCI6InYxIiwidHlwIjoiQVNDLVBBU1MifQ.eyJhcGMiOiJFWEhJQklUT1IiLCJiYWkiOiJCYWkwMDAwMDAwMDAwMDAwMDAwMDAwIiwiYnRjIjoiU1RBTkRBUkQiLCJjdiI6MywiZWlkIjoiQVNDMjAyNiIsImVtYWlsIjoiYUBleGFtcGxlLnRlc3QiLCJleHAiOjE4MDAwMDAwMDAsImp0aSI6Ikp0aTAwMDAwMDAwMDAwMDAwMDAwMDAiLCJuIjoiTm9uY2UwMDAwMDAwMDAwMCIsIm5iZiI6MTcwMDAwMDAwMCwicGlkIjoiUGlkMDAwMDAwMDAwMDAwMDAwMDAwMCIsInYiOjF9.husjTz9heNrMXEDFzQu8hBuVi-6OvhfpJt1olA5X2b1n0LuTjEntbCKpHex5IKh45ArrUb_Fpa1FLkTxXUETAQ"
+    },
+    {
+      "name": "duplicate_json_member",
+      "description": "Header JSON repeats the `alg` member.",
+      "signature_valid": false,
+      "expected_structural_result": "MALFORMED",
+      "compact_jws": "eyJhbGciOiJFUzI1NiIsImFsZyI6Im5vbmUiLCJraWQiOiJ2MSIsInR5cCI6IkFTQy1QQVNTIn0.eyJhcGMiOiJFWEhJQklUT1IiLCJiYWkiOiJCYWkwMDAwMDAwMDAwMDAwMDAwMDAwIiwiYnRjIjoiU1RBTkRBUkQiLCJjdiI6MywiZWlkIjoiQVNDMjAyNiIsImV4cCI6MTgwMDAwMDAwMCwianRpIjoiSnRpMDAwMDAwMDAwMDAwMDAwMDAwMCIsIm4iOiJOb25jZTAwMDAwMDAwMDAwIiwibmJmIjoxNzAwMDAwMDAwLCJwaWQiOiJQaWQwMDAwMDAwMDAwMDAwMDAwMDAwIiwidiI6MX0.husjTz9heNrMXEDFzQu8hBuVi-6OvhfpJt1olA5X2b1n0LuTjEntbCKpHex5IKh45ArrUb_Fpa1FLkTxXUETAQ"
+    }
+  ]
+}

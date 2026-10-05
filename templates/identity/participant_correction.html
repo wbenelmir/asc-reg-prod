@@ -1,0 +1,63 @@
+{% extends "layouts/base_workspace.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% trans "Correct your identity information" %}{% endblock %}
+{% block main_attrs %} hx-boost="true"{% endblock %}
+{% block content %}
+  {% comment %}
+    IDV-3 participant correction (IDV-09): the same account and the same
+    registration. Only the review team's preset requests are shown -- never a
+    reason, a provider result or another person. Submitting creates a new
+    identity revision; the earlier ones are kept.
+  {% endcomment %}
+  <p class="mb-2"><a href="{% url 'registrations:workspace' %}">{% include "components/icon.html" with name="arrow-prev" size="sm" flip=True %} {% trans "My registrations" %}</a></p>
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Reference" %}{% trans ":" context "label separator" %} <bdi dir="ltr" class="asc-code">{{ registration.public_reference }}</bdi></p>
+      <h1>{% trans "Correct your identity information" %}</h1>
+    </div>
+  </div>
+
+  <section class="asc-card asc-form-narrow" aria-labelledby="idv-requests-heading" data-idv-requested>
+    <h2 class="asc-card-title" id="idv-requests-heading">{% include "components/icon.html" with name="mail" %}{% trans "What the review team asks" %}</h2>
+    <ul class="mb-0">
+      {% for label in requested_labels %}<li><bdi>{{ label }}</bdi></li>{% endfor %}
+    </ul>
+  </section>
+
+  {% include "components/error_summary.html" %}
+  <form method="post" enctype="multipart/form-data" novalidate class="asc-card asc-form-narrow" aria-labelledby="idv-correction-heading" data-idv-correction>
+    {% csrf_token %}
+    {{ form.expected_version }}
+    <h2 class="asc-card-title" id="idv-correction-heading">{% include "components/icon.html" with name="edit" %}{% trans "Your identity information" %}</h2>
+    <p class="form-text">{% trans "Write your names in Latin letters, exactly as on your identity document." %}</p>
+    {% include "components/field.html" with field=form.given_names %}
+    {% include "components/field.html" with field=form.family_name %}
+    {% include "components/field.html" with field=form.date_of_birth control="ltr" %}
+    {% if form.nin_value %}{% include "components/field.html" with field=form.nin_value control="ltr" %}{% endif %}
+    {% if form.passport_number %}
+      {% include "components/field.html" with field=form.passport_number control="ltr" %}
+      {% include "components/field.html" with field=form.passport_country_code %}
+      {% include "components/field.html" with field=form.passport_expires_at control="ltr" %}
+    {% endif %}
+    {% if form.document_number %}
+      {# IDV-Q3: the Algerian document declared on the NIN exemption route. #}
+      {% include "components/field.html" with field=form.document_number control="ltr" %}
+      {% include "components/field.html" with field=form.document_expires_at control="ltr" %}
+    {% endif %}
+    <div class="asc-upload-block">
+      <div class="asc-notice asc-notice-neutral mb-3">
+        {% include "components/icon.html" with name="lock" %}
+        <div>
+          <p>{% blocktrans %}Accepted file types: JPEG or PNG. Maximum size: {{ max_size_mb }} MB.{% endblocktrans %}</p>
+          <p class="mb-0">{% trans "Your file is checked for safety before it is stored. It is never made public, and it is never included in exported reports." %}</p>
+        </div>
+      </div>
+      {% if form.national_id_card %}{% include "components/field.html" with field=form.national_id_card mark_optional=True %}{% endif %}
+      {% if show_passport_page %}{% include "components/field.html" with field=form.passport_identity_page mark_optional=True %}{% endif %}
+      {% if form.document_image %}{% include "components/field.html" with field=form.document_image mark_optional=True %}{% endif %}
+    </div>
+    <div class="asc-actions-row">
+      <button type="submit" class="btn btn-primary">{% include "components/icon.html" with name="send" %}<span>{% trans "Send the correction" %}</span></button>
+    </div>
+  </form>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "layouts/base_public.html" %}
+{% load i18n static %}
+{% block title %}{% trans "Start registration" %}{% endblock %}
+{% comment %}
+  The one page meant for search engines (UX-1, S-05). The description names
+  the event in full and claims no date, venue or capacity. Canonical and
+  social URLs are emitted only from a configured HTTPS public origin.
+{% endcomment %}
+{% block robots_meta %}<meta name="robots" content="index, follow">{% endblock %}
+{% block public_meta %}
+  <meta name="description" content="{% trans 'Register for the African Startup Conference 2026. Sign in with a one-time code sent to your email; no password is needed.' %}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{% trans 'African Startup Conference' %}">
+  <meta property="og:title" content="{% trans 'Start registration' %}">
+  <meta property="og:description" content="{% trans 'Register for the African Startup Conference 2026. Sign in with a one-time code sent to your email; no password is needed.' %}">
+  {% if configured_public_base_url %}
+    <link rel="canonical" href="{{ configured_public_base_url }}{{ request.path }}">
+    <meta property="og:url" content="{{ configured_public_base_url }}{{ request.path }}">
+  {% endif %}
+{% endblock %}
+{% block content %}
+  <div class="asc-auth-head">
+    <p class="asc-kicker">{% trans "Participant registration" %}</p>
+    <h1>{% trans "Start your registration" %}</h1>
+    <p>{% trans "Enter your email address and we will send you a one-time verification code. No password is needed." %}</p>
+  </div>
+  {% include "components/error_summary.html" %}
+  {# A full page load, not an htmx swap: a boosted swap keeps this page's <head>, so the next page would inherit the public `index, follow` robots meta. #}
+  <form method="post" novalidate class="asc-auth-card" hx-boost="false"{% if human_check_enabled %} data-human-check-state="pending"{% endif %}>
+    {% csrf_token %}
+    {% for field in form %}
+      {# The ALTCHA widget posts its own hidden `human_check` input (UX-C2). #}
+      {% if field.name == "human_check" %}{% elif field.is_hidden %}{{ field }}{% else %}{% include "components/field.html" %}{% endif %}
+    {% endfor %}
+    {% if human_check_enabled %}
+      {# UX-4 (M01), UX-C2 (UX-D01 option M): the self-hosted ALTCHA check, an automatic proof of work with no puzzle. Its challenge is bound to this session; an expired one is replaced without reloading the page, so the typed email is kept. #}
+      {% get_current_language as current_language %}
+      <div class="asc-human-check-box" data-asc-altcha data-worker-url="{% static 'vendor/altcha/pbkdf2.js' %}">
+        <altcha-widget challenge="{% url 'accounts:human-check-challenge' %}" name="human_check" auto="off"
+          language="{% if current_language == 'fr' %}fr-fr{% elif current_language == 'ar' %}ar{% else %}en{% endif %}"
+          configuration='{"hideFooter": true, "hideLogo": true, "humanInteractionSignature": false}'></altcha-widget>
+        <p class="asc-human-check" data-human-check-status role="status" aria-live="polite"
+           data-text-failed="{% trans 'The automatic security check could not run in this browser. Reload the page, or contact the conference team for assisted registration.' %}"></p>
+      </div>
+      <noscript>
+        <div class="asc-notice asc-notice-warning mb-3" data-human-check-noscript>
+          {% include "components/icon.html" with name="alert-triangle" %}
+          <p>{% trans "This page runs a short automatic security check that needs JavaScript. Enable JavaScript to receive your code. If you cannot, contact the conference team for assisted registration:" %}
+            <a href="mailto:info-africanstartupconference@startup.dz"><bdi dir="ltr">info-africanstartupconference@startup.dz</bdi></a>,
+            <a href="tel:+213770848390"><bdi dir="ltr">+213 770 84 83 90</bdi></a>.</p>
+        </div>
+      </noscript>
+    {% endif %}
+    {# UXR-C1 (UXR-F02): the notice is readable before the email address is given. #}
+    {% url 'privacy:legal-information' as legal_url %}
+    <p class="asc-form-note" data-legal-link>{% blocktrans %}Your email address is used to send your sign-in code and to manage your registration. Read the <a href="{{ legal_url }}">Privacy Notice and Terms</a>.{% endblocktrans %}</p>
+    <button type="submit" class="btn btn-primary asc-btn-lg asc-btn-block">
+      <span>{% trans "Send verification code" %}</span>{% include "components/icon.html" with name="arrow-next" flip=True %}
+    </button>
+  </form>
+  <p class="asc-auth-note">
+    {% include "components/icon.html" with name="info" size="sm" %}
+    <span>{% trans "Already registered? Use the same email address to open your registrations." %}</span>
+  </p>
+{% endblock %}
+{% block extra_head %}
+  {% if human_check_enabled %}<link rel="stylesheet" href="{% static 'vendor/altcha/altcha.css' %}">{% endif %}
+{% endblock %}
+{% block extra_scripts %}
+  {% if human_check_enabled %}
+    {# Local files only, in this order: translations, the widget, then the project glue that registers the worker and holds the submission (UX-C2). #}
+    <script type="module" src="{% static 'vendor/altcha/i18n-en.js' %}"></script>
+    <script type="module" src="{% static 'vendor/altcha/i18n-fr-fr.js' %}"></script>
+    <script type="module" src="{% static 'vendor/altcha/i18n-ar.js' %}"></script>
+    <script type="module" src="{% static 'vendor/altcha/altcha.min.js' %}"></script>
+    <script type="module" src="{% static 'js/asc-altcha.js' %}"></script>
+  {% endif %}
+{% endblock %}

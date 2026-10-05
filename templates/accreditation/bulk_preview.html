@@ -1,0 +1,108 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% comment %}
+  Bulk accreditation, steps 1-4: choose what to assign (from the items the
+  caller may bulk-assign, F8), preview the eligible approved registrations
+  in the caller's scope, then execute exactly that previewed scope.
+{% endcomment %}
+{% block title %}{% trans "Bulk accreditation preview" %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Bulk accreditation" %}</p>
+      <h1>{% trans "Bulk accreditation assignment" %}</h1>
+      <p>{% trans "Assign one role, badge type, access profile or access rule to every approved registration in your scope. Nothing changes until you execute the preview." %}</p>
+    </div>
+  </div>
+
+  <section class="asc-card" aria-labelledby="bulk-form-heading">
+    <h2 class="asc-card-title" id="bulk-form-heading">{% include "components/icon.html" with name="layers" %}{% trans "What to assign" %}</h2>
+    <p class="asc-section-lead">{% trans "Only the items you may assign in bulk are listed." %}</p>
+    {% include "components/error_summary.html" %}
+    {% if has_references %}
+      <form method="post" novalidate data-bulk-form>
+        {% csrf_token %}
+        <input type="hidden" name="idempotency_key" value="{{ idempotency_key }}">
+        <div class="asc-form-grid asc-form-grid-top">
+          {% include "components/field.html" with field=form.kind %}
+          {% include "components/picker.html" with field=form.reference_object_id %}
+          {% include "components/field.html" with field=form.reason mark_optional=True %}
+        </div>
+        <div class="asc-actions-row">
+          <button type="submit" class="btn btn-primary">{% include "components/icon.html" with name="search" %}<span>{% trans "Preview" %}</span></button>
+        </div>
+      </form>
+    {% else %}
+      <div class="asc-empty">
+        <span class="asc-tile">{% include "components/icon.html" with name="layers" %}</span>
+        <h3>{% trans "There is nothing you can assign in bulk." %}</h3>
+        <p>{% trans "Active roles, badge types, access profiles and access rules appear here for the events where you may bulk-assign them." %}</p>
+      </div>
+    {% endif %}
+  </section>
+
+  {% if operation %}
+    <section class="asc-card asc-card-flush" aria-labelledby="preview-heading">
+      <div class="asc-card-toolbar">
+        <h2 class="asc-card-toolbar-title" id="preview-heading">{% trans "Preview results" %}</h2>
+        <span class="asc-count">{% blocktrans count counter=eligible_count %}{{ counter }} registration will be affected{% plural %}{{ counter }} registrations will be affected{% endblocktrans %}</span>
+      </div>
+      <div class="asc-card-form">
+        <dl class="asc-dl">
+          <dt>{% trans "Assignment type" %}</dt><dd>{{ kind_label }}</dd>
+          <dt>{% trans "Assign" %}</dt><dd><bdi>{{ reference_obj.localized_name }}</bdi></dd>
+          <dt>{% trans "Event edition" %}</dt><dd><bdi>{{ reference_obj.event_edition.name }}</bdi></dd>
+        </dl>
+      </div>
+      {% if operation.preview_results %}
+        <div class="asc-table-wrap asc-wide-only">
+          <table class="asc-table" aria-labelledby="preview-heading">
+            <thead><tr><th scope="col">{% trans "Registration" %}</th><th scope="col">{% trans "Eligible" %}</th><th scope="col">{% trans "Reason" %}</th></tr></thead>
+            <tbody>
+              {% for row in operation.preview_results %}
+                {% with reference=references|get_item:row.registration_id %}
+                  <tr>
+                    <th scope="row"><bdi dir="ltr" class="asc-code">{{ reference|default:_("Unknown registration") }}</bdi></th>
+                    <td>{% if row.eligible %}{% trans "Eligible" as label %}{% status_chip "bulk_row" "ELIGIBLE" label %}{% else %}{% trans "Not eligible" as label %}{% status_chip "bulk_row" "NOT_ELIGIBLE" label %}{% endif %}</td>
+                    <td>{% if row.reason %}{{ row.reason|code_label:"bulk_reason" }}{% else %}<span class="asc-muted">—</span>{% endif %}</td>
+                  </tr>
+                {% endwith %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <ul class="asc-records asc-narrow-only" aria-labelledby="preview-heading">
+          {% for row in operation.preview_results %}
+            {% with reference=references|get_item:row.registration_id %}
+              <li class="asc-record" data-record>
+                <div class="asc-record-head"><h3 class="asc-record-title"><bdi dir="ltr" class="asc-code">{{ reference|default:_("Unknown registration") }}</bdi></h3></div>
+                <dl class="asc-record-fields">
+                  <div><dt>{% trans "Eligible" %}</dt><dd>{% if row.eligible %}{% trans "Eligible" as label %}{% status_chip "bulk_row" "ELIGIBLE" label %}{% else %}{% trans "Not eligible" as label %}{% status_chip "bulk_row" "NOT_ELIGIBLE" label %}{% endif %}</dd></div>
+                  {% if row.reason %}<div><dt>{% trans "Reason" %}</dt><dd>{{ row.reason|code_label:"bulk_reason" }}</dd></div>{% endif %}
+                </dl>
+              </li>
+            {% endwith %}
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="asc-empty">
+          <span class="asc-tile">{% include "components/icon.html" with name="inbox" %}</span>
+          <h3>{% trans "No approved registrations in your scope for this event." %}</h3>
+        </div>
+      {% endif %}
+      {% if eligible_count %}
+        <div class="asc-card-foot">
+          <form method="post" action="{% url 'accreditation:bulk-execute' pk=operation.pk %}" class="m-0"
+                data-confirm-title="{% trans 'Execute this bulk assignment?' %}"
+                data-confirm="{% blocktrans count counter=eligible_count %}The assignment will be recorded for {{ counter }} registration, exactly as previewed.{% plural %}The assignment will be recorded for {{ counter }} registrations, exactly as previewed.{% endblocktrans %}"
+                data-confirm-action="{% trans 'Execute' %}">
+            {% csrf_token %}
+            {% trans "I have checked the preview." as fallback_label %}
+            {% include "components/confirm_fallback.html" with id="bulk-execute-confirm" label=fallback_label %}
+            <button type="submit" class="btn btn-danger">{% include "components/icon.html" with name="check-circle" %}<span>{% trans "Execute this exact previewed scope" %}</span></button>
+          </form>
+        </div>
+      {% endif %}
+    </section>
+  {% endif %}
+{% endblock %}

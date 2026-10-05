@@ -1,0 +1,105 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% trans "Controlled exports" %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Exports" %}</p>
+      <h1>{% trans "Controlled exports" %}</h1>
+      <p>{% trans "Every export is scoped to your own authorized event and organization, requires an approved purpose and a reason, and expires automatically." %}</p>
+    </div>
+  </div>
+
+  <section class="asc-card" aria-labelledby="export-form-heading">
+    <h2 class="asc-card-title" id="export-form-heading">{% include "components/icon.html" with name="download" %}{% trans "Request an export" %}</h2>
+    <p class="asc-section-lead">{% trans "Leave the organization as is to include every organization in your scope." %}</p>
+    {% include "components/error_summary.html" %}
+    {% if form.fields.event_edition_id.queryset.exists %}
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="asc-form-grid asc-form-grid-top">
+          {% include "components/field.html" with field=form.event_edition_id %}
+          {% include "components/picker.html" with field=form.organization_id %}
+          {% include "components/field.html" with field=form.purpose_code %}
+        </div>
+        {% include "components/field.html" with field=form.reason %}
+        <div class="asc-notice asc-notice-neutral mb-3">
+          {% include "components/icon.html" with name="lock" %}
+          <p>{% trans "Exports contain a minimized set of fields: never identity document numbers, contact details or internal review notes." %}</p>
+        </div>
+        <button type="submit" class="btn btn-primary">{% include "components/icon.html" with name="download" %}<span>{% trans "Generate export" %}</span></button>
+      </form>
+    {% else %}
+      <div class="asc-empty">
+        <span class="asc-tile">{% include "components/icon.html" with name="download" %}</span>
+        <h3>{% trans "There is no data you can export yet." %}</h3>
+        <p>{% trans "Events appear here once registrations exist in your export scope." %}</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="asc-card asc-card-flush" aria-labelledby="recent-exports-heading">
+    <div class="asc-card-toolbar">
+      <h2 class="asc-card-toolbar-title" id="recent-exports-heading">{% trans "Your recent exports" %}</h2>
+      <span class="asc-count">{% blocktrans count counter=exports|length %}{{ counter }} export{% plural %}{{ counter }} exports{% endblocktrans %}</span>
+    </div>
+    {% if exports %}
+      <div class="asc-table-wrap asc-wide-only">
+        <table class="asc-table" aria-labelledby="recent-exports-heading">
+          <thead>
+            <tr>
+              <th scope="col">{% trans "Event" %}</th>
+              <th scope="col">{% trans "Purpose" %}</th>
+              <th scope="col">{% trans "Status" %}</th>
+              <th scope="col" class="asc-num">{% trans "Rows" %}</th>
+              <th scope="col">{% trans "Expires" %}</th>
+              <th scope="col"><span class="visually-hidden">{% trans "Action" %}</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for export in exports %}
+              <tr>
+                <th scope="row"><bdi>{{ export.event_edition.name }}</bdi></th>
+                <td>{{ export.purpose_code|code_label:"export_purpose" }}</td>
+                <td>{% status_chip "export" export.status export.status|code_label:"export_status" %}</td>
+                <td class="asc-num">{{ export.row_count|default:"—" }}</td>
+                <td><time datetime="{{ export.expires_at|date:'c' }}">{{ export.expires_at }}</time></td>
+                <td class="asc-cell-action">
+                  {% if export.status == "READY" %}
+                    <a href="{% url 'exports:download' pk=export.pk %}" class="btn btn-sm btn-outline-primary">{% include "components/icon.html" with name="download" %}<span>{% trans "Download" %}</span></a>
+                  {% else %}
+                    <span class="asc-muted">{% trans "Not available" %}</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <ul class="asc-records asc-narrow-only" aria-labelledby="recent-exports-heading">
+        {% for export in exports %}
+          <li class="asc-record" data-record>
+            <div class="asc-record-head">
+              <h3 class="asc-record-title"><bdi>{{ export.event_edition.name }}</bdi></h3>
+              <p class="asc-record-meta">{{ export.purpose_code|code_label:"export_purpose" }}</p>
+            </div>
+            <dl class="asc-record-fields">
+              <div><dt>{% trans "Status" %}</dt><dd>{% status_chip "export" export.status export.status|code_label:"export_status" %}</dd></div>
+              <div><dt>{% trans "Rows" %}</dt><dd>{{ export.row_count|default:"—" }}</dd></div>
+              <div class="asc-record-wide"><dt>{% trans "Expires" %}</dt><dd><time datetime="{{ export.expires_at|date:'c' }}">{{ export.expires_at }}</time></dd></div>
+            </dl>
+            {% if export.status == "READY" %}
+              <div class="asc-record-actions"><a href="{% url 'exports:download' pk=export.pk %}" class="btn btn-outline-primary" data-record-action>{% include "components/icon.html" with name="download" %}<span>{% trans "Download" %}</span></a></div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="asc-empty">
+        <span class="asc-tile">{% include "components/icon.html" with name="inbox" %}</span>
+        <h3>{% trans "No exports yet." %}</h3>
+        <p>{% trans "Exports you request appear here until they expire." %}</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

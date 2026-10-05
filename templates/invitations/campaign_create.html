@@ -1,0 +1,34 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% block title %}{% trans "New invitation campaign" %}{% endblock %}
+{% block breadcrumbs %}{% url 'invitations:workspace-dashboard' as parent_url %}{% trans "Organization Workspace" as parent_label %}{% url 'invitations:organization-search' as parent2_url %}{% trans "Find an organization" as parent2_label %}{% trans "New invitation campaign" as current %}{% include "components/breadcrumb_trail.html" with parent_label=parent_label parent_url=parent_url parent2_label=parent2_label parent2_url=parent2_url current=current %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% blocktrans with name=organization.official_name %}For organization: {{ name }}{% endblocktrans %}</p>
+      <h1>{% trans "New invitation campaign" %}</h1>
+      <p>{% trans "A campaign groups the invitation links you share with one organization for the event that is currently open." %}</p>
+    </div>
+  </div>
+
+  <section class="asc-card asc-form-narrow" aria-labelledby="campaign-form-heading">
+    <h2 class="asc-card-title" id="campaign-form-heading">{% include "components/icon.html" with name="mail" %}{% trans "Campaign details" %}</h2>
+    {% include "components/error_summary.html" %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% include "components/field.html" with field=form.name %}
+      <div class="asc-form-grid asc-form-grid-top">
+        {% include "components/field.html" with field=form.valid_from control="ltr" mark_optional=True %}
+        {% include "components/field.html" with field=form.valid_until control="ltr" mark_optional=True %}
+      </div>
+      <div class="asc-form-grid asc-form-grid-top">
+        {% include "components/field.html" with field=form.capacity control="ltr" mark_optional=True %}
+        {% include "components/field.html" with field=form.language %}
+      </div>
+      <div class="asc-actions-row">
+        <button type="submit" class="btn btn-primary"><span>{% trans "Create campaign" %}</span></button>
+        <a class="btn btn-outline-secondary" href="{% url 'invitations:organization-search' %}">{% trans "Cancel" %}</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

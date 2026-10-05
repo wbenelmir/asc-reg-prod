@@ -1,0 +1,89 @@
+{% extends "layouts/base_wizard.html" %}
+{% load i18n registration_ui %}
+{% block title %}{% trans "Review" %}{% endblock %}
+{% block stepper %}{% wizard_stepper registration "review" %}{% endblock %}
+{% block wizard_title %}{% trans "Review your information" %}{% endblock %}
+{% block wizard_lead %}<p>{% trans "Check your answers before continuing to the required notices." %}</p>{% endblock %}
+{% block wizard_body %}
+  <div class="asc-summary-stack">
+    <section class="asc-card asc-summary" aria-labelledby="review-identity-heading">
+      <div class="asc-summary-head">
+        <h2 id="review-identity-heading">{% trans "Identity" %}</h2>
+        <a href="{% url 'registrations:step-identity' %}" class="asc-summary-edit">{% include "components/icon.html" with name="edit" size="sm" %}<span>{% trans "Edit" %}<span class="visually-hidden"> {% trans "Identity" %}</span></span></a>
+      </div>
+      {% with profile=registration.profile %}
+        {% if profile %}
+          <dl class="asc-dl">
+            <dt>{% trans "Name" %}</dt><dd><bdi>{{ profile.submitted_full_name }}</bdi></dd>
+            <dt>{% trans "Date of birth" %}</dt><dd><bdi>{{ profile.date_of_birth }}</bdi></dd>
+            <dt>{% trans "Nationality" %}</dt><dd><bdi>{{ profile.nationality_code.localized_name|default:profile.nationality_code_id }}</bdi></dd>
+            <dt>{% trans "Country of residence" %}</dt><dd><bdi>{{ profile.country_of_residence.localized_name|default:profile.country_of_residence_id }}</bdi></dd>
+          </dl>
+        {% else %}
+          <p class="asc-summary-missing">{% trans "Not provided yet." %}</p>
+        {% endif %}
+      {% endwith %}
+    </section>
+
+    <section class="asc-card asc-summary" aria-labelledby="review-professional-heading">
+      <div class="asc-summary-head">
+        <h2 id="review-professional-heading">{% trans "Professional information" %}</h2>
+        <a href="{% url 'registrations:step-professional' %}" class="asc-summary-edit">{% include "components/icon.html" with name="edit" size="sm" %}<span>{% trans "Edit" %}<span class="visually-hidden"> {% trans "Professional information" %}</span></span></a>
+      </div>
+      {% with affiliation=registration.professional_affiliation %}
+        {% if affiliation %}
+          <dl class="asc-dl">
+            <dt>{% trans "Professional Organization" %}</dt><dd><bdi>{{ affiliation.submitted_organization_name }}</bdi></dd>
+            <dt>{% trans "Organization type" %}</dt><dd>{{ affiliation.get_organization_type_display }}</dd>
+            <dt>{% trans "Job title" %}</dt><dd><bdi>{{ affiliation.job_title }}</bdi></dd>
+            <dt>{% trans "Department" %}</dt><dd><bdi>{{ affiliation.department }}</bdi></dd>
+            <dt>{% trans "Profile photograph" %}</dt>
+            {% if profile_photo %}<dd>{% trans "Profile photograph on file." %}</dd>{% else %}<dd class="asc-summary-missing" data-profile-photo-missing>{% trans "Missing. A profile photograph is required; add it in the professional information step." %}</dd>{% endif %}
+          </dl>
+        {% else %}
+          <p class="asc-summary-missing">{% trans "Not provided yet." %}</p>
+        {% endif %}
+      {% endwith %}
+    </section>
+
+    <section class="asc-card asc-summary" aria-labelledby="review-interests-heading">
+      <div class="asc-summary-head">
+        <h2 id="review-interests-heading">{% trans "Interests and objectives" %}</h2>
+        <a href="{% url 'registrations:step-interests' %}" class="asc-summary-edit">{% include "components/icon.html" with name="edit" size="sm" %}<span>{% trans "Edit" %}<span class="visually-hidden"> {% trans "Interests and objectives" %}</span></span></a>
+      </div>
+      {% with interests=registration.interests.all %}
+        {% if interests %}
+          <ul class="asc-chip-list mb-3">
+            {% for interest in interests %}<li class="asc-chip asc-chip-outline"><bdi>{{ interest.interest_topic.localized_label }}</bdi></li>{% endfor %}
+          </ul>
+        {% else %}
+          <p class="asc-summary-missing">{% trans "Not provided yet." %}</p>
+        {% endif %}
+      {% endwith %}
+      {% if registration.profile.objectives_text %}
+        <p class="asc-summary-text mb-0"><bdi>{{ registration.profile.objectives_text }}</bdi></p>
+      {% endif %}
+    </section>
+    {# UX-3: the participant sees their own accessibility answer here; staff never see it outside the dedicated support screen. #}
+    <section class="asc-card asc-summary" aria-labelledby="review-accommodation-heading">
+      <div class="asc-summary-head">
+        <h2 id="review-accommodation-heading">{% trans "Accessibility support" %}</h2>
+        <a href="{% url 'registrations:step-interests' %}" class="asc-summary-edit">{% include "components/icon.html" with name="edit" size="sm" %}<span>{% trans "Edit" %}<span class="visually-hidden"> {% trans "Accessibility support" %}</span></span></a>
+      </div>
+      {% if accommodation %}
+        <p class="mb-1">{{ accommodation.get_answer_display }}</p>
+        {% if accommodation_labels %}
+          <ul class="asc-chip-list">{% for label in accommodation_labels %}<li class="asc-chip asc-chip-outline"><bdi>{{ label }}</bdi></li>{% endfor %}</ul>
+        {% endif %}
+        {% if accommodation.note_encrypted %}<p class="asc-summary-text mb-0"><bdi>{{ accommodation.note_encrypted }}</bdi></p>{% endif %}
+      {% else %}
+        <p class="asc-muted mb-0">{% trans "Not answered." %}</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <form method="post" class="asc-card asc-wizard-form asc-wizard-form-compact">
+    {% csrf_token %}
+    {% include "registrations/_wizard_actions.html" with step="review" submit_label=_("Continue to notices") %}
+  </form>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% load i18n %}{% comment %}
+  The origin-aware next step of a closed registration: after a final identity
+  rejection (IDV-Q-C1) or a withdrawal by the participant (owner correction,
+  2026-10-04). A button only when it can work; otherwise the accurate next
+  step for an open, invitation or staff-created registration.
+{% endcomment %}{% with option=registration.restart_option %}
+  {% if registration.registered_again %}
+    <p class="mb-0">{% trans "Your new registration for this event is listed on this page." %}</p>
+  {% elif option.available %}
+    <form method="post" action="{% url 'registrations:register-again' pk=registration.pk %}" class="m-0">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary" data-register-again="{{ option.kind }}">{% if option.kind == "INVITATION" %}{% trans "Register again with your invitation" %}{% else %}{% trans "Register again" %}{% endif %}</button>
+    </form>
+  {% elif option.kind == "NEW_INVITATION_NEEDED" %}
+    <p class="mb-0" data-register-again-next="{{ option.kind }}">{% trans "Your invitation can no longer be used. To register again, ask the organization that invited you for a new invitation, then open it while signed in to this account." %}</p>
+  {% elif option.kind == "CONTACT_TEAM" %}
+    <p class="mb-0" data-register-again-next="{{ option.kind }}">{% trans "This registration was made for you by an organization or the registration team. Contact them to register again." %}</p>
+  {% else %}
+    <p class="mb-0" data-register-again-next="{{ option.kind }}">{% trans "Registration is closed at the moment. You can register again while registration is open." %}</p>
+  {% endif %}
+{% endwith %}

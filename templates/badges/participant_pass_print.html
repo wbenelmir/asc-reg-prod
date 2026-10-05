@@ -1,0 +1,54 @@
+{% extends "layouts/base_workspace.html" %}
+{% load i18n static %}
+
+{% comment %}
+Accessible HTML print view for one pass. No PDF dependency is used or
+needed: the print stylesheet produces a clean monochrome page that works in
+every supported browser and keeps the credential value selectable and
+screen-reader accessible, which a rasterized PDF would not.
+{% endcomment %}
+
+{% block title %}{% trans "Entry pass" %}{% endblock %}
+
+{% block content %}
+  <link rel="stylesheet" href="{% static 'css/pass_print.css' %}" media="all">
+
+  <div class="pass-print-sheet">
+    <h1 class="h4">{% trans "ASC 2026 entry pass" %}</h1>
+
+    <dl class="pass-print-fields">
+      <dt>{% trans "Event" %}</dt>
+      <dd><bdi>{{ registration.event_edition.code }}</bdi></dd>
+      <dt>{% trans "Status" %}</dt>
+      <dd data-pass-status="{{ credential.status }}">{{ status_message }}</dd>
+      <dt>{% trans "Fallback reference" %}</dt>
+      <dd><bdi><code>{{ fallback_reference_display }}</code></bdi></dd>
+      <dt>{% trans "Valid from" %}</dt>
+      <dd>{{ valid_from }}</dd>
+      <dt>{% trans "Valid until" %}</dt>
+      <dd>{{ valid_until }}</dd>
+    </dl>
+
+    {% if has_usable_qr %}
+      <h2 class="h6">{% trans "Entry pass QR code" %}</h2>
+      <div class="pass-print-qr" dir="ltr">
+        <img src="{{ qr_image_url }}"
+             alt="{% trans 'QR code for your entry pass. Present it at the entry checkpoint.' %}"
+             width="320" height="320"
+             data-pass-qr="{{ public_id }}">
+      </div>
+    {% else %}
+      {% if may_become_active %}
+        <p>{% trans "An entry pass QR code becomes available once your pass is active." %}</p>
+      {% endif %}
+    {% endif %}
+
+    <p class="pass-print-note">
+      {% trans "This pass proves credential integrity only. An operator may still ask you to confirm your identity." %}
+    </p>
+  </div>
+
+  <p class="d-print-none">
+    <a href="{% url 'badges:participant-passes' %}">{% trans "Back to my entry passes" %}</a>
+  </p>
+{% endblock %}

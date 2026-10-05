@@ -1,0 +1,1 @@
+{# Reconciliation severity: text plus a toned chip, never colour alone. #}<span class="asc-chip {% if severity == 'SECURITY' %}asc-chip-danger{% elif severity == 'CONFLICT' %}asc-chip-warning{% else %}asc-chip-info{% endif %}" data-severity="{{ severity }}">{{ label }}</span>

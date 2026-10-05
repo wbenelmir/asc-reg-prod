@@ -1,0 +1,17 @@
+{% extends conflict_layout|default:"layouts/base_operations.html" %}
+{% load i18n %}
+{% comment %}
+  Review 409 conflict. Staff commands render in the operations shell;
+  participant commands (withdrawal, information response) pass
+  `conflict_layout` = the participant workspace shell and return there.
+{% endcomment %}
+{% block title %}{% trans "Conflict" %}{% endblock %}
+{% block content %}
+  {% if participant_conflict %}
+    {% url 'registrations:workspace' as back_url %}{% trans "Back to my registrations" as back_label %}
+    {% include "components/conflict_state.html" with back_url=back_url back_label=back_label %}
+  {% else %}
+    {% url 'reviews:queue-list' as back_url %}{% trans "Back to the review queue" as back_label %}
+    {% include "components/conflict_state.html" with back_url=back_url back_label=back_label %}
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% comment %}
+  Participant workspace shell (TRD §7.2 `base_workspace`; UI/UX §4.3, §7).
+  Adaptive: a light application bar (UI/UX §13.4: light participant
+  surfaces) with the official logo, the participant's own navigation, the
+  language switcher and sign-out.
+{% endcomment %}
+
+{% block body_attrs %} class="asc-ui asc-workspace"{% endblock %}
+
+{% block header %}
+  <header class="asc-appbar asc-appbar-light">
+    <div class="container-lg asc-appbar-inner">
+      <a class="asc-brand" href="{% url 'registrations:workspace' %}">
+        <img src="{% static 'img/brand/asc-logo.svg' %}" width="90" height="40" alt="{% trans 'African Startup Conference' %}">
+      </a>
+      <nav class="asc-topnav" aria-label="{% trans 'Participant navigation' %}">
+        <ul>
+          {% with view_name=request.resolver_match.view_name namespace=request.resolver_match.namespace %}
+            {# "page" on the list itself; "true" while inside that area (a wizard step, a request). #}
+            <li><a href="{% url 'registrations:workspace' %}"{% if view_name == "registrations:workspace" %} aria-current="page"{% elif namespace == "registrations" or view_name == "reviews:my-information-request" %} aria-current="true"{% endif %}>{% trans "My registrations" %}</a></li>
+            <li><a href="{% url 'badges:participant-passes' %}"{% if workspace_nav == "passes" %} aria-current="page"{% endif %}>{% trans "My entry passes" %}</a></li>
+          {% endwith %}
+        </ul>
+      </nav>
+      <div class="asc-appbar-end">
+        {% include "partials/language_switcher.html" %}
+        {% if participant_authenticated %}
+          <form method="post" action="{% url 'accounts:participant-sign-out' %}" class="m-0">
+            {% csrf_token %}
+            <button type="submit" class="asc-appbar-btn">
+              {% include "components/icon.html" with name="log-out" flip=True %}
+              <span>{% trans "Sign out" %}</span>
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+    <div class="asc-motif" aria-hidden="true"></div>
+  </header>
+{% endblock %}
+
+{% block main %}
+  {# `main_attrs`: participant registration pages keep the legacy chrome's hx-boost (UI/UX gate F2). #}
+  <main id="main-content" class="asc-main"{% block main_attrs %}{% endblock %}>
+    <div class="container-lg">
+      {% include "components/flash_messages.html" %}
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+{% endblock %}
+
+{% block footer %}
+  <footer class="asc-footer">
+    <div class="container-lg d-flex flex-wrap gap-2 justify-content-between">
+      <span>{% trans "ASC 2026 Registration Platform" %}</span>
+      <span>{% trans "Participant workspace" %}</span>
+      {% include "partials/footer_official.html" %}
+    </div>
+  </footer>
+{% endblock %}

@@ -1,0 +1,92 @@
+/* ASC 2026 -- project-owned application styles (UI/UX §12 accessibility rules). */
+
+.skip-link {
+  position: absolute;
+  top: -3rem;
+  left: 1rem;
+  z-index: 2000;
+  background: #fff;
+  color: #000;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* Visible focus indicator on every interactive element -- never suppressed.
+   `!important` is required here: Bootstrap 5's own `.form-control:focus` /
+   `.form-select:focus` / `.form-check-input:focus` / `.btn:focus` rules
+   carry a higher CSS specificity (two class-level selectors) than a bare
+   `input:focus-visible` (one type + one pseudo-class) and set `outline: 0`,
+   replacing it with a box-shadow -- without `!important` this rule would
+   never actually render on any Bootstrap-classed form control, discovered
+   by real-browser accessibility coverage across the full wizard, not only
+   the unclassed skip link (Prompt 5 correction pass §6). */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid #0d6efd !important;
+  outline-offset: 2px !important;
+}
+
+/* Direction isolation for inherently LTR values shown inside RTL text
+   (email, phone, NIN, passport, Registration Reference) -- UI/UX §11.3. */
+.ltr-embed {
+  direction: ltr;
+  unicode-bidi: embed;
+  display: inline-block;
+}
+
+.form-error-summary:focus {
+  outline: 3px solid #0d6efd;
+  outline-offset: 2px;
+}
+
+.step-indicator {
+  font-size: 0.9rem;
+}
+
+.step-indicator .step-current {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
+/* Digital Entry Pass QR (Phase 3 Prompt 2 correction pass).
+   Direction-neutral: the template isolates it with dir="ltr" so the symbol
+   is never mirrored in Arabic RTL layout. */
+.pass-qr {
+  margin-block: 0.75rem;
+}
+
+.pass-qr img {
+  width: 320px;
+  height: 320px;
+  max-width: 100%;
+  image-rendering: pixelated;
+  background: #fff;
+}
+
+/* Phase 3 Prompt 4: entry result photograph box (fixed size so the result
+   layout never shifts while an image loads). */
+.entry-photo {
+  width: 160px;
+  height: 200px;
+  object-fit: cover;
+}

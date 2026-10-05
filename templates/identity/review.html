@@ -1,0 +1,343 @@
+{% extends "layouts/base_operations.html" %}
+{% load static i18n asc_ui %}
+{% block title %}{% blocktrans with ref=registration.public_reference %}Identity review: {{ ref }}{% endblocktrans %}{% endblock %}
+{% block breadcrumbs %}{% url 'identity:queue' as queue_base %}{% if querystring %}{% with queue_url=queue_base|add:"?"|add:querystring %}{% trans "Identity review" as queue_label %}{% include "components/breadcrumb_trail.html" with parent_label=queue_label parent_url=queue_url current=registration.public_reference current_code=True %}{% endwith %}{% else %}{% trans "Identity review" as queue_label %}{% include "components/breadcrumb_trail.html" with parent_label=queue_label parent_url=queue_base current=registration.public_reference current_code=True %}{% endif %}{% endblock %}
+{% block content %}
+  {% comment %}
+    IDV-3 single review screen. Submitted data and the retained official facts
+    sit next to the authorized evidence preview (stacked on small screens).
+    Only retained facts are shown; a birth date the ministry marks as
+    presumed is never shown as verified. Every action form carries the case
+    version (a stale decision is refused with a conflict) and the queue
+    context (to continue with the next case). Keyboard shortcuts:
+    static/js/asc-identity-review.js; none of them submits a form.
+  {% endcomment %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Identity review" %} · {{ case.get_route_display }}</p>
+      <h1>{% blocktrans with ref=registration.public_reference|ltr_isolate %}Identity of {{ ref }}{% endblocktrans %}</h1>
+      <ul class="asc-chip-list mt-2" aria-label="{% trans 'Current status' %}">
+        <li data-idv-status="{{ case.status }}">{% status_chip "identity" case.status case.get_status_display %}</li>
+        {% if case.verification_source %}<li><span class="asc-chip asc-chip-{% if case.verification_source == 'SIMULATED_API' %}warning{% else %}neutral{% endif %}" data-idv-source="{{ case.verification_source }}">{% include "components/icon.html" with name="info" size="sm" %}<span>{{ case.get_verification_source_display }}</span></span></li>{% endif %}
+        <li>{% status_chip "registration" registration.public_status registration.get_public_status_display %}</li>
+      </ul>
+      <p class="asc-section-lead mt-2 mb-0">{% trans "Verifying an identity does not approve participation; participation is decided separately. Approval requires a verified identity." %}</p>
+    </div>
+    <div class="asc-actions-row">
+      {% if skip_url %}<a class="btn btn-outline-secondary" href="{{ skip_url }}" data-idv-skip>{% trans "Next case" %}{% include "components/icon.html" with name="arrow-next" flip=True %}</a>{% endif %}
+    </div>
+  </div>
+
+  {% if case.reason_code %}
+    <div class="asc-notice asc-notice-warning mb-3" data-idv-reason="{{ case.reason_code }}">
+      {% include "components/icon.html" with name="alert-triangle" %}
+      <div>
+        <p class="mb-0"><strong>{% trans "Why this case needs a person:" %}</strong> {{ case.get_reason_code_display }}</p>
+      </div>
+    </div>
+  {% endif %}
+  {% if exemption %}
+    {# IDV-Q3: the documentary route, granted by staff for this registration. #}
+    <div class="asc-notice asc-notice-neutral mb-3" data-idv-nin-exemption>
+      {% include "components/icon.html" with name="info" %}
+      <div>
+        <p class="mb-1"><strong>{% trans "NIN exemption:" %}</strong> {% trans "the participant has no usable NIN. Verify only from the declared Algerian document; no ministry check exists for this case." %}</p>
+        <p class="mb-1">{{ exemption.get_reason_code_display }} · <bdi>{{ exemption.granted_by.display_name|default:exemption.granted_by.email_normalized }}</bdi> · <time datetime="{{ exemption.granted_at|date:'c' }}">{{ exemption.granted_at }}</time></p>
+        <p class="mb-0"><bdi>{{ exemption.explanation_encrypted }}</bdi></p>
+      </div>
+    </div>
+  {% endif %}
+  {% if identity_rejection_outcome %}
+    {# IDV-Q2: the participation outcome recorded with the final rejection. #}
+    <div class="asc-notice asc-notice-neutral mb-3" data-idv-rejection-outcome>
+      {% include "components/icon.html" with name="lock" %}
+      <div><p class="mb-0">{% trans "Finally rejected. The registration is not approved; the participant was told that it was rejected and how to register again from the same account." %}</p></div>
+    </div>
+  {% elif registration_closed %}
+    <div class="asc-notice asc-notice-neutral mb-3" data-idv-registration-closed>
+      {% include "components/icon.html" with name="lock" %}
+      <div><p class="mb-0">{% trans "The registration is closed (withdrawn, cancelled or not approved). Identity actions are not available unless it is reopened." %}</p></div>
+    </div>
+  {% endif %}
+  {% if case.status == "PENDING" %}
+    <div class="asc-notice asc-notice-neutral mb-3" data-idv-pending>
+      {% include "components/icon.html" with name="clock" %}
+      <div><p class="mb-0">{% trans "A ministry check is queued or running. The case stays pending until its own result arrives; it is never shown as verified in advance." %}</p></div>
+    </div>
+  {% endif %}
+  {% if conflicts.exists %}
+    <div class="asc-notice asc-notice-danger mb-3" role="alert" data-idv-conflict>
+      {% include "components/icon.html" with name="layers" %}
+      <div>
+        <p class="mb-1"><strong>{% trans "Duplicate identifier: another person's registration holds it." %}</strong> {% trans "Manual verification is blocked until this conflict is resolved." %}</p>
+        {% if conflicts.visible_references %}<p class="mb-0">{% trans "Registrations in your scope:" %} {% for reference in conflicts.visible_references %}<bdi dir="ltr" class="asc-code">{{ reference }}</bdi>{% if not forloop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+        {% if conflicts.hidden_count %}<p class="mb-0">{% blocktrans count counter=conflicts.hidden_count %}{{ counter }} more registration outside your scope.{% plural %}{{ counter }} more registrations outside your scope.{% endblocktrans %}</p>{% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="asc-idv-layout" data-idv-review data-queue-url="{% url 'identity:queue' %}{% if querystring %}?{{ querystring }}{% endif %}">
+    <div class="asc-idv-facts">
+      <section class="asc-card asc-card-flush" aria-labelledby="idv-compare-heading">
+        <div class="asc-card-toolbar">
+          <h2 class="asc-card-toolbar-title" id="idv-compare-heading">{% include "components/icon.html" with name="id-card" %}{% trans "Submitted and official data" %}</h2>
+        </div>
+        <div class="asc-table-wrap">
+          <table class="asc-table asc-idv-compare" aria-label="{% trans 'Submitted and official data' %}">
+            <thead><tr><th scope="col">{% trans "Field" %}</th><th scope="col">{% trans "Submitted" %}</th><th scope="col">{% trans "Official (retained)" %}</th><th scope="col">{% trans "Result" %}</th></tr></thead>
+            <tbody>
+              {% for row in comparison_rows %}
+                <tr data-idv-field="{{ forloop.counter }}" data-outcome="{{ row.outcome }}"{% if row.outcome == "mismatch" %} class="asc-idv-diff"{% endif %}>
+                  <th scope="row">{{ row.label }}</th>
+                  <td>{% if row.is_date %}<bdi dir="ltr">{{ row.submitted|date:"d/m/Y" }}</bdi>{% else %}<bdi>{{ row.submitted }}</bdi>{% endif %}</td>
+                  <td>
+                    {% if row.is_date and row.outcome == "skipped_presumed" %}
+                      <span class="asc-muted" data-idv-presumed>{% trans "Not compared: the ministry marks this date as presumed (day or month unknown). The entered date is kept; it is not ministry-confirmed." %}</span>
+                    {% elif row.is_date and row.official %}<bdi dir="ltr">{{ row.official|date:"d/m/Y" }}</bdi>
+                    {% elif row.is_date and row.official_text %}<bdi dir="ltr" class="asc-code">{{ row.official_text }}</bdi> <span class="asc-muted">{% trans "(unreadable format, shown as received)" %}</span>
+                    {% elif row.official %}<bdi>{{ row.official }}</bdi>
+                    {% else %}<span class="asc-muted">{% trans "No official value retained" %}</span>{% endif %}
+                  </td>
+                  <td>
+                    {% if row.outcome == "match" %}{% trans "Match" %}
+                    {% elif row.outcome == "normalized_match" %}{% trans "Match (case or spacing only)" %}
+                    {% elif row.outcome == "mismatch" %}<strong>{% trans "Different" %}</strong>
+                    {% elif row.outcome == "skipped_presumed" %}{% trans "Skipped (presumed date)" %}
+                    {% elif row.outcome == "unrecognized_format" %}{% trans "Unreadable format" %}
+                    {% elif row.outcome == "impossible_date" %}{% trans "Impossible date" %}
+                    {% elif row.outcome == "not_compared" %}{% trans "Not compared" %}
+                    {% else %}<span class="asc-muted">—</span>{% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% if names_as_entered %}
+          <div class="asc-notice asc-notice-neutral asc-idv-names-note" data-idv-official-names>
+            {% include "components/icon.html" with name="info" %}
+            <div><p class="mb-0">{% trans "The names were set to the official form (letter case or spacing only)." %} {% trans "As entered:" %} <bdi>{{ names_as_entered.given_names }} {{ names_as_entered.family_name }}</bdi></p></div>
+          </div>
+        {% endif %}
+        <dl class="asc-dl asc-card-form">
+          {% if case.route == "NIN" %}
+            <dt>{% trans "National identity number" %}</dt>
+            <dd data-idv-identifier>{% if show_full_identifier %}<bdi dir="ltr" class="asc-code">{{ identifier.value_encrypted }}</bdi>{% else %}<bdi dir="ltr" class="asc-code">{{ identifier.masked_value }}</bdi> <span class="asc-muted">{% trans "(masked)" %}</span>{% endif %}</dd>
+          {% elif case.route == "NIN_EXEMPTION" %}
+            <dt>{% trans "Declared document" %}</dt>
+            <dd data-idv-document-kind="{{ identifier.identifier_type }}">{% if identifier.identifier_type == "PASSPORT" %}{% trans "Algerian passport" %}{% else %}{% trans "Algerian national identity card" %}{% endif %}</dd>
+            <dt>{% trans "Document number (not a NIN)" %}</dt>
+            <dd data-idv-identifier>{% if show_full_identifier %}<bdi dir="ltr" class="asc-code">{{ identifier.value_encrypted }}</bdi>{% else %}<bdi dir="ltr" class="asc-code">{{ identifier.masked_value }}</bdi> <span class="asc-muted">{% trans "(masked)" %}</span>{% endif %}</dd>
+            <dt>{% trans "Document expiry date" %}</dt><dd>{% if identifier.expires_at %}<bdi dir="ltr">{{ identifier.expires_at|date:"d/m/Y" }}</bdi>{% else %}<span class="asc-muted">{% trans "Not given" %}</span>{% endif %}</dd>
+          {% else %}
+            <dt>{% trans "Passport number" %}</dt>
+            <dd data-idv-identifier>{% if show_full_identifier %}<bdi dir="ltr" class="asc-code">{{ identifier.value_encrypted }}</bdi>{% else %}<bdi dir="ltr" class="asc-code">{{ identifier.masked_value }}</bdi> <span class="asc-muted">{% trans "(masked)" %}</span>{% endif %}</dd>
+            <dt>{% trans "Issuing country" %}</dt><dd>{{ identifier.country_code.localized_name }}</dd>
+            <dt>{% trans "Passport expiry date" %}</dt><dd><bdi dir="ltr">{{ identifier.expires_at|date:"d/m/Y" }}</bdi></dd>
+          {% endif %}
+          <dt>{% trans "Nationality" %}</dt><dd>{{ case.nationality.localized_name }}</dd>
+          <dt>{% trans "Country of residence" %}</dt><dd>{{ profile.country_of_residence.localized_name }}</dd>
+          {% if attempt %}
+            <dt>{% trans "Last service check" %}</dt>
+            <dd>{% if attempt.is_official_provider %}{% trans "Ministry service" %}{% else %}<strong>{% trans "Development simulation (not official)" %}</strong>{% endif %} · <time datetime="{{ attempt.attempted_at|date:'c' }}">{{ attempt.attempted_at }}</time></dd>
+            {% if attempt.presume_flag %}<dt>{% trans "Presumed-date flag" %}</dt><dd data-idv-presume-flag="{{ attempt.presume_flag }}">{{ attempt.presume_flag }}</dd>{% endif %}
+          {% endif %}
+        </dl>
+      </section>
+
+      {% if actionable or rejectable %}
+        <section class="asc-card asc-action-panel" aria-labelledby="idv-actions-heading" data-idv-actions>
+          <h2 class="asc-card-title" id="idv-actions-heading">{% include "components/icon.html" with name="user-check" %}{% trans "Decide" %}</h2>
+          {% if actionable and "verify_identity_manually" in granted %}
+            <details class="asc-idv-action" open data-idv-action="verify">
+              <summary>{% trans "Verify identity" %}</summary>
+              {% with form=forms.verify %}
+                <form method="post" action="{% url 'identity:verify' pk=case.pk %}" data-idv-form="verify">
+                  {% csrf_token %}{% include "identity/_queue_context.html" %}
+                  {% if form.fields.evidence_document.choices %}
+                    {% include "components/field.html" with field=form.evidence_document %}
+                    {% include "components/field.html" with field=form.reason_code %}
+                    {% include "components/field.html" with field=form.note %}
+                    <div class="asc-stack-actions">
+                      <button type="submit" class="btn btn-success" name="advance" value="stay"{% if conflicts.exists %} disabled{% endif %}>{% include "components/icon.html" with name="check-circle" %}<span>{% trans "Verify identity" %}</span></button>
+                      <button type="submit" class="btn btn-outline-success" name="advance" value="next"{% if conflicts.exists %} disabled{% endif %}>{% include "components/icon.html" with name="arrow-next" flip=True %}<span>{% trans "Verify and open the next case" %}</span></button>
+                    </div>
+                  {% else %}
+                    <p class="mb-0 asc-muted" data-idv-no-evidence>{% if case.route == "NIN" %}{% trans "No reviewable national identity card yet. Return the case to ask for it." %}{% elif case.route == "NIN_EXEMPTION" %}{% trans "No reviewable photo of the declared document yet. Return the case to ask for it." %}{% else %}{% trans "No reviewable passport identity page yet. Return the case to ask for it." %}{% endif %}</p>
+                  {% endif %}
+                </form>
+              {% endwith %}
+            </details>
+          {% endif %}
+
+          {% if actionable and "return_identity_for_correction" in granted %}
+            <details class="asc-idv-action" data-idv-action="return"{% if forms.return.errors %} open{% endif %}>
+              <summary>{% trans "Return for correction" %}</summary>
+              {% with form=forms.return %}
+                <form method="post" action="{% url 'identity:return' pk=case.pk %}" data-idv-form="return">
+                  {% csrf_token %}{% include "identity/_queue_context.html" %}
+                  {% include "components/field.html" with field=form.items %}
+                  {% include "components/field.html" with field=form.note %}
+                  <p class="form-text">{% trans "The participant sees only the selected requests, never the reason or a service result." %}</p>
+                  <div class="asc-stack-actions">
+                    <button type="submit" class="btn btn-outline-primary" name="advance" value="stay"><span>{% trans "Return for correction" %}</span></button>
+                    <button type="submit" class="btn btn-outline-primary" name="advance" value="next"><span>{% trans "Return and open the next case" %}</span></button>
+                  </div>
+                </form>
+              {% endwith %}
+            </details>
+          {% endif %}
+
+          {% if actionable and case.route == "NIN" and "correct_identity_nin" in granted %}
+            <details class="asc-idv-action" data-idv-action="correct"{% if forms.correct.errors %} open{% endif %}>
+              <summary>{% trans "Correct NIN and recheck" %}</summary>
+              {% with form=forms.correct %}
+                <form method="post" action="{% url 'identity:correct-nin' pk=case.pk %}" data-idv-form="correct"
+                      data-confirm-title="{% trans 'Change or recheck this NIN?' %}"
+                      data-confirm="{% trans 'A new ministry check starts for the NIN entered. A changed NIN replaces the current one and is checked for duplicates first.' %}"
+                      data-confirm-action="{% trans 'Queue the check' %}" data-confirm-tone="primary">
+                  {% csrf_token %}{% include "identity/_queue_context.html" %}
+                  {% include "components/field.html" with field=form.new_nin control="ltr" %}
+                  {% include "components/field.html" with field=form.reason_code %}
+                  {% if form.fields.evidence_document.choices %}{% include "components/field.html" with field=form.evidence_document %}{% endif %}
+                  {% include "components/field.html" with field=form.confirmed %}
+                  {% include "components/field.html" with field=form.note %}
+                  <button type="submit" class="btn btn-outline-primary" name="advance" value="stay"><span>{% trans "Queue the ministry check" %}</span></button>
+                </form>
+              {% endwith %}
+            </details>
+          {% endif %}
+
+          {% if actionable and case.route == "NIN" and "apply_identity_exception" in granted %}
+            <details class="asc-idv-action" data-idv-action="exception"{% if forms.exception.errors %} open{% endif %}>
+              <summary>{% trans "Staff-assisted exception" %}</summary>
+              {% with form=forms.exception %}
+                <form method="post" action="{% url 'identity:exception' pk=case.pk %}" data-idv-form="exception"
+                      data-confirm-title="{% trans 'Verify by staff-assisted exception?' %}"
+                      data-confirm="{% trans 'This verifies an Algerian identity without a ministry match, from the document selected. It is recorded as an exception, never as an API verification.' %}"
+                      data-confirm-action="{% trans 'Verify by exception' %}" data-confirm-tone="primary">
+                  {% csrf_token %}{% include "identity/_queue_context.html" %}
+                  {% if form.fields.evidence_document.choices %}
+                    {% include "components/field.html" with field=form.evidence_document %}
+                    {% include "components/field.html" with field=form.reason_code %}
+                    {% include "components/field.html" with field=form.note %}
+                    <button type="submit" class="btn btn-outline-success" name="advance" value="stay"{% if conflicts.exists %} disabled{% endif %}><span>{% trans "Verify by exception" %}</span></button>
+                  {% else %}
+                    <p class="mb-0 asc-muted">{% trans "No reviewable Algerian identity document yet." %}</p>
+                  {% endif %}
+                </form>
+              {% endwith %}
+            </details>
+          {% endif %}
+
+          {% if rejectable and "reject_identity" in granted %}
+            <details class="asc-idv-action asc-idv-action-danger" data-idv-action="reject"{% if forms.reject.errors %} open{% endif %}>
+              <summary>{% trans "Reject finally" %}</summary>
+              {% with form=forms.reject %}
+                <form method="post" action="{% url 'identity:reject' pk=case.pk %}" data-idv-form="reject"
+                      data-confirm-title="{% trans 'Reject this identity finally?' %}"
+                      data-confirm="{% trans 'This is a final identity rejection. The registration becomes Not approved, and the participant is told that it was rejected and how to register again. It cannot be corrected or reopened afterwards.' %}"
+                      data-confirm-action="{% trans 'Reject finally' %}">
+                  {% csrf_token %}{% include "identity/_queue_context.html" %}
+                  {% include "components/field.html" with field=form.reason_code %}
+                  {% include "components/field.html" with field=form.note %}
+                  {% include "components/field.html" with field=form.confirmed %}
+                  <button type="submit" class="btn btn-outline-danger" name="advance" value="stay">{% include "components/icon.html" with name="x-circle" %}<span>{% trans "Reject finally" %}</span></button>
+                </form>
+              {% endwith %}
+            </details>
+          {% endif %}
+          {% if not can_act_any %}<p class="mb-0 asc-muted" data-idv-view-only>{% trans "You can view this case but not act on it." %}</p>{% endif %}
+        </section>
+      {% elif case.status == "RETURNED_FOR_CORRECTION" %}
+        <div class="asc-notice asc-notice-neutral" data-idv-returned>{% include "components/icon.html" with name="edit" %}<div><p class="mb-0">{% trans "Waiting for the participant's correction." %}</p></div></div>
+      {% endif %}
+
+      <details class="asc-card asc-idv-history" data-idv-history>
+        <summary class="asc-card-title">{% include "components/icon.html" with name="clock" %}{% trans "History" %}</summary>
+        <h3 class="h6 mt-3">{% trans "Decisions" %}</h3>
+        <ul class="asc-timeline">
+          {% for decision in decisions %}
+            <li data-idv-decision="{{ decision.action }}">
+              <p class="mb-1">{{ decision.get_action_display }}{% if decision.reason_code %} · <span class="asc-code">{{ decision.reason_code }}</span>{% endif %}</p>
+              {% if decision.requested_items %}<p class="mb-1 asc-muted">{% for item in decision.requested_items %}<span class="asc-code">{{ item }}</span>{% if not forloop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+              {% if decision.note_encrypted %}<p class="mb-1"><bdi>{{ decision.note_encrypted }}</bdi></p>{% endif %}
+              <p class="asc-timeline-meta">{% if decision.actor_user %}<bdi>{{ decision.actor_user.display_name|default:decision.actor_user.email_normalized }}</bdi>{% else %}{% trans "Participant" %}{% endif %} · <time datetime="{{ decision.created_at|date:'c' }}">{{ decision.created_at }}</time></p>
+            </li>
+          {% empty %}
+            <li class="asc-timeline-empty">{% trans "No decision yet." %}</li>
+          {% endfor %}
+        </ul>
+        <h3 class="h6 mt-3">{% trans "Identity revisions" %}</h3>
+        <ul class="asc-timeline">
+          {% for revision in revisions %}
+            <li data-idv-revision="{{ revision.number }}"><p class="mb-1">#{{ revision.number }} · {{ revision.get_source_display }}{% if revision.changed_fields %} · {% for field_name in revision.changed_fields %}<span class="asc-code">{{ field_name }}</span>{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}</p><p class="asc-timeline-meta"><time datetime="{{ revision.created_at|date:'c' }}">{{ revision.created_at }}</time></p></li>
+          {% endfor %}
+        </ul>
+        <h3 class="h6 mt-3">{% trans "Checks" %}</h3>
+        <div class="asc-table-wrap">
+          <table class="asc-table" aria-label="{% trans 'Verification checks' %}">
+            <thead><tr><th scope="col">{% trans "When" %}</th><th scope="col">{% trans "Method" %}</th><th scope="col">{% trans "Outcome" %}</th><th scope="col">{% trans "Applied" %}</th></tr></thead>
+            <tbody>
+              {% for item in attempts %}
+                <tr><td><time datetime="{{ item.attempted_at|date:'c' }}">{{ item.attempted_at }}</time></td><td>{{ item.get_method_display }}{% if item.method == "EXTERNAL_SERVICE" and not item.is_official_provider %} · {% trans "simulation" %}{% endif %}</td><td><span class="asc-code">{{ item.outcome|default:item.result }}</span>{% if item.reason_code %} · <span class="asc-code">{{ item.reason_code }}</span>{% endif %}</td><td>{% if item.applied %}{% trans "Yes" %}{% else %}{% trans "No (superseded)" %}{% endif %}</td></tr>
+              {% empty %}
+                <tr><td colspan="4" class="asc-table-empty">{% trans "No check recorded yet." %}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+
+    <section class="asc-card asc-idv-viewer" aria-labelledby="idv-evidence-heading" data-idv-viewer>
+      <h2 class="asc-card-title" id="idv-evidence-heading">{% include "components/icon.html" with name="lock" %}{% trans "Identity evidence" %}</h2>
+      {% if evidence_rows %}
+        <ul class="asc-idv-docs" aria-label="{% trans 'Documents' %}">
+          {% for row in evidence_rows %}
+            <li>
+              {% if row.preview_url %}
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-idv-doc="{{ row.preview_url }}" data-idv-doc-label="{{ row.label }}" aria-pressed="{% if row.preview_url == first_preview_url %}true{% else %}false{% endif %}">{{ row.label }}</button>
+              {% else %}
+                <span class="asc-chip asc-chip-{% if row.reviewable %}neutral{% else %}warning{% endif %}" data-idv-doc-state="{{ row.scan_status }}">{{ row.label }}: {% if not row.reviewable %}{% if row.scan_status == "PENDING" %}{% trans "scan pending" %}{% elif row.scan_status == "REJECTED" %}{% trans "rejected by the scan" %}{% else %}{% trans "unavailable" %}{% endif %}{% else %}{% trans "no permission to view" %}{% endif %}</span>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+        {% with first_preview=first_preview_url %}
+          <div class="asc-idv-toolbar" role="toolbar" aria-label="{% trans 'Image controls' %}" data-idv-toolbar>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-idv-zoom="out" aria-keyshortcuts="-">{% trans "Zoom out" %}</button>
+            <span class="asc-idv-zoom-level" data-idv-zoom-level aria-live="polite">100%</span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-idv-zoom="in" aria-keyshortcuts="+">{% trans "Zoom in" %}</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-idv-rotate="ccw" aria-keyshortcuts="Shift+R">{% trans "Rotate left" %}</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-idv-rotate="cw" aria-keyshortcuts="R">{% trans "Rotate right" %}</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-idv-reset aria-keyshortcuts="0">{% trans "Reset" %}</button>
+          </div>
+          <div class="asc-idv-stage" tabindex="0" aria-label="{% trans 'Evidence image, scrollable when zoomed' %}" data-idv-stage>
+            <p class="asc-idv-state" data-idv-loading{% if not first_preview %} hidden{% endif %}>{% trans "Loading the document…" %}</p>
+            <p class="asc-idv-state" data-idv-error hidden>{% trans "The document could not be loaded. Reload the page or check your permission." %}</p>
+            <p class="asc-idv-state" data-idv-empty{% if first_preview %} hidden{% endif %}>{% trans "No document you may view is available for this case." %}</p>
+            <img class="asc-idv-image asc-idv-z0 asc-idv-r0" data-idv-image alt="{% trans 'Identity document under review' %}"{% if first_preview %} src="{{ first_preview }}"{% endif %} decoding="async" referrerpolicy="no-referrer" draggable="false">
+          </div>
+        {% endwith %}
+      {% else %}
+        <p class="mb-0 asc-muted" data-idv-no-documents>{% trans "No identity document has been uploaded for this case yet." %}</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <details class="asc-card mt-3 asc-idv-shortcuts" data-idv-shortcuts>
+    <summary>{% include "components/icon.html" with name="keyboard" %}{% trans "Keyboard shortcuts" %}</summary>
+    <p class="form-text">{% trans "Shortcuts are ignored while you type in a field, and none of them submits a decision." %}</p>
+    <dl class="asc-dl asc-dl-compact">
+      <dt><kbd>+</kbd> / <kbd>-</kbd></dt><dd>{% trans "Zoom in or out" %}</dd>
+      <dt><kbd>R</kbd> / <kbd>Shift</kbd>+<kbd>R</kbd></dt><dd>{% trans "Rotate right or left" %}</dd>
+      <dt><kbd>0</kbd></dt><dd>{% trans "Reset the image" %}</dd>
+      <dt><kbd>[</kbd> / <kbd>]</kbd></dt><dd>{% trans "Previous or next document" %}</dd>
+      <dt><kbd>V</kbd></dt><dd>{% trans "Go to the Verify form (does not submit)" %}</dd>
+      <dt><kbd>N</kbd></dt><dd>{% trans "Open the next case without deciding" %}</dd>
+      <dt><kbd>Q</kbd></dt><dd>{% trans "Back to the queue" %}</dd>
+    </dl>
+  </details>
+{% endblock %}
+{% block extra_scripts %}{{ block.super }}<script src="{% static 'js/asc-identity-review.js' %}"></script>{% endblock %}

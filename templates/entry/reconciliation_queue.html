@@ -1,0 +1,153 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% block title %}{% trans "Offline reconciliation" %}{% endblock %}
+{% comment %}
+  Supervisor reconciliation queue (Phase 4 Prompt 3, ADR-0024; TRD OFF-005,
+  Flow §11.8, Schema §11.7). Only the cases of the viewer's scope (event,
+  venue or gate) are listed; the recovery counts cover the same scope. A
+  case is closed from its own page, with a review note. Codes and counts
+  only here: participant details appear on the case page, at the checkpoint
+  minimum (display name and registration reference).
+{% endcomment %}
+
+{% block breadcrumbs %}
+  <nav aria-label="{% trans 'Breadcrumb' %}" class="asc-breadcrumbs">
+    <ol>
+      <li><span><bdi>{{ event.name }}</bdi></span>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><span aria-current="page">{% trans "Offline reconciliation" %}</span></li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <h1>{% trans "Offline reconciliation" %}</h1>
+      <p>{% trans "Offline operations the server could not simply accept. Each case keeps what the device knew, what the server knew and what happened. Nothing here changes the original records." %}</p>
+    </div>
+  </div>
+
+  <div class="asc-kpis" role="group" aria-label="{% trans 'Synchronization counts' %}" id="recovery-counts">
+    <div class="asc-kpi asc-kpi-info" data-count="uploaded">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="send" size="sm" %}{% trans "Uploaded" %}</span>
+      <span class="asc-kpi-value">{{ counts.uploaded }}</span>
+      <span class="asc-kpi-note">{% blocktrans count counter=counts.pending %}{{ counter }} not processed yet{% plural %}{{ counter }} not processed yet{% endblocktrans %}</span>
+    </div>
+    <div class="asc-kpi asc-kpi-success" data-count="accepted">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="check-circle" size="sm" %}{% trans "Accepted" %}</span>
+      <span class="asc-kpi-value">{{ counts.accepted }}</span>
+      <span class="asc-kpi-note">{% blocktrans count counter=counts.duplicate %}{{ counter }} duplicate upload{% plural %}{{ counter }} duplicate uploads{% endblocktrans %}</span>
+    </div>
+    <div class="asc-kpi {% if counts.conflict %}asc-kpi-warning{% else %}asc-kpi-success{% endif %}" data-count="conflict">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="alert-triangle" size="sm" %}{% trans "Conflicts" %}</span>
+      <span class="asc-kpi-value">{{ counts.conflict }}</span>
+      <span class="asc-kpi-note">{% blocktrans count counter=open_count %}{{ counter }} open case{% plural %}{{ counter }} open cases{% endblocktrans %}</span>
+    </div>
+    <div class="asc-kpi {% if counts.rejected or counts.quarantined %}asc-kpi-danger{% else %}asc-kpi-success{% endif %}" data-count="rejected">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="ban" size="sm" %}{% trans "Rejected" %}</span>
+      <span class="asc-kpi-value">{{ counts.rejected }}</span>
+      <span class="asc-kpi-note">{% blocktrans count counter=counts.quarantined %}{{ counter }} quarantined{% plural %}{{ counter }} quarantined{% endblocktrans %}</span>
+    </div>
+  </div>
+
+  <form method="get" class="asc-card asc-filters" role="search" aria-label="{% trans 'Filter the reconciliation queue' %}">
+    <div class="asc-filters-grid">
+      <div>
+        <label for="id_status" class="form-label">{% trans "Status" %}</label>
+        <select id="id_status" name="status" class="form-select">
+          <option value="ALL" {% if not status %}selected{% endif %}>{% trans "Any" %}</option>
+          {% for value, label in statuses %}
+            <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="id_severity" class="form-label">{% trans "Severity" %}</label>
+        <select id="id_severity" name="severity" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          {% for value, label in severities %}
+            <option value="{{ value }}" {% if severity == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="id_case_type" class="form-label">{% trans "Case type" %}</label>
+        <select id="id_case_type" name="case_type" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          {% for value, label in case_types %}
+            <option value="{{ value }}" {% if case_type == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="asc-filters-actions">
+      <button type="submit" class="btn btn-primary">{% include "components/icon.html" with name="filter" %}<span>{% trans "Apply filters" %}</span></button>
+      <a class="btn btn-outline-secondary" href="{% url 'entry:reconciliation-queue' event.pk %}">{% trans "Clear filters" %}</a>
+    </div>
+  </form>
+
+  <section class="asc-card asc-card-flush" aria-labelledby="recon-results-heading">
+    <div class="asc-card-toolbar">
+      <h2 class="asc-card-toolbar-title" id="recon-results-heading">{% trans "Reconciliation cases matching the current filters" %}</h2>
+      <span class="asc-count">{% blocktrans count counter=page.paginator.count %}{{ counter }} case{% plural %}{{ counter }} cases{% endblocktrans %}</span>
+    </div>
+    {% if page.object_list %}
+      <div class="asc-table-wrap asc-wide-only">
+        <table class="asc-table" aria-label="{% trans 'Reconciliation cases' %}">
+          <thead>
+            <tr>
+              <th scope="col">{% trans "Case" %}</th>
+              <th scope="col">{% trans "Case type" %}</th>
+              <th scope="col">{% trans "Severity" %}</th>
+              <th scope="col">{% trans "Status" %}</th>
+              <th scope="col">{% trans "Gate" %}</th>
+              <th scope="col">{% trans "Device" %}</th>
+              <th scope="col">{% trans "Opened" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for case in page %}
+              <tr data-case="{{ case.public_id }}">
+                <th scope="row"><a href="{% url 'entry:reconciliation-case' case.public_id %}"><bdi dir="ltr" class="asc-code">{{ case.public_id|slice:":8" }}</bdi></a></th>
+                <td>{{ case.get_case_type_display }}</td>
+                <td>{% include "entry/_severity_chip.html" with severity=case.severity label=case.get_severity_display %}</td>
+                <td><span class="asc-chip {% if case.status == 'OPEN' %}asc-chip-warning{% else %}asc-chip-success{% endif %}">{{ case.get_status_display }}</span></td>
+                <td><bdi dir="ltr" class="asc-code">{{ case.gate.code }}</bdi></td>
+                <td><bdi>{{ case.device.public_name }}</bdi></td>
+                <td><time datetime="{{ case.opened_at|date:'c' }}">{{ case.opened_at|date:"Y-m-d H:i" }}</time></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <ul class="asc-records asc-narrow-only" aria-label="{% trans 'Reconciliation cases' %}">
+        {% for case in page %}
+          <li class="asc-record" data-record>
+            <div class="asc-record-head">
+              <h3 class="asc-record-title">{{ case.get_case_type_display }}</h3>
+              <p class="asc-record-meta"><bdi dir="ltr" class="asc-code">{{ case.public_id|slice:":8" }}</bdi></p>
+            </div>
+            <dl class="asc-record-fields">
+              <div class="asc-record-wide"><dt>{% trans "Status" %}</dt><dd><span class="asc-chip {% if case.status == 'OPEN' %}asc-chip-warning{% else %}asc-chip-success{% endif %}">{{ case.get_status_display }}</span> {% include "entry/_severity_chip.html" with severity=case.severity label=case.get_severity_display %}</dd></div>
+              <div><dt>{% trans "Gate" %}</dt><dd><bdi dir="ltr" class="asc-code">{{ case.gate.code }}</bdi></dd></div>
+              <div><dt>{% trans "Device" %}</dt><dd><bdi>{{ case.device.public_name }}</bdi></dd></div>
+              <div class="asc-record-wide"><dt>{% trans "Opened" %}</dt><dd><time datetime="{{ case.opened_at|date:'c' }}">{{ case.opened_at|date:"Y-m-d H:i" }}</time></dd></div>
+            </dl>
+            <div class="asc-record-actions">
+              <a class="btn btn-outline-primary" href="{% url 'entry:reconciliation-case' case.public_id %}" data-record-action>{% trans "Open case" %}<span class="visually-hidden"> <bdi dir="ltr">{{ case.public_id|slice:":8" }}</bdi></span></a>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+      <div class="asc-card-foot">
+        {% trans "Queue pages" as pages_label %}
+        {% include "components/pagination.html" with label=pages_label %}
+      </div>
+    {% else %}
+      <div class="asc-empty">
+        <span class="asc-tile">{% include "components/icon.html" with name="inbox" %}</span>
+        <h3>{% trans "No reconciliation case matches the current filters." %}</h3>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% load i18n %}
+{% comment %}
+  Shared 409 conflict state (UI/UX Completion Gate Stage 3): the command was
+  refused because the record changed, or is no longer in a state that
+  accepts it. Nothing was changed by the refused command. The view's own
+  explanation is shown by the shell's flash message above this card (the
+  views call `messages.error`), so it is not repeated here. Parameters:
+  `back_url`, `back_label`.
+{% endcomment %}
+<section class="asc-card asc-form-narrow" aria-labelledby="conflict-title">
+  <div class="asc-card-lead">
+    <span class="asc-tile">{% include "components/icon.html" with name="refresh" %}</span>
+    <div>
+      <p class="asc-kicker">{% trans "Nothing was changed" %}</p>
+      <h1 class="h3 mb-2" id="conflict-title">{% trans "This changed since you loaded it" %}</h1>
+      <p class="mb-0">{% trans "Someone else, or another tab, may have updated this record. Reload it to see its current state before trying again." %}</p>
+    </div>
+  </div>
+  <div class="asc-actions-row">
+    <a href="{{ back_url }}" class="btn btn-primary">{{ back_label }}</a>
+  </div>
+</section>

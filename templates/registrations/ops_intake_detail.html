@@ -1,0 +1,90 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% block title %}{{ registration.public_reference }}{% endblock %}
+{% block breadcrumbs %}{% url 'registrations:ops-intake-list' as list_url %}{% trans "Registration intake" as list_label %}{% include "components/breadcrumb_trail.html" with parent_label=list_label parent_url=list_url current=registration.public_reference current_code=True %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Registration" %}</p>
+      <h1><bdi dir="ltr" class="asc-code">{{ registration.public_reference }}</bdi></h1>
+      <ul class="asc-chip-list mt-2">
+        <li>{% status_chip "registration" registration.public_status registration.get_public_status_display %}</li>
+        <li>{% status_chip "processing" registration.internal_status registration.get_internal_status_display %}</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="asc-detail-grid">
+    <section class="asc-card" aria-labelledby="detail-overview-heading">
+      <h2 class="asc-card-title" id="detail-overview-heading">{% include "components/icon.html" with name="info" %}{% trans "Overview" %}</h2>
+      <dl class="asc-dl">
+        <dt>{% trans "Event edition" %}</dt><dd><bdi>{{ registration.event_edition.name }}</bdi></dd>
+        <dt>{% trans "Applicant status" %}</dt><dd>{{ registration.get_public_status_display }}</dd>
+        <dt>{% trans "Processing state" %}</dt><dd>{{ registration.get_internal_status_display }}</dd>
+        <dt>{% trans "Source" %}</dt><dd>{{ registration.get_source_kind_display }}</dd>
+        <dt>{% trans "Submitted at" %}</dt><dd>{% if registration.submitted_at %}<time datetime="{{ registration.submitted_at|date:'c' }}">{{ registration.submitted_at }}</time>{% else %}—{% endif %}</dd>
+      </dl>
+    </section>
+
+    {% with profile=registration.profile %}
+      {% if profile %}
+        <section class="asc-card" aria-labelledby="detail-identity-heading">
+          <h2 class="asc-card-title" id="detail-identity-heading">{% include "components/icon.html" with name="user" %}{% trans "Identity" %}</h2>
+          <dl class="asc-dl">
+            <dt>{% trans "Name" %}</dt><dd><bdi>{{ profile.submitted_full_name }}</bdi></dd>
+            <dt>{% trans "Nationality" %}</dt><dd><bdi>{{ profile.nationality_code.localized_name|default:profile.nationality_code_id }}</bdi></dd>
+          </dl>
+        </section>
+      {% endif %}
+    {% endwith %}
+
+    {% if can_grant_nin_exemption %}
+      {# IDV-Q3: the NIN exemption route for one Algerian draft (people.grant_nin_exemption, exact scope). #}
+      <section class="asc-card" aria-labelledby="detail-nin-exemption-heading" data-nin-exemption-panel>
+        <h2 class="asc-card-title" id="detail-nin-exemption-heading">{% include "components/icon.html" with name="id-card" %}{% trans "Algerian participant without a usable NIN" %}</h2>
+        <p class="asc-section-lead">{% trans "Lets this draft complete the identity step with an Algerian identity card or passport instead of a NIN. No NIN is created and no ministry check runs; the identity is verified manually from the document." %}</p>
+        {% if nin_exemption %}
+          <dl class="asc-dl" data-nin-exemption-status="{{ nin_exemption.status }}">
+            <dt>{% trans "Exemption" %}</dt><dd>{{ nin_exemption.get_status_display }}</dd>
+            <dt>{% trans "Reason" %}</dt><dd>{{ nin_exemption.get_reason_code_display }}</dd>
+            <dt>{% trans "Granted by" %}</dt><dd><bdi>{{ nin_exemption.granted_by.display_name|default:nin_exemption.granted_by.email_normalized }}</bdi> · <time datetime="{{ nin_exemption.granted_at|date:'c' }}">{{ nin_exemption.granted_at }}</time></dd>
+            {% if nin_exemption.revoked_at %}<dt>{% trans "Revoked" %}</dt><dd><time datetime="{{ nin_exemption.revoked_at|date:'c' }}">{{ nin_exemption.revoked_at }}</time></dd>{% endif %}
+          </dl>
+        {% endif %}
+        {% if nin_exemption_revoke_form %}
+          <form method="post" action="{% url 'identity:nin-exemption-revoke' pk=registration.pk %}" data-nin-exemption-form="revoke">
+            {% csrf_token %}
+            {{ nin_exemption_revoke_form.expected_version }}
+            {% include "components/field.html" with field=nin_exemption_revoke_form.note %}
+            <button type="submit" class="btn btn-outline-danger">{% trans "Revoke the exemption" %}</button>
+          </form>
+        {% elif nin_exemption_grantable %}
+          <form method="post" action="{% url 'identity:nin-exemption-grant' pk=registration.pk %}" data-nin-exemption-form="grant"
+                data-confirm-title="{% trans 'Grant a NIN exemption for this draft?' %}"
+                data-confirm="{% trans 'Only this registration can then be completed without a NIN. The identity will be verified manually from the document the participant declares.' %}"
+                data-confirm-action="{% trans 'Grant the exemption' %}" data-confirm-tone="primary">
+            {% csrf_token %}
+            {% include "components/field.html" with field=nin_exemption_grant_form.reason_code %}
+            {% include "components/field.html" with field=nin_exemption_grant_form.explanation %}
+            {% include "components/field.html" with field=nin_exemption_grant_form.confirmed %}
+            <button type="submit" class="btn btn-outline-primary">{% trans "Grant the exemption" %}</button>
+          </form>
+        {% elif not nin_exemption %}
+          <p class="mb-0 asc-muted" data-nin-exemption-unavailable>{% trans "Available only for a draft registration of an Algerian national." %}</p>
+        {% endif %}
+      </section>
+    {% endif %}
+
+    {% with affiliation=registration.professional_affiliation %}
+      {% if affiliation %}
+        <section class="asc-card" aria-labelledby="detail-professional-heading">
+          <h2 class="asc-card-title" id="detail-professional-heading">{% include "components/icon.html" with name="building" %}{% trans "Professional information" %}</h2>
+          <dl class="asc-dl">
+            <dt>{% trans "Professional Organization" %}</dt><dd><bdi>{{ affiliation.submitted_organization_name }}</bdi></dd>
+            <dt>{% trans "Job title" %}</dt><dd><bdi>{{ affiliation.job_title }}</bdi></dd>
+          </dl>
+        </section>
+      {% endif %}
+    {% endwith %}
+  </div>
+{% endblock %}

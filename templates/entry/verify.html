@@ -1,0 +1,212 @@
+{% extends "layouts/base_entry.html" %}
+{% load i18n static %}
+{% block title %}{% trans "Verify entry" %}{% endblock %}
+{% block content %}
+{% comment %}
+  Verification screen (UI/UX §9.4, §14.2 "QR Scanner" / "Identity Search").
+  Lookup priority is the approved order (Flow §10.4): the QR scanner is the
+  primary action; identity-reference, registration-reference and manual
+  search are secondary and appear only when BOTH the device scope and the
+  operator's permissions at this gate allow them.
+{% endcomment %}
+
+<div class="asc-banner-region" id="entry-banners">
+  {% if throttle_notice %}
+    <div class="asc-notice asc-notice-danger" role="alert" id="entry-throttled">
+      {% include "components/icon.html" with name="lock" %}
+      <p><strong>{% trans "Lookups paused" %}</strong>{{ throttle_notice }}</p>
+    </div>
+  {% endif %}
+  {% if degraded_notice %}
+    <div class="asc-notice asc-notice-warning" role="status" id="entry-degraded-server">
+      {% include "components/icon.html" with name="alert-triangle" %}
+      <p><strong>{% trans "Verification is slower than usual" %}</strong>{{ degraded_notice }}</p>
+    </div>
+  {% endif %}
+  {# Shown by static/js/entry.js only; hidden while the connection is healthy. #}
+  <div class="asc-notice asc-notice-danger" role="alert" id="entry-offline-banner" hidden>
+    {% include "components/icon.html" with name="cloud-off" %}
+    <p><strong>{% trans "Connection lost — verification is unavailable" %}</strong>{% trans "Do not admit anyone on the basis of a physical badge alone. Keep this page open; it reconnects automatically. If the outage continues, call your supervisor and follow the continuity procedure." %}{% if checkpoint.device.status == "OFFLINE_READY" %} <a href="{% url 'entry:offline-shell' %}" id="entry-offline-link">{% trans "This device is prepared: continue on the offline verification page." %}</a>{% endif %}</p>
+  </div>
+  <div class="asc-notice asc-notice-warning" role="status" id="entry-degraded-banner" hidden>
+    {% include "components/icon.html" with name="alert-triangle" %}
+    <p><strong>{% trans "Connection unstable" %}</strong>{% trans "Results may take longer. If a verification fails, verify again before deciding." %}</p>
+  </div>
+  <div class="asc-notice asc-notice-danger" role="alert" id="entry-session-banner" hidden>
+    {% include "components/icon.html" with name="lock" %}
+    <p><strong>{% trans "Your checkpoint session has ended" %}</strong>{% trans "Sign in and set up the checkpoint again before verifying." %} <a href="{% url 'entry:home' %}">{% trans "Go to checkpoint set-up" %}</a></p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <section class="asc-card" aria-labelledby="page-title" id="scan">
+      <div class="asc-card-lead">
+        <span class="asc-tile">{% include "components/icon.html" with name="qr" %}</span>
+        <div>
+          <h1 id="page-title" class="h3 mb-1">{% trans "Verify entry" %}</h1>
+          <p class="text-body-secondary mb-0">{% trans "Scan the participant's Digital Entry Pass. A connected scanner types the code and submits it for you." %}</p>
+        </div>
+      </div>
+
+      {% if qr_form %}
+        {% if active_form == "qr" %}{% include "components/error_summary.html" with form=qr_form values_not_kept=True %}{% endif %}
+        <form method="post" action="{% url 'entry:verify-qr' %}" novalidate data-entry-scan-form>
+          {% csrf_token %}
+          <label class="form-label fs-5" for="{{ qr_form.token.id_for_label }}">{{ qr_form.token.label }}</label>
+          <div class="asc-scan-field">
+            {% include "components/icon.html" with name="qr" %}
+            {{ qr_form.token }}
+          </div>
+          {% if qr_form.token.errors %}
+            <div id="id_token_error" class="asc-field-error">
+              {% include "components/icon.html" with name="alert-octagon" size="sm" %}
+              <span>{% for error in qr_form.token.errors %}{{ error }}{% endfor %}</span>
+            </div>
+          {% endif %}
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-2">
+            <span class="asc-scan-status" data-scan-status data-ready="true"
+                  data-text-ready="{% trans 'Ready for the scanner' %}"
+                  data-text-idle="{% trans 'Scanner paused — select the field or start scanning' %}">
+              <span class="asc-scan-status-dot" aria-hidden="true"></span>
+              <span data-scan-status-text>{% trans "Ready for the scanner" %}</span>
+            </span>
+            <span class="text-body-secondary small">{% blocktrans trimmed %}Press <kbd>Enter</kbd> to verify a typed code.{% endblocktrans %}</span>
+          </div>
+          <button type="submit" class="btn btn-primary asc-btn-xl asc-btn-block mt-3" data-entry-submit>
+            {% include "components/icon.html" with name="check-circle" %}
+            <span>{% trans "Verify QR" %}</span>
+          </button>
+        </form>
+      {% elif not lookup_tabs %}
+        <div class="asc-empty" id="entry-no-method">
+          <span class="asc-tile">{% include "components/icon.html" with name="lock" %}</span>
+          <h2>{% trans "No verification method is available to you here" %}</h2>
+          <p>{% trans "This device's scope and your permissions at this gate do not allow any lookup. Ask your supervisor or the device administrator to check your assignment." %}</p>
+        </div>
+      {% else %}
+        <div class="asc-notice asc-notice-neutral" role="status">
+          {% include "components/icon.html" with name="info" %}
+          <p>{% trans "QR scanning is not enabled for you at this checkpoint. Use one of the approved lookup methods below." %}</p>
+        </div>
+      {% endif %}
+    </section>
+
+    {% if lookup_tabs %}
+      <section class="asc-card" aria-labelledby="lookup-heading" id="other-methods">
+        <h2 class="asc-card-title" id="lookup-heading">
+          {% include "components/icon.html" with name="search" %}
+          {% trans "Other verification methods" %}
+        </h2>
+        <p class="text-body-secondary">{% trans "Use these only when the QR code cannot be scanned. Every lookup is recorded, and repeated lookups are limited." %}</p>
+
+        <ul class="nav asc-tabs" role="tablist">
+          {% for tab in lookup_tabs %}
+            <li class="nav-item" role="presentation">
+              <button class="nav-link{% if tab.key == active_tab %} active{% endif %}" id="tab-{{ tab.key }}" type="button" role="tab"
+                      data-bs-toggle="pill" data-bs-target="#pane-{{ tab.key }}" aria-controls="pane-{{ tab.key }}"
+                      aria-selected="{% if tab.key == active_tab %}true{% else %}false{% endif %}"{% if tab.key != active_tab %} tabindex="-1"{% endif %}>
+                {% include "components/icon.html" with name=tab.icon %}
+                <span>{{ tab.label }}</span>
+              </button>
+            </li>
+          {% endfor %}
+        </ul>
+
+        <div class="tab-content">
+          {% if identity_form %}
+            <div class="tab-pane fade{% if active_tab == 'identity' %} show active{% endif %}" id="pane-identity" role="tabpanel" aria-labelledby="tab-identity" tabindex="0">
+              {% if active_form == "identity" %}{% include "components/error_summary.html" with form=identity_form values_not_kept=True %}{% endif %}
+              <form method="post" action="{% url 'entry:lookup-identity' %}" novalidate>
+                {% csrf_token %}
+                <div class="row g-3">
+                  <div class="col-12 col-md-4">{% include "components/field.html" with field=identity_form.method wrapper_class="" %}</div>
+                  <div class="col-12 col-md-8">{% include "components/field.html" with field=identity_form.value wrapper_class="" %}</div>
+                  <div class="col-12 col-md-8">{% include "components/field.html" with field=identity_form.country_code wrapper_class="" %}</div>
+                  <div class="col-12 col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-outline-primary asc-btn-xl asc-btn-block">
+                      {% include "components/icon.html" with name="search" %}<span>{% trans "Look up" %}</span>
+                    </button>
+                  </div>
+                </div>
+                <p class="form-text mt-2 mb-0">{% trans "Matched by a protected index only; the number is never stored or shown." %}</p>
+              </form>
+            </div>
+          {% endif %}
+          {% if reference_form %}
+            <div class="tab-pane fade{% if active_tab == 'reference' %} show active{% endif %}" id="pane-reference" role="tabpanel" aria-labelledby="tab-reference" tabindex="0">
+              {% if active_form == "reference" %}{% include "components/error_summary.html" with form=reference_form values_not_kept=True %}{% endif %}
+              <form method="post" action="{% url 'entry:lookup-reference' %}" novalidate>
+                {% csrf_token %}
+                <div class="row g-3 align-items-end">
+                  <div class="col-12 col-md-8">{% include "components/field.html" with field=reference_form.reference wrapper_class="" %}</div>
+                  <div class="col-12 col-md-4">
+                    <button type="submit" class="btn btn-outline-primary asc-btn-xl asc-btn-block">
+                      {% include "components/icon.html" with name="search" %}<span>{% trans "Look up" %}</span>
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          {% endif %}
+          {% if manual_form %}
+            <div class="tab-pane fade{% if active_tab == 'manual' %} show active{% endif %}" id="pane-manual" role="tabpanel" aria-labelledby="tab-manual" tabindex="0">
+              {% if active_form == "manual" %}{% include "components/error_summary.html" with form=manual_form values_not_kept=True %}{% endif %}
+              <form method="post" action="{% url 'entry:lookup-manual' %}" novalidate>
+                {% csrf_token %}
+                <div class="row g-3 align-items-end">
+                  <div class="col-12 col-md-8">{% include "components/field.html" with field=manual_form.query wrapper_class="" %}</div>
+                  <div class="col-12 col-md-4">
+                    <button type="submit" class="btn btn-outline-secondary asc-btn-xl asc-btn-block">
+                      {% include "components/icon.html" with name="search" %}<span>{% trans "Search" %}</span>
+                    </button>
+                  </div>
+                </div>
+                <p class="form-text mt-2 mb-0">{% blocktrans trimmed with minimum=manual_search_min_chars maximum=manual_search_max_results %}Searches this event only, needs at least {{ minimum }} characters, and returns at most {{ maximum }} candidates.{% endblocktrans %}</p>
+              </form>
+            </div>
+          {% endif %}
+        </div>
+      </section>
+    {% endif %}
+  </div>
+
+  <aside class="col-lg-4" aria-label="{% trans 'Checkpoint information' %}">
+    <section class="asc-card" aria-labelledby="connection-heading">
+      <h2 class="asc-card-title" id="connection-heading">{% include "components/icon.html" with name="online" %}{% trans "Connection" %}</h2>
+      <dl class="asc-dl asc-dl-stacked">
+        <dt>{% trans "Mode" %}</dt>
+        <dd>{% trans "Online verification" %}</dd>
+        <dt>{% trans "Offline verification" %}</dt>
+        <dd>
+          {% if checkpoint.device.status == "OFFLINE_READY" %}
+            <span class="asc-chip asc-chip-success" data-offline-ready>{% include "components/icon.html" with name="check-circle" size="sm" %}{% trans "Prepared" %}</span>
+            <span class="d-block fw-normal text-body-secondary small mt-1">{% trans "If the connection is lost, continue on the offline verification page: signed QR passes only, recorded on this device until they are uploaded." %} <a href="{% url 'entry:offline-shell' %}">{% trans "Offline verification" %}</a></span>
+          {% else %}
+            <span class="asc-chip">{% include "components/icon.html" with name="lock" size="sm" %}{% trans "Not enabled" %}</span>
+            <span class="d-block fw-normal text-body-secondary small mt-1">{% trans "Offline continuity (Plan B) is not active on this device. Without a connection, do not verify; follow the continuity procedure." %}</span>
+          {% endif %}
+        </dd>
+      </dl>
+    </section>
+    <section class="asc-card" aria-labelledby="session-heading">
+      <h2 class="asc-card-title" id="session-heading">{% include "components/icon.html" with name="clock" %}{% trans "Your session" %}</h2>
+      <dl class="asc-dl asc-dl-stacked">
+        <dt>{% trans "Operator" %}</dt>
+        <dd><bdi>{{ checkpoint.user.display_name }}</bdi></dd>
+        <dt>{% trans "Session ends at the latest" %}</dt>
+        <dd><time datetime="{{ checkpoint.operator_session.expires_at|date:'c' }}">{{ checkpoint.operator_session.expires_at|time:"H:i" }}</time></dd>
+      </dl>
+      <p class="small text-body-secondary mb-0">{% blocktrans trimmed count minutes=inactivity_minutes %}The session also ends after {{ minutes }} minute without activity.{% plural %}The session also ends after {{ minutes }} minutes without activity.{% endblocktrans %}</p>
+    </section>
+    <section class="asc-card" aria-labelledby="rule-heading">
+      <h2 class="asc-card-title" id="rule-heading">{% include "components/icon.html" with name="shield" %}{% trans "Before you admit" %}</h2>
+      <ul class="asc-steps small">
+        <li>{% trans "A generic physical badge alone is not proof of identity." %}</li>
+        <li>{% trans "Always verify a Digital Entry Pass or an approved identity reference." %}</li>
+        <li>{% trans "If a result is unclear, send the person to the review desk." %}</li>
+      </ul>
+    </section>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+[project]
+name = "asc2026-registration-platform"
+version = "0.1.0"
+description = "ASC 2026 Registration Platform - web registration, accreditation, badge, entry and event-operations platform"
+requires-python = ">=3.14,<3.15"
+dependencies = [
+  # Framework
+  "django>=5.2.17,<5.3",
+  # Native PostgreSQL 17.11 driver (binary build; verified against cp314 win_amd64 wheel)
+  "psycopg[binary]>=3.3.6,<4",
+  # Cache / Celery broker client. Configured for staging and production only;
+  # not exercised locally (Phase 1 runs Celery in eager mode, no broker). See
+  # docs/architecture/ADR-0009-redis-celery-local-boundary.md
+  "redis>=8.1.0,<9",
+  # Outbox consumption and message dispatch. Eager execution locally; no
+  # local worker process is started. See ADR-0009.
+  "celery>=5.6.3,<6",
+  # Field encryption, versioned HMAC blind indexes, advisory-lock key
+  # derivation (Phase 1 CP 3h / §5.5 of the accepted plan).
+  "cryptography>=50.0.1,<51",
+  # S3-compatible private object storage interface. Declared and configured
+  # for staging/production selection only; never exercised locally, where
+  # PrivateFileSystemStorage is used instead. See ADR-0013.
+  "django-storages[s3]>=1.14.6,<2",
+  "boto3>=1.43.98,<2",
+  # Profile-photograph validation and normalization (Prompt 4).
+  "pillow>=12.3.0,<13",
+  # E.164 phone validation, wrapped by a project-owned form field (Prompt 4).
+  "phonenumbers>=9.0.39,<10",
+  # Reviewed JOSE implementation for Compact JWS parsing and ES256 public-key
+  # verification of Digital Entry Pass QR credentials (Phase 3 Prompt 2,
+  # ADR-0019). Verification only: private signing keys never leave the opaque
+  # SigningKeyProvider, so signing uses a minimal project-owned assembly
+  # adapter that implements no cryptographic primitive. Depends only on
+  # `cryptography`, already approved above.
+  "joserfc>=1.7.5,<2",
+  # Pure-Python QR encoder (no native build, no external service) for the
+  # participant Digital Entry Pass QR image endpoint (Phase 3 Prompt 2
+  # correction pass). Zero transitive dependencies; rendering happens
+  # server-side in memory and the token never enters a URL.
+  "segno>=1.6.6,<2",
+  # Device API boundary only (Phase 4 Prompt 2, binding decision P2-A;
+  # TRD §6.1 / §15.1 / ADR-003: "DRF only at device/external boundaries").
+  # Server-rendered HTML views stay ordinary Django views. No schema-
+  # generation dependency: the OpenAPI document is hand-maintained and
+  # contract-tested (docs/api/entry_device_api_v1.openapi.json).
+  "djangorestframework>=3.16.1,<4",
+  # Self-hosted ALTCHA proof-of-work challenges and LOCAL HMAC verification
+  # for the OTP-request human check (UX-C2, owner decision UX-D01 option M).
+  # MIT, no required dependency. Its remote Sentinel helper (`verify_server`)
+  # is never called; no ALTCHA Cloud or other external service is used.
+  "altcha>=2.1.0,<2.2",
+  "waitress>=3.0.2,<4",
+]
+
+[dependency-groups]
+dev = [
+  "ruff>=0.16.8,<0.17",
+  "pytest>=9.1.1,<10",
+  "pytest-django>=4.14.0,<5",
+  "pytest-playwright>=0.9.0,<0.10",
+  "playwright>=1.63.0,<2",
+  "pip-audit>=2.10.1,<3",
+  # TEST-ONLY QR decoder, used solely to prove an encode/decode round trip:
+  # the rendered graphic must decode back to the exact issued compact JWS.
+  # Never imported by application code.
+  "pyzbar>=0.1.9,<0.2",
+]
+
+# mypy, django-stubs and pytest-cov are deliberately NOT included.
+# Deferred per the accepted Phase 1 plan (§5.2): approved dependencies are
+# limited to what Prompt 2 literally authorizes plus pip-audit.
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+extend-exclude = [
+  "static/vendor",
+  "tests/assets/vendor",
+  "var",
+  "staticfiles",
+]
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle errors
+  "F",   # pyflakes
+  "W",   # pycodestyle warnings
+  "I",   # isort
+  "UP",  # pyupgrade
+  "B",   # bugbear
+  "DJ",  # flake8-django
+  "S",   # bandit (security)
+]
+ignore = [
+  "S101", # assert is fine in tests and internal invariants
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106"]
+"scripts/**" = ["S603", "S607"]
+# Environment settings modules deliberately re-export everything from
+# base.py with `from .base import *`, which is the standard Django
+# multi-settings pattern (accepted plan §5 environment matrix). F403/F405
+# are expected and safe here: every name is defined in base.py, reviewed
+# together with the module that uses it.
+"config/settings/local.py" = ["F403", "F405"]
+"config/settings/test.py" = ["F403", "F405"]
+"config/settings/staging.py" = ["F403", "F405"]
+"config/settings/production.py" = ["F403", "F405"]
+"config/settings/_deployment.py" = ["F403", "F405"]
+"config/settings/staging_migration.py" = ["F403", "F405"]
+"config/settings/production_migration.py" = ["F403", "F405"]
+# Django-generated migration files reproduce Django's own field help_text
+# verbatim (e.g. PermissionsMixin's is_superuser/groups/user_permissions),
+# which exceeds this project's 100-column limit; migrations are otherwise
+# reviewed for correctness, not house style.
+"**/migrations/*.py" = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+python_files = ["test_*.py", "*_test.py"]
+# Per-app unit tests live in apps/<name>/tests/ (TRD §13.2 internal layer
+# convention). Cross-cutting suites (foundation, integration, concurrency,
+# browser) live in the top-level tests/ tree (accepted plan §4).
+testpaths = ["apps", "tests"]
+addopts = "--strict-markers"
+markers = [
+  "concurrency: real multi-connection PostgreSQL concurrency tests (not Redis integration)",
+  "foundation: Prompt 2 checks that require no project database migration",
+  "performance: provisional online-verification load harness (Phase 3 Prompt 5, synthetic data)",
+]

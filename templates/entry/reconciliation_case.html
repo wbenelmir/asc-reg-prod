@@ -1,0 +1,135 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% block title %}{{ case_type_label }}{% endblock %}
+{% comment %}
+  One reconciliation case (Phase 4 Prompt 3, Schema §11.7, Flow §11.8): what
+  the device knew, what the server knew and what physically happened, kept
+  apart; every linked synchronized operation; the append-only supervisor
+  actions. Closing a case records a note; it never edits the Entry Event.
+  Participant data is the checkpoint minimum (display name, registration
+  reference). Notes are shown to authorized supervisors of this scope only.
+{% endcomment %}
+
+{% block breadcrumbs %}
+  <nav aria-label="{% trans 'Breadcrumb' %}" class="asc-breadcrumbs">
+    <ol>
+      <li><a href="{% url 'entry:reconciliation-queue' case.event_edition_id %}">{% trans "Offline reconciliation" %}</a>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><span aria-current="page"><bdi dir="ltr" class="asc-code">{{ case.public_id|slice:":8" }}</bdi></span></li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="asc-page-head">
+    <h1>{{ case_type_label }}</h1>
+    <p>
+      <span class="asc-chip {% if case.status == 'OPEN' %}asc-chip-warning{% else %}asc-chip-success{% endif %}" data-case-status="{{ case.status }}">{{ case.get_status_display }}</span>
+      {% include "entry/_severity_chip.html" with severity=case.severity label=severity_label %}
+      <span class="text-body-secondary">{% trans "Opened" %} <time datetime="{{ case.opened_at|date:'c' }}">{{ case.opened_at|date:"Y-m-d H:i:s" }}</time></span>
+    </p>
+  </div>
+
+  {% if case.entry_event and case.entry_event.offline_conflict %}
+    <div class="asc-notice asc-notice-warning" role="status" id="case-conflict-notice">
+      {% include "components/icon.html" with name="alert-triangle" %}
+      <p><strong>{% trans "Offline — conflict" %}</strong>{% trans "The device recorded this admission while disconnected. It is kept as recorded and is never shown as a normal admission." %}</p>
+    </div>
+  {% elif case.severity == "SECURITY" and not case.entry_event %}
+    <div class="asc-notice asc-notice-danger" role="status" id="case-security-notice">
+      {% include "components/icon.html" with name="alert-octagon" %}
+      <p><strong>{% trans "Not applied" %}</strong>{% trans "The device should never have recorded this. No Entry Event was created; the upload is kept as evidence." %}</p>
+    </div>
+  {% endif %}
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <section class="asc-card" aria-labelledby="fact-heading">
+        <h2 class="asc-card-title" id="fact-heading">{% include "components/icon.html" with name="gate" %}{% trans "What happened" %}</h2>
+        <dl class="asc-dl">
+          <dt>{% trans "Gate" %}</dt><dd><bdi>{{ case.gate.localized_name }}</bdi> <bdi dir="ltr" class="asc-chip asc-chip-outline asc-code ms-1">{{ case.gate.code }}</bdi></dd>
+          <dt>{% trans "Device" %}</dt><dd><bdi>{{ case.device.public_name }}</bdi></dd>
+          {% if operator %}<dt>{% trans "Operator" %}</dt><dd><bdi>{{ operator }}</bdi></dd>{% endif %}
+          {% if participant %}
+            <dt>{% trans "Participant" %}</dt><dd><bdi>{{ participant.display_name }}</bdi> <bdi dir="ltr" class="asc-code ms-1">{{ participant.registration_reference }}</bdi></dd>
+          {% endif %}
+          {% for label, value, is_time in fact_rows %}
+            <dt>{{ label }}</dt><dd>{% if is_time %}<time datetime="{{ value|date:'c' }}">{{ value|date:"Y-m-d H:i:s" }}</time>{% else %}<bdi dir="ltr" class="asc-code">{{ value }}</bdi>{% endif %}</dd>
+          {% endfor %}
+        </dl>
+      </section>
+      <div class="row g-4">
+        <div class="col-md-6">
+          <section class="asc-card h-100" aria-labelledby="device-known-heading" data-known="device">
+            <h2 class="asc-card-title" id="device-known-heading">{% include "components/icon.html" with name="tablet" %}{% trans "What the device knew" %}</h2>
+            <dl class="asc-dl asc-dl-stacked mb-0">
+              {% for label, value, is_time in device_rows %}
+                <dt>{{ label }}</dt><dd>{% if is_time %}<time datetime="{{ value|date:'c' }}">{{ value|date:"Y-m-d H:i:s" }}</time>{% else %}<bdi>{{ value }}</bdi>{% endif %}</dd>
+              {% empty %}
+                <dd>{% trans "Nothing was recorded." %}</dd>
+              {% endfor %}
+            </dl>
+          </section>
+        </div>
+        <div class="col-md-6">
+          <section class="asc-card h-100" aria-labelledby="server-known-heading" data-known="server">
+            <h2 class="asc-card-title" id="server-known-heading">{% include "components/icon.html" with name="shield" %}{% trans "What the server knew" %}</h2>
+            <dl class="asc-dl asc-dl-stacked mb-0">
+              {% for label, value, is_time in server_rows %}
+                <dt>{{ label }}</dt><dd>{% if is_time %}<time datetime="{{ value|date:'c' }}">{{ value|date:"Y-m-d H:i:s" }}</time>{% else %}<bdi>{{ value }}</bdi>{% endif %}</dd>
+              {% empty %}
+                <dd>{% trans "Nothing was recorded." %}</dd>
+              {% endfor %}
+            </dl>
+          </section>
+        </div>
+      </div>
+      <section class="asc-card" aria-labelledby="operations-heading">
+        <h2 class="asc-card-title" id="operations-heading">{% include "components/icon.html" with name="list" %}{% trans "Synchronized operations" %}</h2>
+        <ul class="list-unstyled d-grid gap-2 mb-0">
+          {% for link in links %}
+            <li data-operation="{{ link.public_id }}">
+              <bdi dir="ltr" class="asc-code">#{{ link.sequence }}</bdi> — {{ link.status }}
+              {% if link.outcome %}<bdi dir="ltr" class="asc-code ms-1">{{ link.outcome }}</bdi>{% endif %}
+              <span class="d-block small text-body-secondary">{% trans "Occurred" %} <time datetime="{{ link.occurred_at|date:'c' }}">{{ link.occurred_at|date:"Y-m-d H:i:s"|default:"—" }}</time> · {% trans "Received" %} <time datetime="{{ link.received_at|date:'c' }}">{{ link.received_at|date:"Y-m-d H:i:s" }}</time>{% if link.duplicates %} · {% blocktrans count counter=link.duplicates %}{{ counter }} duplicate upload{% plural %}{{ counter }} duplicate uploads{% endblocktrans %}{% endif %}</span>
+            </li>
+          {% empty %}
+            <li class="text-body-secondary">{% trans "The upload could not be stored as an operation; its digest is recorded in this case." %}</li>
+          {% endfor %}
+        </ul>
+      </section>
+    </div>
+
+    <div class="col-lg-5">
+      <section class="asc-card" aria-labelledby="actions-heading">
+        <h2 class="asc-card-title" id="actions-heading">{% include "components/icon.html" with name="user-check" %}{% trans "Supervisor review" %}</h2>
+        <ol class="list-unstyled d-grid gap-3 mb-3" id="case-actions">
+          {% for action in actions %}
+            <li data-action="{{ action.action }}">
+              <span class="fw-semibold">{{ action.get_action_display }}</span> — <bdi>{{ action.actor.display_name }}</bdi>, <time datetime="{{ action.created_at|date:'c' }}">{{ action.created_at|date:"Y-m-d H:i" }}</time>
+              <span class="d-block"><bdi>{{ action.note_encrypted }}</bdi></span>
+            </li>
+          {% empty %}
+            <li class="text-body-secondary">{% trans "No review recorded yet." %}</li>
+          {% endfor %}
+        </ol>
+        {% if case.status == "OPEN" %}
+          <form method="post" action="{% url 'entry:reconciliation-action' case.public_id %}" novalidate>
+            {% csrf_token %}
+            {{ form.expected_version }}
+            <fieldset class="mb-3">
+              <legend class="form-label">{% trans "Action" %}</legend>
+              {% for choice in form.action %}
+                <div class="form-check">{{ choice.tag }}<label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label></div>
+              {% endfor %}
+            </fieldset>
+            {% include "components/field.html" with field=form.note %}
+            <p class="small text-body-secondary">{% trans "Closing a case records your review. The Entry Event and the synchronized operation stay exactly as recorded." %}</p>
+            <button type="submit" class="btn btn-primary"><span>{% trans "Record the review" %}</span></button>
+          </form>
+        {% else %}
+          <p class="mb-0">{% blocktrans with name=case.closed_by.display_name %}Closed by <bdi>{{ name }}</bdi>.{% endblocktrans %} <time datetime="{{ case.closed_at|date:'c' }}">{{ case.closed_at|date:"Y-m-d H:i" }}</time></p>
+        {% endif %}
+      </section>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "layouts/base_workspace.html" %}
+{% load i18n %}
+{% block title %}{% trans "Registration is not currently open" %}{% endblock %}
+{% block main_attrs %} hx-boost="true"{% endblock %}
+{% block content %}
+  <div class="asc-narrow">
+    <div class="asc-card asc-empty">
+      <span class="asc-tile">{% include "components/icon.html" with name="clock" %}</span>
+      <h1 class="h3">{% trans "Registration is not currently open" %}</h1>
+      <p>{% trans "There is no event edition open for registration right now. Please check back later." %}</p>
+      <a href="{% url 'registrations:workspace' %}" class="btn btn-outline-secondary mt-2">{% trans "Go to my registrations" %}</a>
+    </div>
+  </div>
+{% endblock %}

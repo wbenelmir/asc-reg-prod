@@ -1,0 +1,116 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% blocktrans with seq=information_request.sequence %}Information Request #{{ seq }}{% endblocktrans %}{% endblock %}
+{% block breadcrumbs %}{% url 'reviews:queue-list' as queue_url %}{% trans "Review queue" as queue_label %}{% blocktrans asvar current with seq=information_request.sequence %}Information Request #{{ seq }}{% endblocktrans %}{% if information_request.review_case_id %}{% url 'reviews:case-detail' pk=information_request.review_case_id as case_url %}{% include "components/breadcrumb_trail.html" with parent_label=queue_label parent_url=queue_url parent2_label=information_request.registration.public_reference parent2_url=case_url current=current %}{% else %}{% include "components/breadcrumb_trail.html" with parent_label=queue_label parent_url=queue_url current=current %}{% endif %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Additional Information Requests" %} · <bdi dir="ltr" class="asc-code">{{ information_request.registration.public_reference }}</bdi></p>
+      <h1>{% blocktrans with seq=information_request.sequence %}Information Request #{{ seq }}{% endblocktrans %}</h1>
+      <ul class="asc-chip-list mt-2" aria-label="{% trans 'Current status' %}">
+        <li>{% status_chip "information_request" information_request.status information_request.get_status_display %}</li>
+      </ul>
+    </div>
+  </div>
+
+  {% if response %}
+    <div class="asc-notice asc-notice-success mb-3" role="status">
+      {% include "components/icon.html" with name="inbox" %}
+      <p><strong>{% trans "A response has been submitted." %}</strong>{% if response.submitted_at %}<time datetime="{{ response.submitted_at|date:'c' }}">{{ response.submitted_at }}</time>{% endif %}</p>
+    </div>
+  {% endif %}
+
+  <div class="asc-detail-layout">
+    <div class="asc-detail-main">
+      <section class="asc-card" aria-labelledby="request-summary-heading">
+        <h2 class="asc-card-title" id="request-summary-heading">{% include "components/icon.html" with name="info" %}{% trans "Request" %}</h2>
+        <dl class="asc-dl">
+          <dt>{% trans "Status" %}</dt><dd>{{ information_request.get_status_display }}</dd>
+          <dt>{% trans "Purpose" %}</dt><dd>{{ information_request.get_purpose_display }}</dd>
+          {% if information_request.deadline_at %}<dt>{% trans "Deadline" %}</dt><dd><time datetime="{{ information_request.deadline_at|date:'c' }}">{{ information_request.deadline_at }}</time></dd>{% endif %}
+          {% if information_request.sent_at %}<dt>{% trans "Sent" %}</dt><dd><time datetime="{{ information_request.sent_at|date:'c' }}">{{ information_request.sent_at }}</time></dd>{% endif %}
+          {% if information_request.cancellation_reason %}<dt>{% trans "Cancellation reason" %}</dt><dd><bdi>{{ information_request.cancellation_reason }}</bdi></dd>{% endif %}
+        </dl>
+      </section>
+
+      <section class="asc-card" aria-labelledby="request-message-heading">
+        <h2 class="asc-card-title" id="request-message-heading">{% include "components/icon.html" with name="mail" %}{% trans "Message to the participant" %}</h2>
+        <dl class="asc-dl asc-dl-stacked">
+          <dt>{% trans "Message (English)" %}</dt><dd lang="en" dir="ltr">{{ information_request.message_en }}</dd>
+          {% if information_request.message_fr %}<dt>{% trans "Message (French)" %}</dt><dd lang="fr" dir="ltr">{{ information_request.message_fr }}</dd>{% endif %}
+          {% if information_request.message_ar %}<dt>{% trans "Message (Arabic)" %}</dt><dd lang="ar" dir="rtl">{{ information_request.message_ar }}</dd>{% endif %}
+        </dl>
+      </section>
+
+      <section class="asc-card asc-card-flush" aria-labelledby="request-items-heading">
+        <div class="asc-card-toolbar">
+          <h2 class="asc-card-toolbar-title" id="request-items-heading">{% trans "Requested items" %}</h2>
+          <span class="asc-count">{% blocktrans count counter=items|length %}{{ counter }} item{% plural %}{{ counter }} items{% endblocktrans %}</span>
+        </div>
+        <ul class="asc-records">
+          {% for item in items %}
+            <li class="asc-record" data-record>
+              <div class="asc-record-head">
+                <h3 class="asc-record-title">{{ item.get_kind_display }}</h3>
+                <p class="asc-record-meta">{% if item.is_required %}{% trans "Required" %}{% else %}{% trans "Optional" %}{% endif %}</p>
+              </div>
+              <dl class="asc-record-fields">
+                {% if item.field_code %}<div><dt>{% trans "Field" %}</dt><dd>{{ item.field_code|code_label:"request_field" }}</dd></div>{% endif %}
+                {% if item.document_type %}<div><dt>{% trans "Document type" %}</dt><dd>{{ item.document_type|code_label:"request_document" }}</dd></div>{% endif %}
+                {% if item.instructions_en %}<div class="asc-record-wide"><dt>{% trans "Instructions (English)" %}</dt><dd lang="en" dir="ltr">{{ item.instructions_en }}</dd></div>{% endif %}
+                {% if item.instructions_fr %}<div class="asc-record-wide"><dt>{% trans "Instructions (French)" %}</dt><dd lang="fr" dir="ltr">{{ item.instructions_fr }}</dd></div>{% endif %}
+                {% if item.instructions_ar %}<div class="asc-record-wide"><dt>{% trans "Instructions (Arabic)" %}</dt><dd lang="ar" dir="rtl">{{ item.instructions_ar }}</dd></div>{% endif %}
+              </dl>
+            </li>
+          {% empty %}
+            <li class="asc-record"><p class="asc-muted mb-0">{% trans "No requested items." %}</p></li>
+          {% endfor %}
+        </ul>
+      </section>
+    </div>
+
+    {% if can_send %}
+      <aside class="asc-detail-aside" aria-label="{% trans 'Request actions' %}">
+        {% if information_request.status == "DRAFT" %}
+          <section class="asc-card asc-action-panel" aria-labelledby="send-heading">
+            <h2 class="asc-card-title" id="send-heading">{% include "components/icon.html" with name="send" %}{% trans "Send to participant" %}</h2>
+            <p class="asc-section-lead">{% trans "The participant is notified and can respond from their workspace." %}</p>
+            <form method="post" action="{% url 'reviews:information-request-send' pk=information_request.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="expected_version" value="{{ information_request.version }}">
+              <button type="submit" class="btn btn-primary asc-btn-block">{% include "components/icon.html" with name="send" %}<span>{% trans "Send to participant" %}</span></button>
+            </form>
+          </section>
+        {% endif %}
+        {% if information_request.status == "SUBMITTED" %}
+          <section class="asc-card asc-action-panel" aria-labelledby="close-heading">
+            <h2 class="asc-card-title" id="close-heading">{% include "components/icon.html" with name="check-circle" %}{% trans "Close reviewed response" %}</h2>
+            <form method="post" action="{% url 'reviews:information-request-close' pk=information_request.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="expected_version" value="{{ information_request.version }}">
+              <button type="submit" class="btn btn-primary asc-btn-block"><span>{% trans "Close reviewed response" %}</span></button>
+            </form>
+          </section>
+        {% endif %}
+        {% if information_request.status != "CANCELLED" and information_request.status != "CLOSED" %}
+          <section class="asc-card" aria-labelledby="cancel-request-heading">
+            <h2 class="asc-card-title" id="cancel-request-heading">{% include "components/icon.html" with name="ban" %}{% trans "Cancel request" %}</h2>
+            <form method="post" action="{% url 'reviews:information-request-cancel' pk=information_request.pk %}"
+                  data-confirm-title="{% trans 'Cancel this information request?' %}"
+                  data-confirm="{% trans 'The participant can no longer respond to this request. This cannot be undone.' %}"
+                  data-confirm-action="{% trans 'Cancel request' %}">
+              {% csrf_token %}
+              <input type="hidden" name="expected_version" value="{{ information_request.version }}">
+              <div class="mb-3">
+                <label for="id_cancel_reason" class="form-label">{% trans "Cancellation reason" %}</label>
+                <textarea id="id_cancel_reason" name="reason" class="form-control" rows="2" required maxlength="500"></textarea>
+              </div>
+              {% include "components/confirm_fallback.html" with id="cancel-request-confirm" %}
+              <button type="submit" class="btn btn-outline-danger"><span>{% trans "Cancel request" %}</span></button>
+            </form>
+          </section>
+        {% endif %}
+      </aside>
+    {% endif %}
+  </div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% load i18n %}
+{# Checkpoint identity and device scope, always visible (Prompt 5; TRD ENTRY-003; UI/UX §4.6 item 3). Configuration data only -- no participant data. #}
+<section class="asc-context" aria-label="{% trans 'Checkpoint' %}">
+  <div class="container-xl asc-context-inner">
+    <div class="asc-meta">
+      <span class="asc-meta-icon">{% include "components/icon.html" with name="gate" %}</span>
+      <span>
+        <span class="asc-meta-label">{% trans "Gate" %}</span>
+        <span class="asc-meta-value"><bdi>{{ checkpoint.gate.localized_name }}</bdi> <bdi dir="ltr" class="asc-chip asc-chip-outline asc-code ms-1">{{ checkpoint.gate.code }}</bdi></span>
+      </span>
+    </div>
+    <div class="asc-meta">
+      <span class="asc-meta-icon">{% include "components/icon.html" with name="layers" %}</span>
+      <span>
+        <span class="asc-meta-label">{% trans "Zone" %}</span>
+        <span class="asc-meta-value"><bdi>{{ checkpoint.zone.localized_name }}</bdi></span>
+      </span>
+    </div>
+    <div class="asc-meta">
+      <span class="asc-meta-icon">{% include "components/icon.html" with name="tablet" %}</span>
+      <span>
+        <span class="asc-meta-label">{% trans "Device" %}</span>
+        <span class="asc-meta-value"><bdi>{{ checkpoint.device.public_name }}</bdi></span>
+      </span>
+    </div>
+    <div class="asc-meta asc-meta-scope">
+      <span class="asc-meta-icon">{% include "components/icon.html" with name="shield" %}</span>
+      <span>
+        <span class="asc-meta-label" id="scope-methods-label">{% trans "Device scope" %}</span>
+        <ul class="asc-chip-list mt-1" aria-labelledby="scope-methods-label">
+          {% for label in scope_method_labels %}<li class="asc-chip asc-chip-outline">{{ label }}</li>{% endfor %}
+        </ul>
+      </span>
+    </div>
+  </div>
+</section>
+<nav class="asc-subnav" aria-label="{% trans 'Entry navigation' %}">
+  <div class="container-xl">
+    <ul>
+      <li><a href="{% url 'entry:verify' %}"{% if entry_nav == "verify" %} aria-current="page"{% endif %}>{% include "components/icon.html" with name="qr" %}<span>{% trans "Verify entry" %}</span></a></li>
+      {% if may_monitor %}
+        <li><a href="{% url 'entry:monitor' %}"{% if entry_nav == "monitor" %} aria-current="page"{% endif %}>{% include "components/icon.html" with name="list" %}<span>{% trans "Checkpoint monitor" %}</span></a></li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>

@@ -1,0 +1,42 @@
+{% extends "layouts/base_wizard.html" %}
+{% load i18n registration_ui %}
+{% block title %}{% trans "Notices" %}{% endblock %}
+{% block stepper %}{% wizard_stepper registration "notices" %}{% endblock %}
+{% block wizard_title %}{% trans "Privacy Notice and Terms" %}{% endblock %}
+{% block wizard_lead %}<p>{% trans "Read both documents, then confirm below to submit your registration." %}</p>{% endblock %}
+{% block wizard_body %}
+  {% if not privacy_version or not terms_version %}
+    <div class="asc-notice asc-notice-warning mb-3" role="alert">
+      {% include "components/icon.html" with name="alert-triangle" %}
+      <p>{% trans "Legal notices are not currently available in your language. Please try again shortly." %}</p>
+    </div>
+  {% endif %}
+
+  {% include "components/error_summary.html" %}
+  <form method="post" novalidate class="asc-card asc-wizard-form" data-language-preserve="safe-fields">
+    {% csrf_token %}
+    <section class="asc-form-section" aria-labelledby="privacy-notice-heading">
+      <h2 id="privacy-notice-heading" class="asc-form-section-title">{% trans "Privacy Notice" %}</h2>
+      <div class="asc-legal" tabindex="0" role="region" aria-labelledby="privacy-notice-heading">
+        {{ privacy_version.content|linebreaks }}
+      </div>
+    </section>
+
+    <section class="asc-form-section" aria-labelledby="terms-heading">
+      <h2 id="terms-heading" class="asc-form-section-title">{% trans "Registration Terms" %}</h2>
+      <div class="asc-legal" tabindex="0" role="region" aria-labelledby="terms-heading">
+        {{ terms_version.content|linebreaks }}
+      </div>
+    </section>
+
+    {# The versions shown above; acceptance is recorded only for them (owner correction, 2026-10-04). #}
+    {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+    <fieldset class="asc-form-section asc-confirmations">
+      <legend class="asc-form-section-title">{% trans "Your confirmation" %}</legend>
+      {% for field in form.visible_fields %}
+        {% include "components/field.html" with mark_optional=True %}
+      {% endfor %}
+    </fieldset>
+    {% include "registrations/_wizard_actions.html" with step="notices" submit_label=_("Submit registration") submit_icon="send" %}
+  </form>
+{% endblock %}

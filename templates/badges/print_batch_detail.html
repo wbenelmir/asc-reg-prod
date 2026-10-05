@@ -1,0 +1,134 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+
+{% comment %}
+One print batch's production and receipt detail (Phase 3 Prompt 3, ADR-0020).
+Only `accepted_quantity` is ever posted to the stock ledger -- units the
+supplier delivered damaged never enter countable stock.
+{% endcomment %}
+
+{% block title %}{% trans "Print batch" %}{% endblock %}
+
+{% block breadcrumbs %}
+  <nav aria-label="{% trans 'Breadcrumb' %}" class="asc-breadcrumbs">
+    <ol>
+      <li><a href="{% url 'registrations:ops-intake-list' %}">{% trans "Operations" %}</a>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li>{% if can_view_stock %}<a href="{% url 'badges:stock-dashboard' event_pk=batch.event_edition_id %}">{% trans "Badge stock" %}</a>{% else %}<span>{% trans "Badge stock" %}</span>{% endif %}{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><span aria-current="page">{% trans "Print batch" %} <bdi dir="ltr" class="asc-code">{{ batch.public_reference }}</bdi></span></li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="asc-page-head">
+    <h1>{% trans "Print batch" %}</h1>
+    <p>{% trans "Generic badges of one type, produced before the event. Only the accepted quantity is added to stock." %}</p>
+  </div>
+
+  {% if batch.status == "RECEIVED" or batch.status == "RECONCILED" or batch.status == "CLOSED" %}
+    <div class="asc-kpis" role="group" aria-label="{% trans 'Receipt summary' %}">
+      <div class="asc-kpi asc-kpi-info"><span class="asc-kpi-label">{% trans "Produced" %}</span><span class="asc-kpi-value">{{ batch.produced_quantity }}</span></div>
+      <div class="asc-kpi asc-kpi-success"><span class="asc-kpi-label">{% trans "Accepted" %}</span><span class="asc-kpi-value">{{ batch.accepted_quantity }}</span></div>
+      <div class="asc-kpi {% if batch.damaged_quantity %}asc-kpi-warning{% endif %}"><span class="asc-kpi-label">{% trans "Damaged" %}</span><span class="asc-kpi-value">{{ batch.damaged_quantity }}</span></div>
+    </div>
+  {% endif %}
+
+  <div class="row g-4">
+  <div class="col-lg-6">
+  <section class="asc-card" aria-labelledby="batch-heading">
+    <h2 class="asc-card-title" id="batch-heading">{% include "components/icon.html" with name="badge" %}{% trans "Batch details" %}</h2>
+    <dl class="asc-dl">
+      <dt>{% trans "Reference" %}</dt>
+      <dd><bdi dir="ltr" class="asc-code">{{ batch.public_reference }}</bdi></dd>
+      <dt>{% trans "Badge type" %}</dt>
+      <dd><bdi dir="ltr" class="asc-code">{{ batch.badge_type.code }}</bdi></dd>
+      <dt>{% trans "Status" %}</dt>
+      <dd data-batch-status="{{ batch.status }}"><span class="asc-chip {% if batch.status == 'RECEIVED' or batch.status == 'RECONCILED' %}asc-chip-success{% elif batch.status == 'CANCELLED' %}asc-chip-danger{% elif batch.status == 'IN_PRODUCTION' %}asc-chip-info{% endif %}">{{ batch.get_status_display }}</span></dd>
+      <dt>{% trans "Planned quantity" %}</dt>
+      <dd>{{ batch.planned_quantity }}</dd>
+      {% if batch.status == "RECEIVED" or batch.status == "RECONCILED" or batch.status == "CLOSED" %}
+        <dt>{% trans "Destination location" %}</dt>
+        <dd><bdi dir="ltr" class="asc-code">{{ batch.destination_location.code }}</bdi></dd>
+      {% endif %}
+    </dl>
+  </section>
+  </div>
+  <div class="col-lg-6">
+  <section class="asc-card" aria-labelledby="actions-heading">
+    <h2 class="asc-card-title" id="actions-heading">{% include "components/icon.html" with name="refresh" %}{% trans "Actions" %}</h2>
+  <div class="d-flex flex-column gap-3">
+    {% if can_manage and batch.status == "DRAFT" %}
+      <form method="post" action="{% url 'badges:print-batch-status-change' pk=batch.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="operation_id" value="{{ status_operation_id }}">
+        <input type="hidden" name="expected_lock_version" value="{{ batch.version }}">
+        <input type="hidden" name="target_status" value="READY">
+        <button type="submit" class="btn btn-primary">{% trans "Mark ready for production" %}</button>
+      </form>
+      <form method="post" action="{% url 'badges:print-batch-status-change' pk=batch.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="operation_id" value="{{ status_operation_id }}">
+        <input type="hidden" name="expected_lock_version" value="{{ batch.version }}">
+        <input type="hidden" name="target_status" value="CANCELLED">
+        <button type="submit" class="btn btn-outline-danger">{% trans "Cancel batch" %}</button>
+      </form>
+    {% endif %}
+    {% if can_manage and batch.status == "READY" %}
+      <form method="post" action="{% url 'badges:print-batch-status-change' pk=batch.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="operation_id" value="{{ status_operation_id }}">
+        <input type="hidden" name="expected_lock_version" value="{{ batch.version }}">
+        <input type="hidden" name="target_status" value="IN_PRODUCTION">
+        <button type="submit" class="btn btn-primary">{% trans "Start production" %}</button>
+      </form>
+      <form method="post" action="{% url 'badges:print-batch-status-change' pk=batch.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="operation_id" value="{{ status_operation_id }}">
+        <input type="hidden" name="expected_lock_version" value="{{ batch.version }}">
+        <input type="hidden" name="target_status" value="CANCELLED">
+        <button type="submit" class="btn btn-outline-danger">{% trans "Cancel batch" %}</button>
+      </form>
+    {% endif %}
+    {% if can_receive and batch.status == "IN_PRODUCTION" %}
+      <form method="post" action="{% url 'badges:print-batch-receive' pk=batch.pk %}" class="asc-form-grid">
+        {% csrf_token %}
+        <input type="hidden" name="operation_id" value="{{ receive_operation_id }}">
+        <input type="hidden" name="expected_lock_version" value="{{ batch.version }}">
+        <div>
+          <label class="form-label" for="produced">{% trans "Produced quantity" %}</label>
+          <input class="form-control" id="produced" type="number" name="produced_quantity" min="0" required>
+        </div>
+        <div>
+          <label class="form-label" for="accepted">{% trans "Accepted quantity" %}</label>
+          <input class="form-control" id="accepted" type="number" name="accepted_quantity" min="0" required>
+        </div>
+        <div>
+          <label class="form-label" for="damaged">{% trans "Damaged quantity" %}</label>
+          <input class="form-control" id="damaged" type="number" name="damaged_quantity" min="0" required>
+        </div>
+        {% if not batch.destination_location %}
+          <div>
+            <label class="form-label" for="destination">{% trans "Destination location" %}</label>
+            <select class="form-select" id="destination" name="destination_location_id" required>
+              {% for location in locations %}
+                <option value="{{ location.pk }}">{{ location.code }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        {% endif %}
+        <div>
+          <button type="submit" class="btn btn-success">{% trans "Record receipt" %}</button>
+        </div>
+      </form>
+      <p class="form-text">
+        {% trans "Only the accepted quantity is added to stock. Units recorded as damaged never enter the ledger." %}
+      </p>
+    {% endif %}
+    {% if not can_manage and not can_receive %}
+      <p class="text-body-secondary mb-0">{% trans "You can view this batch but not change it." %}</p>
+    {% endif %}
+  </div>
+  </section>
+  </div>
+  </div>
+{% endblock %}

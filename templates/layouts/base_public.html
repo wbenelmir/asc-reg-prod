@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% comment %}
+  Public and authentication shell (TRD §7.2 `base_public`; UI/UX §4.2, §6.1).
+
+  Adapted from Finder's split-screen sign-in (account-signin.html): a narrow
+  form column beside a brand panel that shows from the lg breakpoint. The
+  panel is the ASC navy surface with a short factual summary; it carries no
+  form control, so the page still has exactly one primary action.
+
+  `#main-content` stays htmx-boosted exactly as on the legacy chrome (the
+  OTP → workspace journey and its browser tests depend on it); the header,
+  which holds the language switcher, is deliberately outside it.
+
+  Blocks: `content` (the form column), `auth_aside` (the brand panel body),
+  `shell_label` (the space name beside the logo), `brand_url`.
+{% endcomment %}
+
+{% block body_attrs %} class="asc-ui asc-public"{% endblock %}
+
+{% block header %}
+  <header class="asc-appbar asc-appbar-light">
+    <div class="container-xl asc-appbar-inner">
+      <a class="asc-brand" href="{% block brand_url %}{% url 'home' %}{% endblock %}">
+        <img src="{% static 'img/brand/asc-logo.svg' %}" width="90" height="40" alt="{% trans 'African Startup Conference' %}">
+        {% block shell_label %}{% endblock %}
+      </a>
+      {# The language versions of this page are its only navigation. #}
+      <nav class="asc-appbar-end" aria-label="{% trans 'Language' %}">
+        {% include "partials/language_switcher.html" %}
+      </nav>
+    </div>
+  </header>
+{% endblock %}
+
+{% block main %}
+  <main id="main-content" class="asc-main asc-auth-main" hx-boost="true">
+    <div class="container-xl">
+      <div class="asc-auth">
+        <div class="asc-auth-form">
+          {% include "components/flash_messages.html" %}
+          {% block content %}{% endblock %}
+        </div>
+        <aside class="asc-auth-aside" aria-labelledby="asc-auth-aside-title">
+          <div class="asc-auth-aside-body">
+            {% block auth_aside %}
+              <p class="asc-auth-kicker">{% trans "ASC 2026" %}</p>
+              <h2 class="asc-auth-aside-title" id="asc-auth-aside-title">{% trans "Participant registration" %}</h2>
+              <ul class="asc-auth-facts">
+                <li>{% include "components/icon.html" with name="mail" %}<span>{% trans "Sign in with a one-time code sent to your email. No password is needed." %}</span></li>
+                <li>{% include "components/icon.html" with name="list" %}<span>{% trans "Registration takes six short steps. Your progress is saved after each one." %}</span></li>
+                <li>{% include "components/icon.html" with name="lock" %}<span>{% trans "Identity document numbers are stored encrypted." %}</span></li>
+              </ul>
+            {% endblock %}
+          </div>
+          <div class="asc-auth-aside-motif" aria-hidden="true"></div>
+        </aside>
+      </div>
+    </div>
+  </main>
+{% endblock %}
+
+{% block footer %}
+  <footer class="asc-footer">
+    <div class="container-xl d-flex flex-wrap gap-2 justify-content-between">
+      <span>{% trans "ASC 2026 Registration Platform" %}</span>
+      <span>{% trans "African Startup Conference" %}</span>
+      {% include "partials/footer_official.html" %}
+    </div>
+  </footer>
+{% endblock %}

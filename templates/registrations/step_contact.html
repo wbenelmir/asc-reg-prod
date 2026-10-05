@@ -1,0 +1,22 @@
+{% extends "layouts/base_wizard.html" %}
+{% load i18n registration_ui %}
+{% block title %}{% trans "Contact" %}{% endblock %}
+{% block stepper %}{% wizard_stepper registration "contact" %}{% endblock %}
+{% block wizard_title %}{% trans "Contact information" %}{% endblock %}
+{% block wizard_lead %}
+  <p>{% trans "A mobile number is required for every participant. Your verified e-mail address stays your sign-in." %}</p>
+{% endblock %}
+{% block wizard_body %}
+  {% include "components/error_summary.html" %}
+  <form method="post" novalidate class="asc-card asc-wizard-form">
+    {% csrf_token %}
+    <section class="asc-form-section" aria-labelledby="contact-mobile-heading">
+      <h2 class="asc-form-section-title" id="contact-mobile-heading">{% trans "Mobile number" %}</h2>
+      <div class="asc-grid-2 asc-grid-phone">
+        {% include "components/field.html" with field=form.mobile_country_code %}
+        {% include "components/field.html" with field=form.mobile_number control="ltr" %}
+      </div>
+    </section>
+    {% include "registrations/_wizard_actions.html" with step="contact" %}
+  </form>
+{% endblock %}

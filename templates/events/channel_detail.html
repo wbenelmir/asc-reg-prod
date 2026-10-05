@@ -1,0 +1,71 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% comment %}
+  One event's registration channels (UX-4, M24, decision D-12). The server
+  decides and enforces everything; this page only collects the change and
+  its mandatory reason. The window is shown and typed in the EVENT timezone.
+{% endcomment %}
+{% block title %}{% trans "Registration channels" %}{% endblock %}
+{% block breadcrumbs %}
+  <nav aria-label="{% trans 'Breadcrumb' %}" class="asc-breadcrumbs">
+    <ol>
+      <li><a href="{% url 'events:channel-list' %}">{% trans "Registration channels" %}</a>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><span aria-current="page"><bdi dir="ltr">{{ event.code }}</bdi></span></li>
+    </ol>
+  </nav>
+{% endblock %}
+{% block content %}
+  <div class="asc-page-head">
+    <h1>{% trans "Registration channels" %}{% trans ":" context "label separator" %} <bdi>{{ event.name }}</bdi></h1>
+    <p>{% trans "Sign-in, passes, the participant workspace and authorized operations continue in every mode." %}</p>
+  </div>
+
+  <section class="asc-card mb-3" aria-labelledby="channel-state-heading">
+    <h2 class="asc-section-title" id="channel-state-heading">{% include "components/icon.html" with name="gate" %}{% trans "Current state" %}</h2>
+    <p><span class="asc-chip asc-chip-{{ state_tone }}" data-channel-state="{{ state }}">{{ state_label }}</span></p>
+    <dl class="asc-dl asc-dl-compact">
+      <dt>{% trans "Mode" %}</dt><dd>{{ mode_label }}</dd>
+      <dt>{% trans "Opens at (event time)" %}</dt><dd>{% if opens_at_local %}<bdi dir="ltr" class="asc-code">{{ opens_at_local }}</bdi>{% else %}{% trans "Not set" %}{% endif %}</dd>
+      <dt>{% trans "Closes at (event time)" %}</dt><dd>{% if closes_at_local %}<bdi dir="ltr" class="asc-code">{{ closes_at_local }}</bdi>{% else %}{% trans "Not set" %}{% endif %}</dd>
+      <dt>{% trans "Event timezone" %}</dt><dd><bdi dir="ltr" class="asc-code">{{ event.timezone }}</bdi></dd>
+    </dl>
+    <ul class="mb-0 ps-3">
+      <li>{% trans "Open: public registration is allowed only inside the window, when one is set." %}</li>
+      <li>{% trans "Invitation only: public sign-up is refused, including saved public drafts; invitation, delegation and on-behalf registrations continue under their own rules." %}</li>
+      <li>{% trans "Closed: no registration can be started, claimed or submitted on any channel. Saved drafts are kept." %}</li>
+    </ul>
+  </section>
+
+  <section class="asc-card" aria-labelledby="channel-change-heading">
+    <h2 class="asc-section-title" id="channel-change-heading">{% include "components/icon.html" with name="edit" %}{% trans "Change the registration channels" %}</h2>
+    {% include "components/error_summary.html" %}
+    <form method="post" class="asc-wizard-form"
+          data-confirm-title="{% trans 'Apply this registration change?' %}"
+          data-confirm="{% trans 'The new state applies immediately to every participant, including pages already open.' %}"
+          data-confirm-action="{% trans 'Apply change' %}" data-confirm-tone="primary">
+      {% csrf_token %}
+      {{ form.expected_settings_version }}
+      <fieldset class="mb-3"{% if form.mode.errors %} aria-describedby="id_mode_error"{% endif %}>
+        <legend class="form-label">{{ form.mode.label }}</legend>
+        <div class="asc-choice-cards">
+          {% for radio in form.mode %}
+            <label class="asc-choice" for="{{ radio.id_for_label }}">
+              {{ radio.tag }}
+              <span class="asc-choice-body"><span class="asc-choice-title"><bdi>{{ radio.choice_label }}</bdi></span></span>
+            </label>
+          {% endfor %}
+        </div>
+        {% if form.mode.errors %}
+          <div id="id_mode_error" class="asc-field-error">{% include "components/icon.html" with name="alert-octagon" size="sm" %}<bdi>{{ form.mode.errors|join:" " }}</bdi></div>
+        {% endif %}
+      </fieldset>
+      <div class="asc-grid-2">
+        {% include "components/field.html" with field=form.opens_at control="ltr" mark_optional=True %}
+        {% include "components/field.html" with field=form.closes_at control="ltr" mark_optional=True %}
+      </div>
+      {% include "components/field.html" with field=form.reason %}
+      {% include "components/confirm_fallback.html" with id="channel-confirm" label=_("I confirm this change applies immediately.") %}
+      <button type="submit" class="btn btn-primary">{% trans "Apply change" %}</button>
+    </form>
+  </section>
+{% endblock %}

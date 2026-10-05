@@ -1,0 +1,27 @@
+{% load i18n %}
+{% comment %}
+  Shared confirmation dialog for destructive or consequential commands
+  (UI/UX Completion Gate F6; static/js/asc-enhance.js). One instance per
+  page, rendered by base.html. A form opts in with `data-confirm` (the
+  question) and optionally `data-confirm-title`, `data-confirm-action` (the
+  confirm button label; defaults to the submit button's text) and
+  `data-confirm-tone="primary"` for a non-destructive consequential action.
+
+  Opening the dialog never submits anything: the form is submitted only by
+  its confirm button, through the browser's own form submission, so CSRF,
+  POST-only and every server-side permission check apply unchanged. Escape
+  and "Go back" close it and return focus to the button that opened it.
+{% endcomment %}
+<dialog id="asc-confirm-dialog" class="asc-dialog" aria-labelledby="asc-confirm-title" aria-describedby="asc-confirm-message" data-default-title="{% trans 'Confirm this action' %}">
+  <div class="asc-dialog-body">
+    <span class="asc-dialog-icon">{% include "components/icon.html" with name="alert-triangle" %}</span>
+    <div>
+      <h2 class="asc-dialog-title" id="asc-confirm-title"></h2>
+      <p class="asc-dialog-message" id="asc-confirm-message"></p>
+    </div>
+  </div>
+  <div class="asc-dialog-actions">
+    <button type="button" class="btn btn-outline-secondary" data-confirm-cancel>{% trans "Go back" %}</button>
+    <button type="button" class="btn btn-danger" data-confirm-accept></button>
+  </div>
+</dialog>

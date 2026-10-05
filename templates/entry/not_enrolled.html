@@ -1,0 +1,21 @@
+{% extends "layouts/base_entry.html" %}
+{% load i18n %}
+{% block title %}{% trans "Entry device not enrolled" %}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-7">
+    <section class="asc-card">
+      <div class="asc-empty">
+        <span class="asc-tile">{% include "components/icon.html" with name="tablet" %}</span>
+        <h1 class="h3">{% trans "Entry device not enrolled" %}</h1>
+        <p>{% trans "This browser is not an enrolled, active entry device. Entry verification is only available on enrolled devices." %}</p>
+        {% if may_activate %}
+          <a class="btn btn-primary mt-2" href="{% url 'entry:device-activate' %}">{% trans "Enroll this browser with an activation code" %}</a>
+        {% else %}
+          <p class="small">{% trans "Ask a device administrator to enroll this device." %}</p>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

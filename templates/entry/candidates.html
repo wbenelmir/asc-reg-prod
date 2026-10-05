@@ -1,0 +1,43 @@
+{% extends "layouts/base_entry.html" %}
+{% load i18n %}
+{% block title %}{% trans "Select the exact registration" %}{% endblock %}
+{% block content %}
+{% comment %}
+  Several approved contexts match (FR-ENT-004). The operator selects the
+  exact one; privileges are never combined. Minimum distinguishing data
+  only: display name, the last characters of the reference, nationality.
+  The browser receives a random selection handle and an index, never an id.
+{% endcomment %}
+<section class="asc-card" aria-labelledby="candidates-heading">
+  <div class="asc-card-lead">
+    <span class="asc-tile">{% include "components/icon.html" with name="user-check" %}</span>
+    <div>
+      <h1 class="h3 mb-1" id="candidates-heading">{% trans "Select the exact registration" %}</h1>
+      <p class="text-body-secondary mb-0">{% trans "Several approved registrations match. Select the one the person is presenting for; privileges are never combined across registrations." %}</p>
+    </div>
+  </div>
+  {% if truncated %}
+    <div class="asc-notice asc-notice-warning mb-3" role="status">
+      {% include "components/icon.html" with name="alert-triangle" %}
+      <p>{% trans "More matches exist. Refine the search." %}</p>
+    </div>
+  {% endif %}
+  <ul class="list-unstyled d-grid gap-2 mb-4">
+    {% for candidate in candidates %}
+      <li class="asc-candidate">
+        <div>
+          <strong class="d-block fs-5"><bdi>{{ candidate.display_name }}</bdi></strong>
+          <span class="text-body-secondary">{% trans "Reference" %} <bdi dir="ltr" class="asc-code">{{ candidate.reference_hint }}</bdi>{% if candidate.nationality %} · <bdi dir="ltr" class="asc-code">{{ candidate.nationality }}</bdi>{% endif %}</span>
+        </div>
+        <form method="post" action="{% url 'entry:select-candidate' %}" class="m-0">
+          {% csrf_token %}
+          <input type="hidden" name="selection" value="{{ selection_token }}">
+          <input type="hidden" name="index" value="{{ forloop.counter0 }}">
+          <button type="submit" class="btn btn-outline-primary asc-btn-xl">{% include "components/icon.html" with name="check-circle" %}<span>{% trans "Select" %}</span></button>
+        </form>
+      </li>
+    {% endfor %}
+  </ul>
+  <a class="btn btn-outline-secondary" href="{% url 'entry:verify' %}" id="entry-next">{% include "components/icon.html" with name="arrow-next" flip=True %}<span>{% trans "Cancel" %}</span></a>
+</section>
+{% endblock %}

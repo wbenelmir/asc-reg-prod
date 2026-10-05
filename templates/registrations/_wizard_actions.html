@@ -1,0 +1,14 @@
+{% load i18n registration_ui %}
+{# Wizard action bar: Back is a plain link to the previous step (a GET page, nothing is submitted); the step's single submit button comes last. #}
+{% wizard_previous_url step as back_url %}
+<div class="asc-form-actions">
+  {% if back_url %}
+    <a class="btn btn-outline-secondary" href="{{ back_url }}">
+      {% include "components/icon.html" with name="arrow-prev" flip=True %}<span>{% trans "Back" %}</span>
+    </a>
+  {% endif %}
+  <button type="submit" class="btn btn-primary asc-btn-lg">
+    <span>{% if submit_label %}{{ submit_label }}{% else %}{% trans "Continue" %}{% endif %}</span>
+    {% include "components/icon.html" with name=submit_icon|default:"arrow-next" flip=True %}
+  </button>
+</div>

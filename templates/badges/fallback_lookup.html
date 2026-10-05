@@ -1,0 +1,61 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+
+{% comment %}
+Controlled fallback-reference lookup.
+
+Exact match only: one bounded field, no listing, no pagination, no partial
+or wildcard search. This is a locator for a reference the operator already
+holds -- it is not a participant browse surface, and a successful lookup
+grants nothing on its own.
+{% endcomment %}
+
+{% block title %}{% trans "Find an entry pass by reference" %}{% endblock %}
+
+{% block breadcrumbs %}
+  <nav aria-label="{% trans 'Breadcrumb' %}" class="asc-breadcrumbs">
+    <ol>
+      <li><a href="{% url 'registrations:ops-intake-list' %}">{% trans "Operations" %}</a>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><span aria-current="page">{% trans "Find an entry pass by reference" %}</span></li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="asc-page-head">
+    <h1>{% trans "Find an entry pass by reference" %}</h1>
+    <p>{% trans "Exact match only. Every lookup is recorded and repeated lookups are limited." %}</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <section class="asc-card" aria-labelledby="lookup-heading">
+        <h2 class="asc-card-title" id="lookup-heading">{% include "components/icon.html" with name="hash" %}{% trans "Fallback reference" %}</h2>
+        {% include "components/error_summary.html" with form=form %}
+        <form method="post" action="{% url 'badges:fallback-reference-lookup' %}">
+          {% csrf_token %}
+          {% include "components/field.html" with field=form.reference %}
+          <button type="submit" class="btn btn-primary"><span>{% trans "Look up" %}</span></button>
+        </form>
+      </section>
+    </div>
+    <div class="col-lg-6" aria-live="polite">
+      {% if series %}
+        <section class="asc-card" aria-labelledby="match-heading">
+          <h2 class="asc-card-title" id="match-heading">{% include "components/icon.html" with name="check-circle" %}{% trans "Match found" %}</h2>
+          <dl class="asc-dl">
+            <dt>{% trans "Registration reference" %}</dt>
+            <dd><bdi dir="ltr" class="asc-code">{{ series.registration.public_reference }}</bdi></dd>
+          </dl>
+          <a class="btn btn-outline-primary mt-3" href="{% url 'badges:registration-credential' pk=series.registration.pk %}">{% trans "Open credential" %}</a>
+          <p class="form-text mt-2 mb-0">{% trans "A reference match is not an entry decision. The full verification decision still applies." %}</p>
+        </section>
+      {% elif not_found %}
+        <div class="asc-notice asc-notice-neutral" role="status">
+          {% include "components/icon.html" with name="info" %}
+          <p>{% trans "No entry pass matches that reference." %}</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

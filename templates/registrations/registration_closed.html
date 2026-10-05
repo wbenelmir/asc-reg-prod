@@ -1,0 +1,25 @@
+{% extends "layouts/base_workspace.html" %}
+{% load i18n %}
+{% comment %}
+  Registration closed (UX-4, M24, decision D-12). Shown with HTTP 403 for a
+  wizard page, a submission or a new draft that the event's channel state
+  refuses. Only signed-in participants reach it. Saved drafts are kept.
+{% endcomment %}
+{% block title %}{% trans "Registration is closed" %}{% endblock %}
+{% block main_attrs %} hx-boost="true"{% endblock %}
+{% block content %}
+  <div class="asc-narrow">
+    <div class="asc-card asc-empty" data-registration-closed="{% if all_channels_closed %}all{% else %}public{% endif %}">
+      <span class="asc-tile">{% include "components/icon.html" with name="lock" %}</span>
+      {% if all_channels_closed %}
+        <h1 class="h3">{% trans "Registration is closed" %}</h1>
+        <p>{% trans "Registration is closed for this event on every channel. Your saved information is kept." %}</p>
+      {% else %}
+        <h1 class="h3">{% trans "Public registration is closed" %}</h1>
+        <p>{% trans "Public registration is closed for this event. Your saved information is kept. If you received an invitation, open its link." %}</p>
+      {% endif %}
+      <p>{% trans "Your existing registrations and passes stay available in your workspace." %}</p>
+      <a href="{% url 'registrations:workspace' %}" class="btn btn-outline-secondary mt-2">{% trans "Go to my registrations" %}</a>
+    </div>
+  </div>
+{% endblock %}

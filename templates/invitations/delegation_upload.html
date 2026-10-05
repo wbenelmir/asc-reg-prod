@@ -1,0 +1,31 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% block title %}{% trans "Upload delegation list" %}{% endblock %}
+{% block breadcrumbs %}{% url 'invitations:workspace-dashboard' as parent_url %}{% trans "Organization Workspace" as parent_label %}{% url 'invitations:organization-search' as parent2_url %}{% trans "Find an organization" as parent2_label %}{% trans "Upload delegation list" as current %}{% include "components/breadcrumb_trail.html" with parent_label=parent_label parent_url=parent_url parent2_label=parent2_label parent2_url=parent2_url current=current %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% blocktrans with name=organization.official_name %}For organization: {{ name }}{% endblocktrans %}</p>
+      <h1>{% trans "Upload delegation list" %}</h1>
+      <p>{% trans "The file is checked first. Nothing is created until you review the results and apply the valid rows." %}</p>
+    </div>
+  </div>
+
+  <section class="asc-card asc-form-narrow" aria-labelledby="delegation-form-heading">
+    <h2 class="asc-card-title" id="delegation-form-heading">{% include "components/icon.html" with name="layers" %}{% trans "Delegation file" %}</h2>
+    {% include "components/error_summary.html" %}
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="form_token" value="{{ form_token }}">
+      {% include "components/field.html" with field=form.csv_file %}
+      <div class="asc-notice asc-notice-neutral mb-3">
+        {% include "components/icon.html" with name="lock" %}
+        <p>{% trans "Email addresses are stored encrypted and shown masked. Values that look like spreadsheet formulas are rejected." %}</p>
+      </div>
+      <div class="asc-actions-row">
+        <button type="submit" class="btn btn-primary"><span>{% trans "Upload and validate" %}</span></button>
+        <a class="btn btn-outline-secondary" href="{% url 'invitations:organization-search' %}">{% trans "Cancel" %}</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

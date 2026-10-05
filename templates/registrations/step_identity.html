@@ -1,0 +1,137 @@
+{% extends "layouts/base_wizard.html" %}
+{% load i18n registration_ui %}
+{% block title %}{% trans "Identity" %}{% endblock %}
+{% block stepper %}{% wizard_stepper registration "identity" %}{% endblock %}
+{% block wizard_title %}{% trans "Identity and personal information" %}{% endblock %}
+{% block wizard_lead %}<p>{% trans "Enter your name exactly as it appears on your identity document." %}</p>{% endblock %}
+{% block wizard_body %}
+  {% include "components/error_summary.html" %}
+  <form method="post" novalidate class="asc-card asc-wizard-form" data-language-preserve="safe-fields" data-identity-panels="identity_path" enctype="multipart/form-data">
+    {% csrf_token %}
+    <section class="asc-form-section" aria-labelledby="identity-personal-heading">
+      <h2 class="asc-form-section-title" id="identity-personal-heading">{% trans "Personal information" %}</h2>
+      <div class="asc-grid-2">
+        {% include "components/field.html" with field=form.given_names %}
+        {% include "components/field.html" with field=form.family_name %}
+      </div>
+      <div class="asc-grid-2">
+        {% include "components/field.html" with field=form.date_of_birth control="ltr" %}
+      </div>
+      <div class="asc-grid-2">
+        {% include "components/field.html" with field=form.nationality_code %}
+        {% include "components/field.html" with field=form.country_of_residence %}
+      </div>
+    </section>
+
+    <section class="asc-form-section" aria-labelledby="identity-document-heading">
+      <h2 class="asc-form-section-title" id="identity-document-heading">{% trans "Identity document" %}</h2>
+      <fieldset class="mb-3"{% if form.identity_path.errors %} aria-describedby="id_identity_path_error"{% endif %}>
+        <legend class="form-label">{% trans "Which document will you use?" %}</legend>
+        <div class="asc-choice-cards">
+          {% for radio in form.identity_path %}
+            <label class="asc-choice" for="{{ radio.id_for_label }}">
+              {{ radio.tag }}
+              <span class="asc-choice-body">
+                <span class="asc-choice-title"><bdi>{{ radio.choice_label }}</bdi></span>
+                <span class="asc-choice-text">{# The route follows the nationality, never the country of residence. #}{% if radio.data.value == "NIN" %}{% trans "For Algerian nationals, including those living abroad. 18 digits." %}{% elif radio.data.value == "NIN_EXEMPTION" %}{% trans "Authorized for this registration by the registration team: an Algerian identity card or passport, without a NIN." %}{% else %}{% trans "For foreign nationals, wherever they live. A photo or scan of the passport identity page is required." %}{% endif %}</span>
+              </span>
+            </label>
+          {% endfor %}
+        </div>
+        {% if form.identity_path.errors %}
+          <div id="id_identity_path_error" class="asc-field-error">
+            {% include "components/icon.html" with name="alert-octagon" size="sm" %}
+            <bdi>{% for error in form.identity_path.errors %}{{ error }}{% if not forloop.last %} {% endif %}{% endfor %}</bdi>
+          </div>
+        {% endif %}
+      </fieldset>
+
+      <fieldset class="asc-subpanel identity-panel" data-identity-panel="NIN">
+        <legend>{% trans "If you hold an Algerian national identity number" %}</legend>
+        {% include "components/field.html" with field=form.nin_value control="ltr" wrapper_class="mb-0" %}
+        {# IDV-Q3: the only way to the documentary route is a staff grant for this registration. #}
+        <p class="form-text mt-2 mb-0" data-nin-help>{% blocktrans with ref=registration.public_reference %}No usable national identity number? Contact the registration team and give them your registration reference {{ ref }}.{% endblocktrans %}</p>
+      </fieldset>
+
+      {% if form.exemption_document_number %}
+        <fieldset class="asc-subpanel identity-panel" data-identity-panel="NIN_EXEMPTION" data-nin-exemption-panel>
+          <legend>{% trans "Algerian identity document without a NIN" %}</legend>
+          <p class="asc-notice asc-notice-neutral" role="note">{% include "components/icon.html" with name="info" %}<span>{% trans "The registration team authorized this route for your registration. Your identity will be checked by our team from the document you declare here. Enter the document's own number, not a NIN." %}</span></p>
+          <fieldset class="mb-3">
+            <legend class="form-label">{{ form.exemption_document_kind.label }}</legend>
+            <div class="asc-choice-cards">
+              {% for radio in form.exemption_document_kind %}
+                <label class="asc-choice" for="{{ radio.id_for_label }}">
+                  {{ radio.tag }}
+                  <span class="asc-choice-body"><span class="asc-choice-title"><bdi>{{ radio.choice_label }}</bdi></span></span>
+                </label>
+              {% endfor %}
+            </div>
+            {% if form.exemption_document_kind.errors %}
+              <div class="asc-field-error">
+                {% include "components/icon.html" with name="alert-octagon" size="sm" %}
+                <bdi>{% for error in form.exemption_document_kind.errors %}{{ error }}{% if not forloop.last %} {% endif %}{% endfor %}</bdi>
+              </div>
+            {% endif %}
+          </fieldset>
+          <div class="asc-grid-2">
+            {% include "components/field.html" with field=form.exemption_document_number control="ltr" %}
+            {% include "components/field.html" with field=form.exemption_document_expires_at control="ltr" %}
+          </div>
+          <div class="asc-upload-block">
+            <div class="asc-notice asc-notice-neutral mb-3">
+              {% include "components/icon.html" with name="lock" %}
+              <div>
+                <p>{% blocktrans %}Accepted file types: JPEG or PNG. Maximum size: {{ passport_identity_page_max_size_mb }} MB.{% endblocktrans %}</p>
+                <p>{% trans "Your file is checked for safety before it is stored. It is never made public, and it is never included in exported reports." %}</p>
+                {% if exemption_evidence_on_file %}<p>{% trans "A document photo is already on file. Uploading a new one replaces it." %}</p>{% endif %}
+              </div>
+            </div>
+            {% include "components/field.html" with field=form.exemption_document_image wrapper_class="mb-0" %}
+          </div>
+        </fieldset>
+      {% endif %}
+
+      <fieldset class="asc-subpanel identity-panel" data-identity-panel="PASSPORT">
+        <legend>{% trans "If you hold a foreign passport" %}</legend>
+        <div class="asc-grid-2">
+          {% include "components/field.html" with field=form.passport_number control="ltr" %}
+          {% include "components/field.html" with field=form.passport_country_code %}
+        </div>
+        <div class="asc-grid-2">
+          {% include "components/field.html" with field=form.passport_expires_at control="ltr" %}
+        </div>
+        {% if form.passport_identity_page %}
+          {# IDV-3 (A13-02): always present on the passport path, and required. #}
+          <div class="asc-upload-block">
+            <div class="asc-notice asc-notice-neutral mb-3">
+              {% include "components/icon.html" with name="lock" %}
+              <div>
+                <p>{% blocktrans %}We ask for a photo or scan of the passport identity page only, to help confirm the details you entered above -- never a full passport, visa, or any other document.{% endblocktrans %}</p>
+                <p>{% blocktrans %}Accepted file types: JPEG or PNG. Maximum size: {{ passport_identity_page_max_size_mb }} MB.{% endblocktrans %}</p>
+                <p>{% trans "Your file is checked for safety before it is stored. It is never made public, and it is never included in exported reports." %}</p>
+                {% if current_passport_identity_page %}
+                  <p>{% trans "A passport identity page is already on file. Uploading a new one replaces it; there is no separate removal step in this phase." %}</p>
+                {% else %}
+                  <p>{% trans "The passport identity page is required for every foreign participant, so that the details you entered can be checked by our team." %}</p>
+                {% endif %}
+              </div>
+            </div>
+            {% include "components/field.html" with field=form.passport_identity_page wrapper_class="mb-0" %}
+          </div>
+        {% endif %}
+      </fieldset>
+    </section>
+
+    {% include "registrations/_wizard_actions.html" with step="identity" %}
+  </form>
+  {% comment %}
+    Only the selected identity-document panel is shown, and the controls of
+    the hidden panel are disabled so they are never submitted (Prompt 4 final
+    closure pass §9). `static/js/asc-enhance.js` does this through
+    `data-identity-panels`, on load and after every boosted swap (UXR-C1,
+    UXR-F01): the earlier inline script ran inside the swap before the radios
+    got their checked state back and hid both panels. Without JavaScript both
+    panels stay visible and the server validates only the selected path.
+  {% endcomment %}
+{% endblock %}

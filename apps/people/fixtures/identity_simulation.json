@@ -1,0 +1,71 @@
+{
+  "_notice": "SYNTHETIC DEVELOPMENT SIMULATION ONLY. Every NIN, name and date below is invented and belongs to no real person. These bodies follow the observed ministry lookup shape (addendum section 3, corrected copy artifact per A13-10). The simulation is refused in staging and production and is never official verification.",
+  "responses": {
+    "990000000000000010": {
+      "identite": {
+        "nin": "990000000000000010",
+        "nom_f": "BENTEST",
+        "pren_f": "AMINA",
+        "d_nais": "07/03/1990",
+        "presume": "False"
+      }
+    },
+    "990000000000000028": {
+      "identite": {
+        "nin": "990000000000000028",
+        "nom_f": "OUZTEST",
+        "pren_f": "KARIM",
+        "d_nais": "01/01/1985",
+        "presume": "True"
+      }
+    },
+    "990000000000000036": {
+      "identite": {
+        "nin": "990000000000000036",
+        "nom_f": "BENTESTI",
+        "pren_f": "SAMIR",
+        "d_nais": "15/06/1992",
+        "presume": "False"
+      }
+    },
+    "009900000000000044": {
+      "identite": {
+        "nin": "009900000000000044",
+        "nom_f": "ZEROTEST",
+        "pren_f": "LINA",
+        "d_nais": "20/11/1988",
+        "presume": "False"
+      }
+    },
+    "990000000000000052": {
+      "identite": {
+        "nin": "990000000000000060",
+        "nom_f": "OTHERTEST",
+        "pren_f": "NADIA",
+        "d_nais": "02/02/1991",
+        "presume": "False"
+      }
+    },
+    "990000000000000079": {
+      "identite": {
+        "nin": "990000000000000079",
+        "nom_f": "DATETEST",
+        "pren_f": "YACINE",
+        "d_nais": "1990-03-07",
+        "presume": "False"
+      }
+    },
+    "990000000000000087": {
+      "identite": {
+        "nin": "990000000000000087",
+        "nom_f": "FLAGTEST",
+        "pren_f": "SARA",
+        "d_nais": "09/09/1993"
+      }
+    },
+    "990000000000000095": {
+      "identite": null,
+      "result": "Synthetic explanatory text that the platform never interprets."
+    }
+  }
+}

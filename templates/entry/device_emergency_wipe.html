@@ -1,0 +1,54 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% block title %}{% trans "Emergency wipe" %} — {{ device.public_name }}{% endblock %}
+
+{% block breadcrumbs %}
+  <nav aria-label="{% trans 'Breadcrumb' %}" class="asc-breadcrumbs">
+    <ol>
+      <li><a href="{% url 'registrations:ops-intake-list' %}">{% trans "Operations" %}</a>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><span><bdi>{{ device.public_name }}</bdi></span>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><span aria-current="page">{% trans "Emergency wipe" %}</span></li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="asc-page-head">
+    <h1>{% trans "Emergency wipe" %}: <bdi>{{ device.public_name }}</bdi></h1>
+    <p>{% trans "A destructive order, distinct from suspending, revoking or blocking offline use. At its next contact the device deletes all of its local data." %}</p>
+  </div>
+
+  <div class="asc-notice asc-notice-danger" role="note">
+    {% include "components/icon.html" with name="alert-octagon" %}
+    <div>
+      <p class="fw-semibold mb-1">{% trans "Evidence loss" %}</p>
+      <p class="mb-0">
+        {% if expected_loss == "OPERATIONS_AT_RISK" %}
+          {% blocktrans with pending=device.reported_pending_operations|default:0 locked=device.reported_locked_operations|default:0 %}The device last reported {{ pending }} pending and {{ locked }} locked records not yet acknowledged by the server. A wipe may destroy them permanently.{% endblocktrans %}
+        {% elif expected_loss == "NONE_REPORTED" %}
+          {% trans "The device last reported no unacknowledged records. Records made since that report may still be destroyed." %}
+        {% else %}
+          {% trans "The device has never reported its local records. Any unacknowledged record on it may be destroyed." %}
+        {% endif %}
+      </p>
+      <p class="mb-0 mt-1">{% trans "Before wiping, the device reports its record count, sequence range and chain head wherever technically possible." %}</p>
+    </div>
+  </div>
+
+  {% if not mfa_configured %}
+    <div class="asc-notice asc-notice-warning" role="status">
+      {% include "components/icon.html" with name="lock" %}
+      <p>{% trans "MFA step-up is not available in this environment, so an emergency wipe cannot be ordered here." %}</p>
+    </div>
+  {% endif %}
+
+  <section class="asc-card" aria-labelledby="wipe-heading">
+    <h2 class="asc-card-title" id="wipe-heading">{% include "components/icon.html" with name="shield" %}{% trans "Order the wipe" %}</h2>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% include "components/form_fields.html" with form=form %}
+      <button type="submit" class="btn btn-danger"><span>{% trans "Order the emergency wipe" %}</span></button>
+    </form>
+  </section>
+  <p><a href="{% url 'entry:device-detail' device.public_id %}">{% trans "Back to the device" %}</a></p>
+{% endblock %}

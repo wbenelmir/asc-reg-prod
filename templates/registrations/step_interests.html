@@ -1,0 +1,78 @@
+{% extends "layouts/base_wizard.html" %}
+{% load i18n registration_ui %}
+{% block title %}{% trans "Interests and objectives" %}{% endblock %}
+{% block stepper %}{% wizard_stepper registration "interests" %}{% endblock %}
+{% block wizard_title %}{% trans "Interests and objectives" %}{% endblock %}
+{% block wizard_lead %}<p>{% trans "Choose the topics that interest you and tell us what you hope to achieve." %}</p>{% endblock %}
+{% block wizard_body %}
+  {% include "components/error_summary.html" %}
+  <form method="post" novalidate class="asc-card asc-wizard-form" data-language-preserve="safe-fields">
+    {% csrf_token %}
+    {% comment %}
+      UX-2 (M20, C-06): grouped topics. With scripting on, a filter box and a
+      list of removable chips for the selected topics are added; the
+      checkboxes stay the submitted value and the server validates them.
+    {% endcomment %}
+    <fieldset class="asc-form-section" data-asc-topic-picker{% if form.interest_topics.errors %} aria-describedby="id_interest_topics_error"{% endif %}
+              data-label-filter="{% trans 'Filter the topics' %}" data-label-remove="{% trans 'Remove' %}" data-label-selected="{% trans 'Selected topics' %}" data-label-none="{% trans 'No topic matches your search.' %}">
+      <legend class="asc-form-section-title">{{ form.interest_topics.label }}</legend>
+      {% for group in interest_groups %}
+        <div class="asc-topic-group" data-topic-group>
+          <h3 class="asc-topic-group-title">{{ group.label }}</h3>
+          <div class="asc-checks">
+            {% for checkbox in group.checkboxes %}
+              <label class="asc-check" for="{{ checkbox.id_for_label }}" data-topic>{{ checkbox.tag }}<bdi>{{ checkbox.choice_label }}</bdi></label>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+      {% if form.interest_topics.errors %}
+        <div id="id_interest_topics_error" class="asc-field-error">
+          {% include "components/icon.html" with name="alert-octagon" size="sm" %}
+          <bdi>{% for error in form.interest_topics.errors %}{{ error }}{% if not forloop.last %} {% endif %}{% endfor %}</bdi>
+        </div>
+      {% endif %}
+    </fieldset>
+    <section class="asc-form-section" aria-labelledby="interests-objectives-heading">
+      <h2 class="asc-form-section-title" id="interests-objectives-heading">{% trans "Objectives" %}</h2>
+      {% include "components/field.html" with field=form.objectives_text mark_optional=True wrapper_class="mb-0" %}
+    </section>
+    {% comment %}
+      UX-3 (M21, D-10): a voluntary accessibility question. Only practical
+      support to arrange; no diagnosis. The details are shown only for "Yes"
+      (with scripting off, every control stays visible and the server drops
+      details for any other answer). None of these fields is preserved across
+      a language switch (S-18).
+    {% endcomment %}
+    <section class="asc-form-section" aria-labelledby="accommodation-heading" data-accommodation>
+      <h2 class="asc-form-section-title" id="accommodation-heading">{% trans "Accessibility support" %}</h2>
+      <p class="asc-muted">{% trans "Optional. Tell us only what would help you take part. Declining to answer has no effect on your registration." %}</p>
+      <fieldset class="mb-3"{% if form.accommodation_answer.errors %} aria-describedby="id_accommodation_answer_error"{% endif %}>
+        <legend class="form-label">{{ form.accommodation_answer.label }} <span class="asc-optional">{% trans "Optional" %}</span></legend>
+        <div class="asc-checks">
+          {% for radio in form.accommodation_answer %}
+            <label class="asc-check" for="{{ radio.id_for_label }}">{{ radio.tag }}<bdi>{{ radio.choice_label }}</bdi></label>
+          {% endfor %}
+        </div>
+        {% if form.accommodation_answer.errors %}
+          <div id="id_accommodation_answer_error" class="asc-field-error">{% include "components/icon.html" with name="alert-octagon" size="sm" %}<bdi>{{ form.accommodation_answer.errors|join:" " }}</bdi></div>
+        {% endif %}
+      </fieldset>
+      <div data-accommodation-details>
+        <fieldset class="mb-3"{% if form.accommodation_categories.errors %} aria-describedby="id_accommodation_categories_error"{% endif %}>
+          <legend class="form-label">{{ form.accommodation_categories.label }} <span class="asc-optional">{% trans "Optional" %}</span></legend>
+          <div class="asc-checks">
+            {% for checkbox in form.accommodation_categories %}
+              <label class="asc-check" for="{{ checkbox.id_for_label }}">{{ checkbox.tag }}<bdi>{{ checkbox.choice_label }}</bdi></label>
+            {% endfor %}
+          </div>
+          {% if form.accommodation_categories.errors %}
+            <div id="id_accommodation_categories_error" class="asc-field-error">{% include "components/icon.html" with name="alert-octagon" size="sm" %}<bdi>{{ form.accommodation_categories.errors|join:" " }}</bdi></div>
+          {% endif %}
+        </fieldset>
+        {% include "components/field.html" with field=form.accommodation_note mark_optional=True wrapper_class="mb-0" %}
+      </div>
+    </section>
+    {% include "registrations/_wizard_actions.html" with step="interests" %}
+  </form>
+{% endblock %}

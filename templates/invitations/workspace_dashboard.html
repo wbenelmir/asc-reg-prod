@@ -1,0 +1,119 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% trans "Organization Workspace" %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Organizations" %}</p>
+      <h1>{% trans "Organization Workspace" %}</h1>
+      <p>{% trans "Invitation campaigns and delegation lists for the organizations in your authorized scope." %}</p>
+    </div>
+    <div class="asc-actions-row mt-0">
+      <a class="btn btn-primary" href="{% url 'invitations:organization-search' %}">{% include "components/icon.html" with name="search" %}<span>{% trans "Find an organization" %}</span></a>
+      <a class="btn btn-outline-secondary" href="{% url 'invitations:workspace-registrations' %}">{% include "components/icon.html" with name="list" %}<span>{% trans "Registration contexts" %}</span></a>
+    </div>
+  </div>
+
+  <section class="asc-card asc-card-flush" aria-labelledby="campaigns-heading">
+    <div class="asc-card-toolbar">
+      <h2 class="asc-card-toolbar-title" id="campaigns-heading">{% trans "Invitation campaigns" %}</h2>
+      <span class="asc-count">{% blocktrans count counter=campaigns|length %}{{ counter }} campaign{% plural %}{{ counter }} campaigns{% endblocktrans %}</span>
+    </div>
+    {% if campaigns %}
+      <div class="asc-table-wrap asc-wide-only">
+        <table class="asc-table" aria-labelledby="campaigns-heading">
+          <thead>
+            <tr>
+              <th scope="col">{% trans "Reference" %}</th>
+              <th scope="col">{% trans "Name" %}</th>
+              <th scope="col">{% trans "Organization" %}</th>
+              <th scope="col">{% trans "Status" %}</th>
+              <th scope="col"><span class="visually-hidden">{% trans "Actions" %}</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for campaign in campaigns %}
+              <tr>
+                <th scope="row"><bdi dir="ltr" class="asc-code">{{ campaign.public_reference }}</bdi></th>
+                <td><bdi>{{ campaign.name }}</bdi></td>
+                <td><bdi>{{ campaign.organization.official_name }}</bdi></td>
+                <td>{% status_chip "campaign" campaign.status campaign.get_status_display %}</td>
+                <td class="asc-cell-action"><a class="btn btn-sm btn-outline-primary" href="{% url 'invitations:campaign-detail' pk=campaign.pk %}">{% trans "View" %}<span class="visually-hidden"> <bdi dir="ltr">{{ campaign.public_reference }}</bdi></span></a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <ul class="asc-records asc-narrow-only" aria-labelledby="campaigns-heading">
+        {% for campaign in campaigns %}
+          <li class="asc-record" data-record>
+            <div class="asc-record-head">
+              <h3 class="asc-record-title"><bdi>{{ campaign.name }}</bdi></h3>
+              <p class="asc-record-meta"><bdi dir="ltr" class="asc-code">{{ campaign.public_reference }}</bdi></p>
+            </div>
+            <dl class="asc-record-fields">
+              <div><dt>{% trans "Status" %}</dt><dd>{% status_chip "campaign" campaign.status campaign.get_status_display %}</dd></div>
+              <div><dt>{% trans "Organization" %}</dt><dd><bdi>{{ campaign.organization.official_name }}</bdi></dd></div>
+            </dl>
+            <div class="asc-record-actions"><a class="btn btn-outline-primary" href="{% url 'invitations:campaign-detail' pk=campaign.pk %}" data-record-action>{% trans "View" %}<span class="visually-hidden"> <bdi dir="ltr">{{ campaign.public_reference }}</bdi></span></a></div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="asc-empty">
+        <span class="asc-tile">{% include "components/icon.html" with name="mail" %}</span>
+        <h3>{% trans "No campaigns are currently visible to you." %}</h3>
+        <p>{% trans "Find an organization to create its first invitation campaign." %}</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="asc-card asc-card-flush" aria-labelledby="batches-heading">
+    <div class="asc-card-toolbar">
+      <h2 class="asc-card-toolbar-title" id="batches-heading">{% trans "Delegation batches" %}</h2>
+      <span class="asc-count">{% blocktrans count counter=batches|length %}{{ counter }} batch{% plural %}{{ counter }} batches{% endblocktrans %}</span>
+    </div>
+    {% if batches %}
+      <div class="asc-table-wrap asc-wide-only">
+        <table class="asc-table" aria-labelledby="batches-heading">
+          <thead>
+            <tr>
+              <th scope="col">{% trans "Organization" %}</th>
+              <th scope="col">{% trans "Status" %}</th>
+              <th scope="col" class="asc-num">{% trans "Valid rows" %}</th>
+              <th scope="col"><span class="visually-hidden">{% trans "Actions" %}</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for batch in batches %}
+              <tr>
+                <th scope="row"><bdi>{{ batch.organization.official_name }}</bdi></th>
+                <td>{% status_chip "delegation_batch" batch.status batch.get_status_display %}</td>
+                <td class="asc-num">{% blocktrans with valid=batch.valid_row_count total=batch.row_count %}{{ valid }} of {{ total }}{% endblocktrans %}</td>
+                <td class="asc-cell-action"><a class="btn btn-sm btn-outline-primary" href="{% url 'invitations:delegation-detail' pk=batch.pk %}">{% trans "View" %}<span class="visually-hidden"> <bdi>{{ batch.organization.official_name }}</bdi></span></a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <ul class="asc-records asc-narrow-only" aria-labelledby="batches-heading">
+        {% for batch in batches %}
+          <li class="asc-record" data-record>
+            <div class="asc-record-head"><h3 class="asc-record-title"><bdi>{{ batch.organization.official_name }}</bdi></h3></div>
+            <dl class="asc-record-fields">
+              <div><dt>{% trans "Status" %}</dt><dd>{% status_chip "delegation_batch" batch.status batch.get_status_display %}</dd></div>
+              <div><dt>{% trans "Valid rows" %}</dt><dd>{% blocktrans with valid=batch.valid_row_count total=batch.row_count %}{{ valid }} of {{ total }}{% endblocktrans %}</dd></div>
+            </dl>
+            <div class="asc-record-actions"><a class="btn btn-outline-primary" href="{% url 'invitations:delegation-detail' pk=batch.pk %}" data-record-action>{% trans "View" %}<span class="visually-hidden"> <bdi>{{ batch.organization.official_name }}</bdi></span></a></div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="asc-empty">
+        <span class="asc-tile">{% include "components/icon.html" with name="layers" %}</span>
+        <h3>{% trans "No delegation batches are currently visible to you." %}</h3>
+        <p>{% trans "Upload a delegation list from an organization's search result." %}</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

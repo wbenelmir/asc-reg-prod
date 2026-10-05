@@ -1,0 +1,184 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% trans "Identity review" %}{% endblock %}
+{% block content %}
+  {% comment %}
+    IDV-3 identity review queue. Scope, filters, counts and pagination are
+    computed by apps.people.selectors.identity; the NIN is always masked here.
+    Status tabs keep every other filter; "Open" keeps the whole query so the
+    review screen can return to, and continue, this exact queue. IDV-C1
+    (R-IDV-05): no search text ever enters a URL. The search is a separate
+    CSRF-protected POST; links carry only the opaque `ctx` reference of the
+    server-side search context.
+  {% endcomment %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <h1>{% trans "Identity review" %}</h1>
+      <p>{% trans "Identity verification cases in your authorized scope, oldest first. Identity verification never approves participation." %}</p>
+    </div>
+  </div>
+
+  <nav aria-label="{% trans 'Cases by identity status' %}">
+    <ul class="asc-tabs asc-idv-tabs nav" data-idv-status-tabs>
+      {% for value, label, count in status_tabs %}
+        <li class="nav-item">
+          <a class="nav-link{% if filters.status == value %} active{% endif %}"{% if filters.status == value %} aria-current="page"{% endif %} href="?status={{ value }}{% if tab_querystring %}&amp;{{ tab_querystring }}{% endif %}" data-status-tab="{{ value }}">
+            {% status_chip "identity" value label %}
+            <span class="asc-count" data-status-count="{{ value }}">{{ count }}</span>
+          </a>
+        </li>
+      {% endfor %}
+      <li class="nav-item">
+        <a class="nav-link{% if filters.status == all_statuses %} active{% endif %}"{% if filters.status == all_statuses %} aria-current="page"{% endif %} href="?status={{ all_statuses }}" data-status-tab="ALL">{% trans "All" %} <span class="asc-count">{{ total_count }}</span></a>
+      </li>
+    </ul>
+  </nav>
+
+  <form method="post" action="{% url 'identity:search' %}" class="asc-card asc-filters asc-idv-search" role="search" aria-label="{% trans 'Search identity cases' %}" data-idv-search-form>
+    {% csrf_token %}
+    {% for key, value in filters.items %}{% if key != "ctx" %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}{% endfor %}
+    <div class="asc-filter-search">
+      <label for="id_q" class="form-label">{% trans "Search" %}</label>
+      <div class="asc-idv-search-row">
+        <div class="asc-input-icon">
+          {% include "components/icon.html" with name="search" %}
+          <input type="search" id="id_q" name="q" class="form-control" value="" placeholder="{% trans 'Reference, name, or full NIN' %}" autocomplete="off" spellcheck="false" maxlength="100">
+        </div>
+        <button type="submit" class="btn btn-primary">{% include "components/icon.html" with name="search" %}<span>{% trans "Search" %}</span></button>
+      </div>
+      <p class="form-text mb-0">{% trans "A full 18-digit NIN finds only cases whose evidence you may view. The search text is sent privately and never appears in the address." %}</p>
+    </div>
+  </form>
+  {% if search %}
+    <div class="asc-notice asc-notice-neutral mb-3" data-idv-search-active>
+      {% include "components/icon.html" with name="search" %}
+      <div class="asc-idv-search-note">
+        <p class="mb-0">{% blocktrans count counter=search.case_ids|length %}Search applied: {{ counter }} matching case.{% plural %}Search applied: {{ counter }} matching cases.{% endblocktrans %}{% if search.truncated %} {% trans "Only the first matches are kept; refine the search." %}{% endif %}</p>
+        <form method="post" action="{% url 'identity:search' %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="clear">
+          {% for key, value in filters.items %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endfor %}
+          <button type="submit" class="btn btn-outline-secondary btn-sm">{% trans "Clear search" %}</button>
+        </form>
+      </div>
+    </div>
+  {% elif search_expired %}
+    <div class="asc-notice asc-notice-warning mb-3" data-idv-search-expired>
+      {% include "components/icon.html" with name="clock" %}
+      <div><p class="mb-0">{% trans "This search is no longer available. Search again to narrow the queue." %}</p></div>
+    </div>
+  {% endif %}
+
+  <form method="get" class="asc-card asc-filters" aria-label="{% trans 'Filter identity cases' %}">
+    <input type="hidden" name="status" value="{{ filters.status }}">
+    {% if filters.ctx %}<input type="hidden" name="ctx" value="{{ filters.ctx }}">{% endif %}
+    <div class="asc-filters-grid">
+      <div>
+        <label for="id_reason" class="form-label">{% trans "Reason" %}</label>
+        <select id="id_reason" name="reason" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          {% for value, label in reasons %}<option value="{{ value }}"{% if filters.reason == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="id_route" class="form-label">{% trans "Nationality group" %}</label>
+        <select id="id_route" name="route" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          {% for value, label in routes %}<option value="{{ value }}"{% if filters.route == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="id_nationality" class="form-label">{% trans "Nationality" %}</label>
+        <select id="id_nationality" name="nationality" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          {% for code, name in nationalities %}<option value="{{ code }}"{% if filters.nationality == code %} selected{% endif %}>{{ name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="id_source" class="form-label">{% trans "Verification source" %}</label>
+        <select id="id_source" name="source" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          {% for value, label in sources %}<option value="{{ value }}"{% if filters.source == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+      </div>
+      {% if events|length > 1 %}
+        <div>
+          <label for="id_event" class="form-label">{% trans "Event" %}</label>
+          <select id="id_event" name="event" class="form-select">
+            <option value="">{% trans "Any" %}</option>
+            {% for event_id, code in events %}<option value="{{ event_id }}"{% if filters.event == event_id|stringformat:'s' %} selected{% endif %}>{{ code }}</option>{% endfor %}
+          </select>
+        </div>
+      {% endif %}
+    </div>
+    <div class="asc-filters-actions">
+      <button type="submit" class="btn btn-primary">{% include "components/icon.html" with name="filter" %}<span>{% trans "Apply filters" %}</span></button>
+      <a class="btn btn-outline-secondary" href="{% url 'identity:queue' %}">{% trans "Clear filters" %}</a>
+    </div>
+  </form>
+
+  <section class="asc-card asc-card-flush" aria-labelledby="idv-results-heading">
+    <div class="asc-card-toolbar">
+      <h2 class="asc-card-toolbar-title" id="idv-results-heading">{% trans "Cases matching the current filters" %}</h2>
+      <span class="asc-count" data-result-count>{% blocktrans count counter=page.paginator.count %}{{ counter }} case{% plural %}{{ counter }} cases{% endblocktrans %}</span>
+    </div>
+    {% if page.object_list %}
+      <div class="asc-table-wrap asc-wide-only">
+        <table class="asc-table" aria-label="{% trans 'Identity cases' %}">
+          <thead>
+            <tr>
+              <th scope="col">{% trans "Reference" %}</th>
+              <th scope="col">{% trans "Name" %}</th>
+              <th scope="col">{% trans "Identity status" %}</th>
+              <th scope="col">{% trans "Reason" %}</th>
+              <th scope="col">{% trans "Document" %}</th>
+              <th scope="col">{% trans "Nationality" %}</th>
+              <th scope="col">{% trans "Since" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for case in page %}
+              <tr data-idv-row="{{ case.pk }}">
+                <th scope="row"><a href="{% url 'identity:case' pk=case.pk %}{% if querystring %}?{{ querystring }}{% endif %}" data-idv-open><bdi dir="ltr" class="asc-code">{{ case.registration.public_reference }}</bdi></a></th>
+                <td><bdi>{{ case.registration.profile.submitted_given_names }} {{ case.registration.profile.submitted_family_name }}</bdi></td>
+                <td>{% status_chip "identity" case.status case.get_status_display %}{% if case.verification_source %}<div class="asc-muted small">{{ case.get_verification_source_display }}</div>{% endif %}</td>
+                <td>{% if case.reason_code %}{{ case.get_reason_code_display }}{% else %}<span class="asc-muted">—</span>{% endif %}</td>
+                <td>{{ case.get_route_display }} <bdi dir="ltr" class="asc-code">{{ case.current_revision.identifier.masked_value }}</bdi></td>
+                <td>{{ case.nationality.localized_name }}</td>
+                <td><time datetime="{{ case.status_changed_at|date:'c' }}">{{ case.status_changed_at }}</time></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <ul class="asc-records asc-narrow-only" aria-label="{% trans 'Identity cases' %}">
+        {% for case in page %}
+          <li class="asc-record" data-record>
+            <div class="asc-record-head">
+              <h3 class="asc-record-title"><bdi dir="ltr" class="asc-code">{{ case.registration.public_reference }}</bdi></h3>
+              <p class="asc-record-meta"><bdi>{{ case.registration.profile.submitted_given_names }} {{ case.registration.profile.submitted_family_name }}</bdi></p>
+            </div>
+            <dl class="asc-record-fields">
+              <div class="asc-record-wide"><dt>{% trans "Identity status" %}</dt><dd>{% status_chip "identity" case.status case.get_status_display %}</dd></div>
+              <div><dt>{% trans "Reason" %}</dt><dd>{% if case.reason_code %}{{ case.get_reason_code_display }}{% else %}—{% endif %}</dd></div>
+              <div><dt>{% trans "Document" %}</dt><dd>{{ case.get_route_display }}</dd></div>
+              <div class="asc-record-wide"><dt>{% trans "Since" %}</dt><dd><time datetime="{{ case.status_changed_at|date:'c' }}">{{ case.status_changed_at }}</time></dd></div>
+            </dl>
+            <div class="asc-record-actions">
+              <a class="btn btn-outline-primary" href="{% url 'identity:case' pk=case.pk %}{% if querystring %}?{{ querystring }}{% endif %}" data-record-action>{% trans "Open case" %}<span class="visually-hidden"> <bdi dir="ltr">{{ case.registration.public_reference }}</bdi></span></a>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+      <div class="asc-card-foot">
+        {% trans "Identity queue pages" as pages_label %}
+        {% include "components/pagination.html" with label=pages_label %}
+      </div>
+    {% else %}
+      <div class="asc-empty">
+        <span class="asc-tile">{% include "components/icon.html" with name="inbox" %}</span>
+        <h3>{% trans "No identity cases match the current filters." %}</h3>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

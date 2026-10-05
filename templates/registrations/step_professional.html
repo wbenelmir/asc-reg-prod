@@ -1,0 +1,62 @@
+{% extends "layouts/base_wizard.html" %}
+{% load i18n registration_ui %}
+{% block title %}{% trans "Professional information" %}{% endblock %}
+{% block stepper %}{% wizard_stepper registration "professional" %}{% endblock %}
+{% block wizard_title %}{% trans "Professional information" %}{% endblock %}
+{% block wizard_lead %}<p>{% trans "Tell us about the organization you represent at the event." %}</p>{% endblock %}
+{% block wizard_body %}
+  {% include "components/error_summary.html" %}
+  <form method="post" enctype="multipart/form-data" novalidate class="asc-card asc-wizard-form" data-language-preserve="safe-fields">
+    {% csrf_token %}
+    <section class="asc-form-section" aria-labelledby="professional-organization-heading">
+      <h2 class="asc-form-section-title" id="professional-organization-heading">{% trans "Organization" %}</h2>
+      <div class="asc-grid-2">
+        {% include "components/field.html" with field=form.organization_name mark_optional=True %}
+        {% include "components/field.html" with field=form.organization_type mark_optional=True %}
+      </div>
+      <div class="asc-grid-2">
+        {% include "components/field.html" with field=form.sector mark_optional=True %}
+        {% include "components/field.html" with field=form.country_code mark_optional=True %}
+      </div>
+      {# UX-2 (M16, D-07): operating scope is separate from the headquarters country. #}
+      <fieldset class="mb-3"{% if form.operating_scope.errors %} aria-describedby="id_operating_scope_error"{% endif %}>
+        <legend class="form-label">{{ form.operating_scope.label }}</legend>
+        <div class="asc-checks">
+          {% for radio in form.operating_scope %}
+            <label class="asc-check" for="{{ radio.id_for_label }}">{{ radio.tag }}<bdi>{{ radio.choice_label }}</bdi></label>
+          {% endfor %}
+        </div>
+        {% if form.operating_scope.errors %}
+          <div id="id_operating_scope_error" class="asc-field-error">{% include "components/icon.html" with name="alert-octagon" size="sm" %}<bdi>{{ form.operating_scope.errors|join:" " }}</bdi></div>
+        {% endif %}
+      </fieldset>
+      {% include "components/field.html" with field=form.organization_website mark_optional=True %}
+    </section>
+    <section class="asc-form-section" aria-labelledby="professional-role-heading">
+      <h2 class="asc-form-section-title" id="professional-role-heading">{% trans "Your role" %}</h2>
+      <div class="asc-grid-2">
+        {% include "components/field.html" with field=form.job_title mark_optional=True %}
+        {% include "components/field.html" with field=form.department mark_optional=True %}
+      </div>
+      {% include "components/field.html" with field=form.professional_profile_url mark_optional=True %}
+      {% include "components/field.html" with field=form.biography mark_optional=True %}
+    </section>
+    <section class="asc-form-section" aria-labelledby="professional-photo-heading">
+      <h2 class="asc-form-section-title" id="professional-photo-heading">{% trans "Profile photograph" %}</h2>
+      {# Required for every new submission (owner correction, 2026-10-04); never marked optional. #}
+      {% if current_photo %}
+        <div class="asc-notice asc-notice-success mb-3">
+          {% include "components/icon.html" with name="check-circle" %}
+          <p>{% trans "A profile photograph is already on file. Upload a new one only if you want to replace it." %}</p>
+        </div>
+      {% else %}
+        <div class="asc-notice asc-notice-neutral mb-3" data-profile-photo-required>
+          {% include "components/icon.html" with name="info" %}
+          <p>{% trans "A profile photograph is required to submit your registration." %}</p>
+        </div>
+      {% endif %}
+      {% include "components/field.html" with field=form.profile_photo wrapper_class="mb-0" %}
+    </section>
+    {% include "registrations/_wizard_actions.html" with step="professional" %}
+  </form>
+{% endblock %}

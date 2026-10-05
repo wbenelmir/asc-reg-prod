@@ -1,0 +1,29 @@
+{% extends "layouts/base_error.html" %}
+{% load i18n asc_ui %}
+{% comment %}
+  Access denied (F3). Rendered for a signed-in user who lacks the permission
+  a page requires; anonymous users are redirected to sign-in instead. The
+  text is the same for every page and object, so it never tells whether a
+  requested object exists.
+{% endcomment %}
+{% block title %}{% trans "Access denied" %}{% endblock %}
+{% block error_icon %}{% include "components/icon.html" with name="lock" size="lg" %}{% endblock %}
+{% block error_code %}{% trans "Error 403" %}{% endblock %}
+{% block error_title %}{% trans "You do not have access to this page" %}{% endblock %}
+{% block error_body %}
+  <p>{% trans "Your account is signed in, but it does not have the permission this page requires." %}</p>
+  <p>{% trans "If you need access for your work, ask the person who manages your operations account." %}</p>
+{% endblock %}
+{% block error_actions %}
+  {% if request.user.is_authenticated %}
+    <a class="btn btn-primary" href="{% operations_home_url %}">{% trans "Go to your operations home" %}</a>
+    <form method="post" action="{% url 'accounts:operational-sign-out' %}" class="m-0">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-secondary">{% include "components/icon.html" with name="log-out" flip=True %}<span>{% trans "Sign out" %}</span></button>
+    </form>
+  {% elif participant_authenticated %}
+    <a class="btn btn-primary" href="{% url 'registrations:workspace' %}">{% trans "Go to my registrations" %}</a>
+  {% else %}
+    <a class="btn btn-primary" href="{% url 'home' %}">{% trans "Go to the start page" %}</a>
+  {% endif %}
+{% endblock %}

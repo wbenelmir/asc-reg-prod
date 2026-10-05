@@ -1,0 +1,42 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% comment %}
+  Registration channels (UX-4, M24): the events whose channels this operator
+  may manage, with the effective state now. Only events in the operator's
+  scope are listed; the detail page re-checks scope and permission.
+{% endcomment %}
+{% block title %}{% trans "Registration channels" %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <h1>{% trans "Registration channels" %}</h1>
+      <p>{% trans "Open, restrict or close registration for an event. Closing never deletes a registration or a saved draft." %}</p>
+    </div>
+  </div>
+
+  <section class="asc-card asc-card-flush" aria-labelledby="channel-table-caption">
+    <div class="asc-card-toolbar">
+      <h2 class="asc-card-toolbar-title" id="channel-table-caption">{% trans "Events you can manage" %}</h2>
+    </div>
+    {% if events %}
+      <ul class="asc-records" aria-labelledby="channel-table-caption">
+        {% for event in events %}
+          <li class="asc-record" data-record data-channel-state="{{ event.channel_state }}">
+            <div class="asc-record-head">
+              <h3 class="asc-record-title"><bdi>{{ event.name }}</bdi></h3>
+              <p class="asc-record-meta">{% trans "Event edition" %}{% trans ":" context "label separator" %} <bdi dir="ltr" class="asc-code">{{ event.code }}</bdi></p>
+            </div>
+            <dl class="asc-record-fields">
+              <div><dt>{% trans "Current state" %}</dt><dd><span class="asc-chip asc-chip-{{ event.channel_state_tone }}">{{ event.channel_state_label }}</span></dd></div>
+            </dl>
+            <div class="asc-record-actions">
+              <a class="btn btn-outline-primary" href="{% url 'events:channel-detail' pk=event.pk %}" data-record-action>{% trans "Manage" %}<span class="visually-hidden"> <bdi dir="ltr">{{ event.code }}</bdi></span></a>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="asc-table-empty">{% trans "No event is in your scope." %}</p>
+    {% endif %}
+  </section>
+{% endblock %}

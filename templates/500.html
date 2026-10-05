@@ -1,0 +1,16 @@
+{% extends "layouts/base_error.html" %}
+{% load i18n %}
+{% comment %}
+  Static-safe server-error page: Django renders it without a request
+  context, and nothing here may touch the database, the session or the user
+  (the database may be the reason this page is shown). Only static, URL and
+  translation tags are used; no diagnostic detail is ever included.
+{% endcomment %}
+{% block title %}{% trans "Something went wrong" %}{% endblock %}
+{% block error_icon %}{% include "components/icon.html" with name="alert-octagon" size="lg" %}{% endblock %}
+{% block error_code %}{% trans "Error 500" %}{% endblock %}
+{% block error_title %}{% trans "Something went wrong" %}{% endblock %}
+{% block error_body %}
+  <p>{% trans "An unexpected error prevented this page from loading. Try again in a few minutes." %}</p>
+  <p>{% trans "If the problem continues, contact support and mention the time it happened." %}</p>
+{% endblock %}

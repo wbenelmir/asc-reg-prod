@@ -1,0 +1,56 @@
+{% extends "layouts/base_public.html" %}
+{% load i18n %}
+{% comment %}
+  Public legal information (UXR-C1, UXR-F02; UI/UX PUB-07). Read-only, for
+  anyone, before an email address is given. It shows the current published
+  Privacy Notice and Registration Terms exactly as published, including any
+  "to be confirmed" markers they still carry, and says when a document is
+  shown in another language than the page. A missing document is shown as
+  unavailable. `noindex` (base.html and PrivatePageProtectionMiddleware) and
+  `Cache-Control: private, no-store` (the view). Reading it records nothing.
+{% endcomment %}
+{% block title %}{% trans "Privacy Notice and Terms" %}{% endblock %}
+{% block main %}
+  <main id="main-content" class="asc-main" hx-boost="true">
+    <div class="container-xl">
+      <div class="asc-legal-page">
+        <div class="asc-page-head">
+          <p class="asc-kicker">{% trans "Legal information" %}</p>
+          <h1>{% trans "Privacy Notice and Terms" %}</h1>
+          <p>{% trans "These are the documents you will be asked to acknowledge and accept when you submit a registration. You can read them before you start." %}</p>
+        </div>
+        <nav class="asc-legal-toc" aria-label="{% trans 'Documents on this page' %}">
+          <ul>
+            {% for document in documents %}<li><a href="#{{ document.anchor }}">{{ document.heading }}</a></li>{% endfor %}
+          </ul>
+        </nav>
+        {% for document in documents %}
+          <section class="asc-card asc-legal-document" id="{{ document.anchor }}" aria-labelledby="{{ document.anchor }}-heading">
+            <h2 id="{{ document.anchor }}-heading" class="asc-form-section-title">{{ document.heading }}</h2>
+            {% if document.version %}
+              <p class="asc-muted asc-legal-meta" data-legal-version>
+                {% trans "Version" %}{% trans ":" context "label separator" %} <bdi dir="ltr">{{ document.version.version_label }}</bdi>
+                &middot; {% trans "In effect since" %}{% trans ":" context "label separator" %} <bdi>{{ document.version.effective_from|date:"DATE_FORMAT" }}</bdi>
+              </p>
+              {% if document.is_fallback %}
+                <div class="asc-notice asc-notice-neutral mb-3" data-legal-fallback>
+                  {% include "components/icon.html" with name="info" %}
+                  <p>{% blocktrans with language=document.language_name %}This document is not available in your language. It is shown in {{ language }}.{% endblocktrans %}</p>
+                </div>
+              {% endif %}
+              <div class="asc-legal-text" lang="{{ document.language }}" dir="{% if document.is_rtl %}rtl{% else %}ltr{% endif %}">
+                {{ document.version.content|linebreaks }}
+              </div>
+            {% else %}
+              <div class="asc-notice asc-notice-warning mb-0" role="status" data-legal-unavailable>
+                {% include "components/icon.html" with name="alert-triangle" %}
+                <p>{% trans "This document is not available at the moment. Registration cannot be submitted until it is published. Please try again later." %}</p>
+              </div>
+            {% endif %}
+          </section>
+        {% endfor %}
+        <p><a class="btn btn-outline-secondary" href="{% url 'accounts:otp-request' %}">{% include "components/icon.html" with name="arrow-prev" flip=True %}<span>{% trans "Back to registration" %}</span></a></p>
+      </div>
+    </div>
+  </main>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "layouts/base_entry.html" %}
+{% load i18n %}
+{% block title %}{% trans "Request not completed" %}{% endblock %}
+{% block content %}
+{# Unauthorized, conflicting or invalid checkpoint request: the message names what happened; the action returns to a safe place. #}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-7">
+    <section class="asc-card">
+      <div class="asc-empty">
+        <span class="asc-tile">{% include "components/icon.html" with name="lock" %}</span>
+        <h1 class="h3">{% trans "Request not completed" %}</h1>
+        <div class="asc-notice asc-notice-danger text-start w-100" role="alert">
+          {% include "components/icon.html" with name="x-circle" %}
+          <p>{{ message }}</p>
+        </div>
+        <p>{% trans "This request did not record an entry decision. If you think this is wrong, contact your supervisor." %}</p>
+        <a class="btn btn-outline-secondary" href="{% url 'entry:home' %}">{% trans "Back to the checkpoint" %}</a>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

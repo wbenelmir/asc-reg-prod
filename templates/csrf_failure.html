@@ -1,0 +1,16 @@
+{% extends "layouts/base_error.html" %}
+{% load i18n %}
+{% comment %}
+  CSRF failure (settings.CSRF_FAILURE_VIEW -> apps.core.views.csrf_failure).
+  Django's CSRF protection is unchanged; this only replaces its page. The
+  technical reason is never shown (it is logged by Django's own
+  `django.security.csrf` logger).
+{% endcomment %}
+{% block title %}{% trans "Form expired" %}{% endblock %}
+{% block error_icon %}{% include "components/icon.html" with name="shield" size="lg" %}{% endblock %}
+{% block error_code %}{% trans "Error 403" %}{% endblock %}
+{% block error_title %}{% trans "Your form could not be sent" %}{% endblock %}
+{% block error_body %}
+  <p>{% trans "For your security, a form is only accepted from the page that showed it, while your session is active. It may have expired, or your browser may be blocking cookies." %}</p>
+  <p>{% trans "Go back, reload the page and submit the form again. Nothing was saved from this attempt." %}</p>
+{% endblock %}

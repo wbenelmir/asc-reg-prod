@@ -1,0 +1,202 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% block title %}{% trans "Entry observability" %}{% endblock %}
+
+{% block breadcrumbs %}
+  <nav aria-label="{% trans 'Breadcrumb' %}" class="asc-breadcrumbs">
+    <ol>
+      <li><a href="{% url 'registrations:ops-intake-list' %}">{% trans "Operations" %}</a>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><a href="{% url 'entry:device-list' event.pk %}">{% trans "Entry devices" %}</a>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><span aria-current="page">{% trans "Entry observability" %}</span></li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block content %}
+{% comment %}
+  Operational metrics for one event edition (TRD §23.1; Phase 3 Prompt 5).
+  Aggregates, codes and checkpoint coordinates only: no participant,
+  registration, credential, token, identity value or operator appears.
+{% endcomment %}
+{% with v=data.verification d=data.devices q=data.queue st=data.stock an=data.anomalies %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <h1>{% trans "Entry observability" %}</h1>
+      <p><bdi>{{ event.name }}</bdi>. {% trans "Online verification performance, device health and operational exceptions. No participant data is shown." %}</p>
+    </div>
+    <form method="get" class="asc-inline-form" aria-label="{% trans 'Time window' %}">
+      <label class="form-label mb-0 px-1" for="window">{% trans "Window" %}</label>
+      <select class="form-select" id="window" name="window" data-auto-submit>
+        {% for seconds, minutes in windows %}
+          <option value="{{ seconds }}"{% if seconds == window %} selected{% endif %}>{% blocktrans count counter=minutes %}Last {{ counter }} minute{% plural %}Last {{ counter }} minutes{% endblocktrans %}</option>
+        {% endfor %}
+      </select>
+      <noscript><button type="submit" class="btn btn-outline-secondary btn-sm">{% trans "Apply" %}</button></noscript>
+    </form>
+  </div>
+  <p class="small text-body-secondary">{% trans "Generated" %} <time datetime="{{ data.generated_at|date:'c' }}">{{ data.generated_at|date:"Y-m-d H:i:s" }}</time></p>
+
+  <div class="asc-kpis" role="group" aria-label="{% trans 'Headline metrics' %}">
+    <div class="asc-kpi {% if v.p95_ms is None %}{% elif v.within_target %}asc-kpi-success{% else %}asc-kpi-danger{% endif %}" data-metric="p95">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="clock" size="sm" %}{% trans "Verification p95" %}</span>
+      <span class="asc-kpi-value">{% if v.p95_ms is None %}—{% else %}{{ v.p95_ms }} <small class="fs-6">ms</small>{% endif %}</span>
+      <span class="asc-kpi-note">{% blocktrans with target=v.target_p95_ms %}Target: {{ target }} ms or less{% endblocktrans %}{% if v.p95_ms is not None %} · {% if v.within_target %}{% trans "within target" %}{% else %}{% trans "above target" %}{% endif %}{% endif %}</span>
+    </div>
+    <div class="asc-kpi asc-kpi-info" data-metric="verifications">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="qr" size="sm" %}{% trans "Verifications" %}</span>
+      <span class="asc-kpi-value">{{ v.total }}</span>
+      <span class="asc-kpi-note">{% if v.p50_ms is not None %}{% blocktrans with p50=v.p50_ms %}Median {{ p50 }} ms{% endblocktrans %}{% else %}{% trans "No verification in this window" %}{% endif %}</span>
+    </div>
+    <div class="asc-kpi {% if d.enrolled_stale %}asc-kpi-warning{% else %}asc-kpi-success{% endif %}" data-metric="devices">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="tablet" size="sm" %}{% trans "Devices not seen recently" %}</span>
+      <span class="asc-kpi-value">{{ d.enrolled_stale }} <small class="fs-6">/ {{ d.enrolled }}</small></span>
+      <span class="asc-kpi-note">{% blocktrans count counter=d.open_checkpoint_sessions %}{{ counter }} open checkpoint session{% plural %}{{ counter }} open checkpoint sessions{% endblocktrans %}</span>
+    </div>
+    <div class="asc-kpi {% if q.failed %}asc-kpi-danger{% elif q.pending %}asc-kpi-warning{% else %}asc-kpi-success{% endif %}" data-metric="queue">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="send" size="sm" %}{% trans "Outbox queue" %}</span>
+      <span class="asc-kpi-value">{{ q.pending }}</span>
+      <span class="asc-kpi-note">{% blocktrans with failed=q.failed %}{{ failed }} failed{% endblocktrans %}{% if q.oldest_pending_age_seconds is not None %} · {% blocktrans with age=q.oldest_pending_age_seconds %}oldest {{ age }} s{% endblocktrans %}{% endif %}</span>
+    </div>
+    <div class="asc-kpi {% if an.signals or an.throttled %}asc-kpi-warning{% else %}asc-kpi-success{% endif %}" data-metric="anomalies">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="alert-triangle" size="sm" %}{% trans "Anomaly signals" %}</span>
+      <span class="asc-kpi-value">{{ an.signals }}</span>
+      <span class="asc-kpi-note">{% blocktrans with throttled=an.throttled %}{{ throttled }} lookups paused{% endblocktrans %}</span>
+    </div>
+  </div>
+
+  {% if not v.total %}
+    <section class="asc-card">
+      <div class="asc-empty">
+        <span class="asc-tile">{% include "components/icon.html" with name="clock" %}</span>
+        <h2>{% trans "No verification in this window" %}</h2>
+        <p>{% trans "Metrics appear as soon as checkpoints verify entry passes or identity references. Choose a longer window to see earlier activity." %}</p>
+      </div>
+    </section>
+  {% else %}
+    <div class="row g-4">
+      <div class="col-xl-6">
+        <section class="asc-card h-100" aria-labelledby="latency-heading">
+          <h2 class="asc-section-title" id="latency-heading">{% include "components/icon.html" with name="clock" %}{% trans "Latency by method" %}</h2>
+          <p class="asc-section-lead">{% blocktrans with p99=v.p99_ms max=v.max_ms %}Server-side time from lookup to audited result. p99 {{ p99 }} ms, slowest {{ max }} ms.{% endblocktrans %}</p>
+          <div class="asc-table-wrap">
+            <table class="asc-table">
+              <caption class="visually-hidden">{% trans "Latency by method" %}</caption>
+              <thead><tr><th scope="col">{% trans "Method" %}</th><th scope="col" class="asc-num">{% trans "Count" %}</th><th scope="col" class="asc-num">p50 (ms)</th><th scope="col" class="asc-num">p95 (ms)</th></tr></thead>
+              <tbody>
+                {% for row in v.by_method %}
+                  <tr><th scope="row">{{ row.label }}</th><td class="asc-num">{{ row.count }}</td><td class="asc-num">{{ row.p50_ms }}</td><td class="asc-num">{{ row.p95_ms }}</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+      <div class="col-xl-6">
+        <section class="asc-card h-100" aria-labelledby="results-heading">
+          <h2 class="asc-section-title" id="results-heading">{% include "components/icon.html" with name="check-circle" %}{% trans "Results" %}</h2>
+          <div class="asc-table-wrap">
+            <table class="asc-table">
+              <caption class="visually-hidden">{% trans "Results" %}</caption>
+              <thead><tr><th scope="col">{% trans "Result" %}</th><th scope="col" class="asc-num">{% trans "Count" %}</th></tr></thead>
+              <tbody>
+                {% for row in v.by_result %}
+                  <tr><th scope="row"><span class="asc-chip {% if row.result == 'ALLOWED' %}asc-chip-success{% elif row.result == 'ALLOWED_WITH_ADVISORY' %}asc-chip-info{% elif row.result == 'MANUAL_REVIEW' or row.result == 'STALE' %}asc-chip-warning{% elif row.result == 'DENIED' or row.result == 'UNSUPPORTED' %}asc-chip-danger{% endif %}">{{ row.label }}</span></th><td class="asc-num">{{ row.count }}</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+      <div class="col-xl-6">
+        <section class="asc-card h-100" aria-labelledby="gates-heading">
+          <h2 class="asc-section-title" id="gates-heading">{% include "components/icon.html" with name="gate" %}{% trans "By gate" %}</h2>
+          <div class="asc-table-wrap">
+            <table class="asc-table">
+              <caption class="visually-hidden">{% trans "By gate" %}</caption>
+              <thead><tr><th scope="col">{% trans "Gate" %}</th><th scope="col" class="asc-num">{% trans "Count" %}</th><th scope="col" class="asc-num">p95 (ms)</th><th scope="col" class="asc-num">{% trans "Technical errors" %}</th></tr></thead>
+              <tbody>
+                {% for row in v.by_gate %}
+                  <tr><th scope="row"><bdi dir="ltr" class="asc-code">{{ row.label }}</bdi></th><td class="asc-num">{{ row.count }}</td><td class="asc-num">{{ row.p95_ms }}</td><td class="asc-num">{{ row.technical_errors }}</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+      <div class="col-xl-6">
+        <section class="asc-card h-100" aria-labelledby="pass-failures-heading">
+          <h2 class="asc-section-title" id="pass-failures-heading">{% include "components/icon.html" with name="x-circle" %}{% trans "Pass failures" %}</h2>
+          <p class="asc-section-lead">{% trans "QR scans rejected because of the pass itself, with the internal verification code." %}</p>
+          <div class="asc-table-wrap">
+            <table class="asc-table">
+              <caption class="visually-hidden">{% trans "Pass failures" %}</caption>
+              <thead><tr><th scope="col">{% trans "Reason" %}</th><th scope="col">{% trans "Verification code" %}</th><th scope="col" class="asc-num">{% trans "Count" %}</th></tr></thead>
+              <tbody>
+                {% for row in v.pass_failures %}
+                  <tr><th scope="row">{{ row.label }}</th><td><bdi dir="ltr" class="asc-code">{{ row.credential_code|default:"—" }}</bdi></td><td class="asc-num">{{ row.count }}</td></tr>
+                {% empty %}
+                  <tr><td colspan="3" class="asc-table-empty">{% trans "No pass failure in this window." %}</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="row g-4 mt-0">
+    <div class="col-xl-6">
+      <section class="asc-card h-100" aria-labelledby="device-health-heading">
+        <h2 class="asc-section-title" id="device-health-heading">{% include "components/icon.html" with name="tablet" %}{% trans "Device health" %}</h2>
+        <p class="asc-section-lead">{% blocktrans with seconds=d.stale_after_seconds %}An enrolled device counts as not seen recently after {{ seconds }} seconds without contact.{% endblocktrans %}</p>
+        <ul class="asc-chip-list mb-3">
+          {% for row in d.by_status %}<li class="asc-chip asc-chip-outline">{{ row.label }}: {{ row.count }}</li>{% endfor %}
+        </ul>
+        <p class="mb-2">{% blocktrans count counter=d.expiring_within_day %}{{ counter }} enrolled device expires within a day.{% plural %}{{ counter }} enrolled devices expire within a day.{% endblocktrans %}</p>
+        <dl class="asc-dl mb-0" data-metric="offline-readiness">
+          <dt>{% trans "Offline ready devices" %}</dt><dd>{{ d.offline_ready }}</dd>
+          <dt>{% trans "Offline data expiring within an hour" %}</dt><dd>{{ d.offline_packages_expiring_within_hour }}</dd>
+          <dt>{% trans "Devices reporting unacknowledged local records" %}</dt><dd>{{ d.devices_reporting_unacknowledged }}</dd>
+        </dl>
+      </section>
+    </div>
+    <div class="col-xl-6">
+      <section class="asc-card h-100" aria-labelledby="stock-heading">
+        <h2 class="asc-section-title" id="stock-heading">{% include "components/icon.html" with name="package" %}{% trans "Badge stock exceptions" %}</h2>
+        <dl class="asc-dl">
+          <dt>{% trans "Damaged at receipt" %}</dt><dd>{{ st.damaged_at_receipt }}</dd>
+          <dt>{% trans "Count discrepancies" %}</dt><dd>{{ st.reconciliation_discrepancies }} <span class="fw-normal text-body-secondary">({% trans "net" %} <bdi dir="ltr">{{ st.reconciliation_net_discrepancy }}</bdi>)</span></dd>
+          <dt>{% trans "Badges reported lost" %}</dt><dd>{{ st.issuances_lost }}</dd>
+          <dt>{% trans "Issuances voided" %}</dt><dd>{{ st.issuances_voided }}</dd>
+          <dt>{% trans "Badges replaced" %}</dt><dd>{{ st.issuances_replaced }}</dd>
+          {% for row in st.adjustments %}{% if row.count %}<dt>{{ row.label }}</dt><dd>{{ row.count }} <span class="fw-normal text-body-secondary">({% trans "net" %} <bdi dir="ltr">{{ row.net_quantity }}</bdi>)</span></dd>{% endif %}{% endfor %}
+        </dl>
+      </section>
+    </div>
+  </div>
+
+  <section class="asc-card mt-4" aria-labelledby="anomaly-heading">
+    <h2 class="asc-section-title" id="anomaly-heading">{% include "components/icon.html" with name="alert-triangle" %}{% trans "Anomaly signals" %}</h2>
+    <div class="asc-table-wrap">
+      <table class="asc-table">
+        <caption class="visually-hidden">{% trans "Anomaly signals" %}</caption>
+        <thead><tr><th scope="col">{% trans "Time" %}</th><th scope="col">{% trans "Signal" %}</th><th scope="col">{% trans "Gate" %}</th><th scope="col">{% trans "Device" %}</th><th scope="col" class="asc-num">{% trans "Count" %}</th></tr></thead>
+        <tbody>
+          {% for row in an.recent %}
+            <tr>
+              <td><time datetime="{{ row.occurred_at|date:'c' }}">{{ row.occurred_at|date:"H:i:s" }}</time></td>
+              <td><span class="asc-chip {% if row.type == 'THROTTLED' %}asc-chip-danger{% else %}asc-chip-warning{% endif %}">{% if row.kind == "REPEATED_INVALID_SCANS" %}{% trans "Repeated invalid scans" %}{% else %}{% trans "Many identity and reference lookups" %}{% endif %}{% if row.type == "THROTTLED" %} — {% trans "lookups paused" %}{% endif %}</span></td>
+              <td><bdi dir="ltr" class="asc-code">{{ row.gate }}</bdi></td>
+              <td><bdi dir="ltr" class="asc-code">{{ row.device }}</bdi></td>
+              <td class="asc-num">{{ row.count|default:"—" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="asc-table-empty">{% trans "No anomaly signal in this window." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endwith %}
+{% endblock %}

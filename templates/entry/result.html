@@ -1,0 +1,173 @@
+{% extends "layouts/base_entry.html" %}
+{% load i18n static %}
+{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+{% comment %}
+  Verification Result (UI/UX §9.5, §14.4). Each result is carried by text,
+  an icon AND a tone colour -- never colour alone -- and is announced to
+  assistive technology by static/js/entry.js (assertive for results that
+  must stop the operator, polite otherwise).
+
+  The result heading stays until the operator acknowledges it (UI/UX §12.2:
+  critical results are never auto-dismissed). Only the participant details
+  and the decision controls are cleared after inactivity (Flow §15.3); the
+  server enforces its own, independent expiry on the verification.
+{% endcomment %}
+
+<section class="asc-result asc-result-{{ tone }}" id="entry-result" data-result="{{ projection.result }}"
+         data-announce="{% if tone == 'success' or tone == 'info' %}polite{% else %}assertive{% endif %}"
+         aria-labelledby="entry-result-heading">
+  <span class="asc-result-icon">{% include "components/icon.html" with name=icon %}</span>
+  <div>
+    <span class="asc-result-kicker">{% blocktrans trimmed with method=method_label %}Verification result · {{ method }}{% endblocktrans %}</span>
+    <h1 id="entry-result-heading">{{ heading }}</h1>
+    {% if projection.escalate_restricted and not projection.reason_code %}
+      <p class="asc-result-reason">{% trans "Do not admit. Call the supervisor and follow the restricted procedure." %}</p>
+    {% elif projection.reason_label %}
+      <p class="asc-result-reason">{{ projection.reason_label }}</p>
+      {% if projection.escalate_restricted %}<p class="asc-result-note">{% trans "Follow the restricted procedure." %}</p>{% endif %}
+    {% endif %}
+    {% for category in projection.restriction_categories %}<p class="asc-result-note small">{% trans "Restriction category" %}: {{ category }}</p>{% endfor %}
+  </div>
+  <div class="asc-result-actions">
+    <a class="btn btn-outline-secondary asc-btn-xl" href="{% url 'entry:verify' %}" id="entry-next">
+      {% include "components/icon.html" with name="arrow-next" flip=True %}
+      <span>{% trans "Clear and verify next" %}</span>
+    </a>
+    <span class="asc-hint small">{% blocktrans trimmed %}Press <kbd>Esc</kbd> to clear this result.{% endblocktrans %}</span>
+  </div>
+</section>
+
+<div class="row g-4">
+  <div class="{% if pending_operation_id %}col-lg-7{% else %}col-12{% endif %}">
+    {% if projection.participant %}
+      <section class="asc-card" id="entry-participant" aria-labelledby="participant-heading"
+               data-entry-clear-after="{{ clear_after_seconds }}"
+               data-entry-cleared-text="{% trans 'Participant details cleared after inactivity. Verify again if needed.' %}">
+        <h2 class="asc-card-title" id="participant-heading">{% include "components/icon.html" with name="user" %}{% trans "Participant" %}</h2>
+        <div class="asc-person">
+          {% if photo_nonce %}
+            <img src="{% url 'entry:photo' photo_nonce %}" alt="{% trans 'Registered profile photograph' %}" class="asc-photo" width="144" height="180">
+          {% else %}
+            <div class="asc-photo asc-photo-empty">
+              {% include "components/icon.html" with name="user" size="lg" %}
+              <span>{% trans "No photograph on file" %}</span>
+            </div>
+          {% endif %}
+          <dl class="asc-dl">
+            <dt>{% trans "Name" %}</dt>
+            <dd class="asc-dd-lead"><bdi>{{ projection.participant.display_name }}</bdi></dd>
+            <dt>{% trans "Registration reference" %}</dt>
+            <dd><bdi dir="ltr" class="asc-code">{{ projection.participant.registration_reference }}</bdi></dd>
+            {% if projection.participant.badge_type %}<dt>{% trans "Badge type" %}</dt><dd><bdi>{{ projection.participant.badge_type }}</bdi></dd>{% endif %}
+            {% if projection.participant.identity_hint %}<dt>{% trans "Identity reference" %}</dt><dd><bdi dir="ltr" class="asc-code">{{ projection.participant.identity_hint }}</bdi></dd>{% endif %}
+          </dl>
+        </div>
+        {% if projection.prior_entry or projection.advisories %}
+          <div class="mt-3">
+            {% if projection.prior_entry %}
+              <div class="asc-notice" role="status">
+                {% include "components/icon.html" with name="clock" %}
+                <p>{% blocktrans trimmed with time=projection.prior_entry.occurred_at|time:"H:i" gate=projection.prior_entry.gate %}Previously admitted at {{ time }} through {{ gate }}.{% endblocktrans %}</p>
+              </div>
+            {% endif %}
+            {% for advisory in projection.advisories %}
+              <div class="asc-notice asc-notice-neutral">
+                {% include "components/icon.html" with name="info" %}
+                <p>{{ advisory }}</p>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </section>
+    {% else %}
+      <section class="asc-card" aria-labelledby="next-steps-heading">
+        <h2 class="asc-card-title" id="next-steps-heading">{% include "components/icon.html" with name="info" %}{% trans "What to do next" %}</h2>
+        {% if projection.result == "TECHNICAL_ERROR" %}
+          <ol class="asc-steps">
+            <li>{% trans "Verify again. Nothing was recorded for this attempt." %}</li>
+            <li>{% trans "If the error repeats, use another approved lookup method or call your supervisor." %}</li>
+            <li>{% trans "Never admit on the basis of a physical badge alone." %}</li>
+          </ol>
+        {% elif projection.result == "UNSUPPORTED" %}
+          <ol class="asc-steps">
+            <li>{% trans "This code is not a Digital Entry Pass this checkpoint can read." %}</li>
+            <li>{% trans "Ask the participant to open the pass in the official platform, or use an approved identity reference." %}</li>
+          </ol>
+        {% else %}
+          <ol class="asc-steps">
+            <li>{% trans "Do not admit on the basis of this credential." %}</li>
+            <li>{% trans "Ask for another approved identity reference, or send the person to the review desk." %}</li>
+            <li>{% trans "Call your supervisor if the person disputes the result." %}</li>
+          </ol>
+        {% endif %}
+      </section>
+    {% endif %}
+  </div>
+
+  {% if pending_operation_id %}
+    <div class="col-lg-5">
+      <section class="asc-card" aria-labelledby="decision-heading" data-entry-decision>
+        <h2 class="asc-card-title" id="decision-heading">{% include "components/icon.html" with name="check-circle" %}{% trans "Decision" %}</h2>
+        <div class="d-grid gap-3">
+          {% if can_admit %}
+            <form method="post" action="{% url 'entry:decision' %}" class="m-0">
+              {% csrf_token %}
+              <input type="hidden" name="operation_id" value="{{ pending_operation_id }}">
+              <input type="hidden" name="decision" value="ADMIT">
+              <button type="submit" class="btn btn-success asc-btn-xl asc-btn-block" autofocus>
+                {% include "components/icon.html" with name="check-circle" %}<span>{% trans "Admit" %}</span>
+              </button>
+            </form>
+          {% endif %}
+          <form method="post" action="{% url 'entry:decision' %}" class="m-0">
+            {% csrf_token %}
+            <input type="hidden" name="operation_id" value="{{ pending_operation_id }}">
+            <input type="hidden" name="decision" value="DO_NOT_ADMIT">
+            <label class="form-label" for="decision-reason-deny">{% trans "Reason for not admitting" %}</label>
+            <select class="form-select mb-2" name="decision_reason" id="decision-reason-deny">
+              <option value="">{% trans "Follows the verification result" %}</option>
+              {% for value, label in decision_reasons %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+            </select>
+            <button type="submit" class="btn btn-danger asc-btn-xl asc-btn-block"{% if not can_admit %} autofocus{% endif %}>
+              {% include "components/icon.html" with name="x-circle" %}<span>{% trans "Do not admit" %}</span>
+            </button>
+          </form>
+          <form method="post" action="{% url 'entry:decision' %}" class="m-0">
+            {% csrf_token %}
+            <input type="hidden" name="operation_id" value="{{ pending_operation_id }}">
+            <input type="hidden" name="decision" value="REDIRECTED">
+            <input type="hidden" name="decision_reason" value="SENT_TO_REVIEW_DESK">
+            <button type="submit" class="btn btn-outline-warning asc-btn-xl asc-btn-block">
+              {% include "components/icon.html" with name="user-check" %}<span>{% trans "Send to review desk" %}</span>
+            </button>
+          </form>
+        </div>
+        <p class="small text-body-secondary mt-3 mb-0">{% blocktrans trimmed count seconds=decision_window_seconds %}Decide within {{ seconds }} second; after that, verify again.{% plural %}Decide within {{ seconds }} seconds; after that, verify again.{% endblocktrans %}</p>
+      </section>
+
+      {% if override_reasons %}
+        <section class="asc-card" aria-labelledby="override-heading" data-entry-decision>
+          <h2 class="asc-card-title" id="override-heading">{% include "components/icon.html" with name="shield" %}{% trans "Supervisor override" %}</h2>
+          <p class="small">{% trans "Only approved, reason-coded overrides are offered. The override, your identity, the original result, and this checkpoint are recorded." %}</p>
+          <form method="post" action="{% url 'entry:override' %}" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="operation_id" value="{{ pending_operation_id }}">
+            <label for="override-reason" class="form-label">{% trans "Override reason" %}</label>
+            <select id="override-reason" name="override_reason_id" class="form-select mb-2" required>
+              {% for reason in override_reasons %}<option value="{{ reason.pk }}">{{ reason.localized_name }}</option>{% endfor %}
+            </select>
+            <label for="override-note" class="form-label">{% trans "Note (recorded encrypted)" %}</label>
+            <textarea id="override-note" name="note" rows="2" maxlength="500" class="form-control mb-3" autocomplete="off"></textarea>
+            <button type="submit" class="btn btn-warning asc-btn-xl asc-btn-block">
+              {% include "components/icon.html" with name="shield" %}<span>{% trans "Admit by override" %}</span>
+            </button>
+          </form>
+        </section>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+<div class="visually-hidden" id="entry-announcer-polite" aria-live="polite"></div>
+<div class="visually-hidden" id="entry-announcer-assertive" aria-live="assertive"></div>
+{% endblock %}

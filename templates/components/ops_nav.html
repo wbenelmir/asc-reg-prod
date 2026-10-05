@@ -1,0 +1,32 @@
+{% load i18n %}
+{% comment %}
+  Operations section navigation (Finder account sidebar list and navbar
+  links, adapted as a horizontal section bar). Items come from
+  apps.core.navigation: only areas this user's permissions would open.
+  Below the md breakpoint the bar collapses into a native disclosure
+  (<details>), which asc-ui.js closes on load; without JavaScript it simply
+  stays open. Nothing here authorizes anything.
+{% endcomment %}
+{% if items %}
+  <nav class="asc-sectionnav" aria-label="{% trans 'Operations sections' %}">
+    <div class="container-xl">
+      <details class="asc-sectionnav-menu" open data-collapse-below="768">
+        <summary class="asc-sectionnav-toggle">
+          {% include "components/icon.html" with name="menu" %}
+          <span>{% trans "Sections" %}</span>
+          {% for item in items %}{% if item.current %}<span class="asc-sectionnav-current">{{ item.label }}</span>{% endif %}{% endfor %}
+        </summary>
+        <ul>
+          {% for item in items %}
+            <li>
+              <a href="{{ item.url }}"{% if item.current %} aria-current="page"{% endif %} data-section="{{ item.key }}">
+                {% include "components/icon.html" with name=item.icon %}
+                <span>{{ item.label }}</span>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </details>
+    </div>
+  </nav>
+{% endif %}

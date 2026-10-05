@@ -1,0 +1,67 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% trans "Registration contexts" %}{% endblock %}
+{% block breadcrumbs %}{% url 'invitations:workspace-dashboard' as parent_url %}{% trans "Organization Workspace" as parent_label %}{% trans "Registration contexts" as current %}{% include "components/breadcrumb_trail.html" with parent_label=parent_label parent_url=parent_url current=current %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Organizations" %}</p>
+      <h1>{% trans "Registration contexts" %}</h1>
+      <p>{% trans "Registrations that originate from the organizations in your scope, newest first." %}</p>
+    </div>
+  </div>
+
+  <section class="asc-card asc-card-flush" aria-labelledby="org-registrations-heading">
+    <div class="asc-card-toolbar">
+      <h2 class="asc-card-toolbar-title" id="org-registrations-heading">{% trans "Registration contexts visible to your organization scope" %}</h2>
+      <span class="asc-count">{% blocktrans count counter=registrations|length %}{{ counter }} registration{% plural %}{{ counter }} registrations{% endblocktrans %}</span>
+    </div>
+    {% if registrations %}
+      <div class="asc-table-wrap asc-wide-only">
+        <table class="asc-table" aria-labelledby="org-registrations-heading">
+          <thead>
+            <tr>
+              <th scope="col">{% trans "Registration Reference" %}</th>
+              <th scope="col">{% trans "Event edition" %}</th>
+              <th scope="col">{% trans "Source" %}</th>
+              <th scope="col">{% trans "Applicant status" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for registration in registrations %}
+              <tr>
+                <th scope="row"><bdi dir="ltr" class="asc-code">{{ registration.public_reference }}</bdi></th>
+                <td><bdi dir="ltr" class="asc-code">{{ registration.event_edition.code }}</bdi></td>
+                <td>{{ registration.get_source_kind_display }}</td>
+                <td>{% status_chip "registration" registration.public_status registration.get_public_status_display %}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <ul class="asc-records asc-narrow-only" aria-labelledby="org-registrations-heading">
+        {% for registration in registrations %}
+          <li class="asc-record" data-record>
+            <div class="asc-record-head">
+              <h3 class="asc-record-title"><bdi dir="ltr" class="asc-code">{{ registration.public_reference }}</bdi></h3>
+              <p class="asc-record-meta"><bdi dir="ltr" class="asc-code">{{ registration.event_edition.code }}</bdi></p>
+            </div>
+            <dl class="asc-record-fields">
+              <div><dt>{% trans "Applicant status" %}</dt><dd>{% status_chip "registration" registration.public_status registration.get_public_status_display %}</dd></div>
+              <div><dt>{% trans "Source" %}</dt><dd>{{ registration.get_source_kind_display }}</dd></div>
+            </dl>
+          </li>
+        {% endfor %}
+      </ul>
+      {% if registrations|length >= 200 %}
+        <p class="asc-card-foot">{% include "components/icon.html" with name="info" size="sm" %} {% trans "Only the 200 most recent registrations are listed." %}</p>
+      {% endif %}
+    {% else %}
+      <div class="asc-empty">
+        <span class="asc-tile">{% include "components/icon.html" with name="list" %}</span>
+        <h3>{% trans "No registration contexts are currently visible to you." %}</h3>
+        <p>{% trans "Registrations appear here once an invitation, delegation or on-behalf registration is used." %}</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

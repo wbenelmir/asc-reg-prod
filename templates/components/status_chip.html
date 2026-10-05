@@ -1,0 +1,2 @@
+{# Status chip (UI/UX §14.2 "Status Label"): tone + icon + localized text, never colour alone. Rendered by {% status_chip family value label %} in apps/core/templatetags/asc_ui.py. #}
+<span class="asc-chip asc-chip-{{ tone }}{% if extra %} {{ extra }}{% endif %}" data-status="{{ value }}">{% include "components/icon.html" with name=icon size="sm" %}<span>{{ label }}</span></span>

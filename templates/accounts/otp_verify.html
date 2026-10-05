@@ -1,0 +1,29 @@
+{% extends "layouts/base_public.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% trans "Enter verification code" %}{% endblock %}
+{% block content %}
+  <div class="asc-auth-head">
+    <p class="asc-kicker">{% trans "Participant registration" %}</p>
+    <h1>{% trans "Enter your verification code" %}</h1>
+    <p>{% blocktranslate with email=email|ltr_isolate %}We sent a 6-digit code to {{ email }}. It will expire shortly.{% endblocktranslate %}</p>
+  </div>
+  {% if error_message %}
+    <div class="asc-notice asc-notice-danger mb-3" role="alert" tabindex="-1" id="error-summary">
+      {% include "components/icon.html" with name="alert-octagon" %}
+      <p><bdi>{{ error_message }}</bdi></p>
+    </div>
+  {% endif %}
+  <form method="post" novalidate class="asc-auth-card">
+    {% csrf_token %}
+    {% for field in form %}
+      {% include "components/field.html" with control="ltr" %}
+    {% endfor %}
+    <button type="submit" class="btn btn-primary asc-btn-lg asc-btn-block">
+      <span>{% trans "Verify" %}</span>{% include "components/icon.html" with name="arrow-next" flip=True %}
+    </button>
+  </form>
+  <p class="asc-auth-note">
+    {% include "components/icon.html" with name="refresh" size="sm" %}
+    <a href="{% url 'accounts:otp-request' %}">{% trans "Use a different email or request a new code" %}</a>
+  </p>
+{% endblock %}

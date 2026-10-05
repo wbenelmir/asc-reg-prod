@@ -1,0 +1,9 @@
+{# Hidden queue context for an identity action form: the concurrency token, the queue position captured when the case was opened, and the current filters (bounded keys only), so a saved decision can continue with the next case of the same queue. #}
+{{ form.expected_version }}{{ form.after_changed_at }}{{ form.after_pk }}
+{% for key, value in filters.items %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endfor %}
+{% if form.non_field_errors %}
+  <div class="asc-notice asc-notice-danger mb-3" role="alert" data-idv-form-error>
+    {% include "components/icon.html" with name="alert-octagon" %}
+    <div>{% for error in form.non_field_errors %}<p class="mb-0"><bdi>{{ error }}</bdi></p>{% endfor %}</div>
+  </div>
+{% endif %}

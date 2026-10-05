@@ -1,0 +1,18 @@
+{% extends "layouts/base_public.html" %}
+{% load i18n %}
+{% comment %}One generic state for every claim rejection reason (invalid, expired, used, other email).{% endcomment %}
+{% block title %}{% trans "Claim link unavailable" %}{% endblock %}
+{% block content %}
+  <div class="asc-auth-head">
+    <p class="asc-kicker">{% trans "Registration claim" %}</p>
+    <h1>{% trans "This claim link is not available" %}</h1>
+  </div>
+  <div class="asc-notice asc-notice-warning mb-3" role="alert">
+    {% include "components/icon.html" with name="alert-triangle" %}
+    <p>{% trans "This claim link is not available. It may be invalid, expired, or already used." %}</p>
+  </div>
+  <p>{% trans "Please contact the person or organization who invited you, or contact support." %}</p>
+  {% if participant_authenticated %}
+    <a class="btn btn-outline-secondary asc-btn-block" href="{% url 'registrations:workspace' %}">{% trans "Go to my registrations" %}</a>
+  {% endif %}
+{% endblock %}

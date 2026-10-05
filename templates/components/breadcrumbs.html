@@ -1,0 +1,16 @@
+{% load i18n %}
+{# Back-office breadcrumbs (UI/UX §4.6). `crumbs` is a list of (label, url); the last item is the current page. The separator chevron mirrors in RTL. #}
+<nav aria-label="{% trans 'Breadcrumb' %}" class="asc-breadcrumbs">
+  <ol>
+    {% for label, url in crumbs %}
+      <li>
+        {% if not forloop.last %}
+          <a href="{{ url }}"><bdi>{{ label }}</bdi></a>
+          {% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}
+        {% else %}
+          <span aria-current="page"><bdi>{{ label }}</bdi></span>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+</nav>

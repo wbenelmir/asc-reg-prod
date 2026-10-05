@@ -1,0 +1,138 @@
+{% extends "layouts/base_workspace.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% trans "My registrations" %}{% endblock %}
+{% block main_attrs %} hx-boost="true"{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <h1>{% trans "My registrations" %}</h1>
+      <p>{% trans "Your registrations for ASC events, with their current status and any action needed from you." %}</p>
+    </div>
+  </div>
+
+  {% if not registrations %}
+    <div class="asc-card asc-empty">
+      <span class="asc-tile">{% include "components/icon.html" with name="list" %}</span>
+      <h2>{% trans "You have no registrations yet." %}</h2>
+      <p>{% trans "Registration takes six short steps. Your progress is saved after each one." %}</p>
+      {% if can_start_registration %}
+        <a href="{% url 'registrations:step-identity' %}" class="btn btn-primary asc-btn-lg mt-2">{% trans "Start a registration" %}</a>
+      {% else %}
+        <p class="asc-notice asc-notice-neutral mb-0" role="status">{% include "components/icon.html" with name="clock" %}<span>{% trans "Public registration is closed. If you received an invitation, open its link." %}</span></p>
+      {% endif %}
+    </div>
+  {% else %}
+    {% if pending_invitation %}
+      {# IDV-Q-C1: an invitation opened while signed in, usable even with earlier registrations. #}
+      <div class="asc-card asc-notice asc-notice-neutral mb-3" role="status" data-pending-invitation>
+        {% include "components/icon.html" with name="mail" %}
+        <div>
+          <p><strong>{% trans "You opened an invitation" %}</strong></p>
+          <form method="post" action="{% url 'registrations:start-pending-invitation' %}" class="m-0">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">{% trans "Register with this invitation" %}</button>
+          </form>
+        </div>
+      </div>
+    {% endif %}
+    <ul class="asc-reg-list">
+      {% for registration in registrations %}
+        <li class="asc-card asc-reg-card">
+          <div class="asc-reg-card-head">
+            <div>
+              <h2 class="asc-reg-card-title"><bdi>{{ registration.event_edition.name }}</bdi></h2>
+              <p class="asc-reg-card-ref">{% trans "Reference" %}{% trans ":" context "label separator" %} <bdi dir="ltr" class="asc-code">{{ registration.public_reference }}</bdi></p>
+            </div>
+            {% status_chip "registration" registration.public_status registration.get_public_status_display %}
+          </div>
+
+          {% if registration.identity_correction_open %}
+            {# IDV-3 (IDV-09): an identity correction request on this same registration. #}
+            <div class="asc-notice asc-notice-warning" role="status" data-identity-correction>
+              {% include "components/icon.html" with name="alert-triangle" %}
+              <p><strong>{% trans "Action required" %}</strong>
+                <a href="{% url 'identity:participant-correction' pk=registration.pk %}">{% trans "Correct your identity information" %}</a></p>
+            </div>
+          {% endif %}
+          {% if registration.identity_rejected %}
+            {# IDV-Q2: a final identity rejection, and how to register again from this account. #}
+            <div class="asc-notice asc-notice-danger" role="status" data-identity-rejected>
+              {% include "components/icon.html" with name="alert-octagon" %}
+              <div>
+                <p><strong>{% trans "This registration was rejected" %}</strong></p>
+                <p>{% trans "We could not verify your identity, so this registration was rejected. You can register again from this account. Enter your names, date of birth and identity document details exactly as they appear on your official document." %}</p>
+                {# IDV-Q-C1: the next step follows this registration's own origin; a button only when it can work. #}
+                {% include "registrations/_register_again_option.html" %}
+              </div>
+            </div>
+          {% endif %}
+          {% if registration.withdrawn_by_participant %}
+            {# Owner correction (2026-10-04): register again after a withdrawal, by the same origin-aware rules. #}
+            <div class="asc-notice asc-notice-neutral" role="status" data-withdrawn-next-step>
+              {% include "components/icon.html" with name="info" %}
+              <div>
+                <p><strong>{% trans "You withdrew this registration" %}</strong></p>
+                <p>{% trans "It stays withdrawn, with its history. Registering again creates a new, separate registration, with all the current information, documents and consents." %}</p>
+                {% include "registrations/_register_again_option.html" %}
+              </div>
+            </div>
+          {% elif registration.cancelled_by_team %}
+            <div class="asc-notice asc-notice-neutral" role="status" data-cancelled-next-step>
+              {% include "components/icon.html" with name="info" %}
+              <p>{% trans "The registration team cancelled this registration. Contact them if you want to register again." %}</p>
+            </div>
+          {% endif %}
+          {% if registration.active_information_request %}
+            <div class="asc-notice asc-notice-warning" role="status">
+              {% include "components/icon.html" with name="alert-triangle" %}
+              <p><strong>{% trans "Action required" %}</strong>
+                <a href="{% url 'reviews:my-information-request' pk=registration.active_information_request.pk %}">{% trans "Provide additional information" %}</a></p>
+            </div>
+          {% endif %}
+
+          <dl class="asc-dl asc-dl-compact">
+            {% if registration.visible_badge %}<dt>{% trans "Badge" %}</dt><dd><bdi>{{ registration.visible_badge.name }}</bdi></dd>{% endif %}
+            <dt>{% trans "Last updated" %}</dt><dd><time datetime="{{ registration.updated_at|date:'c' }}">{{ registration.updated_at }}</time></dd>
+          </dl>
+
+          <div class="asc-reg-card-actions">
+            {% if registration.public_status == "DRAFT" and not registration.channel_open %}
+              <p class="asc-muted mb-0" data-draft-closed>{% trans "Registration is closed. Your saved draft is kept." %}</p>
+            {% elif registration.public_status == "DRAFT" %}
+              <form method="post" action="{% url 'registrations:continue' pk=registration.pk %}" class="m-0">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">
+                  <span>{% trans "Continue registration" %}</span>{% include "components/icon.html" with name="arrow-next" flip=True %}
+                </button>
+              </form>
+            {% else %}
+              <a href="{% url 'registrations:confirmation' reference=registration.public_reference %}" class="btn btn-outline-secondary">{% trans "View" %}</a>
+            {% endif %}
+            {% if registration.accommodation_withdrawable %}
+              <form method="post" action="{% url 'registrations:withdraw-accommodation' pk=registration.pk %}" class="m-0"
+                    data-confirm-title="{% trans 'Withdraw consent for accessibility information?' %}"
+                    data-confirm="{% trans 'The support team will no longer see your accessibility support details. They are deleted, unless a legal hold requires keeping them. Your registration is not affected.' %}"
+                    data-confirm-action="{% trans 'Withdraw consent' %}">
+                {% csrf_token %}
+                {% include "components/confirm_fallback.html" with id="accommodation-withdraw" suffix=registration.public_reference %}
+                <button type="submit" class="btn btn-outline-secondary">{% trans "Withdraw consent for accessibility information" %}</button>
+              </form>
+            {% endif %}
+            {% if registration.public_status != "WITHDRAWN" and registration.public_status != "DRAFT" and not registration.identity_rejected %}
+              <form method="post" action="{% url 'reviews:my-registration-withdraw' pk=registration.pk %}"
+                    class="m-0 asc-reg-card-danger"
+                    data-confirm-title="{% trans 'Withdraw this registration?' %}"
+                    data-confirm="{% trans 'The registration will be withdrawn and will no longer be reviewed. This cannot be undone.' %}"
+                    data-confirm-action="{% trans 'Withdraw registration' %}">
+                {% csrf_token %}
+                <input type="hidden" name="expected_version" value="{{ registration.version }}">
+                {% include "components/confirm_fallback.html" with id="withdraw-confirm" suffix=registration.public_reference %}
+                <button type="submit" class="btn btn-outline-danger">{% trans "Withdraw" %}</button>
+              </form>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}

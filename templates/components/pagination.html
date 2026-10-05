@@ -1,0 +1,21 @@
+{% load i18n %}
+{# Pagination (UI/UX §14.2): `page` is a Django Page, `querystring` the current filters without `page`. Previous/next arrows mirror in RTL; the position is always stated in text. #}
+{% if page.paginator.num_pages > 1 %}
+  <nav class="asc-pagination" aria-label="{{ label|default:_('Pages') }}">
+    {% if page.has_previous %}
+      <a class="btn btn-outline-secondary" href="?{% if querystring %}{{ querystring }}&amp;{% endif %}page={{ page.previous_page_number }}" rel="prev">
+        {% include "components/icon.html" with name="arrow-prev" flip=True %}<span>{% trans "Previous" %}</span>
+      </a>
+    {% else %}
+      <span class="btn btn-outline-secondary disabled" aria-disabled="true">{% include "components/icon.html" with name="arrow-prev" flip=True %}<span>{% trans "Previous" %}</span></span>
+    {% endif %}
+    <p class="asc-pagination-status">{% blocktrans with number=page.number count=page.paginator.num_pages %}Page {{ number }} of {{ count }}{% endblocktrans %}</p>
+    {% if page.has_next %}
+      <a class="btn btn-outline-secondary" href="?{% if querystring %}{{ querystring }}&amp;{% endif %}page={{ page.next_page_number }}" rel="next">
+        <span>{% trans "Next" %}</span>{% include "components/icon.html" with name="arrow-next" flip=True %}
+      </a>
+    {% else %}
+      <span class="btn btn-outline-secondary disabled" aria-disabled="true"><span>{% trans "Next" %}</span>{% include "components/icon.html" with name="arrow-next" flip=True %}</span>
+    {% endif %}
+  </nav>
+{% endif %}

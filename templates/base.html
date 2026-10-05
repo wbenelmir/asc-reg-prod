@@ -1,0 +1,98 @@
+{% load static i18n %}{% comment %}
+  Language and direction come from the active translation, not only from the
+  i18n context processor: the 400 and 500 pages are rendered without a
+  request context (static-safe), and must still be localized and RTL.
+{% endcomment %}{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{% trans "Registration" %}{% endblock %}{% block title_suffix %} &middot; {% trans "ASC 2026" %}{% endblock %}</title>
+  {% comment %}
+    Search-engine posture (UX-1, S-05): every page is `noindex, nofollow` by
+    default; only the public start page overrides `robots_meta`. The same
+    rule is sent as an `X-Robots-Tag` header by PrivatePageProtectionMiddleware.
+    `public_meta` carries the description and social metadata of public pages
+    only; canonical and social URLs appear only when a real HTTPS public
+    origin is configured, never as an invented address.
+  {% endcomment %}
+  {% comment %}
+    P4-4: htmx 4 settles a swap by copying each old element's attributes onto
+    its new twin with setAttribute. A style attribute that script left on an
+    element (a CSS custom property, a cleared property) would be re-applied as
+    an inline style, which the enforced CSP refuses. "style" is never copied;
+    "data-htmx-powered" is htmx's own default and is kept.
+  {% endcomment %}
+  <meta name="htmx-config" content='{"morphIgnore": ["data-htmx-powered", "style"]}'>
+  {% block robots_meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+  {% block public_meta %}{% endblock %}
+  <link rel="icon" href="{% static 'img/brand/asc-mark.svg' %}" type="image/svg+xml">
+  <link rel="icon" href="{% static 'img/brand/asc-mark-32.png' %}" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="{% static 'img/brand/asc-mark-180.png' %}" sizes="180x180">
+  {% if LANGUAGE_BIDI %}
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.rtl.min.css' %}">
+  {% else %}
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+  {% endif %}
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% comment %}
+    The design system is loaded for EVERY page, and every body carries the
+    `asc-ui` class (UI/UX Completion Gate F2): htmx 4 boosted navigation
+    swaps the body contents but keeps the old <body> attributes and drops
+    the new <head>, so a boosted link between two pages must never depend
+    on either of them. Shell classes (asc-entry, asc-operations, …) are
+    semantic hooks only; no rule in asc-ui.css may depend on them.
+  {% endcomment %}
+  <link rel="stylesheet" href="{% static 'css/asc-ui.css' %}">
+  {% if LANGUAGE_BIDI %}
+    <link rel="preload" href="{% static 'vendor/thmanyah/thmanyahsans-Regular.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static 'vendor/thmanyah/thmanyahsans-Bold.woff2' %}" as="font" type="font/woff2" crossorigin>
+  {% endif %}
+  {% block extra_head %}{% endblock %}
+</head>
+<body{% block body_attrs %} class="asc-ui"{% endblock %}>
+  <span id="htmx-status-announcement" class="visually-hidden" data-text="{% trans 'Page updated.' %}"></span>
+  <a class="skip-link" href="#main-content">{% trans "Skip to main content" %}</a>
+
+  {% comment %}
+    Every page renders inside one of the shells in templates/layouts/
+    (public, workspace, wizard, operations, entry, error), which override
+    `header`, `main` and `footer`. The legacy Bootstrap navbar and footer
+    chrome were removed at the end of the UI/UX Completion Gate (Stage 3).
+  {% endcomment %}
+  {% block header %}{% endblock %}
+
+  <div id="status-region" class="visually-hidden" aria-live="polite" role="status">
+    {% if messages %}{% for message in messages %}{{ message }}. {% endfor %}{% endif %}
+  </div>
+
+  {% include "partials/session_warning.html" %}
+
+  {% block main %}
+  <main id="main-content" class="asc-main">
+    <div class="container-xl">
+      {% include "components/flash_messages.html" %}
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+  {% endblock %}
+
+  {% block footer %}
+  <footer class="asc-footer">
+    <div class="container-xl d-flex flex-wrap gap-2 justify-content-between">
+      <span>{% trans "ASC 2026 Registration Platform" %}</span>
+      {% include "partials/footer_official.html" %}
+    </div>
+  </footer>
+  {% endblock %}
+
+  {% include "components/confirm_dialog.html" %}
+
+  <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
+  <script src="{% static 'js/asc-enhance.js' %}"></script>
+  {# P4-4: the former inline scripts, so the enforced CSP needs no 'unsafe-inline'. #}
+  <script src="{% static 'js/asc-page.js' %}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,66 @@
+{% extends "layouts/base_workspace.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% trans "Additional information needed" %}{% endblock %}
+{% block main_attrs %} hx-boost="true"{% endblock %}
+{% block content %}
+  <p class="mb-2"><a href="{% url 'registrations:workspace' %}">{% include "components/icon.html" with name="arrow-prev" size="sm" flip=True %} {% trans "My registrations" %}</a></p>
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Reference" %}{% trans ":" context "label separator" %} <bdi dir="ltr" class="asc-code">{{ information_request.registration.public_reference }}</bdi></p>
+      <h1>{% trans "Additional information needed" %}</h1>
+      <ul class="asc-chip-list mt-2" aria-label="{% trans 'Current status' %}">
+        <li>{% status_chip "information_request" information_request.status information_request.get_status_display %}</li>
+      </ul>
+    </div>
+  </div>
+
+  <section class="asc-card asc-form-narrow" aria-labelledby="request-message-heading">
+    <h2 class="asc-card-title" id="request-message-heading">{% include "components/icon.html" with name="mail" %}{% trans "Message from the review team" %}</h2>
+    <p class="mb-0"><bdi>{{ information_request.localized_message }}</bdi></p>
+    {% if information_request.deadline_at and can_respond %}
+      <p class="asc-muted mt-2 mb-0">{% trans "Please respond by" %} <time datetime="{{ information_request.deadline_at|date:'c' }}">{{ information_request.deadline_at }}</time></p>
+    {% endif %}
+  </section>
+
+  {% if already_submitted %}
+    <div class="asc-card asc-form-narrow">
+      <div class="asc-notice asc-notice-success" role="status">
+        {% include "components/icon.html" with name="check-circle" %}
+        <p><strong>{% trans "Your response has been submitted. Thank you." %}</strong>{% trans "The review team will continue reviewing your registration." %}</p>
+      </div>
+      <a class="btn btn-outline-secondary mt-3" href="{% url 'registrations:workspace' %}">{% trans "Back to my registrations" %}</a>
+    </div>
+  {% elif can_respond %}
+    <form method="post" enctype="multipart/form-data" novalidate class="asc-card asc-form-narrow" aria-labelledby="response-heading">
+      {% csrf_token %}
+      <h2 class="asc-card-title" id="response-heading">{% include "components/icon.html" with name="edit" %}{% trans "Your response" %}</h2>
+      {% for item, draft_value in items_with_drafts %}
+        <fieldset class="asc-fieldset">
+          <legend><bdi>{{ item.localized_instructions|default:item.get_kind_display }}</bdi>{% if not item.is_required %} <span class="asc-optional">{% trans "Optional" %}</span>{% endif %}</legend>
+          {% if item.kind == "DOCUMENT_UPLOAD" %}
+            <label for="id_document_{{ item.pk }}" class="form-label">{% trans "Upload file" %}</label>
+            <div id="id_document_{{ item.pk }}_help" class="form-text mt-0 mb-1">{% trans "A JPEG or PNG image." %}</div>
+            <input type="file" id="id_document_{{ item.pk }}" name="document_{{ item.pk }}" class="form-control" accept="image/jpeg,image/png" aria-describedby="id_document_{{ item.pk }}_help"{% if item.is_required %} aria-required="true"{% endif %}>
+          {% else %}
+            <label for="id_value_{{ item.pk }}" class="form-label">{% trans "Your answer" %}</label>
+            <input type="text" id="id_value_{{ item.pk }}" name="value_{{ item.pk }}" class="form-control" value="{{ draft_value }}"{% if item.is_required %} aria-required="true"{% endif %}>
+          {% endif %}
+        </fieldset>
+      {% endfor %}
+      <p class="form-text">{% trans "Saving a draft keeps your typed answers; files are attached only when you submit." %}</p>
+      <div class="asc-actions-row">
+        {# Draft first, as before: pressing Enter in an answer saves a draft, never submits. #}
+        <button type="submit" name="action" value="draft" class="btn btn-outline-secondary"><span>{% trans "Save draft" %}</span></button>
+        <button type="submit" name="action" value="submit" class="btn btn-primary">{% include "components/icon.html" with name="send" %}<span>{% trans "Submit response" %}</span></button>
+      </div>
+    </form>
+  {% else %}
+    <div class="asc-card asc-form-narrow">
+      <div class="asc-notice asc-notice-neutral" role="status">
+        {% include "components/icon.html" with name="lock" %}
+        <p>{% trans "This request is no longer accepting responses." %}</p>
+      </div>
+      <a class="btn btn-outline-secondary mt-3" href="{% url 'registrations:workspace' %}">{% trans "Back to my registrations" %}</a>
+    </div>
+  {% endif %}
+{% endblock %}

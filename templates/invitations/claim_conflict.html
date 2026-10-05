@@ -1,0 +1,18 @@
+{% extends "layouts/base_public.html" %}
+{% load i18n %}
+{% comment %}A controlled claim conflict (the participant already has a colliding registration); support resolves it.{% endcomment %}
+{% block title %}{% trans "Claim could not be completed" %}{% endblock %}
+{% block content %}
+  <div class="asc-auth-head">
+    <p class="asc-kicker">{% trans "Registration claim" %}</p>
+    <h1>{% trans "This claim could not be completed" %}</h1>
+  </div>
+  <div class="asc-notice asc-notice-danger mb-3" role="alert">
+    {% include "components/icon.html" with name="x-circle" %}
+    <p>{% trans "This registration could not be linked to your account. Please contact support for assistance." %}</p>
+  </div>
+  <p>{% trans "Your existing registrations are unchanged." %}</p>
+  {% if participant_authenticated %}
+    <a class="btn btn-outline-secondary asc-btn-block" href="{% url 'registrations:workspace' %}">{% trans "Go to my registrations" %}</a>
+  {% endif %}
+{% endblock %}

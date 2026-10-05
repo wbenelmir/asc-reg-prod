@@ -1,0 +1,348 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+
+{% comment %}
+Production and reconciliation summary for one event edition (Phase 3
+Prompt 3, ADR-0020; UI/UX §9.3 "quantities rather than personalized print
+jobs"). Carries badge-type/location aggregates only -- never a
+Registration Context, an identity value, or any participant data.
+{% endcomment %}
+
+{% block title %}{% trans "Badge stock" %}{% endblock %}
+
+{% block breadcrumbs %}
+  <nav aria-label="{% trans 'Breadcrumb' %}" class="asc-breadcrumbs">
+    <ol>
+      <li><a href="{% url 'registrations:ops-intake-list' %}">{% trans "Operations" %}</a>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><span><bdi>{{ event.name }}</bdi></span>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><span aria-current="page">{% trans "Badge stock" %}</span></li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="asc-page-head">
+    <h1>{% trans "Badge stock" %}</h1>
+    <p><bdi dir="ltr" class="asc-code">{{ event.code }}</bdi> — <bdi>{{ event.name }}</bdi>. {% trans "Generic, pre-printed badges by type and location. No participant data appears here." %}</p>
+  </div>
+
+  <div class="asc-kpis" role="group" aria-label="{% trans 'Stock summary' %}">
+    <div class="asc-kpi asc-kpi-info">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="package" size="sm" %}{% trans "On hand" %}</span>
+      <span class="asc-kpi-value">{{ totals.on_hand }}</span>
+      <span class="asc-kpi-note">{% trans "All locations and badge types" %}</span>
+    </div>
+    <div class="asc-kpi asc-kpi-warning">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="lock" size="sm" %}{% trans "Allocated" %}</span>
+      <span class="asc-kpi-value">{{ totals.allocated }}</span>
+      <span class="asc-kpi-note">{% trans "Reserved, not yet handed over" %}</span>
+    </div>
+    <div class="asc-kpi asc-kpi-success">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="check-circle" size="sm" %}{% trans "Available" %}</span>
+      <span class="asc-kpi-value">{{ totals.available }}</span>
+      <span class="asc-kpi-note">{% trans "Free to issue now" %}</span>
+    </div>
+    <div class="asc-kpi {% if totals.discrepancies %}asc-kpi-danger{% endif %}">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="alert-triangle" size="sm" %}{% trans "Count discrepancies" %}</span>
+      <span class="asc-kpi-value">{{ totals.discrepancies }}</span>
+      <span class="asc-kpi-note">{% trans "Recent reconciliations that did not match" %}</span>
+    </div>
+  </div>
+
+  <section class="asc-card" aria-labelledby="balances-heading">
+    <h2 class="asc-section-title" id="balances-heading">{% include "components/icon.html" with name="layers" %}{% trans "Stock locations and balances" %}</h2>
+    <p class="asc-section-lead">{% trans "Transfers, adjustments, allocations and counts are recorded in the append-only stock ledger." %}</p>
+
+    {% if can_manage_locations %}
+      <details class="mb-3">
+        <summary class="btn btn-outline-primary">{% include "components/icon.html" with name="package" %}<span>{% trans "Add location" %}</span></summary>
+        <form method="post" action="{% url 'badges:stock-location-create' event_pk=event.pk %}" class="asc-form-grid mt-3">
+          {% csrf_token %}
+          <input type="hidden" name="operation_id" value="{{ create_location_operation_id }}">
+          <div>
+            <label class="form-label" for="loc-code">{% trans "Code" %}</label>
+            <input class="form-control" id="loc-code" type="text" name="code" maxlength="32" required dir="ltr">
+          </div>
+          <div>
+            <label class="form-label" for="loc-name">{% trans "Name (English)" %}</label>
+            <input class="form-control" id="loc-name" type="text" name="name" maxlength="200" required dir="ltr">
+          </div>
+          <div>
+            <label class="form-label" for="loc-name-fr">{% trans "Name (French)" %}</label>
+            <input class="form-control" id="loc-name-fr" type="text" name="name_fr" maxlength="200" dir="ltr">
+          </div>
+          <div>
+            <label class="form-label" for="loc-name-ar">{% trans "Name (Arabic)" %}</label>
+            <input class="form-control" id="loc-name-ar" type="text" name="name_ar" maxlength="200" dir="rtl">
+          </div>
+          <div>
+            <label class="form-label" for="loc-type">{% trans "Type" %}</label>
+            <select class="form-select" id="loc-type" name="location_type" required>
+              {% for value, text in location_type_choices %}
+                <option value="{{ value }}">{{ text }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary w-100"><span>{% trans "Add location" %}</span></button>
+          </div>
+        </form>
+      </details>
+    {% endif %}
+
+    <div class="asc-table-wrap">
+      <table class="asc-table">
+        <caption class="visually-hidden">{% trans "Stock locations and balances" %}</caption>
+        <thead>
+          <tr>
+            <th scope="col">{% trans "Location" %}</th>
+            <th scope="col">{% trans "Type" %}</th>
+            <th scope="col">{% trans "Badge type" %}</th>
+            <th scope="col" class="asc-num">{% trans "On hand" %}</th>
+            <th scope="col" class="asc-num">{% trans "Allocated" %}</th>
+            <th scope="col" class="asc-num">{% trans "Available" %}</th>
+            {% if can_transfer or can_manage_locations or can_reconcile or can_allocate %}
+              <th scope="col">{% trans "Actions" %}</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in balance_rows %}
+            <tr>
+              <th scope="row"><bdi dir="ltr" class="asc-code">{{ row.location.code }}</bdi></th>
+              <td>{{ row.location.get_location_type_display }}</td>
+              <td><bdi dir="ltr" class="asc-code">{{ row.badge_type.code }}</bdi></td>
+              <td class="asc-num" data-balance-location="{{ row.location.pk }}" data-balance-badge-type="{{ row.badge_type.pk }}">
+                {{ row.quantity }}
+              </td>
+              <td class="asc-num" data-reserved-location="{{ row.location.pk }}" data-reserved-badge-type="{{ row.badge_type.pk }}">
+                {{ row.reserved }}
+              </td>
+              <td class="asc-num" data-available-location="{{ row.location.pk }}" data-available-badge-type="{{ row.badge_type.pk }}">
+                <strong>{{ row.available }}</strong>
+              </td>
+              {% if can_transfer or can_manage_locations or can_reconcile or can_allocate %}
+              <td>
+                <div class="asc-row-actions">
+                  {% if can_transfer %}
+                    <form method="post" class="asc-inline-form"
+                          action="{% url 'badges:stock-transfer-create' event_pk=event.pk source_pk=row.location.pk %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="operation_id" value="{{ transfer_operation_id }}">
+                      <input type="hidden" name="badge_type_id" value="{{ row.badge_type.pk }}">
+                      <label class="visually-hidden" for="transfer-dest-{{ forloop.counter }}">{% trans "Destination location" %}</label>
+                      <select class="form-select form-select-sm" id="transfer-dest-{{ forloop.counter }}" name="destination_location_id" required>
+                        {% for other in locations %}
+                          {% if other.pk != row.location.pk %}
+                            <option value="{{ other.pk }}">{{ other.code }}</option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
+                      <label class="visually-hidden" for="transfer-qty-{{ forloop.counter }}">{% trans "Quantity" %}</label>
+                      <input class="form-control form-control-sm asc-input-qty" id="transfer-qty-{{ forloop.counter }}" type="number" name="quantity" min="1" required placeholder="{% trans "Qty" %}">
+                      <button type="submit" class="btn btn-sm btn-outline-secondary">{% trans "Transfer" %}</button>
+                    </form>
+                  {% endif %}
+                  {% if can_manage_locations %}
+                    <form method="post" class="asc-inline-form"
+                          action="{% url 'badges:stock-adjustment-create' event_pk=event.pk location_pk=row.location.pk %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="operation_id" value="{{ adjust_operation_id }}">
+                      <input type="hidden" name="badge_type_id" value="{{ row.badge_type.pk }}">
+                      <label class="visually-hidden" for="adjust-qty-{{ forloop.counter }}">{% trans "Quantity change" %}</label>
+                      <input class="form-control form-control-sm asc-input-qty" id="adjust-qty-{{ forloop.counter }}" type="number" name="quantity_delta" required placeholder="{% trans "+/-" %}">
+                      <label class="visually-hidden" for="adjust-reason-{{ forloop.counter }}">{% trans "Reason" %}</label>
+                      <select class="form-select form-select-sm" id="adjust-reason-{{ forloop.counter }}" name="reason_code" required>
+                        {% for value, text in adjustment_reason_choices %}
+                          <option value="{{ value }}">{{ text }}</option>
+                        {% endfor %}
+                      </select>
+                      <button type="submit" class="btn btn-sm btn-outline-warning">{% trans "Adjust" %}</button>
+                    </form>
+                  {% endif %}
+                  {% if can_allocate %}
+                    <form method="post" class="asc-inline-form"
+                          action="{% url 'badges:stock-allocation-create' event_pk=event.pk location_pk=row.location.pk %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="operation_id" value="{{ allocate_operation_id }}">
+                      <input type="hidden" name="badge_type_id" value="{{ row.badge_type.pk }}">
+                      <label class="visually-hidden" for="allocate-qty-{{ forloop.counter }}">{% trans "Quantity" %}</label>
+                      <input class="form-control form-control-sm asc-input-qty" id="allocate-qty-{{ forloop.counter }}" type="number" name="quantity" min="1" required placeholder="{% trans "Qty" %}">
+                      <label class="visually-hidden" for="allocate-purpose-{{ forloop.counter }}">{% trans "Purpose" %}</label>
+                      <select class="form-select form-select-sm" id="allocate-purpose-{{ forloop.counter }}" name="purpose_code" required>
+                        {% for value, text in allocation_purpose_choices %}
+                          <option value="{{ value }}">{{ text }}</option>
+                        {% endfor %}
+                      </select>
+                      <button type="submit" class="btn btn-sm btn-outline-primary">{% trans "Allocate" %}</button>
+                    </form>
+                  {% endif %}
+                  {% if can_reconcile %}
+                    <form method="post" class="asc-inline-form"
+                          action="{% url 'badges:stock-reconciliation-create' event_pk=event.pk location_pk=row.location.pk %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="operation_id" value="{{ reconcile_operation_id }}">
+                      <input type="hidden" name="badge_type_id" value="{{ row.badge_type.pk }}">
+                      <label class="visually-hidden" for="count-qty-{{ forloop.counter }}">{% trans "Counted quantity" %}</label>
+                      <input class="form-control form-control-sm asc-input-qty" id="count-qty-{{ forloop.counter }}" type="number" name="counted_quantity" min="0" required placeholder="{% trans "Count" %}">
+                      <button type="submit" class="btn btn-sm btn-outline-secondary">{% trans "Reconcile" %}</button>
+                    </form>
+                  {% endif %}
+                </div>
+              </td>
+              {% endif %}
+            </tr>
+          {% empty %}
+            <tr><td colspan="7" class="asc-table-empty">{% trans "No stock locations exist for this event edition yet." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="asc-card" aria-labelledby="allocations-heading">
+    <h2 class="asc-section-title" id="allocations-heading">{% include "components/icon.html" with name="lock" %}{% trans "Current allocations" %}</h2>
+    <p class="asc-section-lead">{% trans "Allocated stock stays physically at its location but is no longer available to anyone else." %}</p>
+    <div class="asc-table-wrap">
+      <table class="asc-table">
+        <caption class="visually-hidden">{% trans "Currently reserved badge stock" %}</caption>
+        <thead>
+          <tr>
+            <th scope="col">{% trans "Location" %}</th>
+            <th scope="col">{% trans "Badge type" %}</th>
+            <th scope="col">{% trans "Purpose" %}</th>
+            <th scope="col" class="asc-num">{% trans "Reserved" %}</th>
+            <th scope="col" class="asc-num">{% trans "Consumed" %}</th>
+            <th scope="col" class="asc-num">{% trans "Remaining" %}</th>
+            {% if can_allocate %}<th scope="col">{% trans "Actions" %}</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for allocation in allocations %}
+            <tr data-allocation="{{ allocation.pk }}">
+              <th scope="row"><bdi dir="ltr" class="asc-code">{{ allocation.location.code }}</bdi></th>
+              <td><bdi dir="ltr" class="asc-code">{{ allocation.badge_type.code }}</bdi></td>
+              <td>{{ allocation.get_purpose_code_display }}</td>
+              <td class="asc-num">{{ allocation.quantity }}</td>
+              <td class="asc-num">{{ allocation.consumed_quantity }}</td>
+              <td class="asc-num"><strong>{{ allocation.remaining_quantity }}</strong></td>
+              {% if can_allocate %}
+                <td>
+                  <form method="post" class="asc-inline-form"
+                        action="{% url 'badges:stock-allocation-release' event_pk=event.pk pk=allocation.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="operation_id" value="{{ release_operation_id }}">
+                    <input type="hidden" name="expected_lock_version" value="{{ allocation.version }}">
+                    <label class="visually-hidden" for="release-notes-{{ forloop.counter }}">{% trans "Notes (optional)" %}</label>
+                    <input class="form-control form-control-sm" id="release-notes-{{ forloop.counter }}" type="text" name="reason_text" maxlength="300" placeholder="{% trans "Notes (optional)" %}">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">{% trans "Release" %}</button>
+                  </form>
+                </td>
+              {% endif %}
+            </tr>
+          {% empty %}
+            <tr><td colspan="7" class="asc-table-empty">{% trans "No stock is currently allocated." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="asc-card" aria-labelledby="batches-heading">
+    <h2 class="asc-section-title" id="batches-heading">{% include "components/icon.html" with name="badge" %}{% trans "Print batches" %}</h2>
+    <p class="asc-section-lead">{% trans "Batches are prepared before the event by badge type; they contain no participant name, photograph or personal QR code." %}</p>
+    {% if can_manage_batches %}
+      <details class="mb-3">
+        <summary class="btn btn-outline-primary">{% include "components/icon.html" with name="badge" %}<span>{% trans "Create batch" %}</span></summary>
+        <form method="post" action="{% url 'badges:print-batch-create' event_pk=event.pk %}" class="asc-form-grid mt-3">
+          {% csrf_token %}
+          <input type="hidden" name="operation_id" value="{{ create_batch_operation_id }}">
+          <div>
+            <label class="form-label" for="batch-badge-type">{% trans "Badge type" %}</label>
+            <select class="form-select" id="batch-badge-type" name="badge_type_id" required>
+              {% for badge_type in badge_types %}
+                <option value="{{ badge_type.pk }}">{{ badge_type.code }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="form-label" for="batch-qty">{% trans "Planned quantity" %}</label>
+            <input class="form-control" id="batch-qty" type="number" name="planned_quantity" min="1" required>
+          </div>
+          <div>
+            <label class="form-label" for="batch-artwork">{% trans "Artwork version" %}</label>
+            <input class="form-control" id="batch-artwork" type="text" name="artwork_version" maxlength="32" dir="ltr">
+          </div>
+          <div>
+            <label class="form-label" for="batch-destination">{% trans "Destination location" %}</label>
+            <select class="form-select" id="batch-destination" name="destination_location_id">
+              <option value="">{% trans "Choose later" %}</option>
+              {% for location in locations %}
+                <option value="{{ location.pk }}">{{ location.code }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary w-100"><span>{% trans "Create batch" %}</span></button>
+          </div>
+        </form>
+      </details>
+    {% endif %}
+    <div class="asc-table-wrap">
+      <table class="asc-table">
+        <caption class="visually-hidden">{% trans "Print batches" %}</caption>
+        <thead>
+          <tr>
+            <th scope="col">{% trans "Reference" %}</th>
+            <th scope="col">{% trans "Badge type" %}</th>
+            <th scope="col">{% trans "Status" %}</th>
+            <th scope="col" class="asc-num">{% trans "Planned" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for batch in batches %}
+            <tr>
+              <td><a href="{% url 'badges:print-batch-detail' pk=batch.pk %}"><bdi dir="ltr" class="asc-code">{{ batch.public_reference }}</bdi></a></td>
+              <td><bdi dir="ltr" class="asc-code">{{ batch.badge_type.code }}</bdi></td>
+              <td data-batch-status="{{ batch.status }}"><span class="asc-chip {% if batch.status == 'RECEIVED' or batch.status == 'RECONCILED' %}asc-chip-success{% elif batch.status == 'CANCELLED' %}asc-chip-danger{% elif batch.status == 'IN_PRODUCTION' %}asc-chip-info{% endif %}">{{ batch.get_status_display }}</span></td>
+              <td class="asc-num">{{ batch.planned_quantity }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="4" class="asc-table-empty">{% trans "No print batches exist for this event edition yet." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="asc-card" aria-labelledby="ledger-heading">
+    <h2 class="asc-section-title" id="ledger-heading">{% include "components/icon.html" with name="list" %}{% trans "Recent ledger entries" %}</h2>
+    <div class="asc-table-wrap">
+      <table class="asc-table">
+        <caption class="visually-hidden">{% trans "Recent stock ledger entries" %}</caption>
+        <thead>
+          <tr>
+            <th scope="col">{% trans "Recorded" %}</th>
+            <th scope="col">{% trans "Location" %}</th>
+            <th scope="col">{% trans "Badge type" %}</th>
+            <th scope="col">{% trans "Type" %}</th>
+            <th scope="col" class="asc-num">{% trans "Quantity" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in ledger_entries %}
+            <tr>
+              <td>{{ entry.recorded_at }}</td>
+              <td><bdi dir="ltr" class="asc-code">{{ entry.location.code }}</bdi></td>
+              <td><bdi dir="ltr" class="asc-code">{{ entry.badge_type.code }}</bdi></td>
+              <td>{{ entry.get_entry_type_display }}</td>
+              <td class="asc-num"><bdi dir="ltr">{{ entry.quantity_delta }}</bdi></td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="asc-table-empty">{% trans "No stock movement has been recorded yet." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}

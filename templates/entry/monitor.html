@@ -1,0 +1,93 @@
+{% extends "layouts/base_entry.html" %}
+{% load i18n %}
+{% block title %}{% trans "Checkpoint monitor" %}{% endblock %}
+{% block content %}
+{% comment %}
+  Supervisor monitor for THIS gate (ENTRY-005): recent Entry Events, denied
+  or unresolved attempts, and anomaly signals. Codes and times only -- no
+  participant name, reference, token, identity value or search text.
+{% endcomment %}
+<div class="asc-page-head">
+  <h1>{% trans "Checkpoint monitor" %}</h1>
+  <p>{% trans "Recent activity at this gate. Participant details are never shown here." %}</p>
+  {% if may_reconcile %}<p><a class="btn btn-outline-primary" href="{% url 'entry:reconciliation-queue' checkpoint.event_edition.pk %}"><span>{% trans "Open the reconciliation queue" %}</span></a></p>{% endif %}
+</div>
+
+{% if anomalies %}
+  <section class="asc-card" aria-labelledby="anomalies-heading">
+    <h2 class="asc-section-title" id="anomalies-heading">{% include "components/icon.html" with name="alert-triangle" %}{% trans "Anomaly signals" %}</h2>
+    <p class="asc-section-lead">{% trans "Repeated invalid scans or identity lookups at this gate. Check with the operator concerned." %}</p>
+    <ul class="list-unstyled d-grid gap-2 mb-0">
+      {% for signal in anomalies %}
+        <li class="asc-notice {% if signal.throttled %}asc-notice-danger{% else %}asc-notice-warning{% endif %}">
+          {% include "components/icon.html" with name="alert-triangle" %}
+          <p><strong>{% if signal.kind == "REPEATED_INVALID_SCANS" %}{% trans "Repeated invalid scans" %}{% else %}{% trans "Many identity and reference lookups" %}{% endif %}{% if signal.throttled %} — {% trans "lookups paused" %}{% endif %}</strong>
+            <time datetime="{{ signal.occurred_at|date:'c' }}">{{ signal.occurred_at|time:"H:i:s" }}</time>{% if signal.count %} · {% blocktrans count counter=signal.count %}{{ counter }} attempt in the window{% plural %}{{ counter }} attempts in the window{% endblocktrans %}{% endif %}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
+
+<section class="asc-card" aria-labelledby="events-heading">
+  <h2 class="asc-section-title" id="events-heading">{% include "components/icon.html" with name="list" %}{% trans "Recent entry events at this gate" %}</h2>
+  <div class="asc-table-wrap">
+    <table class="asc-table">
+      <caption class="visually-hidden">{% trans "Recent entry events at this gate" %}</caption>
+      <thead>
+        <tr>
+          <th scope="col">{% trans "Time" %}</th>
+          <th scope="col">{% trans "Zone" %}</th>
+          <th scope="col">{% trans "Method" %}</th>
+          <th scope="col">{% trans "Result" %}</th>
+          <th scope="col">{% trans "Decision" %}</th>
+          <th scope="col">{% trans "Override" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in events %}
+          <tr>
+            <td><time datetime="{{ event.occurred_at|date:'c' }}">{{ event.occurred_at|time:"H:i:s" }}</time></td>
+            <td><bdi dir="ltr" class="asc-code">{{ event.zone.code }}</bdi></td>
+            <td>{{ event.get_verification_method_display }}</td>
+            <td>{{ event.get_result_display }}{% if event.reason_code %} — {{ event.get_reason_code_display }}{% endif %}</td>
+            <td><span class="asc-chip {% if event.decision == 'ADMIT' %}asc-chip-success{% elif event.decision == 'DO_NOT_ADMIT' %}asc-chip-danger{% else %}asc-chip-warning{% endif %}">{{ event.get_decision_display }}</span>{% if event.offline_conflict %} <span class="asc-chip asc-chip-danger" data-offline-event="conflict">{% include "components/icon.html" with name="alert-triangle" size="sm" %}{% trans "Offline — conflict" %}</span>{% elif event.offline %} <span class="asc-chip asc-chip-outline" data-offline-event="offline">{% include "components/icon.html" with name="cloud-off" size="sm" %}{% trans "Offline" %}</span>{% endif %}</td>
+            <td>{% if event.override_id %}<span class="asc-chip asc-chip-warning">{% include "components/icon.html" with name="shield" size="sm" %}{% trans "Yes" %}</span>{% endif %}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="asc-table-empty">{% trans "No entry events yet." %}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="asc-card" aria-labelledby="denied-heading">
+  <h2 class="asc-section-title" id="denied-heading">{% include "components/icon.html" with name="x-circle" %}{% trans "Denied or unresolved attempts" %}</h2>
+  <div class="asc-table-wrap">
+    <table class="asc-table">
+      <caption class="visually-hidden">{% trans "Denied or unresolved attempts" %}</caption>
+      <thead>
+        <tr>
+          <th scope="col">{% trans "Time" %}</th>
+          <th scope="col">{% trans "Method" %}</th>
+          <th scope="col">{% trans "Result" %}</th>
+          <th scope="col">{% trans "Reason" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for attempt in denied_attempts %}
+          <tr>
+            <td><time datetime="{{ attempt.occurred_at|date:'c' }}">{{ attempt.occurred_at|time:"H:i:s" }}</time></td>
+            <td>{{ attempt.method }}</td>
+            <td>{{ attempt.result_label }}</td>
+            <td>{{ attempt.reason_label }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4" class="asc-table-empty">{% trans "No denied attempts." %}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

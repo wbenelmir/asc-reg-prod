@@ -1,0 +1,23 @@
+{% extends "layouts/base_entry.html" %}
+{% load i18n %}
+{% block title %}{% trans "Enroll entry device" %}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-6">
+    <section class="asc-card" aria-labelledby="enroll-heading">
+      <div class="asc-card-lead">
+        <span class="asc-tile">{% include "components/icon.html" with name="tablet" %}</span>
+        <div>
+          <h1 class="h3 mb-1" id="enroll-heading">{% trans "Enroll this browser as an entry device" %}</h1>
+          <p class="text-body-secondary mb-0">{% trans "Enter the one-time activation code shown when the device was registered. The code expires quickly and can be used once." %}</p>
+        </div>
+      </div>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% include "components/form_fields.html" with form=form %}
+        <button type="submit" class="btn btn-primary asc-btn-xl asc-btn-block"><span>{% trans "Enroll device" %}</span></button>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}

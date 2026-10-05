@@ -1,0 +1,9 @@
+{% load i18n %}
+{# Breadcrumbs from plain parameters, for pages whose view does not build a `crumbs` list (same markup as components/breadcrumbs.html). Parameters: parent_label, parent_url, optional parent2_label/parent2_url (second level), current, current_code=True for an LTR code. #}
+<nav aria-label="{% trans 'Breadcrumb' %}" class="asc-breadcrumbs">
+  <ol>
+    <li><a href="{{ parent_url }}"><bdi>{{ parent_label }}</bdi></a>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+    {% if parent2_label %}<li><a href="{{ parent2_url }}"><bdi>{{ parent2_label }}</bdi></a>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>{% endif %}
+    <li><span aria-current="page">{% if current_code %}<bdi dir="ltr" class="asc-code">{{ current }}</bdi>{% else %}<bdi>{{ current }}</bdi>{% endif %}</span></li>
+  </ol>
+</nav>

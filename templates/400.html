@@ -1,0 +1,9 @@
+{% extends "layouts/base_error.html" %}
+{% load i18n %}
+{% comment %}Static-safe: Django renders this page without a request context (no database, session or user access).{% endcomment %}
+{% block title %}{% trans "Request not understood" %}{% endblock %}
+{% block error_code %}{% trans "Error 400" %}{% endblock %}
+{% block error_title %}{% trans "The request could not be understood" %}{% endblock %}
+{% block error_body %}
+  <p>{% trans "The page received a request it could not process. Go back, reload the page and try again." %}</p>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "layouts/base_public.html" %}
+{% load i18n %}
+{% comment %}
+  One generic "invitation unavailable" state for every rejection reason
+  (invalid, expired, revoked, rotated): the page never says which one.
+{% endcomment %}
+{% block title %}{% trans "Invitation unavailable" %}{% endblock %}
+{% block content %}
+  <div class="asc-auth-head">
+    <p class="asc-kicker">{% trans "Invitation" %}</p>
+    <h1>{% trans "This invitation is not available" %}</h1>
+  </div>
+  <div class="asc-notice asc-notice-warning mb-3" role="alert">
+    {% include "components/icon.html" with name="alert-triangle" %}
+    <p>{% trans "This invitation link is not available. It may be invalid, expired, or no longer active." %}</p>
+  </div>
+  {% if open_registration_available %}
+    <p>{% trans "You can still register directly." %}</p>
+    <a class="btn btn-primary asc-btn-lg asc-btn-block" href="{% url 'accounts:otp-request' %}"><span>{% trans "Start registration" %}</span>{% include "components/icon.html" with name="arrow-next" flip=True %}</a>
+  {% else %}
+    <p class="mb-0">{% trans "Registration is not currently open. Please contact support for assistance." %}</p>
+  {% endif %}
+{% endblock %}

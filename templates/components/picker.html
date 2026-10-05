@@ -1,0 +1,29 @@
+{% load i18n asc_ui %}
+{% comment %}
+  Filterable choice (F8): a native, labelled select whose options are the
+  server's permission-scoped choices only. When the list is long, the
+  script reveals a filter box that hides non-matching options locally; no
+  request is made and nothing outside the rendered list can be found.
+  The server re-validates every submitted value against the same scope.
+  Parameters: `field` (a bound ChoiceField / ModelChoiceField), optional
+  `help` override, `threshold` (default 8).
+{% endcomment %}
+<div class="mb-3" data-asc-picker data-picker-threshold="{{ threshold|default:8 }}">
+  <label for="{{ field.id_for_label }}" class="form-label"><bdi>{{ field.label }}</bdi></label>
+  {% if field.help_text %}<div id="{{ field.auto_id }}_help" class="form-text mt-0 mb-1">{{ field.help_text }}</div>{% endif %}
+  <div class="asc-picker-filter" hidden>
+    <label for="{{ field.auto_id }}_filter" class="visually-hidden">{% blocktrans with label=field.label %}Filter the choices for {{ label }}{% endblocktrans %}</label>
+    <div class="asc-input-icon">
+      {% include "components/icon.html" with name="search" %}
+      <input type="search" id="{{ field.auto_id }}_filter" class="form-control" autocomplete="off" aria-controls="{{ field.auto_id }}" placeholder="{% trans 'Type to filter the list' %}" data-picker-filter>
+    </div>
+  </div>
+  {{ field|asc_control }}
+  <p class="form-text asc-picker-status" aria-live="polite" data-picker-status data-template="{% trans 'Choices shown:' %}" hidden></p>
+  {% if field.errors %}
+    <div id="{{ field.auto_id }}_error" class="asc-field-error">
+      {% include "components/icon.html" with name="alert-octagon" size="sm" %}
+      <bdi>{% for error in field.errors %}{{ error }}{% if not forloop.last %} {% endif %}{% endfor %}</bdi>
+    </div>
+  {% endif %}
+</div>

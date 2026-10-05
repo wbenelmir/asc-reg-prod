@@ -1,0 +1,77 @@
+/*
+ * Digital Entry Pass print stylesheet (Phase 3 Prompt 2).
+ *
+ * Accessible, monochrome-safe, and dependency-free: no PDF generator is
+ * used, so the printed credential stays selectable text that a screen
+ * reader can announce and a participant can retype if a scan fails.
+ *
+ * Direction-neutral by construction. Logical properties are used instead
+ * of left/right so the sheet mirrors correctly in Arabic RTL, while the
+ * credential value and fallback reference stay LTR inside <bdi>.
+ */
+
+.pass-print-sheet {
+  max-width: 34rem;
+  padding: 1.5rem;
+  border: 1px solid #000;
+  border-radius: 0.25rem;
+}
+
+.pass-print-fields {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.35rem 1rem;
+  margin-block: 1rem;
+}
+
+.pass-print-fields dt {
+  font-weight: 600;
+}
+
+.pass-print-fields dd {
+  margin: 0;
+}
+
+/* The QR graphic is direction-neutral and must never mirror in RTL, so it
+   is isolated with dir="ltr" in the template and centred with logical
+   margins here. `image-rendering: pixelated` keeps module edges crisp when a
+   browser scales the PNG, which matters for scan reliability. */
+.pass-print-qr {
+  margin-block: 1rem;
+  text-align: center;
+}
+
+.pass-print-qr img {
+  width: 320px;
+  height: 320px;
+  image-rendering: pixelated;
+  background: #fff;
+}
+
+.pass-print-note {
+  margin-block-start: 1rem;
+  font-size: 0.85rem;
+}
+
+@media print {
+  /* Remove interactive chrome so the sheet prints on its own. */
+  header,
+  footer,
+  nav,
+  .d-print-none,
+  .skip-link,
+  #status-region {
+    display: none !important;
+  }
+
+  .pass-print-sheet {
+    max-width: none;
+    border-color: #000;
+  }
+
+  /* Never rely on colour in print: status is carried by its text. */
+  * {
+    color: #000 !important;
+    background: transparent !important;
+  }
+}

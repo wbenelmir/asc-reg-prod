@@ -1,0 +1,242 @@
+{% load static i18n %}{% comment %}
+  Enrolled-device PWA shell (Phase 4 Prompt 2, ADR-0023).
+
+  STANDALONE on purpose -- it does not extend base.html -- so the page is
+  identical for every visitor in a given language: no user name, no device
+  identifier, no participant value and no CSRF token in the HTML. The QR
+  form contains only empty local controls, never a participant value.
+  That is what makes it safe for the service worker to keep a copy for use
+  without a network. Everything dynamic is rendered by
+  static/js/entry-offline.js from the device API and the encrypted local
+  store; every string it shows comes from `offline_strings` below.
+{% endcomment %}{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="same-origin">
+  <title>{% trans "Offline readiness" %} — {% trans "Entry & Security" %}</title>
+  <link rel="manifest" href="{% url 'entry:web-manifest' %}">
+  {% if LANGUAGE_BIDI %}
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.rtl.min.css' %}">
+  {% else %}
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+  {% endif %}
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <link rel="stylesheet" href="{% static 'css/asc-ui.css' %}">
+  {% if LANGUAGE_BIDI %}
+    <link rel="preload" href="{% static 'vendor/thmanyah/thmanyahsans-Regular.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static 'vendor/thmanyah/thmanyahsans-Bold.woff2' %}" as="font" type="font/woff2" crossorigin>
+  {% endif %}
+</head>
+<body class="asc-ui asc-entry">
+  <a class="skip-link" href="#main-content">{% trans "Skip to main content" %}</a>
+  <header class="asc-appbar">
+    <div class="container-xl asc-appbar-inner">
+      <a class="asc-brand" href="{% url 'entry:home' %}">
+        <img src="{% static 'img/brand/asc-logo.svg' %}" width="90" height="40" alt="{% trans 'African Startup Conference' %}">
+        <span class="asc-space-label">{% trans "Entry & Security" %}</span>
+      </a>
+    </div>
+    <div class="asc-motif" aria-hidden="true"></div>
+  </header>
+
+  <main id="main-content" class="asc-main">
+    <div class="container-xl" id="offline-shell" data-offline-state="">
+      <div class="asc-page-head">
+        <h1>{% trans "Offline readiness" %}</h1>
+        <p>{% trans "Preparation and status of this device for continuity when the connection is lost. Only signed QR passes can be verified offline." %}</p>
+      </div>
+
+      {% if not enabled %}
+        <div class="asc-notice asc-notice-neutral" role="status" id="offline-disabled">
+          {% include "components/icon.html" with name="info" %}
+          <p>{% trans "Offline continuity is not enabled. This device works online only." %}</p>
+        </div>
+      {% else %}
+        <noscript>
+          <div class="asc-notice asc-notice-danger">
+            <p>{% trans "Offline readiness requires JavaScript. This device works online only." %}</p>
+          </div>
+        </noscript>
+
+        <section class="asc-card" aria-labelledby="offline-state-heading" id="offline-state">
+          <h2 class="asc-card-title" id="offline-state-heading">{% include "components/icon.html" with name="shield" %}{% trans "Operational state" %}</h2>
+          <p class="mb-2">
+            <span class="asc-chip asc-chip-neutral" id="offline-state-chip" data-offline-state="">
+              <svg class="asc-icon" aria-hidden="true" focusable="false"><use href="{% static 'img/icons.svg' %}#i-info"></use></svg>
+              <span data-offline-state-text>{% trans "Checking…" %}</span>
+            </span>
+          </p>
+          <p id="offline-state-explain" class="mb-2"></p>
+          <ul id="offline-state-sub" class="asc-chip-list mb-0" aria-label="{% trans 'Details' %}"></ul>
+        </section>
+
+        <div class="asc-notice asc-notice-neutral" id="offline-message" role="status" hidden><p></p></div>
+        <div id="offline-announcer" class="visually-hidden" aria-live="polite" role="status"></div>
+        <div id="offline-alert" class="visually-hidden" aria-live="assertive" role="alert"></div>
+
+        {# Phase 4 Prompt 3: offline verification of signed QR passes only. #}
+        <section class="asc-card" aria-labelledby="offline-verify-heading" id="offline-verify">
+          <h2 class="asc-card-title" id="offline-verify-heading">{% include "components/icon.html" with name="qr" %}{% trans "Offline verification" %}</h2>
+          <p id="offline-verify-online" class="mb-0">
+            {% trans "The connection is available: verify on the checkpoint page, where the live system decides." %}
+            <a href="{% url 'entry:verify' %}">{% trans "Go to the checkpoint" %}</a>
+          </p>
+          <div class="asc-notice asc-notice-warning mb-3" id="offline-verify-stale" role="status" hidden>
+            {% include "components/icon.html" with name="alert-triangle" %}
+            <p><strong>{% trans "Offline data is stale" %}</strong>{% trans "Nobody can be admitted on it. Each scan can only be sent to manual review or not admitted; no override is possible." %}</p>
+          </div>
+          <form id="offline-verify-form" class="mb-3" novalidate hidden autocomplete="off">
+            <label class="form-label fs-5" for="offline-qr">{% trans "Scan the Digital Entry Pass" %}</label>
+            <div class="asc-scan-field">
+              {% include "components/icon.html" with name="qr" %}
+              <input type="text" id="offline-qr" class="form-control form-control-lg" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="offline-qr-help">
+            </div>
+            <p class="form-text" id="offline-qr-help">{% trans "Only the signed QR code can be verified offline. No name, reference or identity number can be searched on this device." %}</p>
+            <button type="submit" class="btn btn-primary asc-btn-xl">{% include "components/icon.html" with name="check-circle" %}<span>{% trans "Verify offline" %}</span></button>
+          </form>
+          <section class="asc-offline-result asc-result" id="offline-result" aria-labelledby="offline-result-heading" hidden>
+            <span class="asc-result-icon" data-result-icon><svg class="asc-icon" aria-hidden="true" focusable="false"><use href="{% static 'img/icons.svg' %}#i-info"></use></svg></span>
+            <div>
+              <span class="asc-result-kicker">{% trans "Offline verification" %}</span>
+              <h2 class="asc-result-heading" id="offline-result-heading"></h2>
+              <p class="asc-result-reason" id="offline-result-reason"></p>
+              <p class="asc-result-note small" id="offline-result-meta"></p>
+            </div>
+            <dl class="asc-dl asc-offline-person" id="offline-result-person" hidden>
+              <dt>{% trans "Name" %}</dt><dd class="asc-dd-lead"><bdi id="offline-result-name"></bdi></dd>
+              <dt>{% trans "Badge type" %}</dt><dd><bdi id="offline-result-badge"></bdi></dd>
+            </dl>
+            <p class="asc-result-note asc-offline-person" id="offline-result-prior"></p>
+            <ul class="asc-result-note asc-offline-person" id="offline-result-advisories" hidden></ul>
+            <div class="asc-offline-decisions" id="offline-decisions" hidden>
+              <button type="button" class="btn btn-success asc-btn-xl" data-offline-decision="ADMIT" hidden>{% include "components/icon.html" with name="check-circle" %}<span>{% trans "Admit offline" %}</span></button>
+              <div class="asc-offline-field" id="offline-dna-reason-wrap" hidden>
+                <label class="form-label" for="offline-dna-reason">{% trans "Reason for not admitting" %}</label>
+                <select id="offline-dna-reason" class="form-select">
+                  <option value="FOLLOWS_RESULT">{% trans "Follows the verification result" %}</option>
+                  <option value="IDENTITY_MISMATCH">{% trans "Person does not match the record" %}</option>
+                  <option value="PARTICIPANT_LEFT">{% trans "Participant left the checkpoint" %}</option>
+                </select>
+              </div>
+              <button type="button" class="btn btn-danger asc-btn-xl" data-offline-decision="DO_NOT_ADMIT" hidden>{% include "components/icon.html" with name="x-circle" %}<span>{% trans "Do not admit" %}</span></button>
+              <button type="button" class="btn btn-warning asc-btn-xl" data-offline-decision="REDIRECTED" hidden>{% include "components/icon.html" with name="user-check" %}<span>{% trans "Send to manual review" %}</span></button>
+            </div>
+            <div class="asc-offline-override" id="offline-override" hidden>
+              <h3 class="h6">{% trans "Supervisor override (offline)" %}</h3>
+              <label class="form-label" for="offline-override-reason">{% trans "Override reason" %}</label>
+              <select id="offline-override-reason" class="form-select mb-2"></select>
+              <label class="form-label" for="offline-override-note">{% trans "Note (recorded encrypted)" %}</label>
+              <textarea id="offline-override-note" class="form-control mb-2" rows="2" maxlength="500" autocomplete="off"></textarea>
+              <button type="button" class="btn btn-outline-danger" data-offline-decision="OVERRIDE">{% trans "Record the supervisor override" %}</button>
+            </div>
+            <div class="asc-result-actions">
+              <button type="button" class="btn btn-outline-secondary" id="offline-result-clear">{% trans "Clear and verify next" %}</button>
+              <span class="asc-hint small">{% blocktrans trimmed %}Press <kbd>Esc</kbd> to clear this result.{% endblocktrans %}</span>
+            </div>
+          </section>
+          <div class="asc-notice asc-notice-danger mb-0" id="offline-expired" role="status" hidden>
+            {% include "components/icon.html" with name="x-circle" %}
+            <div>
+              <p><strong>{% trans "Offline data expired" %}</strong>{% trans "No verification and no admission is possible on this device. Follow the manual procedure below." %}</p>
+              <button type="button" class="btn btn-outline-danger mt-2" data-offline-decision="REFERRAL">{% trans "Record a referral to the manual procedure" %}</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="asc-card" aria-labelledby="offline-incident-heading" id="offline-incident" hidden>
+          <h2 class="asc-card-title" id="offline-incident-heading">{% include "components/icon.html" with name="alert-octagon" %}{% trans "Verification cannot proceed safely" %}</h2>
+          <ol class="asc-offline-steps">
+            <li>{% trans "Do not admit anyone on this device, and never on a physical badge alone." %}</li>
+            <li>{% trans "Call your supervisor now and give the device name and the status shown above." %}</li>
+            <li>{% trans "Your supervisor applies the approved continuity procedure for this checkpoint. This device records nothing further." %}</li>
+            <li>{% trans "Keep this page open and the device powered: it reconnects on its own and uploads what it holds." %}</li>
+          </ol>
+        </section>
+
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <section class="asc-card" aria-labelledby="offline-readiness-heading">
+              <h2 class="asc-card-title" id="offline-readiness-heading">{% include "components/icon.html" with name="package" %}{% trans "Offline data" %}</h2>
+              <dl class="asc-dl">
+                <dt>{% trans "Device" %}</dt><dd><bdi data-offline-field="device"></bdi></dd>
+                <dt>{% trans "Gate" %}</dt><dd><bdi dir="ltr" class="asc-code" data-offline-field="gate"></bdi></dd>
+                <dt>{% trans "Last preparation" %}</dt><dd><bdi data-offline-field="prepared"></bdi></dd>
+                <dt>{% trans "Last self-test" %}</dt><dd><bdi data-offline-field="self_test"></bdi></dd>
+                <dt>{% trans "Package version" %}</dt><dd><bdi dir="ltr" data-offline-field="package_version"></bdi></dd>
+                <dt>{% trans "Freshness" %}</dt><dd><span data-offline-field="band"></span></dd>
+                <dt>{% trans "Package data age" %}</dt><dd><bdi data-offline-field="package_age"></bdi></dd>
+                <dt>{% trans "Critical update age" %}</dt><dd><bdi data-offline-field="critical_age"></bdi></dd>
+                <dt>{% trans "Hard expiry" %}</dt><dd><bdi data-offline-field="expires_in"></bdi></dd>
+                <dt>{% trans "Authorized operators" %}</dt><dd><bdi data-offline-field="grant"></bdi></dd>
+              </dl>
+            </section>
+            <section class="asc-card" aria-labelledby="offline-scope-heading" id="offline-scope">
+              <h2 class="asc-card-title" id="offline-scope-heading">{% include "components/icon.html" with name="gate" %}{% trans "Device scope" %}</h2>
+              <dl class="asc-dl mb-0">
+                <dt>{% trans "Event" %}</dt><dd><bdi dir="ltr" class="asc-code" data-offline-field="event"></bdi></dd>
+                <dt>{% trans "Permitted zones" %}</dt><dd><bdi dir="ltr" class="asc-code" data-offline-field="zones"></bdi></dd>
+                <dt>{% trans "Checkpoint zone" %}</dt><dd><bdi dir="ltr" class="asc-code" data-offline-field="zone"></bdi></dd>
+                <dt>{% trans "Scope version" %}</dt><dd><bdi dir="ltr" data-offline-field="scope_version"></bdi></dd>
+                <dt>{% trans "Offline values" %}</dt><dd><span data-offline-field="sensitivity"></span></dd>
+                <dt>{% trans "Working offline as" %}</dt><dd><bdi data-offline-field="operator"></bdi></dd>
+              </dl>
+            </section>
+            <section class="asc-card" aria-labelledby="offline-evidence-heading" id="offline-sync">
+              <h2 class="asc-card-title" id="offline-evidence-heading">{% include "components/icon.html" with name="lock" %}{% trans "Local records and synchronization" %}</h2>
+              <p class="asc-section-lead">{% trans "Records not yet acknowledged by the server are never deleted by ordinary cleanup. A record counts as synchronized only once the server has confirmed it." %}</p>
+              <p class="mb-2"><span class="asc-chip asc-chip-outline" id="offline-sync-status" data-sync-status="" role="status"></span></p>
+              <dl class="asc-dl">
+                <dt>{% trans "Last successful synchronization" %}</dt><dd><bdi data-offline-field="last_sync"></bdi></dd>
+                <dt>{% trans "Pending" %}</dt><dd><bdi dir="ltr" data-offline-field="pending"></bdi></dd>
+                <dt>{% trans "Being uploaded" %}</dt><dd><bdi dir="ltr" data-offline-field="in_flight"></bdi></dd>
+                <dt>{% trans "Acknowledged by the server" %}</dt><dd><bdi dir="ltr" data-offline-field="acknowledged"></bdi></dd>
+                <dt>{% trans "Needing supervisor review" %}</dt><dd><bdi dir="ltr" data-offline-field="conflicted"></bdi></dd>
+                <dt>{% trans "Locked (upload only)" %}</dt><dd><bdi dir="ltr" data-offline-field="locked"></bdi></dd>
+                <dt>{% trans "Last sequence" %}</dt><dd><bdi dir="ltr" data-offline-field="sequence"></bdi></dd>
+                <dt>{% trans "Chain head" %}</dt><dd><bdi dir="ltr" class="asc-code" data-offline-field="chain_head"></bdi></dd>
+              </dl>
+              <div class="asc-notice asc-notice-warning" id="offline-conflicts-notice" role="status" hidden>
+                {% include "components/icon.html" with name="alert-triangle" %}
+                <p>{% trans "Some records need a supervisor's review: the server found a conflict. They stay recorded exactly as they happened; a supervisor resolves them in the reconciliation queue." %}</p>
+              </div>
+              <button type="button" class="btn btn-outline-primary" data-offline-action="upload" data-offline-requires="UPLOAD_OPERATIONS"><span>{% trans "Upload local records now" %}</span></button>
+            </section>
+          </div>
+          <div class="col-lg-6">
+            <section class="asc-card" aria-labelledby="offline-commands-heading">
+              <h2 class="asc-card-title" id="offline-commands-heading">{% include "components/icon.html" with name="refresh" %}{% trans "Preparation" %}</h2>
+              <div class="d-grid gap-3">
+                <button type="button" class="btn btn-primary" data-offline-action="prepare" data-offline-requires="PREPARE_DEVICE"><span>{% trans "Prepare this device for offline use" %}</span></button>
+                <p class="small text-body-secondary mb-0">{% trans "For device administrators signed in on this device. Registers new device keys, downloads the offline data and runs the self-test." %}</p>
+                <button type="button" class="btn btn-outline-primary" data-offline-action="refresh" data-offline-requires="REFRESH_PACKAGE"><span>{% trans "Refresh offline data" %}</span></button>
+                <button type="button" class="btn btn-outline-primary" data-offline-action="self-test" data-offline-requires="PREPARE_DEVICE"><span>{% trans "Run the self-test again" %}</span></button>
+                <button type="button" class="btn btn-outline-primary" data-offline-action="grant" data-offline-requires="VERIFY_ONLINE"><span>{% trans "Authorize me for offline work on this device" %}</span></button>
+                <p class="small text-body-secondary mb-0">{% trans "Requires your live checkpoint session. The authorization is issued online only and ends with your session." %}</p>
+                <a class="btn btn-outline-secondary" href="{% url 'entry:home' %}"><span>{% trans "Back to the checkpoint" %}</span></a>
+              </div>
+            </section>
+            <section class="asc-card" aria-labelledby="offline-actions-heading">
+              <h2 class="asc-card-title" id="offline-actions-heading">{% include "components/icon.html" with name="list" %}{% trans "Actions in the current state" %}</h2>
+              <ul id="offline-actions" class="list-unstyled d-grid gap-2 mb-0 asc-offline-actions"></ul>
+            </section>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </main>
+
+  <footer class="asc-footer">
+    <div class="container-xl d-flex flex-wrap gap-2 justify-content-between">
+      <span>{% trans "ASC 2026 Registration Platform" %}</span>
+      <span>{% trans "Entry & Security — authorized personnel only" %}</span>
+    </div>
+  </footer>
+  {% if enabled %}
+    {{ offline_config|json_script:"asc-offline-config" }}
+    {{ offline_strings|json_script:"asc-offline-strings" }}
+    <script src="{% static 'js/entry-offline.js' %}"></script>
+  {% endif %}
+</body>
+</html>

@@ -1,0 +1,243 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+
+{% comment %}
+Generic physical badge handover for one exact Registration Context (Phase 3
+Prompt 3, ADR-0020; UI/UX §9.3, §14.2 "Badge Issuance Panel"). A wrong Badge
+Type is never substituted automatically: the server refuses unless the
+selected Badge Type matches this registration's current assignment exactly.
+Shows the registration reference and badge types only -- no identity value.
+{% endcomment %}
+
+{% block title %}{% trans "Physical badge" %}{% endblock %}
+
+{% block breadcrumbs %}
+  <nav aria-label="{% trans 'Breadcrumb' %}" class="asc-breadcrumbs">
+    <ol>
+      <li><a href="{% url 'registrations:ops-intake-list' %}">{% trans "Operations" %}</a>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><span>{% trans "Registration" %} <bdi dir="ltr" class="asc-code">{{ registration.public_reference }}</bdi></span>{% include "components/icon.html" with name="chevron-next" size="sm" flip=True %}</li>
+      <li><span aria-current="page">{% trans "Physical badge" %}</span></li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="asc-page-head">
+    <h1>{% trans "Physical badge" %}</h1>
+    <p>{% trans "Hand over generic badge stock of the assigned type, after the entry pass or identity has been verified." %}</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <section class="asc-card" aria-labelledby="current-heading">
+        <h2 class="asc-card-title" id="current-heading">{% include "components/icon.html" with name="badge" %}{% trans "Current issuance" %}</h2>
+        {% if current_issuance %}
+          <table class="asc-table">
+            <caption class="visually-hidden">{% trans "Current physical badge issuance" %}</caption>
+            <tbody>
+              <tr>
+                <th scope="row">{% trans "Status" %}</th>
+                <td data-issuance-status="{{ current_issuance.status }}">
+                  <span class="asc-chip {% if current_issuance.status == 'ISSUED' %}asc-chip-success{% elif current_issuance.status == 'LOST' %}asc-chip-danger{% else %}asc-chip-outline{% endif %}">{{ current_issuance.get_status_display }}</span>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">{% trans "Badge type" %}</th>
+                <td><bdi dir="ltr" class="asc-code">{{ current_issuance.badge_type.code }}</bdi></td>
+              </tr>
+              <tr>
+                <th scope="row">{% trans "Location" %}</th>
+                <td><bdi dir="ltr" class="asc-code">{{ current_issuance.location.code }}</bdi></td>
+              </tr>
+              <tr>
+                <th scope="row">{% trans "Issued" %}</th>
+                <td>{{ current_issuance.issued_at }}</td>
+              </tr>
+            </tbody>
+          </table>
+        {% else %}
+          <div class="asc-empty">
+            <span class="asc-tile">{% include "components/icon.html" with name="badge" %}</span>
+            <p>{% trans "No physical badge has been issued for this registration." %}</p>
+          </div>
+        {% endif %}
+      </section>
+
+      <section class="asc-card" aria-labelledby="history-heading">
+        <h2 class="asc-card-title" id="history-heading">{% include "components/icon.html" with name="clock" %}{% trans "Issuance history" %}</h2>
+        {% if history %}
+          <div class="asc-table-wrap">
+            <table class="asc-table">
+              <caption class="visually-hidden">{% trans "All physical badge issuances for this registration" %}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">{% trans "Badge type" %}</th>
+                  <th scope="col">{% trans "Status" %}</th>
+                  <th scope="col">{% trans "Issued" %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for entry in history %}
+                  <tr>
+                    <td><bdi dir="ltr" class="asc-code">{{ entry.badge_type.code }}</bdi></td>
+                    <td data-issuance-status="{{ entry.status }}">{{ entry.get_status_display }}</td>
+                    <td>{{ entry.issued_at }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-body-secondary mb-0">{% trans "No physical badge has ever been issued for this registration." %}</p>
+        {% endif %}
+      </section>
+    </div>
+
+    <div class="col-lg-5">
+      <section class="asc-card" aria-labelledby="context-heading">
+        <h2 class="asc-card-title" id="context-heading">{% include "components/icon.html" with name="shield" %}{% trans "Registration context" %}</h2>
+        <dl class="asc-dl asc-dl-stacked">
+          <dt>{% trans "Registration reference" %}</dt>
+          <dd><bdi dir="ltr" class="asc-code">{{ registration.public_reference }}</bdi></dd>
+          <dt>{% trans "Assigned badge type" %}</dt>
+          <dd>
+            {% if assignment %}<bdi dir="ltr" class="asc-code">{{ assignment.badge_type.code }}</bdi>{% else %}
+              <span class="asc-chip asc-chip-warning">{% include "components/icon.html" with name="alert-triangle" size="sm" %}{% trans "No current badge assignment." %}</span>
+            {% endif %}
+          </dd>
+        </dl>
+        <p class="small text-body-secondary mb-0">{% trans "A generic physical badge alone is not proof of identity." %}</p>
+      </section>
+
+      {% if not current_issuance and can_issue and assignment %}
+        <section class="asc-card" aria-labelledby="issue-heading">
+          <h2 class="asc-card-title" id="issue-heading">{% include "components/icon.html" with name="package" %}{% trans "Issue a badge" %}</h2>
+          <form method="post" action="{% url 'badges:badge-issue' pk=registration.pk %}" class="d-grid gap-3">
+            {% csrf_token %}
+            <input type="hidden" name="operation_id" value="{{ issue_operation_id }}">
+            <input type="hidden" name="badge_type_id" value="{{ assignment.badge_type.pk }}">
+            <div>
+              <label class="form-label" for="issue-location">{% trans "Issuing location" %}</label>
+              <select class="form-select" id="issue-location" name="location_id" required>
+                {% for location in locations %}
+                  <option value="{{ location.pk }}">{{ location.code }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="issue-allocation">{% trans "Current allocations" %}</label>
+              <select class="form-select" id="issue-allocation" name="allocation_id">
+                <option value="">{% trans "Available" %}</option>
+                {% for allocation in issuance_allocations %}
+                  <option value="{{ allocation.pk }}">
+                    {{ allocation.location.code }} — {{ allocation.get_purpose_code_display }} — {% trans "Remaining" %}: {{ allocation.remaining_quantity }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="issue-serial">{% trans "Serial number (optional)" %}</label>
+              <input class="form-control" id="issue-serial" type="text" name="optional_serial_number" maxlength="64" dir="ltr">
+            </div>
+            <button type="submit" class="btn btn-primary asc-btn-xl">
+              {% include "components/icon.html" with name="check-circle" %}
+              <span>{% trans "Issue" %} <bdi dir="ltr">{{ assignment.badge_type.code }}</bdi></span>
+            </button>
+          </form>
+        </section>
+      {% elif not current_issuance and can_issue and not assignment %}
+        <div class="asc-notice asc-notice-warning mt-3" role="status">
+          {% include "components/icon.html" with name="alert-triangle" %}
+          <p>{% trans "A badge can be issued only after a badge type is assigned to this registration." %}</p>
+        </div>
+      {% endif %}
+
+      {% if current_issuance and can_return %}
+        <section class="asc-card" aria-labelledby="change-heading">
+          <h2 class="asc-card-title" id="change-heading">{% include "components/icon.html" with name="refresh" %}{% trans "Change this issuance" %}</h2>
+          <div class="d-grid gap-4">
+            <form method="post" class="d-grid gap-2"
+                  action="{% url 'badges:badge-issuance-replace' registration_pk=registration.pk pk=current_issuance.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="operation_id" value="{{ replace_operation_id }}">
+              <input type="hidden" name="expected_lock_version" value="{{ current_issuance.version }}">
+              <h3 class="h6 mb-0">{% trans "Replace badge" %}</h3>
+              <div>
+                <label class="form-label" for="replace-badge-type">{% trans "New badge type" %}</label>
+                <select class="form-select" id="replace-badge-type" name="badge_type_id" required>
+                  {% if assignment %}
+                    <option value="{{ assignment.badge_type.pk }}">{{ assignment.badge_type.code }}</option>
+                  {% endif %}
+                </select>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="return-original" name="return_original">
+                <label class="form-check-label" for="return-original">
+                  {% trans "The original badge is being returned to stock" %}
+                </label>
+              </div>
+              <div>
+                <label class="form-label" for="replace-reason">{% trans "Reason" %}</label>
+                <select class="form-select" id="replace-reason" name="reason_code" required>
+                  {% for value, text in replace_reason_choices %}
+                    <option value="{{ value }}">{{ text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div>
+                <label class="form-label" for="replace-reason-text">{% trans "Notes (optional)" %}</label>
+                <input class="form-control" id="replace-reason-text" type="text" name="reason_text" maxlength="300">
+              </div>
+              <button type="submit" class="btn btn-outline-primary"><span>{% trans "Replace badge" %}</span></button>
+            </form>
+
+            <form method="post" class="d-grid gap-2"
+                  action="{% url 'badges:badge-issuance-return' registration_pk=registration.pk pk=current_issuance.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="operation_id" value="{{ return_operation_id }}">
+              <input type="hidden" name="expected_lock_version" value="{{ current_issuance.version }}">
+              <h3 class="h6 mb-0">{% trans "Record return" %}</h3>
+              <div>
+                <label class="form-label" for="return-reason">{% trans "Reason" %}</label>
+                <select class="form-select" id="return-reason" name="reason_code" required>
+                  {% for value, text in return_reason_choices %}
+                    <option value="{{ value }}">{{ text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div>
+                <label class="form-label" for="return-reason-text">{% trans "Notes (optional)" %}</label>
+                <input class="form-control" id="return-reason-text" type="text" name="reason_text" maxlength="300">
+              </div>
+              <button type="submit" class="btn btn-success"><span>{% trans "Record return" %}</span></button>
+            </form>
+
+            <form method="post" class="d-grid gap-2"
+                  action="{% url 'badges:badge-issuance-mark-lost' registration_pk=registration.pk pk=current_issuance.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="operation_id" value="{{ lost_operation_id }}">
+              <input type="hidden" name="expected_lock_version" value="{{ current_issuance.version }}">
+              <div>
+                <label class="form-label" for="lost-reason-text">{% trans "Notes (optional)" %}</label>
+                <input class="form-control" id="lost-reason-text" type="text" name="reason_text" maxlength="300">
+              </div>
+              <button type="submit" class="btn btn-outline-danger"><span>{% trans "Report lost" %}</span></button>
+            </form>
+
+            <form method="post" class="d-grid gap-2"
+                  action="{% url 'badges:badge-issuance-void' registration_pk=registration.pk pk=current_issuance.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="operation_id" value="{{ void_operation_id }}">
+              <input type="hidden" name="expected_lock_version" value="{{ current_issuance.version }}">
+              <div>
+                <label class="form-label" for="void-reason-text">{% trans "Notes (optional)" %}</label>
+                <input class="form-control" id="void-reason-text" type="text" name="reason_text" maxlength="300">
+              </div>
+              <button type="submit" class="btn btn-outline-secondary"><span>{% trans "Void issuance" %}</span></button>
+            </form>
+          </div>
+        </section>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

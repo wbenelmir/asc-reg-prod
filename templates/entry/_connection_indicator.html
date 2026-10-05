@@ -1,0 +1,29 @@
+{% load i18n %}
+{% comment %}
+  Persistent connection indicator (UI/UX §9.7). Server-rendered as Online
+  (this page was just served); static/js/entry.js then keeps it truthful
+  with the browser's online/offline events and a passive status check that
+  never counts as operator activity. States: online, checking, degraded,
+  offline, session-ended. Offline verification is NOT available (Plan B not
+  enabled): the offline state tells the operator not to verify, never that
+  local verification is happening.
+{% endcomment %}
+<div class="asc-conn" id="entry-connection" data-state="{% if degraded_notice %}degraded{% else %}online{% endif %}"
+     data-status-url="{% url 'entry:status' %}"
+     data-poll-seconds="{{ connection_poll_seconds|default:20 }}"
+     data-failures-to-offline="{{ connection_failures_to_offline|default:3 }}"
+     data-failure-span-seconds="{{ connection_failure_span_seconds|default:20 }}"
+     data-retry-seconds="{{ connection_retry_seconds|default:5 }}"
+     data-text-online="{% trans 'Online' %}"
+     data-text-checking="{% trans 'Checking connection…' %}"
+     data-text-degraded="{% trans 'Online — degraded' %}"
+     data-text-offline="{% trans 'Connection lost' %}"
+     data-text-session-ended="{% trans 'Session ended' %}">
+  <span class="asc-conn-dot" aria-hidden="true"></span>
+  <span data-conn-icon="online">{% include "components/icon.html" with name="online" %}</span>
+  <span data-conn-icon="degraded">{% include "components/icon.html" with name="alert-triangle" %}</span>
+  <span data-conn-icon="offline">{% include "components/icon.html" with name="offline" %}</span>
+  <span data-conn-icon="session-ended">{% include "components/icon.html" with name="lock" %}</span>
+  <span data-conn-text>{% if degraded_notice %}{% trans "Online — degraded" %}{% else %}{{ mode_label }}{% endif %}</span>
+</div>
+<span class="visually-hidden" id="entry-connection-announcer" aria-live="polite"></span>

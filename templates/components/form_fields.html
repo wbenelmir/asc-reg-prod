@@ -1,0 +1,24 @@
+{% load i18n %}
+{# Every field of `form`: hidden inputs as-is, multiple-choice checkboxes as a labelled fieldset, everything else through components/field.html. #}
+{% for field in form %}
+  {% if field.is_hidden %}
+    {{ field }}
+  {% elif field.field.widget.allow_multiple_selected and field.field.widget.input_type == "checkbox" %}
+    <fieldset class="mb-3"{% if field.errors %} aria-describedby="id_{{ field.name }}_error"{% endif %}>
+      <legend class="form-label fs-6"><bdi>{{ field.label }}</bdi></legend>
+      <div class="asc-checks">
+        {% for option in field %}
+          <label class="asc-check" for="{{ option.id_for_label }}">{{ option.tag }}<bdi>{{ option.choice_label }}</bdi></label>
+        {% endfor %}
+      </div>
+      {% if field.errors %}
+        <div id="id_{{ field.name }}_error" class="asc-field-error">
+          {% include "components/icon.html" with name="alert-octagon" size="sm" %}
+          <bdi>{% for error in field.errors %}{{ error }}{% if not forloop.last %} {% endif %}{% endfor %}</bdi>
+        </div>
+      {% endif %}
+    </fieldset>
+  {% else %}
+    {% include "components/field.html" %}
+  {% endif %}
+{% endfor %}

@@ -1,0 +1,14 @@
+{% load i18n %}
+{% comment %}
+  No-JavaScript safeguard for a form that uses the shared confirmation
+  dialog: without scripting the dialog cannot open, so the browser itself
+  requires this consent box before the form submits. It has no name and is
+  never sent. The form must not carry `novalidate`. Parameters: `id`,
+  optional `suffix` (appended to the id for repeated forms) and `label`.
+{% endcomment %}
+<noscript>
+  <div class="asc-checkbox asc-confirm-fallback">
+    <input type="checkbox" class="form-check-input" id="{{ id }}{% if suffix %}-{{ suffix }}{% endif %}" required>
+    <label class="form-check-label" for="{{ id }}{% if suffix %}-{{ suffix }}{% endif %}">{{ label|default:_("I understand that this cannot be undone.") }}</label>
+  </div>
+</noscript>

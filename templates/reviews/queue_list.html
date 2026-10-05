@@ -1,0 +1,127 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% trans "Review queue" %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <h1>{% trans "Review queue" %}</h1>
+      <p>{% trans "Review cases in your authorized scope, highest priority first." %}</p>
+    </div>
+  </div>
+
+  <form method="get" class="asc-card asc-filters" role="search" aria-label="{% trans 'Filter the review queue' %}">
+    <div class="asc-filters-grid">
+      <div class="asc-filter-search">
+        <label for="id_q" class="form-label">{% trans "Search" %}</label>
+        <div class="asc-input-icon">
+          {% include "components/icon.html" with name="search" %}
+          <input type="search" id="id_q" name="q" class="form-control" value="{{ request.GET.q }}" placeholder="{% trans 'Reference or name' %}">
+        </div>
+      </div>
+      <div>
+        <label for="id_case_type" class="form-label">{% trans "Case type" %}</label>
+        <select id="id_case_type" name="case_type" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          {% for value, label in case_types %}
+            <option value="{{ value }}" {% if request.GET.case_type == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="id_queue_code" class="form-label">{% trans "Queue" %}</label>
+        <select id="id_queue_code" name="queue_code" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          {% for value, label in queue_codes %}
+            <option value="{{ value }}" {% if request.GET.queue_code == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="id_status" class="form-label">{% trans "Status" %}</label>
+        <select id="id_status" name="status" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          {% for value, label in statuses %}
+            <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="id_assignment" class="form-label">{% trans "Assignment" %}</label>
+        <select id="id_assignment" name="assignment" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          <option value="mine" {% if request.GET.assignment == "mine" %}selected{% endif %}>{% trans "Assigned to me" %}</option>
+          <option value="unassigned" {% if request.GET.assignment == "unassigned" %}selected{% endif %}>{% trans "Unassigned" %}</option>
+        </select>
+      </div>
+    </div>
+    <div class="asc-filters-actions">
+      <button type="submit" class="btn btn-primary">{% include "components/icon.html" with name="filter" %}<span>{% trans "Apply filters" %}</span></button>
+      {% if querystring %}<a class="btn btn-outline-secondary" href="{% url 'reviews:queue-list' %}">{% trans "Clear filters" %}</a>{% endif %}
+    </div>
+  </form>
+
+  <section class="asc-card asc-card-flush" aria-labelledby="queue-results-heading">
+    <div class="asc-card-toolbar">
+      <h2 class="asc-card-toolbar-title" id="queue-results-heading">{% trans "Review cases matching the current filters" %}</h2>
+      <span class="asc-count">{% blocktrans count counter=page.paginator.count %}{{ counter }} case{% plural %}{{ counter }} cases{% endblocktrans %}</span>
+    </div>
+    {% if page.object_list %}
+      {# Wide screens: a real table. Phones: the same rows as stacked records (UI checkpoint 1 correction); only one is displayed. #}
+      <div class="asc-table-wrap asc-wide-only">
+        <table class="asc-table" aria-label="{% trans 'Review cases' %}">
+          <thead>
+            <tr>
+              <th scope="col">{% trans "Reference" %}</th>
+              <th scope="col">{% trans "Case type" %}</th>
+              <th scope="col">{% trans "Queue" %}</th>
+              <th scope="col">{% trans "Status" %}</th>
+              <th scope="col" class="asc-num">{% trans "Priority" %}</th>
+              <th scope="col">{% trans "Opened" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for case in page %}
+              <tr>
+                <th scope="row"><a href="{% url 'reviews:case-detail' pk=case.pk %}"><bdi dir="ltr" class="asc-code">{{ case.registration.public_reference }}</bdi></a></th>
+                <td>{{ case.get_case_type_display }}</td>
+                <td>{{ case.get_queue_code_display }}</td>
+                <td>{% status_chip "review_case" case.status case.get_status_display %}</td>
+                <td class="asc-num">{{ case.priority }}</td>
+                <td><time datetime="{{ case.opened_at|date:'c' }}">{{ case.opened_at }}</time></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <ul class="asc-records asc-narrow-only" aria-label="{% trans 'Review cases' %}">
+        {% for case in page %}
+          <li class="asc-record" data-record>
+            <div class="asc-record-head">
+              <h3 class="asc-record-title"><bdi dir="ltr" class="asc-code">{{ case.registration.public_reference }}</bdi></h3>
+              <p class="asc-record-meta">{% trans "Priority" %}{% trans ":" context "label separator" %} {{ case.priority }}</p>
+            </div>
+            <dl class="asc-record-fields">
+              <div class="asc-record-wide"><dt>{% trans "Status" %}</dt><dd>{% status_chip "review_case" case.status case.get_status_display %}</dd></div>
+              <div><dt>{% trans "Case type" %}</dt><dd>{{ case.get_case_type_display }}</dd></div>
+              <div><dt>{% trans "Queue" %}</dt><dd>{{ case.get_queue_code_display }}</dd></div>
+              <div class="asc-record-wide"><dt>{% trans "Opened" %}</dt><dd><time datetime="{{ case.opened_at|date:'c' }}">{{ case.opened_at }}</time></dd></div>
+            </dl>
+            <div class="asc-record-actions">
+              <a class="btn btn-outline-primary" href="{% url 'reviews:case-detail' pk=case.pk %}" data-record-action>{% trans "Open case" %}<span class="visually-hidden"> <bdi dir="ltr">{{ case.registration.public_reference }}</bdi></span></a>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+      <div class="asc-card-foot">
+        {% trans "Queue pages" as pages_label %}
+        {% include "components/pagination.html" with label=pages_label %}
+      </div>
+    {% else %}
+      <div class="asc-empty">
+        <span class="asc-tile">{% include "components/icon.html" with name="inbox" %}</span>
+        <h3>{% trans "No review cases match the current filters." %}</h3>
+        {% if querystring %}<p><a href="{% url 'reviews:queue-list' %}">{% trans "Clear filters" %}</a></p>{% endif %}
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

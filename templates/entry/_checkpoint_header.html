@@ -1,0 +1,13 @@
+{% load i18n %}
+{# Persistent checkpoint status bar (TRD ENTRY-003, UI/UX §9.7): the active mode is always visible. #}
+<section class="border rounded p-2 mb-3 d-flex flex-wrap gap-3 align-items-center small" aria-label="{% trans 'Checkpoint status' %}">
+  <span class="badge text-bg-success" role="status"><span aria-hidden="true">●</span> {% trans "Mode" %}: {{ mode_label }}</span>
+  <span>{% trans "Gate" %}: <strong>{{ checkpoint.gate.localized_name }}</strong> ({{ checkpoint.gate.code }})</span>
+  <span>{% trans "Zone" %}: <strong>{{ checkpoint.zone.localized_name }}</strong></span>
+  <span>{% trans "Device" %}: {{ checkpoint.device.public_name }}</span>
+  <span>{% trans "Operator" %}: {{ checkpoint.user.display_name }}</span>
+  <form method="post" action="{% url 'entry:session-end' %}" class="ms-auto m-0">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-sm btn-outline-secondary">{% trans "End my session" %}</button>
+  </form>
+</section>

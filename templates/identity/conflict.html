@@ -1,0 +1,16 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% comment %}
+  IDV-3 409: the identity case changed (another reviewer, the participant or
+  the worker) or no longer accepts the action. Nothing was saved. The view's
+  explanation is shown above the shared conflict card.
+{% endcomment %}
+{% block title %}{% trans "Conflict" %}{% endblock %}
+{% block content %}
+  <div class="asc-notice asc-notice-warning mb-3" role="alert" data-idv-conflict-message>
+    {% include "components/icon.html" with name="refresh" %}
+    <div><p class="mb-0"><bdi>{{ message }}</bdi></p></div>
+  </div>
+  {% trans "Open the case again" as back_label %}
+  {% include "components/conflict_state.html" with back_url=case_url back_label=back_label %}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% block title %}{% trans "Conflict" %}{% endblock %}
+{% block content %}
+  {% if registration_pk %}
+    {% url 'accreditation:registration-detail' pk=registration_pk as back_url %}{% trans "Back to the accreditation" as back_label %}
+  {% else %}
+    {% url 'registrations:ops-intake-list' as back_url %}{% trans "Back to operations" as back_label %}
+  {% endif %}
+  {% include "components/conflict_state.html" with back_url=back_url back_label=back_label %}
+{% endblock %}

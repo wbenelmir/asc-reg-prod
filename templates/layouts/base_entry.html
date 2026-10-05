@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% comment %}
+  Entry & Security shell (TRD §7.2 `base_entry`; UI/UX §4.5, §4.6, §9.7).
+
+  Tablet-first: navy application bar with the official logo, the space
+  name, the persistent connection indicator, the language switcher and the
+  operator's session control; then the checkpoint identity strip and the
+  entry sub-navigation (only on checkpoint pages); then the page.
+
+  The shell prioritizes scanning and verification, never general
+  administration. It carries no participant data of its own.
+{% endcomment %}
+
+{% block body_attrs %} class="asc-ui asc-entry" data-entry-busy-text="{% trans 'Verifying…' %}"{% endblock %}
+
+{% block header %}
+  <header class="asc-appbar">
+    <div class="container-xl asc-appbar-inner">
+      <a class="asc-brand" href="{% url 'entry:home' %}">
+        <img src="{% static 'img/brand/asc-logo.svg' %}" width="90" height="40" alt="{% trans 'African Startup Conference' %}">
+        <span class="asc-space-label">{% trans "Entry & Security" %}</span>
+      </a>
+      <div class="asc-appbar-end">
+        {% if checkpoint %}{% include "entry/_connection_indicator.html" %}{% endif %}
+        {% include "partials/language_switcher.html" %}
+        {% if checkpoint %}
+          <span class="asc-operator">
+            {% include "components/icon.html" with name="user" %}
+            <bdi>{{ checkpoint.user.display_name }}</bdi>
+          </span>
+          <form method="post" action="{% url 'entry:session-end' %}" class="m-0">
+            {% csrf_token %}
+            <button type="submit" class="asc-appbar-btn">
+              {% include "components/icon.html" with name="log-out" flip=True %}
+              <span>{% trans "End my session" %}</span>
+            </button>
+          </form>
+        {% elif request.user.is_authenticated %}
+          <form method="post" action="{% url 'accounts:operational-sign-out' %}" class="m-0">
+            {% csrf_token %}
+            <button type="submit" class="asc-appbar-btn">
+              {% include "components/icon.html" with name="log-out" flip=True %}
+              <span>{% trans "Sign out" %}</span>
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+    <div class="asc-motif" aria-hidden="true"></div>
+  </header>
+  {% if checkpoint %}{% include "entry/_checkpoint_context.html" %}{% endif %}
+{% endblock %}
+
+{% block main %}
+  <main id="main-content" class="asc-main">
+    <div class="container-xl">
+      {% include "components/flash_messages.html" %}
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+{% endblock %}
+
+{% block footer %}
+  <footer class="asc-footer">
+    <div class="container-xl d-flex flex-wrap gap-2 justify-content-between">
+      <span>{% trans "ASC 2026 Registration Platform" %}</span>
+      <span>{% trans "Entry & Security — authorized personnel only" %}</span>
+      {% include "partials/footer_official.html" %}
+    </div>
+  </footer>
+{% endblock %}
+
+{% block extra_scripts %}<script src="{% static 'js/entry.js' %}"></script>{% endblock %}

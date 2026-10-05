@@ -1,0 +1,21 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% block title %}{% trans "Device activation code" %}{% endblock %}
+{% block content %}
+{# Shown once, never cached (Cache-Control: no-store is set by the view). #}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-7">
+    <section class="asc-card text-center" aria-labelledby="code-heading">
+      <span class="asc-tile mb-3">{% include "components/icon.html" with name="lock" %}</span>
+      <h1 class="h3" id="code-heading">{% trans "Device activation code" %}</h1>
+      <p>{% blocktrans with name=device.public_name %}Activation code for “{{ name }}”:{% endblocktrans %}</p>
+      <p><bdi dir="ltr" class="asc-code-display">{{ code }}</bdi></p>
+      <div class="asc-notice asc-notice-warning text-start" role="alert">
+        {% include "components/icon.html" with name="alert-triangle" %}
+        <p>{% blocktrans with minutes=valid_minutes %}This code is shown only once, can be used once, and expires in {{ minutes }} minutes. Enter it on the physical device while signed in as a device administrator. Do not send it by email or chat.{% endblocktrans %}</p>
+      </div>
+      <a class="btn btn-outline-secondary mt-3" href="{% url 'entry:device-detail' device.public_id %}">{% trans "Back to the device" %}</a>
+    </section>
+  </div>
+</div>
+{% endblock %}

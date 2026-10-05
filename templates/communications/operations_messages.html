@@ -1,0 +1,72 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% trans "Communication delivery" %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Communications" %}</p>
+      <h1>{% trans "Communication delivery" %}</h1>
+      <p>{% trans "Delivery evidence is shown without recipient addresses or message content." %}</p>
+    </div>
+  </div>
+
+  <section class="asc-card asc-card-flush" aria-labelledby="communication-heading">
+    <div class="asc-card-toolbar">
+      <h2 class="asc-card-toolbar-title" id="communication-heading">{% trans "Messages in your authorized scope" %}</h2>
+      <span class="asc-count">{% blocktrans count counter=communication_messages|length %}{{ counter }} message{% plural %}{{ counter }} messages{% endblocktrans %}</span>
+    </div>
+    {% if communication_messages %}
+      <div class="asc-table-wrap asc-wide-only">
+        <table class="asc-table" aria-labelledby="communication-heading">
+          <thead>
+            <tr>
+              <th scope="col">{% trans "Created" %}</th>
+              <th scope="col">{% trans "Event" %}</th>
+              <th scope="col">{% trans "Reference" %}</th>
+              <th scope="col">{% trans "Purpose" %}</th>
+              <th scope="col">{% trans "Language" %}</th>
+              <th scope="col">{% trans "Status" %}</th>
+              <th scope="col" class="asc-num">{% trans "Attempts" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in communication_messages %}
+              <tr>
+                <th scope="row"><time datetime="{{ item.created_at|date:'c' }}">{{ item.created_at }}</time></th>
+                <td>{% if item.event_edition %}<bdi>{{ item.event_edition.name }}</bdi>{% else %}<span class="asc-muted">—</span>{% endif %}</td>
+                <td>{% if item.registration %}<bdi dir="ltr" class="asc-code">{{ item.registration.public_reference }}</bdi>{% else %}<span class="asc-muted">—</span>{% endif %}</td>
+                <td>{{ item.template_version.template.purpose_code|code_label:"communication_purpose" }}</td>
+                <td>{{ item.language|code_label:"language" }}</td>
+                <td>{% status_chip "message" item.status item.status|code_label:"message_status" %}</td>
+                <td class="asc-num">{{ item.attempts.all|length }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <ul class="asc-records asc-narrow-only" aria-labelledby="communication-heading">
+        {% for item in communication_messages %}
+          <li class="asc-record" data-record>
+            <div class="asc-record-head">
+              <h3 class="asc-record-title">{{ item.template_version.template.purpose_code|code_label:"communication_purpose" }}</h3>
+              <p class="asc-record-meta"><time datetime="{{ item.created_at|date:'c' }}">{{ item.created_at }}</time></p>
+            </div>
+            <dl class="asc-record-fields">
+              <div class="asc-record-wide"><dt>{% trans "Status" %}</dt><dd>{% status_chip "message" item.status item.status|code_label:"message_status" %}</dd></div>
+              <div><dt>{% trans "Reference" %}</dt><dd>{% if item.registration %}<bdi dir="ltr" class="asc-code">{{ item.registration.public_reference }}</bdi>{% else %}<span class="asc-muted">—</span>{% endif %}</dd></div>
+              <div><dt>{% trans "Language" %}</dt><dd>{{ item.language|code_label:"language" }}</dd></div>
+              <div><dt>{% trans "Event" %}</dt><dd>{% if item.event_edition %}<bdi>{{ item.event_edition.name }}</bdi>{% else %}<span class="asc-muted">—</span>{% endif %}</dd></div>
+              <div><dt>{% trans "Attempts" %}</dt><dd>{{ item.attempts.all|length }}</dd></div>
+            </dl>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="asc-empty">
+        <span class="asc-tile">{% include "components/icon.html" with name="mail" %}</span>
+        <h3>{% trans "No communication records are visible." %}</h3>
+        <p>{% trans "Messages appear here once the platform sends email in your scope." %}</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}
