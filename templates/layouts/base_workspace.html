@@ -13,7 +13,7 @@
   <header class="asc-appbar asc-appbar-light">
     <div class="container-lg asc-appbar-inner">
       <a class="asc-brand" href="{% url 'registrations:workspace' %}">
-        <img src="{% static 'img/brand/asc-logo.svg' %}" width="90" height="40" alt="{% trans 'African Startup Conference' %}">
+        {% include "partials/conference_identity.html" %}
       </a>
       <nav class="asc-topnav" aria-label="{% trans 'Participant navigation' %}">
         <ul>

@@ -27,8 +27,8 @@
   {# Day / Month / Year (UX-1, S-08): one group, one legend, three labelled parts. #}
   <fieldset class="{{ wrapper_class|default:'mb-3' }} asc-date-group"{% if field.errors %} aria-describedby="{{ field.auto_id }}_error"{% endif %}>
     <legend class="form-label fs-6"><bdi>{{ field.label }}</bdi>{% if mark_optional and not field.field.required %} <span class="asc-optional">{% trans "Optional" %}</span>{% endif %}</legend>
-    {% if field.help_text %}<div id="{{ field.auto_id }}_help" class="form-text mt-0 mb-1">{{ field.help_text }}</div>{% endif %}
     {{ field|asc_control:"ltr" }}
+    {% if field.help_text %}<div id="{{ field.auto_id }}_help" class="form-text">{{ field.help_text }}</div>{% endif %}
     {% if field.errors %}
       <div id="{{ field.auto_id }}_error" class="asc-field-error">
         {% include "components/icon.html" with name="alert-octagon" size="sm" %}
@@ -37,16 +37,18 @@
     {% endif %}
   </fieldset>
 {% else %}
-  <div class="{{ wrapper_class|default:'mb-3' }}">
+  <div class="{{ wrapper_class|default:'mb-3' }} asc-field">
     <label for="{{ field.id_for_label }}" class="form-label"><bdi>{{ field.label }}</bdi>{% if mark_optional and not field.field.required %} <span class="asc-optional">{% trans "Optional" %}</span>{% endif %}</label>
-    {% if field.help_text %}<div id="{{ field.auto_id }}_help" class="form-text mt-0 mb-1">{{ field.help_text }}</div>{% endif %}
-    {{ field|asc_control:control_options }}
-    {% if field.errors %}
-      <div id="{{ field.auto_id }}_error" class="asc-field-error">
-        {% include "components/icon.html" with name="alert-octagon" size="sm" %}
-        <bdi>{% for error in field.errors %}{{ error }}{% if not forloop.last %} {% endif %}{% endfor %}</bdi>
-      </div>
-    {% endif %}
+    <div class="asc-field-control">{{ field|asc_control:control_options }}</div>
+    <div class="asc-field-feedback">
+      {% if field.help_text %}<div id="{{ field.auto_id }}_help" class="form-text">{{ field.help_text }}</div>{% endif %}
+      {% if field.errors %}
+        <div id="{{ field.auto_id }}_error" class="asc-field-error">
+          {% include "components/icon.html" with name="alert-octagon" size="sm" %}
+          <bdi>{% for error in field.errors %}{{ error }}{% if not forloop.last %} {% endif %}{% endfor %}</bdi>
+        </div>
+      {% endif %}
+    </div>
   </div>
 {% endif %}
 {% endwith %}

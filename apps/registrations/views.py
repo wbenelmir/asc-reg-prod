@@ -717,7 +717,10 @@ def confirmation(request, reference: str):
     person = _current_person(request)
     registration = get_object_or_404(Registration, public_reference=reference, person=person)
     confirmation_message = (
-        CommunicationMessage.objects.filter(registration=registration)
+        CommunicationMessage.objects.filter(
+            registration=registration,
+            template_version__template__code="REGISTRATION_CONFIRMATION",
+        )
         .order_by("-created_at")
         .first()
     )

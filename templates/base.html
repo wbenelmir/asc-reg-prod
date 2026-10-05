@@ -43,7 +43,7 @@
     on either of them. Shell classes (asc-entry, asc-operations, …) are
     semantic hooks only; no rule in asc-ui.css may depend on them.
   {% endcomment %}
-  <link rel="stylesheet" href="{% static 'css/asc-ui.css' %}">
+  <link rel="stylesheet" href="{% static 'css/asc-ui.css' %}?v=1.1-ui-03">
   {% if LANGUAGE_BIDI %}
     <link rel="preload" href="{% static 'vendor/thmanyah/thmanyahsans-Regular.woff2' %}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{% static 'vendor/thmanyah/thmanyahsans-Bold.woff2' %}" as="font" type="font/woff2" crossorigin>
@@ -60,7 +60,13 @@
     `header`, `main` and `footer`. The legacy Bootstrap navbar and footer
     chrome were removed at the end of the UI/UX Completion Gate (Stage 3).
   {% endcomment %}
-  {% block header %}{% endblock %}
+  {% block header %}
+    <header class="asc-appbar asc-appbar-light">
+      <div class="container-xl asc-appbar-inner">
+        <a class="asc-brand" href="{% url 'home' %}">{% include "partials/conference_identity.html" %}</a>
+      </div>
+    </header>
+  {% endblock %}
 
   <div id="status-region" class="visually-hidden" aria-live="polite" role="status">
     {% if messages %}{% for message in messages %}{{ message }}. {% endfor %}{% endif %}

@@ -46,6 +46,10 @@
             {% status_chip "registration" registration.public_status registration.get_public_status_display %}
           </div>
 
+          {% if not registration.identity_rejected and not registration.withdrawn_by_participant and not registration.cancelled_by_team %}
+            {% include "registrations/_status_guidance.html" %}
+          {% endif %}
+
           {% if registration.identity_correction_open %}
             {# IDV-3 (IDV-09): an identity correction request on this same registration. #}
             <div class="asc-notice asc-notice-warning" role="status" data-identity-correction>

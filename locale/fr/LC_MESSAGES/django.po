@@ -8708,3 +8708,95 @@ msgstr "Téléversez une photo nette de la pièce d'identité que vous avez déc
 
 #~ msgid "Leave as is to include every organization in your scope."
 #~ msgstr "Laissez tel quel pour inclure toutes les organisations de votre périmètre."
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "African Startup Conference 2026"
+msgstr "African Startup Conference 2026"
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "African Startup Conference — Deeptech, the real challenge"
+msgstr "African Startup Conference — Deeptech, le véritable défi"
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "Request received — awaiting acceptance"
+msgstr "Demande reçue — en attente d’acceptation"
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "Your request is under review"
+msgstr "Votre demande est en cours d’examen"
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "Submitting a registration request does not mean your participation has been approved. Please wait for the organizers' decision."
+msgstr "L’envoi d’une demande d’inscription ne signifie pas que votre participation est acceptée. Veuillez attendre la décision des organisateurs."
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "The decision will appear here and you will be notified by email. If accepted, check your workspace and email for your invitation and attendance instructions."
+msgstr "La décision apparaîtra ici et vous en serez informé(e) par email. En cas d’acceptation, consultez votre espace et votre email pour votre invitation et les consignes de participation."
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "Your request has not been submitted yet"
+msgstr "Votre demande n’a pas encore été envoyée"
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "Complete the remaining steps and submit your request for the organizers to review it."
+msgstr "Complétez les étapes restantes et envoyez votre demande pour qu’elle soit examinée par les organisateurs."
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "Information needed — your participation is not yet approved"
+msgstr "Informations nécessaires — votre participation n’est pas encore acceptée"
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "Follow the action shown in your registrations to provide the information requested by the organizers."
+msgstr "Suivez l’action indiquée dans vos inscriptions pour fournir les informations demandées par les organisateurs."
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "Your participation has been approved"
+msgstr "Votre participation a été acceptée"
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "Check your workspace and email for your invitation and attendance instructions. Approval does not mean an invitation has already been sent."
+msgstr "Consultez votre espace et votre email pour votre invitation et les consignes de participation. L’acceptation ne signifie pas qu’une invitation a déjà été envoyée."
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "Your participation has not been approved"
+msgstr "Votre participation n’a pas été acceptée"
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "See your registrations for any available next step, or contact the registration team if you need help."
+msgstr "Consultez vos inscriptions pour connaître les démarches disponibles, ou contactez l’équipe d’inscription si vous avez besoin d’aide."
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "This request is closed"
+msgstr "Cette demande est clôturée"
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "This registration is no longer active. See your registrations for its history and any available next step."
+msgstr "Cette inscription n’est plus active. Consultez vos inscriptions pour retrouver son historique et les démarches disponibles."
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "Registration details"
+msgstr "Détails de l’inscription"
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "Follow your registration request and the organizers' decision from your workspace."
+msgstr "Suivez votre demande d’inscription et la décision des organisateurs depuis votre espace."
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "An email acknowledging receipt of your request has been sent. It does not confirm acceptance."
+msgstr "Un email accusant réception de votre demande a été envoyé. Il ne confirme pas votre acceptation."
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "Your request receipt email is queued. It does not confirm acceptance."
+msgstr "L’email accusant réception de votre demande est en attente d’envoi. Il ne confirme pas votre acceptation."
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "Your request was received, but its receipt email could not be sent. Keep your Registration Reference and follow the decision in your workspace."
+msgstr "Votre demande a été reçue, mais son accusé de réception n’a pas pu être envoyé par email. Conservez votre référence d’inscription et suivez la décision dans votre espace."
+
+#: templates/partials/conference_identity.html templates/registrations/_status_guidance.html templates/registrations/confirmation.html
+msgid "Keep your Registration Reference and follow your request in your workspace. No receipt email is currently available."
+msgstr "Conservez votre référence d’inscription et suivez votre demande dans votre espace. Aucun accusé de réception par email n’est disponible pour le moment."
+
+#: templates/partials/conference_identity.html
+msgid "5th edition"
+msgstr "5e édition"

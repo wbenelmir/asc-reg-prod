@@ -16,7 +16,7 @@
   <header class="asc-appbar">
     <div class="container-xl asc-appbar-inner">
       <a class="asc-brand" href="{% if request.user.is_authenticated %}{% operations_home_url %}{% else %}{% url 'accounts:operational-sign-in' %}{% endif %}">
-        <img src="{% static 'img/brand/asc-logo.svg' %}" width="90" height="40" alt="{% trans 'African Startup Conference' %}">
+        {% include "partials/conference_identity.html" %}
         <span class="asc-space-label">{% trans "Operations" %}</span>
       </a>
       <div class="asc-appbar-end">

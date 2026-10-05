@@ -1,0 +1,36 @@
+{% load i18n %}
+{% if registration.public_status == "SUBMITTED" or registration.public_status == "UNDER_REVIEW" %}
+  <div class="asc-notice asc-notice-neutral asc-registration-guidance" data-registration-guidance="{{ registration.public_status }}">
+    {% include "components/icon.html" with name="clock" %}
+    <div>
+      <p class="asc-registration-guidance-title"><strong>{% if registration.public_status == "SUBMITTED" %}{% trans "Request received — awaiting acceptance" %}{% else %}{% trans "Your request is under review" %}{% endif %}</strong></p>
+      <p>{% trans "Submitting a registration request does not mean your participation has been approved. Please wait for the organizers' decision." %}</p>
+      <p class="asc-registration-next-step">{% trans "The decision will appear here and you will be notified by email. If accepted, check your workspace and email for your invitation and attendance instructions." %}</p>
+    </div>
+  </div>
+{% elif registration.public_status == "DRAFT" %}
+  <div class="asc-notice asc-notice-neutral asc-registration-guidance" data-registration-guidance="DRAFT">
+    {% include "components/icon.html" with name="edit" %}
+    <div><p class="asc-registration-guidance-title"><strong>{% trans "Your request has not been submitted yet" %}</strong></p><p>{% trans "Complete the remaining steps and submit your request for the organizers to review it." %}</p></div>
+  </div>
+{% elif registration.public_status == "ADDITIONAL_INFORMATION_REQUIRED" %}
+  <div class="asc-notice asc-notice-warning asc-registration-guidance" data-registration-guidance="ADDITIONAL_INFORMATION_REQUIRED">
+    {% include "components/icon.html" with name="alert-triangle" %}
+    <div><p class="asc-registration-guidance-title"><strong>{% trans "Information needed — your participation is not yet approved" %}</strong></p><p>{% trans "Follow the action shown in your registrations to provide the information requested by the organizers." %}</p></div>
+  </div>
+{% elif registration.public_status == "APPROVED" %}
+  <div class="asc-notice asc-notice-success asc-registration-guidance" data-registration-guidance="APPROVED">
+    {% include "components/icon.html" with name="check-circle" %}
+    <div><p class="asc-registration-guidance-title"><strong>{% trans "Your participation has been approved" %}</strong></p><p>{% trans "Check your workspace and email for your invitation and attendance instructions. Approval does not mean an invitation has already been sent." %}</p></div>
+  </div>
+{% elif registration.public_status == "NOT_APPROVED" %}
+  <div class="asc-notice asc-notice-danger asc-registration-guidance" data-registration-guidance="NOT_APPROVED">
+    {% include "components/icon.html" with name="x-circle" %}
+    <div><p class="asc-registration-guidance-title"><strong>{% trans "Your participation has not been approved" %}</strong></p><p>{% trans "See your registrations for any available next step, or contact the registration team if you need help." %}</p></div>
+  </div>
+{% elif registration.public_status == "WITHDRAWN" %}
+  <div class="asc-notice asc-notice-neutral asc-registration-guidance" data-registration-guidance="WITHDRAWN">
+    {% include "components/icon.html" with name="ban" %}
+    <div><p class="asc-registration-guidance-title"><strong>{% trans "This request is closed" %}</strong></p><p>{% trans "This registration is no longer active. See your registrations for its history and any available next step." %}</p></div>
+  </div>
+{% endif %}

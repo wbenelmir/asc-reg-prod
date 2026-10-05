@@ -1,17 +1,14 @@
 {% extends "layouts/base_workspace.html" %}
 {% load i18n asc_ui %}
-{% block title %}{% trans "Registration confirmed" %}{% endblock %}
+{% block title %}{% trans "Registration details" %}{% endblock %}
 {% block main_attrs %} hx-boost="true"{% endblock %}
 {% block content %}
   <div class="asc-narrow">
-    <section class="asc-result asc-result-success asc-confirmation" aria-labelledby="confirmation-heading">
-      <span class="asc-result-icon">{% include "components/icon.html" with name="check-circle" %}</span>
-      <div>
-        <span class="asc-result-kicker">{% trans "Registration submitted" %}</span>
-        <h1 id="confirmation-heading">{% trans "Thank you for registering" %}</h1>
-        <p class="asc-result-note">{% trans "Your registration is now with the organizers. You can follow its status in your workspace." %}</p>
-      </div>
-    </section>
+    <div class="asc-page-head asc-confirmation">
+      <h1 id="confirmation-heading">{% trans "Registration details" %}</h1>
+      <p>{% trans "Follow your registration request and the organizers' decision from your workspace." %}</p>
+    </div>
+    {% include "registrations/_status_guidance.html" %}
 
     <div class="asc-card">
       <dl class="asc-dl">
@@ -21,14 +18,17 @@
         <dd>{% status_chip "registration" registration.public_status registration.get_public_status_display %}</dd>
       </dl>
 
-      {% if confirmation_message.status == "SENT" %}
-        <div class="asc-notice asc-notice-success mt-3">{% include "components/icon.html" with name="mail" %}<p>{% trans "A confirmation email has been sent to your registered email address." %}</p></div>
+      {% if registration.public_status != "DRAFT" %}
+      {% if confirmation_message.status == "SENT" or confirmation_message.status == "DELIVERED" %}
+        <div class="asc-notice asc-notice-success mt-3">{% include "components/icon.html" with name="mail" %}<p>{% trans "An email acknowledging receipt of your request has been sent. It does not confirm acceptance." %}</p></div>
       {% elif confirmation_message.status == "QUEUED" %}
-        <div class="asc-notice mt-3">{% include "components/icon.html" with name="clock" %}<p>{% trans "Your confirmation email is queued and will be sent shortly." %}</p></div>
+        <div class="asc-notice mt-3">{% include "components/icon.html" with name="clock" %}<p>{% trans "Your request receipt email is queued. It does not confirm acceptance." %}</p></div>
       {% elif confirmation_message.status == "FAILED" %}
-        <div class="asc-notice asc-notice-warning mt-3">{% include "components/icon.html" with name="alert-triangle" %}<p>{% trans "Your registration succeeded, but the confirmation email could not be sent. Keep your Registration Reference and contact support if needed." %}</p></div>
+        <div class="asc-notice asc-notice-warning mt-3">{% include "components/icon.html" with name="alert-triangle" %}<p>{% trans "Your request was received, but its receipt email could not be sent. Keep your Registration Reference and follow the decision in your workspace." %}</p></div>
       {% else %}
-        <div class="asc-notice asc-notice-neutral mt-3">{% include "components/icon.html" with name="info" %}<p>{% trans "Your registration succeeded. Keep your Registration Reference; email confirmation is not currently available." %}</p></div>
+        <div class="asc-notice asc-notice-neutral mt-3">{% include "components/icon.html" with name="info" %}<p>{% trans "Keep your Registration Reference and follow your request in your workspace. No receipt email is currently available." %}</p></div>
+      {% endif %}
+
       {% endif %}
 
       <div class="asc-form-actions">

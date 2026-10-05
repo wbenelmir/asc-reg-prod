@@ -22,7 +22,7 @@
   <header class="asc-appbar asc-appbar-light">
     <div class="container-xl asc-appbar-inner">
       <a class="asc-brand" href="{% block brand_url %}{% url 'home' %}{% endblock %}">
-        <img src="{% static 'img/brand/asc-logo.svg' %}" width="90" height="40" alt="{% trans 'African Startup Conference' %}">
+        {% include "partials/conference_identity.html" %}
         {% block shell_label %}{% endblock %}
       </a>
       {# The language versions of this page are its only navigation. #}

@@ -197,8 +197,9 @@ def test_confirmation_never_stores_plaintext_email_outside_the_encrypted_field(
     assert raw_value.startswith("v")
 
 
+@pytest.mark.parametrize("newer_decision_message", [False, True])
 def test_confirmation_page_does_not_claim_failed_email_was_sent(
-    client, registration: Registration
+    client, registration: Registration, newer_decision_message: bool
 ) -> None:
     from django.urls import reverse
 
@@ -208,10 +209,40 @@ def test_confirmation_page_does_not_claim_failed_email_was_sent(
         PARTICIPANT_LAST_ACTIVITY_AT_KEY,
     )
 
+    registration.public_status = "SUBMITTED"
+    registration.save(update_fields=["public_status"])
     message = send_registration_confirmation(registration)
     CommunicationMessage.objects.filter(pk=message.pk).update(
         status=CommunicationMessageStatus.FAILED
     )
+    if newer_decision_message:
+        template, _ = MessageTemplate.objects.get_or_create(
+            code="DECISION_STATUS", defaults={"channel": "EMAIL", "purpose_code": "DECISION_STATUS"}
+        )
+        version = MessageTemplateVersion.objects.create(
+            template=template,
+            language="en",
+            version_label="receipt-isolation-test",
+            subject="Decision update",
+            body="A synthetic decision update.",
+            status="PUBLISHED",
+            effective_from=timezone.now(),
+            content_hash="d" * 64,
+        )
+        CommunicationMessage.objects.create(
+            registration=registration,
+            event_edition=registration.event_edition,
+            person=registration.person,
+            template_version=version,
+            channel=message.channel,
+            language="en",
+            destination_encrypted=message.destination_encrypted,
+            destination_hash=message.destination_hash,
+            destination_hash_key_version=message.destination_hash_key_version,
+            content_hash="d" * 64,
+            idempotency_key=f"decision-receipt-isolation:{registration.pk}",
+            status=CommunicationMessageStatus.SENT,
+        )
     now = timezone.now().isoformat()
     session = client.session
     session[PARTICIPANT_SESSION_KEY] = str(registration.person_id)
@@ -224,5 +255,6 @@ def test_confirmation_page_does_not_claim_failed_email_was_sent(
     )
     content = response.content.decode()
     assert response.status_code == 200
-    assert "confirmation email could not be sent" in content
-    assert "confirmation email has been sent" not in content
+    assert response.context["confirmation_message"].pk == message.pk
+    assert "receipt email could not be sent" in content
+    assert "acknowledging receipt of your request has been sent" not in content
