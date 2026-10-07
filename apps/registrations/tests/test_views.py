@@ -19,6 +19,7 @@ from django.urls import reverse
 
 from apps.accounts.models import OperationalUser, OperationalUserStatus
 from apps.accounts.otp import DeterministicTestOtpGenerator
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.core.models import Country, Sector
 from apps.core.testing import otp_request_data
 from apps.documents.tests.factories import make_test_photo
@@ -455,10 +456,7 @@ def _make_ops_user(email: str) -> OperationalUser:
 
 
 def _sign_in(client: Client, email: str) -> None:
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": email, "password": "__test_password__"},
-    )
+    staff_sign_in(client, email, "__test_password__")
 
 
 def _grant_scoped_view_permission(user: OperationalUser) -> None:

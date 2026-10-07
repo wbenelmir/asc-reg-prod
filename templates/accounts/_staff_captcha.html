@@ -1,0 +1,34 @@
+{% load i18n %}
+{% comment %}
+  Staff sign-in image CAPTCHA (apps.accounts.captcha_guard). The answer is
+  never in this markup. "New image" is a real link to this page, so without
+  JavaScript it reloads the page (which issues a new image); with JavaScript
+  static/js/asc-captcha.js replaces the image in place, keeps the typed email,
+  (hx-boost="false": the boosted page navigation must not take the click),
+  clears and focuses the answer and announces the change.
+  Context: `captcha` (or None when this network requested too many images),
+  `captcha_error` (a message or "").
+{% endcomment %}
+<div class="asc-captcha mb-3" data-staff-captcha data-refresh-url="{% url 'accounts:staff-captcha-refresh' %}" data-captcha-form="staff-sign-in"
+     data-text-refreshed="{% trans 'New security image loaded. Type its characters.' %}">
+  {% if captcha %}
+    <input type="hidden" name="captcha_key" value="{{ captcha.key }}" data-captcha-key>
+    <label for="id_captcha_answer" class="form-label">{% trans "Security check: type the characters shown in the image" %}</label>
+    <div class="asc-captcha-row">
+      <img src="{{ captcha.image_url }}" width="180" height="56" class="asc-captcha-image" data-captcha-image
+           alt="{% blocktrans with length=captcha.length %}Security image with {{ length }} letters and digits{% endblocktrans %}">
+      <a href="{{ request.get_full_path }}" class="btn btn-outline-secondary" hx-boost="false" data-captcha-refresh>{% include "components/icon.html" with name="refresh" %}<span>{% trans "New image" %}</span></a>
+    </div>
+    <input type="text" name="captcha_answer" id="id_captcha_answer" maxlength="16" required dir="ltr"
+           class="form-control asc-captcha-answer{% if captcha_error %} is-invalid{% endif %}"
+           autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text"
+           aria-describedby="id_captcha_answer_help{% if captcha_error %} id_captcha_answer_error{% endif %}"{% if captcha_error %} aria-invalid="true"{% endif %}>
+    {% if captcha_error %}
+      <div id="id_captcha_answer_error" class="asc-field-error">{% include "components/icon.html" with name="alert-octagon" size="sm" %}<bdi>{{ captcha_error }}</bdi></div>
+    {% endif %}
+    <div class="form-text" id="id_captcha_answer_help">{% blocktrans with length=captcha.length minutes=captcha.timeout_minutes %}{{ length }} characters, not case-sensitive. Each image works once and expires after {{ minutes }} minutes; after a wrong answer a new image is shown.{% endblocktrans %}</div>
+    <p class="visually-hidden" role="status" aria-live="polite" data-captcha-status></p>
+  {% else %}
+    <p class="asc-notice asc-notice-warning mb-0" role="alert" data-captcha-unavailable>{% include "components/icon.html" with name="alert-triangle" %}<span>{% trans "Too many security images were requested from your network. Wait a few minutes, then reload this page." %}</span></p>
+  {% endif %}
+</div>

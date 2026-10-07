@@ -27,3 +27,4 @@
     <a href="{% url 'accounts:otp-request' %}">{% trans "Use a different email or request a new code" %}</a>
   </p>
 {% endblock %}
+{% block auth_aside_art %}{% include "partials/auth_panel_artwork.html" %}{% endblock %}

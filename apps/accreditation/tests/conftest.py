@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 from django.utils import timezone
 
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.accreditation.models import AccessProfile, AccessRule, BadgeType, ParticipantRole
 from apps.core.models import Country, Sector
 from apps.events.models import EventEdition
@@ -140,9 +141,5 @@ def make_operational_user_with_membership(
 
 
 def sign_in_operational(client, email: str) -> None:
-    from django.urls import reverse
 
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": email, "password": TEST_OPERATIONAL_PASSWORD},
-    )
+    staff_sign_in(client, email, TEST_OPERATIONAL_PASSWORD)

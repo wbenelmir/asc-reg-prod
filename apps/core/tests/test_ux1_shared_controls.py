@@ -585,9 +585,9 @@ def _footer(html: str) -> str:
 # (docs/execution/UX_REMARKS_DECISION_GATE.md §17.7): the shared footer carries
 # no link, contact or social item. These tests replace the M23/S-13, C-07 and
 # UXR-F02 footer assertions; the removed items must not come back unreviewed.
-# FOOTER-02 (2026-10-04, §17.12) supersedes only the EMPTY partial: it now
-# shows the two official institutional lines (apps/core/tests/
-# test_official_footer.py), still with no link.
+# FOOTER-02 (2026-10-04, §17.12) briefly showed two institutional lines; the
+# owner's version 1.1 UI work package 01 (2026-10-05) keeps the partial empty
+# again (apps/core/tests/test_official_footer.py), still with no link.
 @pytest.mark.parametrize(
     "url_name",
     ["accounts:otp-request", "accounts:operational-sign-in"],
@@ -618,19 +618,11 @@ def test_the_footer_partial_loads_no_third_party_resource() -> None:
     for tag in ("<script", "<img", "<iframe", "<link", "<style", "<object", "<embed"):
         assert tag not in partial
     assert re.findall(r'(?:href|src)="([^"]+)"', partial) == []
-    # FOOTER-02 (superseding A-10's empty partial): the two official lines and
-    # nothing else -- no link, no image, no script.
+    # Version 1.1 UI work package 01 (owner, 2026-10-05) keeps the
+    # institutional footer empty, superseding FOOTER-02's two lines.
     from django.template.loader import render_to_string
 
-    rendered = render_to_string("partials/footer_official.html")
-    assert "<a " not in rendered
-    assert (
-        re.sub(r"<[^>]+>", " ", rendered).split()
-        == (
-            "Ministère de l'Économie de la Connaissance, des Start-up et des Micro-entreprise "
-            "Direction des Systèmes d’Information (DSI)"
-        ).split()
-    )
+    assert render_to_string("partials/footer_official.html").strip() == ""
 
 
 def test_the_footer_has_no_leftover_link_text_in_any_language(client: Client) -> None:

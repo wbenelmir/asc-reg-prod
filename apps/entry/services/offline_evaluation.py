@@ -294,6 +294,15 @@ def evaluate_at(
         return _finish(
             [Blocker(EntryResult.DENIED, EntryReasonCode.REGISTRATION_NOT_APPROVED)], [], **common
         )
+    # 2b. Attendance days at `at` (entitlement and enforcement as they stood
+    # then; the same rule as the online evaluator).
+    from apps.accreditation.attendance import admission_problem
+
+    attendance_problem = admission_problem(
+        registration=registration, event_edition=event_edition, at=at
+    )
+    if attendance_problem:
+        blockers.append(Blocker(EntryResult.DENIED, attendance_problem))
     # 3. Restrictions that existed at `at`.
     restrictions = restrictions_at(registration, at)
     if any(r.severity == RestrictionSeverity.DENY_ENTRY for r in restrictions):

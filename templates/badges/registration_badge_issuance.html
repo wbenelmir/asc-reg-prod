@@ -53,8 +53,30 @@ Shows the registration reference and badge types only -- no identity value.
                 <th scope="row">{% trans "Issued" %}</th>
                 <td>{{ current_issuance.issued_at }}</td>
               </tr>
+              <tr>
+                <th scope="row">{% trans "Attendance marking" %}</th>
+                <td data-attendance-marking="{{ current_issuance.attendance_marking|default:'NONE' }}">
+                  {% if attendance_marking_pending %}<span class="asc-chip asc-chip-warning">{% include "components/icon.html" with name="alert-triangle" size="sm" %}{% if current_issuance.attendance_marking %}{% trans "Outdated: does not match the current attendance days" %}{% else %}{% trans "Not recorded" %}{% endif %}</span>{% else %}<span class="asc-chip asc-chip-success">{{ attendance_view.label }}</span>{% endif %}
+                </td>
+              </tr>
             </tbody>
           </table>
+          {% if attendance_marking_pending and can_issue and attendance_entitlement %}
+            {# Record the marking applied to the badge already handed over (generic stock: sticker, overlay or print variant). #}
+            <form method="post" class="asc-card-form mt-3" action="{% url 'badges:badge-issuance-attendance-marking' registration_pk=registration.pk pk=current_issuance.pk %}" data-record-attendance-marking>
+              {% csrf_token %}
+              <input type="hidden" name="expected_lock_version" value="{{ current_issuance.version }}">
+              <input type="hidden" name="attendance_marking" value="{{ attendance_entitlement.category }}">
+              <h3 class="h6">{% trans "Record the attendance marking" %}</h3>
+              <p class="mb-2">{% trans "Apply this marking to the badge, then confirm" %}{% trans ":" context "label separator" %}</p>
+              <p class="mb-2">{% include "badges/_attendance_marking.html" with attendance=attendance_view %}</p>
+              <div class="asc-checkbox mb-2">
+                <input type="checkbox" class="form-check-input" id="marking-applied" required>
+                <label class="form-check-label" for="marking-applied">{% trans "I applied this marking to the badge the participant holds." %}</label>
+              </div>
+              <button type="submit" class="btn btn-outline-primary">{% trans "Record the marking" %}</button>
+            </form>
+          {% endif %}
         {% else %}
           <div class="asc-empty">
             <span class="asc-tile">{% include "components/icon.html" with name="badge" %}</span>
@@ -105,6 +127,10 @@ Shows the registration reference and badge types only -- no identity value.
               <span class="asc-chip asc-chip-warning">{% include "components/icon.html" with name="alert-triangle" size="sm" %}{% trans "No current badge assignment." %}</span>
             {% endif %}
           </dd>
+          <dt>{% trans "Attendance days" %}</dt>
+          <dd data-attendance-category="{{ attendance_entitlement.category|default:'UNCLASSIFIED' }}">
+            {% if attendance_view and not attendance_view.is_pending %}{% include "badges/_attendance_marking.html" with attendance=attendance_view %}{% else %}<span class="asc-chip asc-chip-warning">{% trans "Not yet classified" %}</span>{% endif %}
+          </dd>
         </dl>
         <p class="small text-body-secondary mb-0">{% trans "A generic physical badge alone is not proof of identity." %}</p>
       </section>
@@ -139,6 +165,17 @@ Shows the registration reference and badge types only -- no identity value.
               <label class="form-label" for="issue-serial">{% trans "Serial number (optional)" %}</label>
               <input class="form-control" id="issue-serial" type="text" name="optional_serial_number" maxlength="64" dir="ltr">
             </div>
+            {% if attendance_entitlement %}
+              {# The generic badge carries no days: the operator applies the attendance marking and confirms it. #}
+              <div class="asc-checkbox">
+                <input type="checkbox" class="form-check-input" id="issue-attendance-marking" name="attendance_marking" value="{{ attendance_entitlement.category }}">
+                <label class="form-check-label" for="issue-attendance-marking">{% trans "I applied the attendance marking to this badge" %}{% trans ":" context "label separator" %} <strong>{{ attendance_view.label }}</strong></label>
+              </div>
+            {% elif attendance_enforced %}
+              <p class="asc-notice asc-notice-warning mb-0" role="status">{% include "components/icon.html" with name="alert-triangle" %}<span>{% trans "This registration's attendance days are not classified, so no badge can be handed over while attendance enforcement is active." %}</span></p>
+            {% else %}
+              <p class="form-text mb-0">{% trans "Attendance days not yet classified: record the badge marking once they are." %}</p>
+            {% endif %}
             <button type="submit" class="btn btn-primary asc-btn-xl">
               {% include "components/icon.html" with name="check-circle" %}
               <span>{% trans "Issue" %} <bdi dir="ltr">{{ assignment.badge_type.code }}</bdi></span>

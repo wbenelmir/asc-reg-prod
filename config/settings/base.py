@@ -91,6 +91,10 @@ INSTALLED_APPS = [
     # ONLY for the device API boundary (`/entry/api/v1/`). HTML views stay
     # ordinary Django views.
     "rest_framework",
+    # Staff sign-in image CAPTCHA: django-simple-captcha provides only the
+    # challenge store (`captcha_captchastore`) and the image renderer; its
+    # URLconf is NOT included (apps.accounts.captcha_guard verifies).
+    "captcha",
 ]
 
 MIDDLEWARE = [
@@ -298,6 +302,11 @@ CELERY_BEAT_SCHEDULE = {
         "task": "core.purge_human_challenge_uses",
         "schedule": 60 * 60,
     },
+    # Expired staff sign-in CAPTCHA challenges (bounded batches).
+    "accounts-purge-expired-staff-captchas": {
+        "task": "accounts.purge_expired_staff_captchas",
+        "schedule": 15 * 60,
+    },
     # IDV-2 (A13-14): recovers identity jobs left by a broker outage or a dead
     # worker. Idempotent: a job is claimed with a lease before any provider call.
     "people-dispatch-due-identity-verification-jobs": {
@@ -343,6 +352,29 @@ OPERATIONAL_SIGN_IN_MAX_FAILURES_PER_EMAIL = env_int(
 OPERATIONAL_SIGN_IN_MAX_FAILURES_PER_NETWORK = env_int(
     "OPERATIONAL_SIGN_IN_MAX_FAILURES_PER_NETWORK", default=50
 )
+
+# Staff credential setup and password reset links (`apps.accounts.
+# administration`): single use, only a digest stored, replaced by a newer
+# link, and valid for this many seconds.
+OPERATIONAL_CREDENTIAL_SETUP_TTL_SECONDS = env_int(
+    "OPERATIONAL_CREDENTIAL_SETUP_TTL_SECONDS", default=48 * 60 * 60
+)
+
+# Staff sign-in image CAPTCHA (`apps.accounts.captcha_guard`): self-hosted
+# django-simple-captcha, session- and purpose-bound, one attempt per image,
+# atomic consumption. Answers come from `secrets`; there is no test answer and
+# no audio variant. The participant OTP keeps its ALTCHA proof of work.
+STAFF_CAPTCHA_LENGTH = env_int("STAFF_CAPTCHA_LENGTH", default=5)
+CAPTCHA_TIMEOUT = env_int("STAFF_CAPTCHA_TIMEOUT_MINUTES", default=5)  # minutes
+CAPTCHA_CHALLENGE_FUNCT = "apps.accounts.captcha_guard.challenge"
+CAPTCHA_IMAGE_SIZE = (180, 56)
+CAPTCHA_FONT_SIZE = 32
+CAPTCHA_LETTER_ROTATION = (-20, 20)
+CAPTCHA_FOREGROUND_COLOR = "#102b3a"
+CAPTCHA_2X_IMAGE = False
+CAPTCHA_TEST_MODE = False  # never accept the package's test answer
+CAPTCHA_FLITE_PATH = None  # no audio variant (no external tool)
+CAPTCHA_SOX_PATH = None
 
 # ---------------------------------------------------------------------------
 # Malware scanning (SEC-006). `ScannerAdapter` interface with a deterministic
@@ -497,6 +529,12 @@ MINISTRY_NIN_API_TOTAL_TIMEOUT_SECONDS = env_int(
 )
 MINISTRY_NIN_API_MAX_RESPONSE_BYTES = env_int("MINISTRY_NIN_API_MAX_RESPONSE_BYTES", default=65536)
 MINISTRY_NIN_API_CA_BUNDLE = env("MINISTRY_NIN_API_CA_BUNDLE", default="")
+# Ministry NIN diagnostics page (`apps.people.nin_diagnostics`): network checks
+# per operator and per environment in each window, counted on the shared
+# counter; one check runs at a time.
+NIN_DIAGNOSTICS_MAX_PER_OPERATOR = env_int("NIN_DIAGNOSTICS_MAX_PER_OPERATOR", default=5)
+NIN_DIAGNOSTICS_MAX_PER_ENVIRONMENT = env_int("NIN_DIAGNOSTICS_MAX_PER_ENVIRONMENT", default=20)
+NIN_DIAGNOSTICS_WINDOW_SECONDS = env_int("NIN_DIAGNOSTICS_WINDOW_SECONDS", default=600)
 
 # Identity verification worker policy (engineering defaults, ADR-0026). The
 # owner reports no provider usage limits (A13-11); these bounds apply anyway.

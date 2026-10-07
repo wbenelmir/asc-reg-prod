@@ -76,6 +76,32 @@ class LookupOutcome:
     request_reference: str = ""
 
 
+@dataclass(frozen=True)
+class AuthenticationProbe:
+    """The result of `MinistryNinProvider.probe_authentication`: `failure` is
+    None on success. Never carries the token."""
+
+    failure: LookupOutcome | None
+    lifetime_seconds: int | None
+    #: The HTTP status of the authentication response (a failure carries its
+    #: own in `failure.http_status`).
+    http_status: int | None = None
+
+
+class _StatusRecordingTransport:
+    """Wraps a transport to remember the status of the last response (for the
+    diagnostics probe); passes everything else through unchanged."""
+
+    def __init__(self, transport) -> None:
+        self._transport = transport
+        self.last_status: int | None = None
+
+    def request(self, method, path, *, headers, body):
+        response = self._transport.request(method, path, headers=headers, body=body)
+        self.last_status = response.status
+        return response
+
+
 class NinLookupProvider(Protocol):
     PROVIDER_CODE: str
     IS_OFFICIAL: bool
@@ -714,6 +740,37 @@ class MinistryNinProvider:
                 )
             lifetime = min(declared - TOKEN_EXPIRY_SAFETY_SECONDS, config.token_cache_seconds)
         return token, lifetime, None
+
+    def probe_authentication(self) -> AuthenticationProbe:
+        """One FRESH authentication request, for the diagnostics page.
+
+        Never answered from the token cache, and the token obtained is
+        discarded: it is neither cached nor returned, so normal lookups keep
+        their own token. Only the outcome, the HTTP status of the response
+        and the usable lifetime (seconds, when the response declares one,
+        otherwise the configured cache time) are reported."""
+        if self.configuration_problems():
+            return AuthenticationProbe(
+                LookupOutcome(LookupKind.NOT_CONFIGURED, detail="not_configured"), None
+            )
+        transport = self._get_transport()
+        recorder = _StatusRecordingTransport(transport)
+        self._transport = recorder
+        try:
+            _token, lifetime, failure = self._authenticate()
+        finally:
+            self._transport = transport
+        if failure is not None:
+            return AuthenticationProbe(failure, None, failure.http_status)
+        return AuthenticationProbe(None, max(int(lifetime), 0), recorder.last_status)
+
+    def cached_token_seconds_left(self) -> int | None:
+        """Seconds left of this process's cached token, or None. Metadata only
+        (never the token), and true for this process only."""
+        token = self._tokens.current()
+        if token is None:
+            return None
+        return max(int(token.expires_at_monotonic - time.monotonic()), 0)
 
     # -- lookup --------------------------------------------------------------
 

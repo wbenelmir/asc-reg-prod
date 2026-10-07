@@ -724,6 +724,9 @@ def confirmation(request, reference: str):
         .order_by("-created_at")
         .first()
     )
+    from apps.accreditation.attendance import participant_attendance
+
+    registration.attendance = participant_attendance(registration)
     return render(
         request,
         "registrations/confirmation.html",
@@ -770,6 +773,7 @@ def workspace(request):
             status__in=InformationRequestStatus.participant_action_required_statuses(),
         )
     }
+    from apps.accreditation.attendance import participant_attendance
     from apps.accreditation.selectors import participant_safe_badge_projection
     from apps.people.models import IdentityStatus, IdentityVerification
 
@@ -834,6 +838,9 @@ def workspace(request):
         # `None` unless the assigned badge type's OWN `participant_visible`
         # flag is explicitly `True` -- never the raw assignment/badge row.
         registration.visible_badge = participant_safe_badge_projection(registration)
+        # Attendance days shown WITH the approval status (None unless
+        # approved; an unclassified approval reads as pending, never guessed).
+        registration.attendance = participant_attendance(registration)
         if registration.public_status == RegistrationPublicStatus.DRAFT:
             registration.channel_open = decide_for_registration(registration).allowed
         accommodation = accommodation_request_for(registration)

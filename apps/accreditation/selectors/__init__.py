@@ -173,3 +173,52 @@ def registration_references(registration_ids) -> dict[str, str]:
             "pk", "public_reference"
         )
     }
+
+
+def events_with_edition_wide_permission(user, permission: str):
+    """Event editions where `user` holds `permission` ("app_label.codename")
+    for the WHOLE edition: through a membership not narrowed to an
+    organization, venue or gate (the rule `apps.events.selectors.
+    events_with_channel_control` applies to registration channels). Used for
+    edition-wide attendance settings such as the opening-day capacity."""
+    from apps.accounts.policies import effective_scoped_memberships
+    from apps.events.models import EventEdition
+
+    if not getattr(user, "is_authenticated", False) or not getattr(user, "is_active", False):
+        return EventEdition.objects.none()
+    if user.is_superuser:
+        return EventEdition.objects.order_by("-starts_at")
+    app_label, _, codename = permission.partition(".")
+    memberships = effective_scoped_memberships(user).filter(
+        organization_id__isnull=True,
+        group__permissions__content_type__app_label=app_label,
+        group__permissions__codename=codename,
+    )
+    if memberships.filter(event_edition_id__isnull=True).exists():
+        return EventEdition.objects.order_by("-starts_at")
+    return EventEdition.objects.filter(
+        pk__in=memberships.values_list("event_edition_id", flat=True)
+    ).order_by("-starts_at")
+
+
+def events_with_any_scoped_permission(user, permission: str):
+    """Event editions in which `user` holds `permission` in at least one
+    scope (an organization-narrowed membership included). The pages then
+    list only the rows of that scope."""
+    from apps.accounts.policies import effective_scoped_memberships
+    from apps.events.models import EventEdition
+
+    if not getattr(user, "is_authenticated", False) or not getattr(user, "is_active", False):
+        return EventEdition.objects.none()
+    if user.is_superuser:
+        return EventEdition.objects.order_by("-starts_at")
+    app_label, _, codename = permission.partition(".")
+    memberships = effective_scoped_memberships(user).filter(
+        group__permissions__content_type__app_label=app_label,
+        group__permissions__codename=codename,
+    )
+    if memberships.filter(event_edition_id__isnull=True).exists():
+        return EventEdition.objects.order_by("-starts_at")
+    return EventEdition.objects.filter(
+        pk__in=memberships.values_list("event_edition_id", flat=True)
+    ).order_by("-starts_at")

@@ -15,7 +15,9 @@ import pytest
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.test import Client, override_settings
-from django.urls import include, path, reverse
+from django.urls import include, path
+
+from apps.accounts.tests.sign_in import staff_sign_in
 
 
 def _raise_server_error(request):
@@ -110,10 +112,7 @@ def test_400_page_is_static_safe_and_localized(language, direction) -> None:
 @pytest.mark.parametrize(("language", "direction"), LANGUAGES)
 def test_csrf_failure_keeps_protection_and_hides_the_reason(language, direction) -> None:
     client = _client(language, enforce_csrf_checks=True)
-    response = client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": "csrf-probe@example.test", "password": "__not-used__"},
-    )
+    response = staff_sign_in(client, "csrf-probe@example.test", "__not-used__")
     # Django's CSRF middleware still refuses the request.
     assert response.status_code == 403
     assert "csrf_failure.html" in [t.name for t in response.templates]
@@ -134,10 +133,7 @@ def test_csrf_failure_does_not_sign_anyone_in() -> None:
         status=OperationalUserStatus.ACTIVE,
     )
     client = Client(enforce_csrf_checks=True)
-    response = client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": "csrf-user@example.test", "password": "__csrf-synthetic__"},
-    )
+    response = staff_sign_in(client, "csrf-user@example.test", "__csrf-synthetic__")
     assert response.status_code == 403
     assert "_auth_user_id" not in client.session
 

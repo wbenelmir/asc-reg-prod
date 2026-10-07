@@ -5,8 +5,9 @@ the CACHE-01 counter.
   implemented.
 * The MFA step-up for sensitive operations and the shared challenge counter
   are separate items, assessed on their own facts.
-* Removing the sign-in blocker never manufactures READY: legal, retention and
-  every other unresolved prerequisite stay visible.
+* Removing the sign-in blocker never manufactures READY: retention and every
+  other unresolved prerequisite stay visible (the legal-notice item reports
+  only that the owner's general v3 wording carries no marker).
 
 Synthetic data only.
 """
@@ -68,7 +69,9 @@ def test_the_enforcement_fact_is_unchanged() -> None:
 def test_removing_the_sign_in_blocker_does_not_manufacture_ready() -> None:
     report = release_readiness.assess_release_readiness()
     items = _items(report)
-    assert items["legal_notices"].status == BLOCKED  # the seeded draft notices (C-09)
+    # The owner's general v3 wording carries no marker (privacy.0005, C-09):
+    # that item says so and nothing more; the other blockers keep release blocked.
+    assert items["legal_notices"].status == READY
     assert items["retention"].status == BLOCKED  # OD-007
     assert report.overall == BLOCKED
     assert any("C-01" in entry for entry in report.not_covered)

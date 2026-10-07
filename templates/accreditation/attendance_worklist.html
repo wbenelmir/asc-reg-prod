@@ -1,0 +1,76 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% comment %}
+  Approved registrations of one edition with their attendance days, filtered
+  by default to the ones still to classify. Only registrations in the
+  reader's scope are listed; each change form appears only where the reader
+  may change attendance in that registration's own scope, and the server
+  re-checks it.
+{% endcomment %}
+{% block title %}{% blocktrans with code=event.code %}Approved registrations: {{ code }}{% endblocktrans %}{% endblock %}
+{% block breadcrumbs %}{% url 'accreditation:attendance-overview' as list_url %}{% trans "Attendance days" as list_label %}{% include "components/breadcrumb_trail.html" with parent_label=list_label parent_url=list_url current=event.code current_code=True %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Attendance days" %}</p>
+      <h1>{% trans "Approved registrations" %}</h1>
+      <p>{% trans "Registrations approved before attendance days existed stay unclassified until you choose their days. Nothing is assigned automatically." %}</p>
+    </div>
+    {% if can_view_policy %}<div class="asc-actions-row"><a class="btn btn-outline-secondary" href="{% url 'accreditation:attendance-policy' event_pk=event.pk %}">{% trans "Days, capacity and enforcement" %}</a></div>{% endif %}
+  </div>
+
+  {% if not configured %}
+    <p class="asc-notice asc-notice-warning" role="status" data-attendance-not-configured>{% include "components/icon.html" with name="alert-triangle" %}<span>{% trans "The conference days and the opening-day capacity are not configured yet. Classification is possible once they are." %}</span></p>
+  {% else %}
+    <p class="asc-notice asc-notice-neutral" role="status" data-opening-places>{% include "components/icon.html" with name="info" %}<span>{% blocktrans with allocated=counts.all_days capacity=counts.opening_capacity remaining=counts.opening_remaining %}Opening-day places: {{ allocated }} allocated of {{ capacity }} ({{ remaining }} left).{% endblocktrans %}</span></p>
+  {% endif %}
+
+  <nav class="asc-card asc-filter-tabs mb-3" aria-label="{% trans 'Filter the registrations' %}">
+    <ul class="asc-chip-list">
+      {% for item in filters %}
+        <li><a class="asc-chip{% if item.key == shown %} asc-chip-info{% else %} asc-chip-outline{% endif %}" href="?show={{ item.key }}"{% if item.key == shown %} aria-current="page"{% endif %}>{{ item.label }} <span dir="ltr">({{ item.count }})</span></a></li>
+      {% endfor %}
+    </ul>
+    <form method="get" class="mt-2" role="search">
+      <input type="hidden" name="show" value="{{ shown }}">
+      <label for="id_attendance_reference" class="form-label">{% trans "Find by registration reference" context "attendance worklist" %}</label>
+      <div class="asc-actions-row">
+        <input type="text" id="id_attendance_reference" name="reference" value="{{ reference }}" maxlength="32" class="form-control" dir="ltr" autocomplete="off" spellcheck="false">
+        <button type="submit" class="btn btn-outline-primary">{% trans "Find" context "attendance worklist" %}</button>
+      </div>
+    </form>
+  </nav>
+
+  <section class="asc-card asc-card-flush" aria-labelledby="attendance-list-caption">
+    <div class="asc-card-toolbar">
+      <h2 class="asc-card-toolbar-title" id="attendance-list-caption">{% trans "Registrations" %}</h2>
+      <span class="asc-count">{% blocktrans count counter=page.paginator.count %}{{ counter }} registration{% plural %}{{ counter }} registrations{% endblocktrans %}</span>
+    </div>
+    {% if page.object_list %}
+      <ul class="asc-records" aria-labelledby="attendance-list-caption">
+        {% for registration in page.object_list %}
+          <li class="asc-record" data-record data-attendance-row="{{ registration.public_reference }}">
+            <div class="asc-record-head">
+              <h3 class="asc-record-title"><bdi dir="ltr" class="asc-code">{{ registration.public_reference }}</bdi></h3>
+              <p class="asc-record-meta">{{ registration.get_source_kind_display }}{% if registration.source_organization %} · <bdi>{{ registration.source_organization.official_name }}</bdi>{% endif %}</p>
+            </div>
+            <dl class="asc-record-fields">
+              <div><dt>{% trans "Attendance days" %}</dt><dd data-attendance-category="{{ registration.current_attendance.category|default:'UNCLASSIFIED' }}">{% if registration.current_attendance %}{{ registration.current_attendance.get_category_display }}{% else %}<span class="asc-chip asc-chip-warning">{% trans "Not yet classified" %}</span>{% endif %}</dd></div>
+              <div><dt>{% trans "Physical badge marking" %}</dt><dd>{% if registration.badge_marking_pending %}<span class="asc-chip asc-chip-warning">{% trans "To record on the badge page" %}</span>{% else %}<span class="asc-muted">{% trans "Nothing to do" %}</span>{% endif %}</dd></div>
+            </dl>
+            <div class="asc-record-actions">
+              <a class="btn btn-outline-secondary" href="{% url 'accreditation:registration-detail' pk=registration.pk %}">{% trans "Accreditation" %}<span class="visually-hidden"> <bdi dir="ltr">{{ registration.public_reference }}</bdi></span></a>
+              {% if registration.badge_marking_pending %}<a class="btn btn-outline-secondary" href="{% url 'badges:registration-badge-issuance' pk=registration.pk %}">{% trans "Badge page" %}<span class="visually-hidden"> <bdi dir="ltr">{{ registration.public_reference }}</bdi></span></a>{% endif %}
+            </div>
+            {% if registration.can_change_attendance and configured %}
+              {% include "accreditation/_attendance_change_form.html" with registration=registration current=registration.current_attendance next_url=next_url suffix=forloop.counter %}
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+      {% include "components/pagination.html" with page=page querystring=querystring %}
+    {% else %}
+      <p class="asc-table-empty">{% trans "No registration matches this filter." %}</p>
+    {% endif %}
+  </section>
+{% endblock %}

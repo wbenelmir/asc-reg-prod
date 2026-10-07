@@ -11,8 +11,8 @@ from __future__ import annotations
 
 import pytest
 from django.test import Client, override_settings
-from django.urls import reverse
 
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.audit import action_codes
 from apps.audit.models import AuditEvent
 from apps.entry.models import DeviceWipeOrder
@@ -29,10 +29,7 @@ def _password_signed_in_manager(event) -> Client:
         "p44c3.wipe.manager@example.test", group_name="Security Restriction Managers", event=event
     )
     client = Client(REMOTE_ADDR="198.51.100.41")
-    response = client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": manager.email_normalized, "password": factories.TEST_PASSWORD},
-    )
+    response = staff_sign_in(client, manager.email_normalized, factories.TEST_PASSWORD)
     assert response.status_code == 302  # password alone signs in (MFA-01 revised)
     return client
 

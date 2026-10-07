@@ -1,0 +1,110 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% comment %}
+  Ministry NIN service diagnostics for technical operators. Three separate
+  checks: configuration (shown on every load, no request is sent), a fresh
+  authentication (POST) and a lookup of an authorized test number (POST).
+  No result is stored except a sanitized audit event; the test number is
+  never shown again, and no identity data, token, address or credential is
+  ever displayed.
+{% endcomment %}
+{% block title %}{% trans "Ministry NIN service" %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Integrations" %}</p>
+      <h1>{% trans "Ministry NIN service" %}</h1>
+      <p>{% trans "Check the identity number service without submitting a registration. Each check runs only when you press its button." %}</p>
+    </div>
+  </div>
+
+  {% if presented %}
+    <section class="asc-notice asc-notice-{{ presented.tone }} mb-3" role="{% if presented.tone == 'danger' %}alert{% else %}status{% endif %}" tabindex="-1" id="diagnostic-result"
+             data-diagnostic-action="{{ presented.result.action }}" data-diagnostic-outcome="{{ presented.result.outcome }}">
+      {% if presented.tone == "success" %}{% include "components/icon.html" with name="check-circle" %}{% elif presented.tone == "danger" %}{% include "components/icon.html" with name="alert-octagon" %}{% else %}{% include "components/icon.html" with name="info" %}{% endif %}
+      <div>
+        <h2 class="asc-notice-title">{{ presented.action_label }}{% trans ":" context "label separator" %} {{ presented.title }}</h2>
+        <p>{{ presented.meaning }}</p>
+        {% if presented.next_action %}<p><strong>{% trans "Next step" %}{% trans ":" context "label separator" %}</strong> {{ presented.next_action }}</p>{% endif %}
+        <dl class="asc-dl asc-dl-compact">
+          {% if presented.result.http_status %}<dt>{% trans "HTTP status" %}</dt><dd><span dir="ltr">{{ presented.result.http_status }}</span></dd>{% endif %}
+          {% if presented.result.detail %}<dt>{% trans "Detail code" %}</dt><dd><code dir="ltr">{{ presented.result.detail }}</code></dd>{% endif %}
+          {% if presented.result.reached_provider %}<dt>{% trans "Duration" %}</dt><dd><span dir="ltr">{{ presented.result.duration_ms }} ms</span></dd>{% endif %}
+          {% if presented.result.token_lifetime_seconds is not None %}<dt>{% trans "Token lifetime" %}</dt><dd>{% blocktrans with seconds=presented.result.token_lifetime_seconds %}{{ seconds }} seconds (the token itself is never shown or kept){% endblocktrans %}</dd>{% endif %}
+          <dt>{% trans "Checked at" %}</dt><dd><time datetime="{{ presented.result.checked_at|date:'c' }}">{{ presented.result.checked_at }}</time> · <span dir="ltr">{{ presented.result.environment }}</span></dd>
+        </dl>
+      </div>
+    </section>
+  {% endif %}
+
+  <div class="asc-detail-layout">
+    <div class="asc-detail-main">
+      <section class="asc-card" aria-labelledby="nin-config-heading" data-diagnostic-section="configuration">
+        <h2 class="asc-card-title" id="nin-config-heading">{% include "components/icon.html" with name="list" %}{% trans "1. Configuration" %}</h2>
+        <p class="asc-muted">{% trans "Read from this server's settings when the page opens. No request is sent." %}</p>
+        <dl class="asc-dl">
+          <dt>{% trans "Configured service" %}</dt>
+          <dd><code dir="ltr">{{ readiness.backend_code }}</code> · {% if readiness.is_official %}{% trans "official Ministry adapter" %}{% else %}<strong>{% trans "not the official Ministry adapter" %}</strong>{% endif %}</dd>
+          <dt>{% trans "Readiness" %}</dt>
+          <dd data-readiness="{% if readiness.ready %}ready{% else %}not-ready{% endif %}">{% if readiness.ready %}<span class="asc-chip asc-chip-success">{% trans "Settings complete" %}</span>{% else %}<span class="asc-chip asc-chip-warning">{% trans "Not ready" %}</span>{% endif %}</dd>
+          {% if readiness.missing_settings %}<dt>{% trans "Missing settings" %}</dt><dd><ul class="asc-plain-list">{% for name in readiness.missing_settings %}<li><code dir="ltr">{{ name }}</code></li>{% endfor %}</ul></dd>{% endif %}
+          {% if readiness.invalid_settings %}<dt>{% trans "Invalid settings" %}</dt><dd><ul class="asc-plain-list">{% for name in readiness.invalid_settings %}<li><code dir="ltr">{{ name }}</code></li>{% endfor %}</ul></dd>{% endif %}
+          <dt>{% trans "Cached token in this web process" %}</dt>
+          <dd>{% if readiness.cached_token_seconds is not None %}{% blocktrans with seconds=readiness.cached_token_seconds %}Present, about {{ seconds }} seconds left.{% endblocktrans %}{% else %}{% trans "None" %}{% endif %} <span class="asc-muted">{% trans "A cached token is not proof that authentication works now; each process keeps its own." %}</span></dd>
+        </dl>
+      </section>
+
+      <section class="asc-card" aria-labelledby="nin-auth-heading" data-diagnostic-section="authentication">
+        <h2 class="asc-card-title" id="nin-auth-heading">{% include "components/icon.html" with name="lock" %}{% trans "2. Authentication" %}</h2>
+        <p>{% trans "Sends one new authentication request with the configured credentials, never a cached token. The token received is discarded. Success does not show that the lookup endpoint works." %}</p>
+        <form method="post" action="{% url 'identity:nin-diagnostics-authentication' %}" class="asc-card-form">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary"{% if not readiness.ready %} disabled{% endif %}><span>{% trans "Test authentication" %}</span></button>
+        </form>
+      </section>
+
+      <section class="asc-card" aria-labelledby="nin-lookup-heading" data-diagnostic-section="lookup">
+        <h2 class="asc-card-title" id="nin-lookup-heading">{% include "components/icon.html" with name="search" %}{% trans "3. Lookup" %}</h2>
+        <p>{% trans "Looks up one identity number you are authorized to use for testing. It checks the lookup endpoint only: it creates no registration, changes no identity and verifies nobody. The number is not stored, shown again or logged." %}</p>
+        <form method="post" action="{% url 'identity:nin-diagnostics-lookup' %}" class="asc-card-form" autocomplete="off" novalidate>
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label" for="id_diagnostic_nin">{% trans "Authorized test identity number (NIN)" %}</label>
+            <input type="text" id="id_diagnostic_nin" name="nin" class="form-control" inputmode="numeric" maxlength="18" autocomplete="off" spellcheck="false" dir="ltr" aria-describedby="id_diagnostic_nin_help" required>
+            <p class="form-text" id="id_diagnostic_nin_help">{% trans "18 digits. Never use a participant's number." %}</p>
+          </div>
+          <button type="submit" class="btn btn-primary"{% if not readiness.ready %} disabled{% endif %}><span>{% trans "Test lookup" %}</span></button>
+        </form>
+      </section>
+    </div>
+
+    <aside class="asc-detail-aside">
+      <section class="asc-card asc-card-flush" aria-labelledby="nin-recent-heading">
+        <div class="asc-card-toolbar">
+          <h2 class="asc-card-toolbar-title" id="nin-recent-heading">{% include "components/icon.html" with name="clock" %}{% trans "Recent checks" %}</h2>
+        </div>
+        <p class="asc-card-note asc-muted">{% trans "A record of earlier checks, not the current state of the service." %}</p>
+        {% if recent %}
+          <ul class="asc-records" aria-labelledby="nin-recent-heading">
+            {% for row in recent %}
+              <li class="asc-record" data-recent-outcome="{{ row.outcome }}">
+                <div class="asc-record-head">
+                  <h3 class="asc-record-title">{{ row.action_label }}{% trans ":" context "label separator" %} {{ row.outcome_label }}</h3>
+                  <p class="asc-record-meta"><time datetime="{{ row.occurred_at|date:'c' }}">{{ row.occurred_at }}</time></p>
+                </div>
+                <dl class="asc-record-fields">
+                  {% if row.http_status %}<div><dt>{% trans "HTTP status" %}</dt><dd><span dir="ltr">{{ row.http_status }}</span></dd></div>{% endif %}
+                  {% if row.duration_ms is not None %}<div><dt>{% trans "Duration" %}</dt><dd><span dir="ltr">{{ row.duration_ms }} ms</span></dd></div>{% endif %}
+                  <div><dt>{% trans "Environment" %}</dt><dd><span dir="ltr">{{ row.environment }}</span></dd></div>
+                  <div class="asc-record-wide"><dt>{% trans "Operator" %}</dt><dd><bdi dir="ltr">{{ row.operator }}</bdi></dd></div>
+                </dl>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="asc-card-note">{% trans "No check yet." %}</p>
+        {% endif %}
+      </section>
+    </aside>
+  </div>
+{% endblock %}

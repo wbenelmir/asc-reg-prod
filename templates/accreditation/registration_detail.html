@@ -19,6 +19,44 @@
   </div>
 
   <div class="asc-accreditation">
+      {% if attendance_panel %}
+        {# Attendance days (apps.accreditation.attendance): distinct from role, badge type and access profile. #}
+        <section class="asc-card" aria-labelledby="attendance-heading" data-attendance-panel>
+          <h2 class="asc-card-title" id="attendance-heading">{% include "components/icon.html" with name="clock" %}{% trans "Attendance days" %}</h2>
+          {% if not attendance_panel.approved %}
+            <p class="asc-muted mb-0">{% trans "Attendance days apply to an approved, current registration only." %}</p>
+          {% else %}
+            <dl class="asc-dl">
+              <dt>{% trans "Current attendance days" %}</dt>
+              <dd data-attendance-category="{{ attendance_panel.current.category|default:'UNCLASSIFIED' }}">{% if attendance_panel.current %}{{ attendance_panel.current.get_category_display }}{% else %}<span class="asc-chip asc-chip-warning">{% trans "Not yet classified" %}</span>{% endif %}</dd>
+              {% if attendance_panel.participant_view %}
+                <dt>{% trans "What the participant sees" %}</dt>
+                <dd><bdi>{{ attendance_panel.participant_view.statement }}</bdi></dd>
+              {% endif %}
+              {% if attendance_panel.issuance %}
+                <dt>{% trans "Physical badge marking" %}</dt>
+                <dd>{% if attendance_panel.badge_marking_pending %}<span class="asc-chip asc-chip-warning">{% trans "Does not match: record the marking on the badge page" %}</span> <a href="{% url 'badges:registration-badge-issuance' pk=registration.pk %}">{% trans "Badge page" %}</a>{% else %}{% trans "Matches the current attendance days" %}{% endif %}</dd>
+              {% endif %}
+            </dl>
+            {% if attendance_panel.can_change %}
+              {% url 'accreditation:registration-detail' pk=registration.pk as detail_url %}
+              {% include "accreditation/_attendance_change_form.html" with registration=registration current=attendance_panel.current category_choices=attendance_panel.category_choices next_url=detail_url suffix="detail" %}
+            {% endif %}
+          {% endif %}
+          {% if attendance_panel.history %}
+            <h3 class="asc-card-form-title mt-3">{% trans "History" context "attendance history" %}</h3>
+            <ul class="asc-timeline">
+              {% for entry in attendance_panel.history %}
+                <li>
+                  <p class="mb-1">{{ entry.get_category_display }} · {{ entry.get_origin_display }}{% if entry.status == "CURRENT" %} · <strong>{% trans "current" %}</strong>{% endif %}</p>
+                  <p class="asc-timeline-meta"><bdi>{{ entry.decided_by.display_name|default:entry.decided_by }}</bdi> · <time datetime="{{ entry.effective_from|date:'c' }}">{{ entry.effective_from }}</time>{% if entry.reason %} · <bdi>{{ entry.reason }}</bdi>{% endif %}</p>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </section>
+      {% endif %}
+
       {% if can_view_role %}
         <section class="asc-card" aria-labelledby="roles-heading">
           <h2 class="asc-card-title" id="roles-heading">{% include "components/icon.html" with name="user" %}{% trans "Participant roles" %}</h2>

@@ -23,6 +23,24 @@ REGISTRATION_INTAKE_PERMISSIONS: tuple[tuple[str, str], ...] = (
 # entry/gate/scan permission is ever granted to this group in this prompt.
 EXTERNAL_SECURITY_TEMPORARY_GROUP_NAME = "External Security (Temporary)"
 
+# Staff account administration (`apps.accounts.administration`): create staff
+# accounts, change their status and validity, send credential setup links and
+# grant or revoke scoped roles within the administrator's own scope. No other
+# group receives it; the first administrator is set up with
+# `manage.py bootstrap_account_administrator`.
+ACCOUNT_ADMINISTRATORS_GROUP_NAME = "Account Administrators"
+ACCOUNT_ADMINISTRATORS_PERMISSIONS: tuple[tuple[str, str], ...] = (
+    ("accounts", "manage_operational_accounts"),
+)
+
+# Ministry NIN service diagnostics (`apps.people.nin_diagnostics`): a technical
+# role, granted only for every event and organization (`roles.py`,
+# `global_only`); the page refuses any narrower membership.
+INTEGRATION_DIAGNOSTICS_GROUP_NAME = "Integration Diagnostics Operators"
+INTEGRATION_DIAGNOSTICS_PERMISSIONS: tuple[tuple[str, str], ...] = (
+    ("people", "run_ministry_nin_diagnostics"),
+)
+
 
 def _ensure_registration_intake_group(sender, **kwargs):
     """Idempotently ensure the "Registration Intake" group and its permissions exist.
@@ -52,6 +70,17 @@ def _ensure_registration_intake_group(sender, **kwargs):
     # Prompt 4) -- existence only, so the group is available to assign a
     # temporary external-security account to without granting anything.
     Group.objects.get_or_create(name=EXTERNAL_SECURITY_TEMPORARY_GROUP_NAME)
+    for group_name, permissions in (
+        (ACCOUNT_ADMINISTRATORS_GROUP_NAME, ACCOUNT_ADMINISTRATORS_PERMISSIONS),
+        (INTEGRATION_DIAGNOSTICS_GROUP_NAME, INTEGRATION_DIAGNOSTICS_PERMISSIONS),
+    ):
+        group, _ = Group.objects.get_or_create(name=group_name)
+        for app_label, codename in permissions:
+            permission = Permission.objects.filter(
+                content_type__app_label=app_label, codename=codename
+            ).first()
+            if permission is not None:
+                group.permissions.add(permission)
 
 
 class AccountsConfig(AppConfig):
@@ -62,6 +91,8 @@ class AccountsConfig(AppConfig):
     label = "accounts"
 
     def ready(self) -> None:
+        from apps.accounts import checks  # noqa: F401 - registers the CAPTCHA checks
+
         # Connected for EVERY app's post_migrate, not only this app's: the
         # intake permissions belong to `registrations`, which migrates after
         # `accounts`, so a handler limited to this sender ran before they

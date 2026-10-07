@@ -13,6 +13,7 @@ import uuid
 import pytest
 from django.utils import timezone
 
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.accreditation.models import (
     AccessProfile,
     AccessProfileAssignment,
@@ -202,12 +203,8 @@ def make_operational_user_with_membership(
 
 
 def sign_in_operational(client, email: str) -> None:
-    from django.urls import reverse
 
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": email, "password": TEST_OPERATIONAL_PASSWORD},
-    )
+    staff_sign_in(client, email, TEST_OPERATIONAL_PASSWORD)
 
 
 def publish_and_activate_key(*, provider, actor, key_id: str = "v1"):

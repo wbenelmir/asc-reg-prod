@@ -15,7 +15,7 @@ from django.test import override_settings
 
 from apps.accounts.otp import DeterministicTestOtpGenerator
 from tests.browser.database import database_call, database_sync
-from tests.browser.helpers import fill_date, read_date, switch_language
+from tests.browser.helpers import fill_date, read_date, solve_staff_captcha, switch_language
 
 pytestmark = pytest.mark.django_db(transaction=True)
 
@@ -48,6 +48,7 @@ def _sign_in_operational(live_server, page, email: str) -> None:
     page.goto(f"{live_server.url}/accounts/ops/sign-in/")
     page.fill("#id_email", email)
     page.fill("#id_password", "__test_password__")
+    solve_staff_captcha(page)
     page.locator("#main-content button[type=submit]").click()
     page.wait_for_url("**/ops/registrations/**")
 

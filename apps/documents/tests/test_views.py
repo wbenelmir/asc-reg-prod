@@ -17,6 +17,7 @@ from apps.accounts.models import (
     ScopedGroupMembership,
     ScopedGroupMembershipStatus,
 )
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.audit.models import AuditEvent
 from apps.documents.models import Document, DocumentStatus
 from apps.documents.services import save_profile_photo
@@ -204,9 +205,7 @@ def _sign_in_operational(client: Client, email: str) -> None:
     the view entirely, so it never establishes the operational session-expiry
     timestamps `OperationalSessionExpiryMiddleware` fails closed without
     (Prompt 5 correction pass §4)."""
-    response = client.post(
-        reverse("accounts:operational-sign-in"), {"email": email, "password": "__test_password__"}
-    )
+    response = staff_sign_in(client, email, "__test_password__")
     assert response.status_code == 302
 
 

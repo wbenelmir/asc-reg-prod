@@ -113,6 +113,18 @@ class RegistrationNotEligibleError(StockServiceError):
     reason_code = "REGISTRATION_NOT_ELIGIBLE"
 
 
+class AttendanceMarkingError(StockServiceError):
+    """Raised when a physical badge's attendance marking cannot be issued or
+    recorded: the registration's attendance days are not classified while
+    attendance enforcement is active (`UNCLASSIFIED`), or the confirmed
+    marking differs from the current attendance days (`MISMATCH`). Never
+    inferred from the Badge Type."""
+
+    def __init__(self, message: str = "", *, code: str = "") -> None:
+        super().__init__(message)
+        self.code = code
+
+
 class DuplicateStockLocationError(StockServiceError):
     """Raised when a location code is reused within the same event edition."""
 
@@ -256,6 +268,78 @@ def _lock_eligible_registration(registration_id):
             "issued for it."
         )
     return registration
+
+
+def _require_attendance_classified(registration) -> None:
+    from apps.accreditation import attendance
+
+    policy = attendance.policy_for(registration.event_edition_id)
+    if policy is not None and policy.enforcement_active:
+        if attendance.current_entitlement(registration.pk) is None:
+            raise AttendanceMarkingError(
+                "Attendance enforcement is active and this registration's attendance days "
+                "are not classified.",
+                code="UNCLASSIFIED",
+            )
+
+
+def record_attendance_marking(
+    *, issuance: BadgeIssuance, attendance_marking: str, actor, expected_lock_version: int
+) -> BadgeIssuance:
+    """Record that the handed-over badge now carries the attendance marking
+    (sticker, overlay or print variant) of the registration's CURRENT
+    attendance days.
+
+    `attendance_marking` is what the operator confirms having applied; it
+    must equal the current entitlement exactly -- no substitution, no
+    inference from the Badge Type. Only a current (ISSUED) badge of an active
+    approved registration can be marked. Lock order: Registration first,
+    then the issuance (as every issuance command)."""
+    from apps.accreditation import attendance
+    from apps.accreditation.models import AttendanceCategory
+
+    if attendance_marking not in AttendanceCategory.values:
+        raise AttendanceMarkingError("Unknown attendance marking.", code="MISMATCH")
+    with transaction.atomic():
+        locked_registration = _lock_eligible_registration(issuance.registration_id)
+        locked = BadgeIssuance.objects.select_for_update().get(pk=issuance.pk)
+        if locked.version != expected_lock_version:
+            raise StockConcurrencyError("This badge issuance changed meanwhile.")
+        if locked.status != BadgeIssuanceStatus.ISSUED:
+            raise StockStateError("Only a current physical badge can be marked.")
+        current = attendance.current_entitlement(locked_registration.pk)
+        if current is None:
+            raise AttendanceMarkingError(
+                "This registration's attendance days are not classified.", code="UNCLASSIFIED"
+            )
+        if current.category != attendance_marking:
+            raise AttendanceMarkingError(
+                "The marking differs from the current attendance days.", code="MISMATCH"
+            )
+        before = locked.attendance_marking
+        locked.attendance_marking = attendance_marking
+        locked.attendance_marking_recorded_at = timezone.now()
+        locked.attendance_marking_recorded_by = actor if getattr(actor, "pk", None) else None
+        locked.version += 1
+        locked.save(
+            update_fields=[
+                "attendance_marking",
+                "attendance_marking_recorded_at",
+                "attendance_marking_recorded_by",
+                "version",
+                "updated_at",
+            ]
+        )
+        _stock_audit(
+            action_code=action_codes.BADGE_ATTENDANCE_MARKING_RECORDED,
+            actor=actor,
+            target_type="BadgeIssuance",
+            target_uuid=locked.pk,
+            event_edition_id=locked_registration.event_edition_id,
+            before={"attendance_marking": before or None},
+            after={"attendance_marking": attendance_marking},
+        )
+    return locked
 
 
 def _new_ledger_operation_id() -> str:
@@ -1304,6 +1388,10 @@ def issue_badge(
             # before anything is locked further or written (P8-02). An
             # assignment's registration never changes.
             locked_registration = _lock_eligible_registration(badge_assignment.registration_id)
+            # Attendance days (apps.accreditation.attendance): while
+            # enforcement is active, a badge is handed over only to a
+            # classified registration, so its marking can be applied.
+            _require_attendance_classified(locked_registration)
             locked_assignment = BadgeTypeAssignment.objects.select_for_update().get(
                 pk=badge_assignment.pk
             )

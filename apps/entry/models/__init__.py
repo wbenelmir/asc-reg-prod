@@ -134,6 +134,20 @@ class EntryReasonCode(models.TextChoices):
     ACCESS_RULE_DENY = "ACCESS_RULE_DENY", _("Checkpoint closed for this access profile")
     ALREADY_ADMITTED = "ALREADY_ADMITTED", _("Single-entry access already used")
     IDENTITY_UNVERIFIED = "IDENTITY_UNVERIFIED", _("Identity reference not verified")
+    # Attendance entitlement (`apps.accreditation.attendance`), enforced only
+    # once attendance enforcement is active for the event edition.
+    ATTENDANCE_DAY_NOT_AUTHORIZED = (
+        "ATTENDANCE_DAY_NOT_AUTHORIZED",
+        _("Approval does not include today (opening day not authorized)"),
+    )
+    ATTENDANCE_UNCLASSIFIED = (
+        "ATTENDANCE_UNCLASSIFIED",
+        _("Attendance days not yet classified"),
+    )
+    ATTENDANCE_NOT_CONFERENCE_DAY = (
+        "ATTENDANCE_NOT_CONFERENCE_DAY",
+        _("Today is not a conference day"),
+    )
     VERIFICATION_STALE = "VERIFICATION_STALE", _("Verification expired; verify again")
     TECHNICAL_ERROR = "TECHNICAL_ERROR", _("Technical error")
     # Phase 4 Prompt 3 (ADR-0024): results only an OFFLINE device can reach.
@@ -177,6 +191,13 @@ NEVER_OVERRIDEABLE_REASON_CODES: frozenset[str] = frozenset(
         EntryReasonCode.OFFLINE_DATA_STALE,
         EntryReasonCode.OFFLINE_DATA_CHANGED,
         EntryReasonCode.OFFLINE_PACKAGE_EXPIRED,
+        # The attendance days decide opening-day capacity: an override could
+        # admit a participant whose place was never allocated. The operator
+        # changes the entitlement instead (within capacity), which the next
+        # verification then reads.
+        EntryReasonCode.ATTENDANCE_DAY_NOT_AUTHORIZED,
+        EntryReasonCode.ATTENDANCE_UNCLASSIFIED,
+        EntryReasonCode.ATTENDANCE_NOT_CONFERENCE_DAY,
     }
 )
 

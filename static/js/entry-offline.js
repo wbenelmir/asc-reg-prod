@@ -1607,6 +1607,14 @@
         prior: null,
       });
     }
+    // 2b. Attendance days no longer cover this package's day (critical delta;
+    // never overrideable, like the online ATTENDANCE_DAY_NOT_AUTHORIZED).
+    if (withdrawn === "ATTENDANCE_NOT_AUTHORIZED") {
+      return Object.assign(finishLocal([blocker("DENIED", "ATTENDANCE_DAY_NOT_AUTHORIZED")], []), {
+        restrictionBlocksOverride: false,
+        prior: null,
+      });
+    }
     // 3. Restrictions in force now: package set merged MONOTONICALLY with the delta.
     var restrictions = (entry.restrictions || [])
       .concat(delta.restrictions[entry.jti] || [])

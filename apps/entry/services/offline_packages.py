@@ -275,9 +275,20 @@ def project_package_body(
         if known is None or moment > known:
             last_admitted[registration_id] = moment
 
+    # Attendance days (apps.accreditation.attendance): once enforcement is
+    # active, a package -- valid only on the event day of its cutoff -- holds
+    # only the contexts whose attendance covers that day. Any other one is a
+    # local miss on the device (manual review), never an offline admission
+    # the server would refuse. None: enforcement not active, no filtering.
+    from apps.accreditation.attendance import registrations_authorized_on
+
+    attendance_authorized = registrations_authorized_on(event, reg_ids, now)
+
     entries = []
     for credential in passes:
         registration = credential.registration
+        if attendance_authorized is not None and registration.pk not in attendance_authorized:
+            continue
         badge = badges.get(registration.pk)
         access = accesses.get(registration.pk)
         if badge is None or access is None:
@@ -1116,6 +1127,17 @@ def delta_body(*, package: OfflinePackage, delta_version: int, now) -> dict:
         "jti", flat=True
     ):
         withdrawn[jti] = "REGISTRATION_NOT_APPROVED"
+    # Attendance days: under the CURRENT entitlements, every active pass whose
+    # attendance does not cover this package's day (the local day of its
+    # cutoff; a package never outlives it) is withdrawn while enforcement is
+    # active -- a downgrade reaches devices with the next delta.
+    from apps.accreditation.attendance import registrations_withdrawn_for_package_day
+
+    active_by_registration = dict(active.values_list("registration_id", "jti"))
+    for registration_id in registrations_withdrawn_for_package_day(
+        event, active_by_registration, package_cutoff=package.data_cutoff_at
+    ):
+        withdrawn.setdefault(active_by_registration[registration_id], "ATTENDANCE_NOT_AUTHORIZED")
     if changes.pass_ids:
         rows = list(
             DigitalEntryPass.objects.filter(pk__in=changes.pass_ids).values_list(

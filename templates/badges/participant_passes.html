@@ -68,6 +68,10 @@ caption beside it keeps the page direction.
           {% endif %}
           <dt>{% trans "Registration reference" %}</dt>
           <dd><bdi dir="ltr" class="asc-code">{{ item.registration.public_reference }}</bdi></dd>
+          {% if item.attendance %}
+            <dt>{% trans "Authorized days" %}</dt>
+            <dd data-pass-attendance="{{ item.attendance.state }}">{% include "badges/_attendance_marking.html" with attendance=item.attendance %}</dd>
+          {% endif %}
           <dt>{% trans "Fallback reference" %}</dt>
           <dd><bdi dir="ltr" class="asc-code">{{ item.fallback_reference_display }}</bdi></dd>
           <dt>{% trans "Valid from" %}</dt>

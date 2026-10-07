@@ -1,0 +1,26 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% block title %}{% trans "New staff account" %}{% endblock %}
+{% block breadcrumbs %}{% url 'staff_accounts:list' as list_url %}{% trans "Staff accounts" as list_label %}{% trans "New staff account" as current %}{% include "components/breadcrumb_trail.html" with parent_label=list_label parent_url=list_url current=current %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head">
+    <h1>{% trans "New staff account" %}</h1>
+    <p>{% trans "The account is created as Invited, without a password and without a role. Sending a setup link, activating it and granting roles are separate steps on the next page." %}</p>
+  </div>
+  <form method="post" class="asc-card asc-card-form" novalidate>
+    {% csrf_token %}
+    {% include "components/error_summary.html" with form=form %}
+    {% include "components/field.html" with field=form.email control="ltr" %}
+    {% include "components/field.html" with field=form.display_name %}
+    {% include "components/field.html" with field=form.account_type %}
+    <p class="form-text">{% trans "A temporary external-security account needs an end of validity; its roles never last longer than the account." %}</p>
+    <div class="asc-form-grid">
+      {% include "components/field.html" with field=form.active_from wrapper_class="" control="ltr" mark_optional=True %}
+      {% include "components/field.html" with field=form.active_until wrapper_class="" control="ltr" mark_optional=True %}
+    </div>
+    <div class="asc-form-actions">
+      <button type="submit" class="btn btn-primary">{% trans "Create the account" %}</button>
+      <a class="btn btn-outline-secondary" href="{% url 'staff_accounts:list' %}">{% trans "Cancel" %}</a>
+    </div>
+  </form>
+{% endblock %}

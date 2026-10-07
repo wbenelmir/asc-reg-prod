@@ -18,6 +18,7 @@ from django.template import Context, Template
 from django.test import Client
 from django.urls import reverse
 
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.core.navigation import OPERATIONS_SECTIONS, operations_navigation
 from apps.core.templatetags.asc_ui import _STATUS_TONES, asc_control, ltr_isolate, status_tone
 
@@ -115,10 +116,7 @@ def _signed_in(user) -> Client:
     """A client signed in through the real operational sign-in view, so the
     session clocks the expiry middleware checks are established as usual."""
     client = Client()
-    response = client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": user.email_normalized, "password": PASSWORD},
-    )
+    response = staff_sign_in(client, user.email_normalized, PASSWORD)
     assert response.status_code == 302
     return client
 

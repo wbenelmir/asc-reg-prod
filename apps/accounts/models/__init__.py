@@ -113,6 +113,12 @@ class OperationalUser(AbstractBaseUser, PermissionsMixin):
     active_from = models.DateTimeField(null=True, blank=True)
     active_until = models.DateTimeField(null=True, blank=True)
     is_staff = models.BooleanField(default=False)
+    #: The administrator who created the account in the staff accounts area
+    #: (empty for older and command-created accounts). Lets a scoped
+    #: administrator keep reading a new account until it has a role.
+    created_by = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -303,3 +309,62 @@ class ScopedGroupMembership(models.Model):
 
     def __str__(self) -> str:  # pragma: no cover - trivial
         return f"{self.user_id}:{self.group_id}:{self.status}"
+
+
+class CredentialSetupPurpose(models.TextChoices):
+    INVITATION = "INVITATION", "Invitation"
+    RESET = "RESET", "Password reset"
+
+
+class CredentialSetupToken(models.Model):
+    """One single-use, expiring link that lets a staff member set their own
+    password (`apps.accounts.administration`).
+
+    Only a SHA-256 digest of the 256-bit random token is stored, so the link
+    cannot be recovered from the database. A token is used once
+    (`used_at`), replaced by a newer one (`revoked_at`), or expires
+    (`expires_at`); at most one open token exists per account. It never
+    signs anyone in and never activates an account: activation and access
+    are separate administrator actions.
+
+    Also carries the `manage_operational_accounts` permission (a custom
+    permission must be declared on some model).
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid7, editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="credential_setup_tokens"
+    )
+    purpose = models.CharField(max_length=16, choices=CredentialSetupPurpose.choices)
+    token_digest = models.CharField(max_length=64, unique=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name="+"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    used_at = models.DateTimeField(null=True, blank=True)
+    revoked_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "accounts_credential_setup_token"
+        permissions = [
+            (
+                "manage_operational_accounts",
+                "Can create staff accounts, manage their status and grant scoped access",
+            ),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user"],
+                condition=models.Q(used_at__isnull=True, revoked_at__isnull=True),
+                name="acc_setup_token_one_open_uq",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(expires_at__gt=models.F("created_at")),
+                name="acc_setup_token_expiry_after_creation",
+            ),
+        ]
+        indexes = [models.Index(fields=["user", "created_at"], name="acc_setup_token_user_idx")]
+
+    def __str__(self) -> str:  # pragma: no cover - never the token
+        return f"setup:{self.user_id}:{self.purpose}"

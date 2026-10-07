@@ -1,0 +1,152 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% comment %}
+  One staff account: status and effective access shown separately, roles
+  with their scope and validity (current and past), and the commands this
+  administrator may run. Each command is authorized again by the server
+  (scope, self-change, last administrator); a hidden button is never the
+  boundary. No password, link or token is ever shown here.
+{% endcomment %}
+{% block title %}{% trans "Staff account" %}{% endblock %}
+{% block breadcrumbs %}{% url 'staff_accounts:list' as list_url %}{% trans "Staff accounts" as list_label %}{% include "components/breadcrumb_trail.html" with parent_label=list_label parent_url=list_url current=account.email_normalized current_code=True %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Staff account" %}</p>
+      <h1><bdi>{{ account.display_name|default:account.email_normalized }}</bdi></h1>
+      <ul class="asc-chip-list mt-2" aria-label="{% trans 'Current state' %}">
+        <li><span class="asc-chip asc-chip-{{ status_tone }}" data-account-status="{{ account.status }}">{% trans "Account status" %}{% trans ":" context "label separator" %} {{ status_label }}</span></li>
+      </ul>
+    </div>
+  </div>
+
+  {% if is_self %}
+    <p class="asc-notice asc-notice-neutral" role="status">{% include "components/icon.html" with name="info" %}<span>{% trans "This is your own account. Another administrator changes its status, validity and roles." %}</span></p>
+  {% elif not can_administer %}
+    <p class="asc-notice asc-notice-warning" role="status">{% include "components/icon.html" with name="alert-triangle" %}<span>{% trans "This account has roles outside your administration scope: you can read it and grant roles in your scope, but not change its status, validity or credentials." %}{% if hidden_roles %} {% trans "Roles outside your administration scope are not shown." %}{% endif %}</span></p>
+  {% elif hidden_roles %}
+    <p class="asc-notice asc-notice-neutral" role="status">{% include "components/icon.html" with name="info" %}<span>{% trans "Roles outside your administration scope are not shown." %}</span></p>
+  {% endif %}
+
+  <div class="asc-detail-layout">
+    <div class="asc-detail-main">
+      <section class="asc-card" aria-labelledby="account-summary-heading">
+        <h2 class="asc-card-title" id="account-summary-heading">{% include "components/icon.html" with name="user" %}{% trans "Account" %}</h2>
+        <dl class="asc-dl">
+          <dt>{% trans "Email address" %}</dt><dd><bdi dir="ltr">{{ account.email_normalized }}</bdi></dd>
+          <dt>{% trans "Account type" %}</dt><dd>{{ account.get_account_type_display }}</dd>
+          <dt>{% trans "Account status" %}</dt><dd>{{ status_label }}</dd>
+          <dt>{% trans "Effective access" %}</dt><dd data-access="{{ access_code }}">{{ access_label }}</dd>
+          <dt>{% trans "Password" %}</dt><dd>{% if has_password %}{% trans "Set" %}{% else %}<span class="asc-muted">{% trans "Not set yet" %}</span>{% endif %}</dd>
+          <dt>{% trans "Valid from" %}</dt><dd>{% if account.active_from %}<time datetime="{{ account.active_from|date:'c' }}">{{ account.active_from }}</time>{% else %}<span class="asc-muted">{% trans "No limit" %}</span>{% endif %}</dd>
+          <dt>{% trans "Valid until" %}</dt><dd>{% if account.active_until %}<time datetime="{{ account.active_until|date:'c' }}">{{ account.active_until }}</time>{% else %}<span class="asc-muted">{% trans "No limit" %}</span>{% endif %}</dd>
+          {% if can_administer %}<dt>{% trans "Setup link" %}</dt><dd>{% if open_link %}{% blocktrans with expires=open_link.expires_at %}One unused link, valid until {{ expires }}.{% endblocktrans %}{% else %}<span class="asc-muted">{% trans "No open link" %}</span>{% endif %}</dd>{% endif %}
+        </dl>
+      </section>
+
+      <section class="asc-card asc-card-flush" aria-labelledby="roles-heading">
+        <div class="asc-card-toolbar">
+          <h2 class="asc-card-toolbar-title" id="roles-heading">{% include "components/icon.html" with name="shield" %}{% trans "Roles and scope" %}</h2>
+        </div>
+        {% if memberships %}
+          <ul class="asc-records" aria-labelledby="roles-heading">
+            {% for membership in memberships %}
+              <li class="asc-record" data-membership="{{ membership.pk }}" data-membership-state="{{ membership.state }}">
+                <div class="asc-record-head">
+                  <h3 class="asc-record-title"><bdi>{{ membership.role_label }}</bdi></h3>
+                  <p class="asc-record-meta">{{ membership.state_label }}</p>
+                </div>
+                <dl class="asc-record-fields">
+                  <div><dt>{% trans "Event edition" %}</dt><dd>{% if membership.event_edition %}<bdi dir="ltr" class="asc-code">{{ membership.event_edition.code }}</bdi>{% else %}<strong>{% trans "Every event edition" %}</strong>{% endif %}</dd></div>
+                  <div><dt>{% trans "Organization" %}</dt><dd>{% if membership.organization %}<bdi>{{ membership.organization.official_name }}</bdi>{% else %}{% trans "Every organization" %}{% endif %}</dd></div>
+                  {% if membership.venue or membership.gate %}<div><dt>{% trans "Checkpoint" %}</dt><dd><bdi dir="ltr" class="asc-code">{{ membership.venue.code }}{% if membership.gate %} / {{ membership.gate.code }}{% endif %}</bdi></dd></div>{% endif %}
+                  <div class="asc-record-wide"><dt>{% trans "Validity" %}</dt><dd>{% if membership.active_from %}<time datetime="{{ membership.active_from|date:'c' }}">{{ membership.active_from }}</time>{% else %}{% trans "No start limit" %}{% endif %} → {% if membership.active_until %}<time datetime="{{ membership.active_until|date:'c' }}">{{ membership.active_until }}</time>{% else %}{% trans "No end" %}{% endif %}</dd></div>
+                </dl>
+                {% if membership.revocable %}
+                  <form method="post" action="{% url 'staff_accounts:revoke' pk=account.pk %}" class="asc-command"
+                        data-confirm-title="{% trans 'End this role now?' %}"
+                        data-confirm="{% trans 'The role stops applying on the next request and stays in the history.' %}"
+                        data-confirm-action="{% trans 'End the role' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="membership_id" value="{{ membership.pk }}">
+                    <label class="form-label" for="revoke-reason-{{ membership.pk }}">{% trans "Reason" %}</label>
+                    <input type="text" id="revoke-reason-{{ membership.pk }}" name="reason" required minlength="3" maxlength="300" class="form-control">
+                    {% include "components/confirm_fallback.html" with id="revoke-confirm" suffix=membership.pk %}
+                    <button type="submit" class="btn btn-outline-danger">{% trans "End the role" %}</button>
+                  </form>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="asc-table-empty">{% trans "No role yet. The account opens no area until a role is granted." %}</p>
+        {% endif %}
+      </section>
+
+      {% if can_grant %}
+        <section class="asc-card" aria-labelledby="grant-heading">
+          <h2 class="asc-card-title" id="grant-heading">{% include "components/icon.html" with name="user-check" %}{% trans "Grant a role" %}</h2>
+          <p class="asc-section-lead">{% trans "Roles come from a fixed list. Choose the event edition and the organization explicitly; only scopes inside your own administration scope are accepted." %}</p>
+          <form method="post" action="{% url 'staff_accounts:grant' pk=account.pk %}" class="asc-card-form" novalidate>
+            {% csrf_token %}
+            {% include "components/field.html" with field=grant_form.role %}
+            <div class="asc-form-grid">
+              {% include "components/field.html" with field=grant_form.event wrapper_class="" %}
+              {% include "components/field.html" with field=grant_form.organization wrapper_class="" %}
+              {% include "components/field.html" with field=grant_form.gate wrapper_class="" mark_optional=True %}
+            </div>
+            {% include "components/field.html" with field=grant_form.confirm_broad_scope %}
+            <div class="asc-form-grid">
+              {% include "components/field.html" with field=grant_form.active_from wrapper_class="" control="ltr" mark_optional=True %}
+              {% include "components/field.html" with field=grant_form.active_until wrapper_class="" control="ltr" mark_optional=True %}
+            </div>
+            {% if is_external_security %}<p class="form-text">{% trans "Temporary external-security account: the role ends no later than the account." %}</p>{% endif %}
+            {% include "components/field.html" with field=grant_form.reason %}
+            <button type="submit" class="btn btn-outline-primary">{% trans "Grant the role" %}</button>
+          </form>
+        </section>
+      {% endif %}
+    </div>
+
+    <aside class="asc-detail-aside" aria-label="{% trans 'Account actions' %}">
+      {% if can_administer %}
+        <section class="asc-card asc-action-panel" aria-labelledby="credential-heading">
+          <h2 class="asc-card-title" id="credential-heading">{% include "components/icon.html" with name="mail" %}{% trans "Password setup" %}</h2>
+          <p class="asc-section-lead">{% trans "Sends a single-use, expiring link to the account's own email address. A newer link replaces an older one. The link never signs in and never activates the account." %}</p>
+          <form method="post" action="{% url 'staff_accounts:credential-link' pk=account.pk %}" class="mb-2">
+            {% csrf_token %}
+            <input type="hidden" name="purpose" value="{% if has_password %}RESET{% else %}INVITATION{% endif %}">
+            <button type="submit" class="btn btn-outline-primary asc-btn-block">{% if has_password %}{% trans "Send a password reset link" %}{% else %}{% trans "Send a setup link" %}{% endif %}</button>
+          </form>
+        </section>
+
+        <section class="asc-card" aria-labelledby="status-heading">
+          <h2 class="asc-card-title" id="status-heading">{% include "components/icon.html" with name="refresh" %}{% trans "Account status" %}</h2>
+          {% for item in status_commands %}
+            <form method="post" action="{% url 'staff_accounts:status' pk=account.pk %}" class="asc-command"
+                  {% if item.danger %}data-confirm-title="{{ item.label }}" data-confirm="{% trans 'The account stops working on its next request. Nothing is deleted.' %}" data-confirm-action="{{ item.label }}"{% endif %}>
+              {% csrf_token %}
+              <input type="hidden" name="command" value="{{ item.command }}">
+              <label class="form-label" for="status-reason-{{ item.command }}">{% trans "Reason" %}</label>
+              <input type="text" id="status-reason-{{ item.command }}" name="reason" required minlength="3" maxlength="300" class="form-control">
+              {% if item.danger %}{% include "components/confirm_fallback.html" with id="status-confirm" suffix=item.command %}{% endif %}
+              <button type="submit" class="btn {% if item.danger %}btn-outline-danger{% else %}btn-success{% endif %}">{{ item.label }}</button>
+            </form>
+          {% endfor %}
+        </section>
+
+        <section class="asc-card" aria-labelledby="update-heading">
+          <h2 class="asc-card-title" id="update-heading">{% include "components/icon.html" with name="edit" %}{% trans "Name and validity" %}</h2>
+          <form method="post" action="{% url 'staff_accounts:update' pk=account.pk %}" novalidate>
+            {% csrf_token %}
+            {% include "components/field.html" with field=update_form.display_name %}
+            {% include "components/field.html" with field=update_form.active_from control="ltr" mark_optional=True %}
+            {% include "components/field.html" with field=update_form.active_until control="ltr" mark_optional=True %}
+            {% include "components/field.html" with field=update_form.reason %}
+            <button type="submit" class="btn btn-outline-primary">{% trans "Save" %}</button>
+          </form>
+        </section>
+      {% endif %}
+    </aside>
+  </div>
+{% endblock %}

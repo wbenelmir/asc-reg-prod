@@ -550,6 +550,10 @@ class IdentityVerification(UUIDPrimaryKeyModel, TimestampedModel, VersionedModel
             ("return_identity_for_correction", "Can return an identity for correction"),
             ("reject_identity", "Can finally reject an identity"),
             ("apply_identity_exception", "Can verify an identity by staff-assisted exception"),
+            (
+                "run_ministry_nin_diagnostics",
+                "Can test the Ministry NIN service configuration, authentication and lookup",
+            ),
         ]
         constraints = [
             models.CheckConstraint(

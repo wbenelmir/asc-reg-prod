@@ -27,3 +27,12 @@ class CommunicationPurpose:
     # Owner decision IDV-Q2 (2026-10-02): a final identity rejection, with how
     # to register again from the same account. Seeded by `communications.0007`.
     IDENTITY_REJECTION = "IDENTITY_REJECTION"
+    # Attendance entitlements (`apps.accreditation.attendance`), seeded by
+    # `communications.0008`: the approval decision with its authorized days
+    # (replaces the generic DECISION_STATUS message for an approval), and a
+    # later classification or change of those days.
+    APPROVAL_ATTENDANCE = "APPROVAL_ATTENDANCE"
+    ATTENDANCE_CHANGE = "ATTENDANCE_CHANGE"
+    # Staff credential setup and reset links are NOT queued here: like the
+    # participant OTP they are sent directly and never stored in a message
+    # row (`apps.accounts.administration.deliver_setup_link`).

@@ -1986,7 +1986,7 @@ body.asc-ui .skip-link:focus {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: flex-start;
   min-height: 30rem;
   overflow: hidden;
   border-radius: 1.25rem;
@@ -1999,7 +1999,33 @@ body.asc-ui .skip-link:focus {
 .asc-ui .asc-auth-aside-body {
   position: relative;
   z-index: 1;
+  margin-top: auto;
   padding: clamp(1.5rem, 3vw, 3rem);
+}
+
+/* The conference artwork in the panel's upper area (sign-in pages only):
+   the supplied transparent lockup on the panel's own navy gradient, centred
+   in the free space above the text, never cropped or stretched. */
+.asc-ui .asc-auth-aside-art {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1 0 auto;
+  align-items: center;
+  padding: clamp(1.5rem, 3vw, 3rem) clamp(1.5rem, 3vw, 3rem) 0;
+}
+
+.asc-ui .asc-auth-aside-lockup {
+  display: block;
+  width: 100%;
+  max-width: 36rem;
+  height: auto;
+  object-fit: contain;
+}
+
+/* The artwork replaces the stripe motif (no competing diagonals). */
+.asc-ui .asc-auth-aside-art ~ .asc-auth-aside-motif {
+  display: none;
 }
 
 .asc-ui .asc-auth-kicker {
@@ -4363,4 +4389,167 @@ body.asc-ui :lang(ar) {
   .asc-ui .asc-conference-brand > img {
     height: 2.25rem;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Attendance days (apps.accreditation.attendance). The words and dates */
+/* always carry the meaning; the coloured inline-start edge only helps  */
+/* recognition (never the sole distinction).                            */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-required {
+  margin-inline-start: 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--asc-warning-fg);
+}
+
+.asc-ui .asc-attendance {
+  margin-block: 0.5rem;
+}
+
+.asc-ui .asc-attendance-statement {
+  font-weight: 600;
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-attendance-days {
+  margin: 0 0 0.5rem;
+  padding-inline-start: 1.25rem;
+}
+
+.asc-ui .asc-attendance-choice .form-check {
+  margin-block-end: 0.75rem;
+}
+
+.asc-ui .asc-attendance-mark {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding-block: 0.25rem;
+  padding-inline: 0.625rem;
+  border-inline-start: 0.375rem solid var(--asc-neutral-edge);
+  border-radius: var(--asc-radius-sm);
+  background: var(--asc-neutral-bg);
+  color: var(--asc-neutral-fg);
+}
+
+.asc-ui .asc-attendance-mark-all {
+  border-inline-start-color: var(--asc-success-edge);
+  background: var(--asc-success-bg);
+  color: var(--asc-success-fg);
+}
+
+.asc-ui .asc-attendance-mark-following {
+  border-inline-start-color: var(--asc-info-edge);
+  background: var(--asc-info-bg);
+  color: var(--asc-info-fg);
+}
+
+.asc-ui .asc-attendance-mark-pending {
+  border-inline-start-color: var(--asc-warning-edge);
+  background: var(--asc-warning-bg);
+  color: var(--asc-warning-fg);
+}
+
+.asc-ui .asc-attendance-mark-excluded {
+  font-weight: 600;
+}
+
+.asc-ui .asc-attendance-change {
+  margin-block-start: var(--asc-space-2);
+  padding-block-start: var(--asc-space-2);
+  border-block-start: 1px solid var(--asc-border);
+}
+
+.asc-ui .asc-attendance-change fieldset {
+  margin-block-end: 0.5rem;
+}
+
+.asc-ui .asc-checklist {
+  list-style: none;
+  margin: 0 0 var(--asc-space-2);
+  padding: 0;
+}
+
+.asc-ui .asc-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-block-end: 0.5rem;
+}
+
+.asc-ui .asc-checklist li[data-ok="true"] .asc-icon {
+  color: var(--asc-success-edge);
+}
+
+.asc-ui .asc-checklist li[data-ok="false"] .asc-icon {
+  color: var(--asc-warning-edge);
+}
+
+.asc-ui .asc-filter-tabs {
+  padding: var(--asc-space-2);
+}
+
+.asc-ui .asc-filter-tabs .asc-chip {
+  text-decoration: none;
+}
+
+@media print {
+  .asc-ui .asc-attendance-mark {
+    border: 2px solid #000;
+    border-inline-start-width: 0.5rem;
+    background: none;
+    color: #000;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Staff sign-in security image (apps.accounts.captcha_guard): a plain, */
+/* unanimated white tile; the row wraps on narrow screens and at 200 %. */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-captcha-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-block-end: 0.5rem;
+}
+
+.asc-ui .asc-captcha-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  background: #fff;
+  border: 1px solid var(--asc-border-strong);
+  border-radius: var(--asc-radius-sm);
+}
+
+.asc-ui .asc-captcha-answer {
+  max-width: 16rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ------------------------------------------------------------------ */
+/* Ministry NIN service diagnostics (people/ministry_nin_diagnostics)  */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-notice-title {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.asc-ui .asc-card-note {
+  margin: 0;
+  padding: 0.75rem var(--asc-space-3);
+  font-size: 0.9375rem;
+}
+
+.asc-ui .asc-plain-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }

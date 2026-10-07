@@ -169,6 +169,11 @@ urlpatterns = [
         name="badge-issuance-replace",
     ),
     path(
+        "ops/badges/registrations/<uuid:registration_pk>/badge-issuances/<uuid:pk>/attendance-marking/",
+        views.badge_issuance_attendance_marking,
+        name="badge-issuance-attendance-marking",
+    ),
+    path(
         "ops/badges/registrations/<uuid:registration_pk>/badge-issuances/<uuid:pk>/return/",
         views.badge_issuance_return,
         name="badge-issuance-return",

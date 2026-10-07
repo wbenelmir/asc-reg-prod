@@ -171,7 +171,10 @@ def _approve(registration, manager, version):
     from apps.reviews.services import record_approved_decision
 
     return record_approved_decision(
-        registration=registration, expected_version=version, decided_by=manager
+        registration=registration,
+        expected_version=version,
+        decided_by=manager,
+        attendance_category="FOLLOWING_TWO_DAYS",
     )
 
 

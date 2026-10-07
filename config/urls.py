@@ -27,6 +27,7 @@ urlpatterns = [
     path("i18n/setlang/", core_views.set_language, name="set-language"),
     path("", home, name="home"),
     path("accounts/", include("apps.accounts.urls")),
+    path("", include("apps.accounts.ops_urls")),
     path("", include("apps.registrations.urls")),
     path("", include("apps.documents.urls")),
     path("", include("apps.invitations.urls")),

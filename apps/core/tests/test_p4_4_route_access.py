@@ -42,6 +42,14 @@ PUBLIC = {
     "accounts/ops/sign-in/",
     "accounts/ops/sign-out/",
     "accounts/ops/session/extend/",
+    # Staff sign-in image: served only to the session it was issued to (410
+    # otherwise); the refresh is a CSRF-protected POST returning a new key.
+    "accounts/ops/sign-in/security-image/<str:key>/",
+    "accounts/ops/sign-in/security-image-refresh/",
+    # Staff credential setup: a single-use, expiring link moved into the
+    # session, then a password form bound to that session only.
+    "accounts/setup/<str:token>/",
+    "accounts/setup/",
     "invite/<str:token>/",
     "claim/resume/",
     "claim/<str:token>/",
@@ -68,6 +76,12 @@ OPS_IN_VIEW_POLICY = {
     "ops/entry/reconciliation/<str:public_id>/",
     "ops/entry/reconciliation/<str:public_id>/action/",
     "ops/entry/devices/<str:public_id>/emergency-wipe/",
+    # Ministry NIN service diagnostics: a GLOBAL membership with
+    # `people.run_ministry_nin_diagnostics` (or a superuser), checked in the
+    # view and again by every service call (`apps.people.nin_diagnostics`).
+    "ops/integrations/ministry-nin/",
+    "ops/integrations/ministry-nin/authentication/",
+    "ops/integrations/ministry-nin/lookup/",
 }
 #: Checkpoint (gate) routes: `checkpoint_required` = operational sign-in plus
 #: an enrolled device cookie plus an open checkpoint session.

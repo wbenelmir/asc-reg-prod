@@ -211,7 +211,10 @@ def test_a_rejection_supersedes_an_earlier_approval(idv_event, legal_versions, m
     assign_approval_prerequisites(registration, manager)
     registration.refresh_from_db()
     approval = record_approved_decision(
-        registration=registration, expected_version=registration.version, decided_by=manager
+        registration=registration,
+        expected_version=registration.version,
+        decided_by=manager,
+        attendance_category="FOLLOWING_TWO_DAYS",
     )
     # The identity later goes back to manual review (as a linked correction would do).
     IdentityVerification.objects.filter(pk=case.pk).update(

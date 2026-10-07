@@ -131,6 +131,7 @@ def registration_accreditation_detail(request, pk):
         "badge": "accreditation.view_badgetypeassignment" in permissions,
         "profile": "accreditation.view_accessprofileassignment" in permissions,
         "rule": "accreditation.view_accessruleassignment" in permissions,
+        "attendance": "accreditation.view_attendanceentitlement" in permissions,
     }
     if not any(permission_flags.values()):
         raise Http404
@@ -189,6 +190,10 @@ def registration_accreditation_detail(request, pk):
         if can_assign_rule or can_change_rule
         else AccessRule.objects.none(),
     }
+    if permission_flags["attendance"]:
+        from .attendance_views import attendance_panel_context
+
+        context["attendance_panel"] = attendance_panel_context(registration, permissions)
     return render(request, "accreditation/registration_detail.html", context)
 
 

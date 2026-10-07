@@ -17,6 +17,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.audit import action_codes
 from apps.entry.models import EntryReasonCode, EntryResult
 from apps.entry.observability import verification_summary
@@ -178,10 +179,7 @@ def test_historical_rows_without_gate_identity_fail_closed(twins, event):
 
 
 def _start(client, twin, user):
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": user.email_normalized, "password": factories.TEST_PASSWORD},
-    )
+    staff_sign_in(client, user.email_normalized, factories.TEST_PASSWORD)
     client.cookies[settings.ENTRY_DEVICE_COOKIE_NAME] = twin.secret
     response = client.post(reverse("entry:home"), {"action": "start", "zone_id": str(twin.zone.pk)})
     assert response.status_code == 302

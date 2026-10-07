@@ -17,6 +17,7 @@ from django.urls import reverse
 from django.utils import timezone, translation
 from django.utils.html import escape
 
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.core.service_errors import GENERIC_SERVICE_ERROR
 from apps.entry import presentation
 from apps.entry.services import EntryPermissionError, EntryStateError
@@ -43,10 +44,7 @@ def _assert_localized(response, language, *, raw: str, expected) -> None:
 
 
 def _sign_in(client, user, language):
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": user.email_normalized, "password": factories.TEST_PASSWORD},
-    )
+    staff_sign_in(client, user.email_normalized, factories.TEST_PASSWORD)
     client.cookies[settings.LANGUAGE_COOKIE_NAME] = language
 
 

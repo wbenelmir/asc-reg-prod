@@ -9,6 +9,7 @@ import logging
 import pytest
 from django.urls import reverse
 
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.audit.models import AuditEvent
 from apps.entry.models import EntryEvent
 from apps.entry.services.decisions import pending_from_assessment, record_entry_decision
@@ -130,10 +131,7 @@ def test_http_lookup_does_not_log_the_submitted_value(
     factories.add_identifier(
         person=person, identifier_type="NIN", country="DZ", value=SYNTHETIC_NIN
     )
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": operator.email_normalized, "password": factories.TEST_PASSWORD},
-    )
+    staff_sign_in(client, operator.email_normalized, factories.TEST_PASSWORD)
     client.cookies[settings.ENTRY_DEVICE_COOKIE_NAME] = device_and_secret[1]
     client.post(reverse("entry:home"), {"action": "start", "zone_id": str(layout.main.pk)})
     response = client.post(

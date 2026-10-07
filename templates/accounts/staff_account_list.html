@@ -1,0 +1,56 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% comment %}
+  Staff accounts: account status shown separately from what the account can
+  actually do now (effective access). Every action is on the account page
+  and is authorized again by the server.
+{% endcomment %}
+{% block title %}{% trans "Staff accounts" %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <h1>{% trans "Staff accounts" %}</h1>
+      <p>{% trans "Create staff accounts, send single-use setup links, and grant roles within your administration scope." %}</p>
+    </div>
+    <div class="asc-actions-row"><a class="btn btn-primary" href="{% url 'staff_accounts:create' %}">{% trans "New staff account" %}</a></div>
+  </div>
+
+  <form method="get" class="asc-card asc-card-form mb-3" role="search">
+    <div class="asc-form-grid">
+      {% include "components/field.html" with field=form.q wrapper_class="" %}
+      {% include "components/field.html" with field=form.status wrapper_class="" %}
+      {% include "components/field.html" with field=form.role wrapper_class="" %}
+      <div><button type="submit" class="btn btn-outline-primary">{% trans "Filter" %}</button></div>
+    </div>
+  </form>
+
+  <section class="asc-card asc-card-flush" aria-labelledby="staff-list-caption">
+    <div class="asc-card-toolbar">
+      <h2 class="asc-card-toolbar-title" id="staff-list-caption">{% trans "Accounts" %}</h2>
+      <span class="asc-count">{% blocktrans count counter=page.paginator.count %}{{ counter }} account{% plural %}{{ counter }} accounts{% endblocktrans %}</span>
+    </div>
+    {% if page.object_list %}
+      <ul class="asc-records" aria-labelledby="staff-list-caption">
+        {% for account in page.object_list %}
+          <li class="asc-record" data-record data-staff-account="{{ account.pk }}">
+            <div class="asc-record-head">
+              <h3 class="asc-record-title"><bdi>{{ account.display_name|default:account.email_normalized }}</bdi></h3>
+              <p class="asc-record-meta"><bdi dir="ltr">{{ account.email_normalized }}</bdi></p>
+            </div>
+            <dl class="asc-record-fields">
+              <div><dt>{% trans "Account status" %}</dt><dd><span class="asc-chip asc-chip-{{ account.status_tone }}" data-account-status="{{ account.status }}">{{ account.status_label }}</span></dd></div>
+              <div class="asc-record-wide"><dt>{% trans "Effective access" %}</dt><dd data-access="{{ account.access_code }}">{{ account.access_label }}</dd></div>
+              <div class="asc-record-wide"><dt>{% trans "Current roles" %}</dt><dd>{% for role in account.current_roles %}<bdi>{{ role }}</bdi>{% if not forloop.last %} · {% endif %}{% empty %}<span class="asc-muted">{% trans "None" %}</span>{% endfor %}{% if account.has_hidden_roles %} <span class="asc-muted" data-hidden-roles>{% trans "(and roles outside your scope)" %}</span>{% endif %}</dd></div>
+            </dl>
+            <div class="asc-record-actions">
+              <a class="btn btn-outline-primary" href="{% url 'staff_accounts:detail' pk=account.pk %}" data-record-action>{% trans "Open" %}<span class="visually-hidden"> <bdi dir="ltr">{{ account.email_normalized }}</bdi></span></a>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+      {% include "components/pagination.html" with page=page querystring=querystring %}
+    {% else %}
+      <p class="asc-table-empty">{% trans "No account matches these filters." %}</p>
+    {% endif %}
+  </section>
+{% endblock %}

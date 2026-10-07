@@ -12,6 +12,7 @@ import pytest
 from playwright.sync_api import expect
 
 from tests.browser.database import database_call
+from tests.browser.helpers import solve_staff_captcha
 
 pytestmark = pytest.mark.django_db(transaction=True)
 
@@ -63,6 +64,7 @@ def test_generate_and_download_an_export_in_a_real_browser(live_server, page) ->
     page.goto(f"{live_server.url}/accounts/ops/sign-in/")
     page.fill("#id_email", user.email_normalized)
     page.fill("#id_password", TEST_OPERATIONAL_PASSWORD)
+    solve_staff_captcha(page)
     page.locator("#main-content button[type=submit]").click()
     page.wait_for_load_state("networkidle")
 
@@ -138,6 +140,7 @@ def test_communication_status_page_renders_rtl_in_arabic(live_server, page) -> N
     page.goto(f"{live_server.url}/accounts/ops/sign-in/")
     page.fill("#id_email", user.email_normalized)
     page.fill("#id_password", TEST_OPERATIONAL_PASSWORD)
+    solve_staff_captcha(page)
     page.locator("#main-content button[type=submit]").click()
     page.wait_for_load_state("networkidle")
 

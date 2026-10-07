@@ -4,8 +4,8 @@ Privacy Notice and Registration Terms (`privacy.0005`).
 New versions through the established publication mechanism; the previous
 versions, their hashes and the acceptance records that reference them are
 kept; new registrations accept and record exactly the current version they
-were shown; the unconfirmed institutional facts stay identified, never
-invented. Synthetic data only.
+were shown. The owner's general wording (same migration) invents no
+institutional fact. Synthetic data only.
 """
 
 from __future__ import annotations
@@ -45,7 +45,6 @@ class _V3:
 
 V3 = _V3()
 LANGUAGES = ("en", "fr", "ar")
-OWNER_FR_NAME = "Ministère de l'Économie de la Connaissance, des Start-up et des Micro-entreprise"
 
 
 def _current(code, language):
@@ -80,54 +79,75 @@ def test_the_previous_versions_are_retired_never_rewritten(code, language):
     assert v1.status == LegalDocumentVersionStatus.RETIRED
 
 
-@pytest.mark.parametrize("language", LANGUAGES)
-def test_every_substantive_protection_of_v2_is_kept(language):
-    """v3 changes only the banner, the owner-supplied French name and the
-    collection facts in force (photo and passport copy required)."""
-    for code, sections in (("PRIVACY_NOTICE", 12), ("TERMS", 11)):
-        v2_text = V2.CONTENT[(code, language)].split("\n\n", 1)[1]  # without the banner
-        v3_text = V3.CONTENT[(code, language)]
-        assert len(re.findall(r"(?m)^\d+\. ", v3_text)) == sections
-        v2_paragraphs = [p for p in v2_text.split("\n") if p.strip()]
-        v3_paragraphs = [p for p in v3_text.split("\n") if p.strip()]
-        assert len(v2_paragraphs) == len(v3_paragraphs)
-        changed = [new for old, new in zip(v2_paragraphs, v3_paragraphs, strict=True) if old != new]
-        expected = {
-            "PRIVACY_NOTICE": {"en": 2, "fr": 3, "ar": 2},
-            "TERMS": {"en": 0, "fr": 1, "ar": 0},
-        }
-        assert len(changed) == expected[code][language], changed
+# The owner replaced the drafted v3 text with a general wording in the same
+# migration (`privacy.0005` module docstring, 2026-10-04): unresolved factual
+# details are omitted at the owner's request, which "does not establish legal
+# completeness or production readiness". These tests pin that approved
+# wording: what it covers, that it invents no institutional fact, and that the
+# collection facts it states match the rules in force.
+
+_PARAGRAPHS = {"PRIVACY_NOTICE": 8, "TERMS": 7}
 
 
 @pytest.mark.parametrize("language", LANGUAGES)
-def test_the_unconfirmed_facts_stay_identified_and_none_is_invented(language):
+def test_the_general_wording_has_the_same_structure_in_every_language(language):
+    for code, paragraphs in _PARAGRAPHS.items():
+        text = V3.CONTENT[(code, language)]
+        assert len([p for p in text.split("\n\n") if p.strip()]) == paragraphs, (code, language)
+
+
+def test_the_general_wording_covers_the_participant_facing_topics():
+    privacy = V3.CONTENT[("PRIVACY_NOTICE", "en")]
+    for statement in (
+        "collects information needed to manage participation applications",
+        "used to process your application",
+        "limited to authorized personnel",
+        "Required fields are identified in the form",
+        "requires explicit, separate consent",
+        "withdraw this consent from your personal workspace",
+        "Never share your sign-in codes",
+        "does not automatically erase",
+        "Requests concerning your personal data",
+    ):
+        assert statement in privacy, statement
+    terms = V3.CONTENT[("TERMS", "en")]
+    for statement in (
+        "Submitting an application does not confirm admission",
+        "accurate information and legible documents",
+        "do not share your sign-in codes",
+        "reviewed by authorized personnel",
+        "withdraw an active application",
+        "forged documents",
+        "as described in the Privacy Notice",
+    ):
+        assert statement in terms, statement
+
+
+@pytest.mark.parametrize("language", LANGUAGES)
+def test_the_general_wording_invents_no_institutional_fact(language):
+    """No placeholder is left to read as a fact, and no controller address,
+    contact, authority reference or approval is asserted."""
     for code in ("PRIVACY_NOTICE", "TERMS"):
-        v2_markers = MARKER_PATTERN.findall(V2.CONTENT[(code, language)])
-        v3_markers = MARKER_PATTERN.findall(V3.CONTENT[(code, language)])
-        removed = [marker for marker in v2_markers if marker not in v3_markers]
-        assert all(marker in v2_markers for marker in v3_markers)
-        if code == "PRIVACY_NOTICE" and language == "fr":
-            # Only the official French name was supplied (by the owner, 2026-10-04).
-            assert removed == ["[À CONFIRMER : dénomination officielle en français.]"]
-            assert OWNER_FR_NAME in V3.CONTENT[(code, language)]
-        else:
-            assert removed == []
-    assert "approved by the ANPDP" not in V3.CONTENT[("PRIVACY_NOTICE", "en")]
-    blockers = legal_release_blockers()
-    assert {(code, lang) for code, lang, _marker in blockers} == {
-        (code, lang) for code in ("PRIVACY_NOTICE", "TERMS") for lang in LANGUAGES
-    }
+        text = V3.CONTENT[(code, language)]
+        assert MARKER_PATTERN.findall(text) == []
+        assert not re.search(r"[\w.+-]+@[\w-]+\.[\w.]+", text)  # no email address
+        assert not re.search(r"https?://|www\.", text)  # no address of a site
+        assert not re.search(r"\+?\d[\d .-]{7,}\d", text)  # no telephone number
+        for claim in ("ANPDP", "approved by", "approuvé", "18-07", "25-11"):
+            assert claim not in text, (code, language, claim)
+    assert legal_release_blockers() == []
 
 
 def test_the_collection_facts_match_the_rules_in_force():
     english = V3.CONTENT[("PRIVACY_NOTICE", "en")]
-    assert "a profile photograph (required)" in english
+    assert "a photograph and the supporting documents requested in the form" in english
     assert "optional profile photograph" not in english
-    assert "a photo or scan of the passport identity page is required" in english
     assert "only when the event requires it" not in english
-    assert "photo de profil (obligatoire)" in V3.CONTENT[("PRIVACY_NOTICE", "fr")]
-    assert "وصورة شخصية (إلزامية)" in V3.CONTENT[("PRIVACY_NOTICE", "ar")]
-    assert OWNER_FR_NAME in V3.CONTENT[("TERMS", "fr")]
+    assert (
+        "photographie et pièces justificatives demandées dans le formulaire"
+        in (V3.CONTENT[("PRIVACY_NOTICE", "fr")])
+    )
+    assert "والصورة الشخصية والوثائق المطلوبة في الاستمارة" in V3.CONTENT[("PRIVACY_NOTICE", "ar")]
 
 
 @pytest.mark.parametrize("language", LANGUAGES)

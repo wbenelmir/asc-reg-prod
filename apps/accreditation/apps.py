@@ -34,14 +34,36 @@ ACCREDITATION_COORDINATORS_PERMISSIONS: tuple[tuple[str, str], ...] = (
     ("accreditation", "view_bulkassignmentoperation"),
     ("accreditation", "add_bulkassignmentoperation"),
     ("registrations", "view_registration"),
+    # Attendance days are read-only for coordinators (they prepare badges
+    # and passes); classifying or changing them is a decision-maker action.
+    ("accreditation", "view_attendanceentitlement"),
+)
+
+#: Attendance configuration (the three days, the opening-day capacity and the
+#: enforcement switch) is its own capability. No existing group receives it.
+ATTENDANCE_POLICY_MANAGERS_GROUP_NAME = "Attendance Policy Managers"
+ATTENDANCE_POLICY_MANAGERS_PERMISSIONS: tuple[tuple[str, str], ...] = (
+    ("accreditation", "view_attendancepolicy"),
+    ("accreditation", "manage_attendancepolicy"),
+    ("accreditation", "view_attendanceentitlement"),
+    ("registrations", "view_registration"),
+)
+
+#: The decision makers (`apps.reviews.apps`' Accreditation Managers, who hold
+#: `reviews.add_registrationdecision`) choose the attendance days at approval,
+#: so they also classify earlier approvals and change the days later. Added
+#: here, after this app's own permissions exist in a fresh `migrate`.
+ATTENDANCE_DECISION_PERMISSIONS: tuple[tuple[str, str], ...] = (
+    ("accreditation", "view_attendancepolicy"),
+    ("accreditation", "view_attendanceentitlement"),
+    ("accreditation", "change_attendanceentitlement"),
 )
 
 
-def _ensure_accreditation_group(sender, **kwargs):
-    from django.contrib.auth.models import Group, Permission
+def _add_permissions(group, permission_pairs) -> None:
+    from django.contrib.auth.models import Permission
 
-    group, _ = Group.objects.get_or_create(name=ACCREDITATION_COORDINATORS_GROUP_NAME)
-    for app_label, codename in ACCREDITATION_COORDINATORS_PERMISSIONS:
+    for app_label, codename in permission_pairs:
         try:
             permission = Permission.objects.get(
                 content_type__app_label=app_label, codename=codename
@@ -49,6 +71,19 @@ def _ensure_accreditation_group(sender, **kwargs):
         except Permission.DoesNotExist:
             continue
         group.permissions.add(permission)
+
+
+def _ensure_accreditation_group(sender, **kwargs):
+    from django.contrib.auth.models import Group
+
+    from apps.reviews.apps import ACCREDITATION_MANAGERS_GROUP_NAME
+
+    group, _ = Group.objects.get_or_create(name=ACCREDITATION_COORDINATORS_GROUP_NAME)
+    _add_permissions(group, ACCREDITATION_COORDINATORS_PERMISSIONS)
+    group, _ = Group.objects.get_or_create(name=ATTENDANCE_POLICY_MANAGERS_GROUP_NAME)
+    _add_permissions(group, ATTENDANCE_POLICY_MANAGERS_PERMISSIONS)
+    group, _ = Group.objects.get_or_create(name=ACCREDITATION_MANAGERS_GROUP_NAME)
+    _add_permissions(group, ATTENDANCE_DECISION_PERMISSIONS)
 
 
 class AccreditationConfig(AppConfig):

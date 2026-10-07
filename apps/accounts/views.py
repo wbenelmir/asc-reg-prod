@@ -7,6 +7,7 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
+from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
 
 from apps.core import human_check
@@ -14,8 +15,8 @@ from apps.core.concurrency import resolve_request_client_network_identity
 from apps.core.middleware.correlation import get_correlation_id
 from apps.people.services import resolve_or_create_participant_for_email
 
+from . import captcha_guard, participant_auth, session_expiry
 from . import operational_sign_in as sign_in_attempts
-from . import participant_auth, session_expiry
 from .forms import OperationalSignInForm, OtpRequestForm, OtpVerifyForm
 from .models import AuthenticationChallengeChannel
 from .otp import ConsumeOutcome, consume_challenge, issue_challenge
@@ -235,6 +236,7 @@ def _operational_default_destination(user) -> str:
     return operations_home_url(user)
 
 
+@sensitive_post_parameters("password", "captcha_answer")
 @require_http_methods(["GET", "POST"])
 def operational_sign_in(request):
     if request.user.is_authenticated:
@@ -245,7 +247,20 @@ def operational_sign_in(request):
     form = OperationalSignInForm(request.POST or None)
     error_message = None
     status = 200
-    if request.method == "POST" and form.is_valid():
+    captcha_error = None
+    if request.method == "POST":
+        # Staff sign-in image CAPTCHA (apps.accounts.captcha_guard): checked
+        # FIRST and consumed whatever the outcome (one attempt per image). A
+        # refusal never reaches the password check, so it neither signs in nor
+        # counts towards the per-email or per-network sign-in limits; the page
+        # then shows a new image and keeps the typed email.
+        captcha_error = captcha_guard.verify(
+            request.session, request.POST.get("captcha_key"), request.POST.get("captcha_answer")
+        )
+        if captcha_error:
+            form.is_valid()
+            form.add_error("captcha_answer", captcha_guard.MESSAGES[captcha_error])
+    if request.method == "POST" and not captcha_error and form.is_valid():
         # P4-4 (P44-F03): attempt limits per typed email and per network, and
         # an audit event for every outcome (AF-AUTH-03).
         result = sign_in_attempts.attempt_sign_in(
@@ -276,12 +291,70 @@ def operational_sign_in(request):
         else:
             error_message = _("Incorrect email or password.")
 
-    return render(
+    # Every rendered page (first visit or any refusal) gets a fresh
+    # single-use challenge bound to this session -- unless this client network
+    # requested too many images (shared limiter; no row, no session then).
+    captcha = None
+    if captcha_guard.issuance_allowed(resolve_request_client_network_identity(request)):
+        new_session = request.session.is_empty()
+        captcha = captcha_guard.issue(request.session)
+        if new_session:
+            human_check.mark_anonymous_session_short_lived(request.session)
+    else:
+        status = 429
+    response = render(
         request,
         "accounts/operational_sign_in.html",
-        {"form": form, "error_message": error_message},
+        {
+            "form": form,
+            "error_message": error_message,
+            "captcha": captcha,
+            "captcha_error": captcha_guard.MESSAGES.get(captcha_error) if captcha_error else "",
+        },
         status=status,
     )
+    response["Cache-Control"] = "no-store, private"
+    return response
+
+
+@require_http_methods(["GET"])
+def staff_captcha_image(request, key):
+    """The image of one challenge bound to THIS session (only the drawn
+    characters; the answer never leaves the server). Never cached; an unknown,
+    consumed, expired or foreign key answers 410 like the package."""
+    from captcha import views as captcha_views
+    from django.http import HttpResponse
+    from django.utils.cache import add_never_cache_headers
+
+    bound = captcha_guard._bound(request.session)
+    if key not in bound.values():
+        response = HttpResponse(status=410)
+    else:
+        response = captcha_views.captcha_image(request, key, scale=1)
+    add_never_cache_headers(response)
+    return response
+
+
+@require_http_methods(["POST"])
+def staff_captcha_refresh(request):
+    """Replace this session's sign-in challenge (CSRF-protected POST; the
+    sign-in page is anonymous). Answers with the new key and image URL only,
+    never the answer; refused like the page when the network asked for too
+    many images."""
+    from django.http import JsonResponse
+    from django.utils.cache import add_never_cache_headers
+
+    def answer(data, status=200):
+        response = JsonResponse(data, status=status)
+        add_never_cache_headers(response)
+        return response
+
+    if request.POST.get("form") != captcha_guard.STAFF_SIGN_IN:
+        return answer({"error": "INVALID_REQUEST"}, 400)
+    if not captcha_guard.issuance_allowed(resolve_request_client_network_identity(request)):
+        return answer({"error": "TRY_AGAIN_LATER"}, 429)
+    challenge = captcha_guard.issue(request.session)
+    return answer({"key": challenge.key, "image_url": challenge.image_url})
 
 
 @login_required(login_url="accounts:operational-sign-in")

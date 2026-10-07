@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from apps.accounts.models import OperationalUser, OperationalUserStatus, ScopedGroupMembership
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.communications.models import CommunicationChannel, MessageTemplate, MessageTemplateVersion
 from apps.communications.services import queue_communication
 from apps.events.models import EventEdition
@@ -85,10 +86,7 @@ def test_operations_message_view_is_scope_filtered_and_redacts_recipient():
         granted_by=user,
     )
     client = Client()
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": user.email_normalized, "password": PASSWORD},
-    )
+    staff_sign_in(client, user.email_normalized, PASSWORD)
     response = client.get(reverse("communications:operations-messages"))
     content = response.content.decode()
     assert response.status_code == 200

@@ -68,28 +68,6 @@ def _sign_in(page, live_server, person_id: str, language: str = "en") -> None:
 # Footer
 # ---------------------------------------------------------------------------
 
-_LAYOUT = """() => {
-  const block = document.querySelector('[data-footer-institution]');
-  const ministry = block.querySelector('.asc-footer-ministry');
-  const directorate = block.querySelector('.asc-footer-directorate');
-  const container = block.parentElement.getBoundingClientRect();
-  const box = block.getBoundingClientRect();
-  const line = parseFloat(getComputedStyle(ministry).lineHeight);
-  return {
-    overflow: document.documentElement.scrollWidth > window.innerWidth,
-    ministrySize: parseFloat(getComputedStyle(ministry).fontSize),
-    directorateSize: parseFloat(getComputedStyle(directorate).fontSize),
-    ministryLines: Math.round(ministry.getBoundingClientRect().height / line),
-    direction: getComputedStyle(block).direction,
-    font: getComputedStyle(ministry).fontFamily,
-    align: getComputedStyle(ministry).textAlign,
-    pageDirection: getComputedStyle(document.documentElement).direction,
-    rightGap: container.right - box.right,
-    leftGap: box.left - container.left,
-    textRight: Math.max(...Array.from(ministry.getClientRects()).map((r) => r.right)),
-  };
-}"""
-
 
 @pytest.mark.parametrize(
     ("language", "width"),
@@ -97,25 +75,28 @@ _LAYOUT = """() => {
     ids=["arabic-phone", "french-phone", "english-desktop"],
 )
 def test_the_official_footer_is_readable_on_every_screen(live_server, page, language, width):
+    """Version 1.1 UI work package 01 (owner, 2026-10-05) keeps the
+    institutional footer empty (superseding FOOTER-02's two lines): the
+    shared footer still renders, readable, without an institution block."""
     page.set_viewport_size({"width": width, "height": 812})
     page.context.add_cookies(
         [{"name": "django_language", "value": language, "url": live_server.url}]
     )
     page.goto(f"{live_server.url}/accounts/start/")
-    block = page.locator("[data-footer-institution]")
-    expect(block.locator(".asc-footer-ministry")).to_have_text(MINISTRY)
-    expect(block.locator(".asc-footer-directorate")).to_have_text(DIRECTORATE)
-    block.scroll_into_view_if_needed()
-    layout = page.evaluate(_LAYOUT)
+    footer = page.locator("footer.asc-footer")
+    expect(footer).to_be_visible()
+    footer.scroll_into_view_if_needed()
+    assert page.locator("[data-footer-institution]").count() == 0
+    text = footer.inner_text()
+    assert MINISTRY not in text and DIRECTORATE not in text
+    assert footer.locator("a").count() == 0
+    layout = page.evaluate(
+        "() => ({overflow: document.documentElement.scrollWidth > window.innerWidth,"
+        " pageDirection: document.documentElement.dir})"
+    )
     assert layout["overflow"] is False  # no horizontal scrolling
-    assert layout["directorateSize"] < layout["ministrySize"]
-    assert layout["direction"] == "ltr"  # the French lines keep their own order
-    if width == 375:
-        assert layout["ministryLines"] >= 2  # wraps instead of overflowing
-    assert "Thmanyah" not in layout["font"]  # the Arabic font is for Arabic text only
     if language == "ar":
         assert layout["pageDirection"] == "rtl"
-        assert layout["align"] == "right"  # on the Arabic page's reading side
     _shot(page, f"footer-{language}-{width}")
 
 

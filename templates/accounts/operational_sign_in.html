@@ -1,5 +1,5 @@
 {% extends "layouts/base_public.html" %}
-{% load i18n %}
+{% load i18n static %}
 {% block title %}{% trans "Operational sign-in" %}{% endblock %}
 {% block body_attrs %} class="asc-ui asc-public asc-public-ops"{% endblock %}
 {% block brand_url %}{% url 'accounts:operational-sign-in' %}{% endblock %}
@@ -15,19 +15,25 @@
       {% include "components/icon.html" with name="alert-octagon" %}
       <p><bdi>{{ error_message }}</bdi></p>
     </div>
+  {% elif captcha_error %}
+    <div class="asc-notice asc-notice-danger mb-3" role="alert" tabindex="-1" id="error-summary">
+      {% include "components/icon.html" with name="alert-octagon" %}
+      <p><a href="#id_captcha_answer"><bdi>{{ captcha_error }}</bdi></a></p>
+    </div>
   {% endif %}
   <form method="post" novalidate class="asc-auth-card">
     {% csrf_token %}
-    {% for field in form %}
-      {% include "components/field.html" %}
-    {% endfor %}
+    {% include "components/field.html" with field=form.email %}
+    {% include "components/field.html" with field=form.password %}
+    {% include "accounts/_staff_captcha.html" %}
     <button type="submit" class="btn btn-primary asc-btn-lg asc-btn-block">
       <span>{% trans "Sign in" %}</span>{% include "components/icon.html" with name="log-in" flip=True %}
     </button>
   </form>
 {% endblock %}
+{% block auth_aside_art %}{% include "partials/auth_panel_artwork.html" %}{% endblock %}
 {% block auth_aside %}
-  <p class="asc-auth-kicker">{% trans "ASC 2026" %}</p>
+  <p class="asc-auth-kicker"><bdi dir="ltr">{% trans "ASC 2026" %}</bdi> · {% trans "5th edition" %}</p>
   <h2 class="asc-auth-aside-title" id="asc-auth-aside-title">{% trans "Operations" %}</h2>
   <ul class="asc-auth-facts">
     <li>{% include "components/icon.html" with name="shield" %}<span>{% trans "Each area opens only with the permissions assigned to your account." %}</span></li>
@@ -35,3 +41,4 @@
     <li>{% include "components/icon.html" with name="log-out" flip=True %}<span>{% trans "Sign out when you leave a shared device." %}</span></li>
   </ul>
 {% endblock %}
+{% block extra_scripts %}<script src="{% static 'js/asc-captcha.js' %}"></script>{% endblock %}

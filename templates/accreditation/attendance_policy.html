@@ -1,0 +1,115 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% comment %}
+  Attendance settings of one event edition: the three conference days, the
+  opening-day capacity, the counts, the activation checklist and the
+  enforcement switch. Editing and switching need the edition-wide
+  `manage_attendancepolicy` permission (checked again by every command).
+{% endcomment %}
+{% block title %}{% blocktrans with code=event.code %}Attendance days: {{ code }}{% endblocktrans %}{% endblock %}
+{% block breadcrumbs %}{% url 'accreditation:attendance-overview' as list_url %}{% trans "Attendance days" as list_label %}{% include "components/breadcrumb_trail.html" with parent_label=list_label parent_url=list_url current=event.code current_code=True %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Attendance days" %}</p>
+      <h1><bdi>{{ event.name }}</bdi></h1>
+      <p>{% blocktrans with tz=event.timezone %}Days are calendar dates in the event timezone ({{ tz }}). The hours inside each day stay governed by the access profiles and access rules.{% endblocktrans %}</p>
+      <ul class="asc-chip-list mt-2" aria-label="{% trans 'Current state' %}">
+        <li>{% if policy.enforcement_active %}<span class="asc-chip asc-chip-success" data-enforcement="active">{% trans "Admission enforcement active" %}</span>{% else %}<span class="asc-chip asc-chip-info" data-enforcement="inactive">{% trans "Admission enforcement not active" %}</span>{% endif %}</li>
+      </ul>
+    </div>
+    <div class="asc-actions-row">
+      <a class="btn btn-outline-primary" href="{% url 'accreditation:attendance-worklist' event_pk=event.pk %}">{% trans "Approved registrations" %}</a>
+    </div>
+  </div>
+
+  <div class="asc-detail-layout">
+    <div class="asc-detail-main">
+      <section class="asc-card" aria-labelledby="attendance-counts-heading">
+        <h2 class="asc-card-title" id="attendance-counts-heading">{% include "components/icon.html" with name="list" %}{% trans "Approved registrations" %}</h2>
+        <dl class="asc-dl" data-attendance-counts>
+          <dt>{% trans "Conference days" %}</dt>
+          <dd>{% if days %}<ol class="asc-attendance-days">{% for day in days %}<li>{{ day }}</li>{% endfor %}</ol>{% else %}<span class="asc-muted">{% trans "Not configured" %}</span>{% endif %}</dd>
+          <dt>{% trans "Opening-day capacity" %}</dt>
+          <dd>{% if counts.opening_capacity is not None %}<span dir="ltr">{{ counts.opening_capacity }}</span>{% else %}<span class="asc-muted">{% trans "Not configured" %}</span>{% endif %}</dd>
+          <dt>{% trans "Opening-day places allocated" %}</dt>
+          <dd data-count="all-days"><span dir="ltr">{{ counts.all_days }}</span>{% if counts.opening_remaining is not None %} · {% blocktrans with remaining=counts.opening_remaining %}{{ remaining }} left{% endblocktrans %}{% endif %}</dd>
+          <dt>{% trans "Two following days only" %}</dt>
+          <dd data-count="following"><span dir="ltr">{{ counts.following_days }}</span></dd>
+          <dt>{% trans "Not yet classified" %}</dt>
+          <dd data-count="unclassified"><span dir="ltr">{{ counts.unclassified }}</span>{% if counts.unclassified %} · <a href="{% url 'accreditation:attendance-worklist' event_pk=event.pk %}?show=unclassified">{% trans "Classify them" %}</a>{% endif %}</dd>
+          <dt>{% trans "Badge markings to record" %}</dt>
+          <dd data-count="badges"><span dir="ltr">{{ counts.badge_markings_pending }}</span>{% if counts.badge_markings_pending %} · <a href="{% url 'accreditation:attendance-worklist' event_pk=event.pk %}?show=badges">{% trans "Show them" %}</a>{% endif %}</dd>
+        </dl>
+      </section>
+
+      <section class="asc-card" aria-labelledby="attendance-settings-heading">
+        <h2 class="asc-card-title" id="attendance-settings-heading">{% include "components/icon.html" with name="clock" %}{% trans "Days and capacity" %}</h2>
+        {% if can_manage %}
+          {% if suggested_days %}
+            <p class="asc-notice asc-notice-neutral" role="status">{% include "components/icon.html" with name="info" %}<span>{% blocktrans with day1=suggested_days.0 day3=suggested_days.2 %}The event edition's own dates start on {{ day1 }} and include {{ day3 }}. Check the real conference days before saving; nothing is saved until you submit.{% endblocktrans %}</span></p>
+          {% endif %}
+          <form method="post" class="asc-card-form" novalidate>
+            {% csrf_token %}
+            {% include "components/error_summary.html" with form=form %}
+            {{ form.expected_version }}
+            <div class="asc-form-grid">
+              {% include "components/field.html" with field=form.opening_date wrapper_class="" control="ltr" %}
+              {% include "components/field.html" with field=form.second_date wrapper_class="" control="ltr" %}
+              {% include "components/field.html" with field=form.third_date wrapper_class="" control="ltr" %}
+              {% include "components/field.html" with field=form.opening_day_capacity wrapper_class="" control="ltr" %}
+            </div>
+            {% include "components/field.html" with field=form.reason %}
+            <button type="submit" class="btn btn-primary">{% trans "Save the settings" %}</button>
+          </form>
+          <p class="form-text">{% trans "The days cannot change once any registration has attendance days or while enforcement is active. The capacity can never be set below the places already allocated." %}</p>
+        {% else %}
+          <p class="asc-muted mb-0">{% trans "You can read these settings. Changing them needs the attendance policy manager role." %}</p>
+        {% endif %}
+      </section>
+    </div>
+
+    <aside class="asc-detail-aside" aria-label="{% trans 'Admission enforcement' %}">
+      <section class="asc-card asc-action-panel" aria-labelledby="attendance-readiness-heading">
+        <h2 class="asc-card-title" id="attendance-readiness-heading">{% include "components/icon.html" with name="shield" %}{% trans "Admission enforcement" %}</h2>
+        <p class="asc-section-lead">{% trans "When active, admission refuses a participant on a day their approval does not cover, and any participant whose days are not classified." %}</p>
+        <ul class="asc-checklist" data-readiness>
+          {% for row in readiness_rows %}
+            <li data-readiness-item="{{ row.item.code }}" data-ok="{{ row.item.ok|yesno:'true,false' }}">
+              {% if row.item.ok %}{% include "components/icon.html" with name="check-circle" %}{% elif row.item.blocking %}{% include "components/icon.html" with name="x-circle" %}{% else %}{% include "components/icon.html" with name="info" %}{% endif %}
+              <span>{{ row.label }}{% if row.item.count is not None %} (<span dir="ltr">{{ row.item.count }}</span>){% endif %}{% if not row.item.ok and row.item.blocking %} — <strong>{% trans "required" %}</strong>{% endif %}</span>
+            </li>
+          {% endfor %}
+        </ul>
+        {% if can_manage %}
+          {% if policy.enforcement_active %}
+            <form method="post" action="{% url 'accreditation:attendance-deactivate' event_pk=event.pk %}"
+                  data-confirm-title="{% trans 'Switch attendance enforcement off?' %}"
+                  data-confirm="{% trans 'Admission will no longer check the authorized days. Current offline data is revoked. The attendance days and the capacity are kept.' %}"
+                  data-confirm-action="{% trans 'Switch off' %}">
+              {% csrf_token %}
+              {{ deactivation_form.expected_version }}
+              {% include "components/field.html" with field=deactivation_form.reason %}
+              {% include "components/confirm_fallback.html" with id="attendance-deactivate-confirm" %}
+              <button type="submit" class="btn btn-outline-danger asc-btn-block">{% trans "Switch enforcement off" %}</button>
+            </form>
+          {% else %}
+            <form method="post" action="{% url 'accreditation:attendance-activate' event_pk=event.pk %}"
+                  data-confirm-title="{% trans 'Activate attendance enforcement?' %}"
+                  data-confirm="{% trans 'From now on admission checks the authorized days. Current offline data is revoked and devices must download new data.' %}"
+                  data-confirm-action="{% trans 'Activate' %}">
+              {% csrf_token %}
+              {{ activation_form.expected_version }}
+              {% include "components/confirm_fallback.html" with id="attendance-activate-confirm" %}
+              <button type="submit" class="btn btn-primary asc-btn-block"{% if not readiness.ready %} disabled aria-describedby="attendance-not-ready"{% endif %}>{% trans "Activate enforcement" %}</button>
+              {% if not readiness.ready %}<p class="form-text" id="attendance-not-ready">{% trans "Every required item of the checklist must be met first." %}</p>{% endif %}
+            </form>
+          {% endif %}
+        {% endif %}
+        {% if policy.enforcement_activated_at %}
+          <p class="form-text mt-2">{% trans "Last activated" %}{% trans ":" context "label separator" %} <time datetime="{{ policy.enforcement_activated_at|date:'c' }}">{{ policy.enforcement_activated_at }}</time></p>
+        {% endif %}
+      </section>
+    </aside>
+  </div>
+{% endblock %}

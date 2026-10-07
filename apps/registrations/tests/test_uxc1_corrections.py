@@ -30,6 +30,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from apps.accounts.models import OperationalUser, OperationalUserStatus, ScopedGroupMembership
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.core.models import Country, Sector
 from apps.events.models import EventEdition, EventEditionStatus
 from apps.organizations.models import ProfessionalAffiliation
@@ -146,7 +147,7 @@ def _coordinator(email: str, *events) -> OperationalUser:
 
 def _operational_client(email: str) -> Client:
     client = Client()
-    client.post(reverse("accounts:operational-sign-in"), {"email": email, "password": PASSWORD})
+    staff_sign_in(client, email, PASSWORD)
     return client
 
 

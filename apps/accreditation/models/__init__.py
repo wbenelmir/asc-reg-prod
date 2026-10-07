@@ -477,6 +477,242 @@ class AccessRuleAssignment(BaseAssignment):
 
 
 # ---------------------------------------------------------------------------
+# Attendance entitlement (which conference days an approval covers)
+# ---------------------------------------------------------------------------
+
+
+class AttendanceCategory(models.TextChoices):
+    """The two attendance scopes an approval may grant.
+
+    There is deliberately no third member: an approved registration WITHOUT a
+    current `AttendanceEntitlement` is "not yet classified", a state that
+    exists only for registrations approved before entitlements existed and
+    is resolved by an authorized operator. It is never offered as a choice.
+    """
+
+    ALL_CONFERENCE_DAYS = "ALL_CONFERENCE_DAYS", _("All three conference days")
+    FOLLOWING_TWO_DAYS = "FOLLOWING_TWO_DAYS", _("The two days after the opening day")
+
+
+class AttendancePolicy(UUIDPrimaryKeyModel, TimestampedModel, VersionedModel):
+    """The attendance configuration of one Event Edition.
+
+    The three conference days are local calendar dates in the edition's own
+    timezone (`EventEdition.timezone`). The day boundary is the local
+    midnight, the same boundary the offline packages use for their hard
+    expiry; the hours inside a day stay governed by the existing Access
+    Profile and Access Rule windows. Nothing here is guessed: every value is
+    entered by an authorized operator (`manage_attendancepolicy`).
+
+    The opening-day capacity counts approved registrations that hold an
+    `ALL_CONFERENCE_DAYS` entitlement; the count is derived from the
+    entitlement rows, never kept in a counter, so a withdrawal or a change
+    can never release the same place twice. Every command that could add an
+    opening-day place locks this row first (`SELECT ... FOR UPDATE`).
+
+    `enforcement_active` is the controlled switch that makes admission
+    enforce the attendance days. It stays off after deployment and is
+    switched on only through `apps.accreditation.attendance.activate_enforcement`
+    once its prerequisites hold.
+    """
+
+    event_edition = models.OneToOneField(
+        "events.EventEdition", on_delete=models.PROTECT, related_name="attendance_policy"
+    )
+    opening_date = models.DateField(null=True, blank=True)
+    second_date = models.DateField(null=True, blank=True)
+    third_date = models.DateField(null=True, blank=True)
+    opening_day_capacity = models.PositiveIntegerField(null=True, blank=True)
+    enforcement_active = models.BooleanField(default=False)
+    enforcement_activated_at = models.DateTimeField(null=True, blank=True)
+    enforcement_activated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name="+"
+    )
+    enforcement_deactivated_at = models.DateTimeField(null=True, blank=True)
+    enforcement_deactivated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name="+"
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name="+"
+    )
+
+    class Meta:
+        db_table = "accreditation_attendance_policy"
+        permissions = [
+            (
+                "manage_attendancepolicy",
+                "Can configure attendance days, opening-day capacity and enforcement",
+            ),
+        ]
+        constraints = [
+            # All three dates or none, strictly increasing.
+            models.CheckConstraint(
+                condition=models.Q(
+                    opening_date__isnull=True, second_date__isnull=True, third_date__isnull=True
+                )
+                | models.Q(
+                    opening_date__isnull=False,
+                    second_date__isnull=False,
+                    third_date__isnull=False,
+                    second_date__gt=models.F("opening_date"),
+                    third_date__gt=models.F("second_date"),
+                ),
+                name="acc_attpolicy_dates_ordered",
+            ),
+            # Enforcement needs the days and the capacity.
+            models.CheckConstraint(
+                condition=models.Q(enforcement_active=False)
+                | models.Q(
+                    opening_date__isnull=False,
+                    opening_day_capacity__isnull=False,
+                    enforcement_activated_at__isnull=False,
+                ),
+                name="acc_attpolicy_active_requires_configuration",
+            ),
+        ]
+
+    def __str__(self) -> str:  # pragma: no cover - trivial
+        return f"attendance-policy:{self.event_edition_id}"
+
+
+class AttendanceEnforcementIntervalSource(models.TextChoices):
+    RECORDED = "RECORDED", _("Recorded when enforcement was switched on")
+    RECONSTRUCTED = "RECONSTRUCTED", _("Rebuilt from the last recorded switch")
+    UNCERTAIN = "UNCERTAIN", _("Earlier history not recorded (treated as enforced)")
+
+
+class AttendanceEnforcementInterval(UUIDPrimaryKeyModel, TimestampedModel):
+    """One period during which admission enforced the attendance days.
+
+    `started_at` is included, `ended_at` excluded; an open interval has no
+    end. Activation opens one and deactivation closes it, both under the
+    policy row lock, so at most one interval per policy is open. The
+    synchronization service judges an offline operation by the interval that
+    covered its occurrence time, so a later deactivation or reactivation
+    never changes how an earlier operation is judged.
+
+    `UNCERTAIN` rows come only from the migration that introduced this
+    table: when the earlier cycles of a policy had already been overwritten,
+    the unknown period counts as enforced (an operation from that period is
+    judged by the stricter rule, never silently accepted)."""
+
+    policy = models.ForeignKey(
+        AttendancePolicy, on_delete=models.PROTECT, related_name="enforcement_intervals"
+    )
+    started_at = models.DateTimeField()
+    started_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name="+"
+    )
+    ended_at = models.DateTimeField(null=True, blank=True)
+    ended_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name="+"
+    )
+    source = models.CharField(
+        max_length=16,
+        choices=AttendanceEnforcementIntervalSource.choices,
+        default=AttendanceEnforcementIntervalSource.RECORDED,
+    )
+
+    class Meta:
+        db_table = "accreditation_attendance_enforcement_interval"
+        ordering = ["started_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["policy"],
+                condition=models.Q(ended_at__isnull=True),
+                name="acc_attenf_one_open_per_policy",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(ended_at__isnull=True)
+                | models.Q(ended_at__gt=models.F("started_at")),
+                name="acc_attenf_end_after_start",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["policy", "started_at"], name="acc_attenf_policy_start_idx")
+        ]
+
+    def __str__(self) -> str:  # pragma: no cover - trivial
+        return f"attendance-enforcement:{self.policy_id}:{self.started_at:%Y-%m-%dT%H:%M}"
+
+
+class AttendanceEntitlementStatus(models.TextChoices):
+    CURRENT = "CURRENT", _("Current")
+    SUPERSEDED = "SUPERSEDED", _("Superseded")
+
+
+class AttendanceEntitlementOrigin(models.TextChoices):
+    APPROVAL = "APPROVAL", _("Chosen at approval")
+    LEGACY_CLASSIFICATION = "LEGACY_CLASSIFICATION", _("Classification of an earlier approval")
+    CHANGE = "CHANGE", _("Change after approval")
+
+
+class AttendanceEntitlement(UUIDPrimaryKeyModel, TimestampedModel):
+    """The attendance days one Registration Context is authorized for.
+
+    Kept distinct from the participant role, the badge type, the access
+    profile and staff permissions: it narrows WHICH DAYS the existing
+    accreditation may be used, and never widens it. Append-only history: a
+    change supersedes the current row (`status`, `effective_until`) and
+    creates a new one pointing back to it; nothing is overwritten or deleted.
+    One CURRENT row per registration at most (partial unique constraint).
+    """
+
+    registration = models.ForeignKey(
+        "registrations.Registration",
+        on_delete=models.PROTECT,
+        related_name="attendance_entitlements",
+    )
+    event_edition = models.ForeignKey(
+        "events.EventEdition", on_delete=models.PROTECT, related_name="+"
+    )
+    category = models.CharField(max_length=24, choices=AttendanceCategory.choices)
+    status = models.CharField(
+        max_length=16,
+        choices=AttendanceEntitlementStatus.choices,
+        default=AttendanceEntitlementStatus.CURRENT,
+    )
+    origin = models.CharField(max_length=24, choices=AttendanceEntitlementOrigin.choices)
+    effective_from = models.DateTimeField()
+    effective_until = models.DateTimeField(null=True, blank=True)
+    reason = models.CharField(max_length=300, blank=True, default="")
+    decided_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+"
+    )
+    #: The `reviews.RegistrationDecision` an approval-time entitlement was
+    #: recorded with (an id, not a foreign key: `reviews` already depends on
+    #: this app, and the decision history is never deleted).
+    decision_id = models.UUIDField(null=True, blank=True)
+    supersedes = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.PROTECT, related_name="superseded_by"
+    )
+
+    class Meta:
+        db_table = "accreditation_attendance_entitlement"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["registration"],
+                condition=models.Q(status=AttendanceEntitlementStatus.CURRENT),
+                name="acc_attendance_one_current_uq",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(effective_until__isnull=True)
+                | models.Q(effective_until__gte=models.F("effective_from")),
+                name="acc_attendance_valid_range",
+            ),
+        ]
+        indexes = [
+            models.Index(
+                fields=["event_edition", "status", "category"], name="acc_attendance_event_idx"
+            ),
+            models.Index(fields=["registration", "status"], name="acc_attendance_reg_idx"),
+        ]
+
+    def __str__(self) -> str:  # pragma: no cover - trivial
+        return f"attendance:{self.registration_id}:{self.category}:{self.status}"
+
+
+# ---------------------------------------------------------------------------
 # Bulk operations (preview -> execute, idempotent, fully audited)
 # ---------------------------------------------------------------------------
 

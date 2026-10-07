@@ -25,7 +25,7 @@ import pytest
 from playwright.sync_api import expect
 
 from tests.browser.database import database_call
-from tests.browser.helpers import fill_date
+from tests.browser.helpers import fill_date, solve_staff_captcha
 
 pytestmark = pytest.mark.django_db(transaction=True)
 
@@ -71,6 +71,7 @@ def _sign_in(page, live_server, email: str) -> None:
     page.goto(f"{live_server.url}/accounts/ops/sign-in/")
     page.fill("#id_email", email)
     page.fill("#id_password", PASSWORD)
+    solve_staff_captcha(page)
     page.locator("#main-content button[type=submit]").click()
     page.wait_for_load_state("networkidle")
 

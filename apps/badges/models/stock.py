@@ -383,6 +383,20 @@ class BadgeIssuance(UUIDPrimaryKeyModel, TimestampedModel, VersionedModel):
         settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
     )
 
+    #: The attendance marking (sticker, overlay or print variant) the issuing
+    #: operator confirmed on THIS physical badge: one of
+    #: `accreditation.AttendanceCategory`, or blank while none was recorded.
+    #: The generic stock is per Badge Type, so the attendance days are never
+    #: inferred from the Badge Type; they are recorded explicitly and must
+    #: equal the registration's current attendance entitlement
+    #: (`apps.badges.services.stock.record_attendance_marking`).
+    #: `db_default` keeps inserts by a release without this column valid.
+    attendance_marking = models.CharField(max_length=24, blank=True, default="", db_default="")
+    attendance_marking_recorded_at = models.DateTimeField(null=True, blank=True)
+    attendance_marking_recorded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )
+
     #: Replacement chain, mirroring `DigitalEntryPass.replaced_by` exactly:
     #: the outgoing issuance points forward to its replacement once one
     #: exists; the replacement is never created before the outgoing row is

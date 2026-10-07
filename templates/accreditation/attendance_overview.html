@@ -1,0 +1,43 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% comment %}
+  Attendance: the event editions whose attendance days this operator may
+  open. Each page re-checks permission and scope on the server.
+{% endcomment %}
+{% block title %}{% trans "Attendance days" %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <h1>{% trans "Attendance days" %}</h1>
+      <p>{% trans "Which conference days each approval covers: all three days, or only the two days after the opening day. Opening-day places are limited." %}</p>
+    </div>
+  </div>
+
+  <section class="asc-card asc-card-flush" aria-labelledby="attendance-events-caption">
+    <div class="asc-card-toolbar">
+      <h2 class="asc-card-toolbar-title" id="attendance-events-caption">{% trans "Events in your scope" %}</h2>
+    </div>
+    {% if rows %}
+      <ul class="asc-records" aria-labelledby="attendance-events-caption">
+        {% for row in rows %}
+          <li class="asc-record" data-record data-attendance-event="{{ row.event.code }}">
+            <div class="asc-record-head">
+              <h3 class="asc-record-title"><bdi>{{ row.event.name }}</bdi></h3>
+              <p class="asc-record-meta">{% trans "Event edition" %}{% trans ":" context "label separator" %} <bdi dir="ltr" class="asc-code">{{ row.event.code }}</bdi></p>
+            </div>
+            <dl class="asc-record-fields">
+              <div><dt>{% trans "Configuration" %}</dt><dd>{% if row.configured %}<span class="asc-chip asc-chip-success">{% trans "Days and capacity configured" %}</span>{% else %}<span class="asc-chip asc-chip-warning">{% trans "Not configured" %}</span>{% endif %}</dd></div>
+              <div><dt>{% trans "Admission enforcement" %}</dt><dd>{% if row.enforcement_active %}<span class="asc-chip asc-chip-success">{% trans "Active" %}</span>{% else %}<span class="asc-chip asc-chip-info">{% trans "Not active" %}</span>{% endif %}</dd></div>
+            </dl>
+            <div class="asc-record-actions">
+              <a class="btn btn-outline-primary" href="{% url 'accreditation:attendance-worklist' event_pk=row.event.pk %}" data-record-action>{% trans "Approved registrations" %}<span class="visually-hidden"> <bdi dir="ltr">{{ row.event.code }}</bdi></span></a>
+              {% if row.can_view_policy %}<a class="btn btn-outline-secondary" href="{% url 'accreditation:attendance-policy' event_pk=row.event.pk %}">{% trans "Days, capacity and enforcement" %}<span class="visually-hidden"> <bdi dir="ltr">{{ row.event.code }}</bdi></span></a>{% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="asc-table-empty">{% trans "No event is in your scope." %}</p>
+    {% endif %}
+  </section>
+{% endblock %}

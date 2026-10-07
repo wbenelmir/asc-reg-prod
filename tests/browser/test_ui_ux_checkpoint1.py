@@ -25,7 +25,13 @@ from playwright.sync_api import expect
 
 from apps.accounts.otp import DeterministicTestOtpGenerator
 from tests.browser.database import database_call, database_sync
-from tests.browser.helpers import fill_date, read_date, select_choice, switch_language
+from tests.browser.helpers import (
+    fill_date,
+    read_date,
+    select_choice,
+    solve_staff_captcha,
+    switch_language,
+)
 from tests.browser.test_entry_ui_prompt5 import CONTRAST_JS
 
 pytestmark = pytest.mark.django_db(transaction=True)
@@ -139,6 +145,7 @@ def _sign_in_operational(live_server, page, user) -> None:
     page.goto(f"{live_server.url}/accounts/ops/sign-in/")
     page.fill("#id_email", user.email_normalized)
     page.fill("#id_password", OPS_PASSWORD)
+    solve_staff_captcha(page)
     page.locator("#main-content button[type=submit]").click()
     page.wait_for_url("**/ops/registrations/**")
 
@@ -268,6 +275,7 @@ def test_public_and_sign_in_pages_evidence(live_server, page) -> None:
     _capture(page, "auth-04-ops-sign-in-en-desktop.png", "en", DESKTOP)
     page.fill("#id_email", "nobody@example.test")
     page.fill("#id_password", "not-the-password")
+    solve_staff_captcha(page)
     page.locator("#main-content button[type=submit]").click()
     expect(page.locator("#error-summary")).to_be_visible()
     _capture(page, "auth-04-ops-sign-in-error-en-mobile.png", "en", MOBILE)

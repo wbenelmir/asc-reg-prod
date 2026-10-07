@@ -40,6 +40,10 @@ def _grant_required_assignments(*, registration, event, actor):
     from apps.people.tests.identity_fixtures import make_verified_identity_case
 
     make_verified_identity_case(registration)
+    # Approval also needs the event's attendance days and opening-day capacity.
+    from apps.accreditation.tests.attendance_fixtures import configure_attendance
+
+    configure_attendance(event)
 
 
 def test_queue_list_requires_sign_in():
@@ -260,7 +264,7 @@ def test_approve_decision_succeeds_for_an_authorized_reviewer(event, organizatio
 
     response = client.post(
         reverse("reviews:case-decision-approve", kwargs={"pk": case.pk}),
-        {"expected_version": registration.version},
+        {"expected_version": registration.version, "attendance_category": "FOLLOWING_TWO_DAYS"},
     )
 
     assert response.status_code == 302
@@ -293,7 +297,7 @@ def test_approve_decision_creates_immutable_decision_history_and_audit_evidence(
 
     client.post(
         reverse("reviews:case-decision-approve", kwargs={"pk": case.pk}),
-        {"expected_version": registration.version},
+        {"expected_version": registration.version, "attendance_category": "FOLLOWING_TWO_DAYS"},
     )
 
     decisions = RegistrationDecision.objects.filter(registration=registration)
@@ -328,7 +332,7 @@ def test_approve_decision_blocked_without_required_assignments(event, organizati
 
     response = client.post(
         reverse("reviews:case-decision-approve", kwargs={"pk": case.pk}),
-        {"expected_version": registration.version},
+        {"expected_version": registration.version, "attendance_category": "FOLLOWING_TWO_DAYS"},
         follow=True,
     )
 
@@ -357,7 +361,7 @@ def test_approve_decision_denied_for_a_user_with_only_view_scope(event, organiza
 
     response = client.post(
         reverse("reviews:case-decision-approve", kwargs={"pk": case.pk}),
-        {"expected_version": registration.version},
+        {"expected_version": registration.version, "attendance_category": "FOLLOWING_TWO_DAYS"},
     )
 
     # Signed in without the permission: the 403 page, never a sign-in
@@ -387,7 +391,7 @@ def test_approve_decision_denied_for_wrong_event_scope(event, other_event, organ
 
     response = client.post(
         reverse("reviews:case-decision-approve", kwargs={"pk": case.pk}),
-        {"expected_version": registration.version},
+        {"expected_version": registration.version, "attendance_category": "FOLLOWING_TWO_DAYS"},
     )
 
     assert response.status_code == 404
@@ -415,7 +419,7 @@ def test_approve_decision_denied_for_wrong_organization_scope(
 
     response = client.post(
         reverse("reviews:case-decision-approve", kwargs={"pk": case.pk}),
-        {"expected_version": registration.version},
+        {"expected_version": registration.version, "attendance_category": "FOLLOWING_TWO_DAYS"},
     )
 
     assert response.status_code == 404
@@ -504,6 +508,7 @@ def test_approve_decision_ignores_unapproved_participant_reason_input(event, org
         reverse("reviews:case-decision-approve", kwargs={"pk": case.pk}),
         {
             "expected_version": registration.version,
+            "attendance_category": "FOLLOWING_TWO_DAYS",
             "participant_reason_code": "CALLER_CONTROLLED",
         },
     )
@@ -534,7 +539,7 @@ def test_approve_decision_resubmission_with_current_version_does_not_duplicate_d
 
     first = client.post(
         reverse("reviews:case-decision-approve", kwargs={"pk": case.pk}),
-        {"expected_version": registration.version},
+        {"expected_version": registration.version, "attendance_category": "FOLLOWING_TWO_DAYS"},
     )
     assert first.status_code == 302
     registration.refresh_from_db()
@@ -543,7 +548,7 @@ def test_approve_decision_resubmission_with_current_version_does_not_duplicate_d
     # version must be an idempotent no-op -- never a second current decision.
     second = client.post(
         reverse("reviews:case-decision-approve", kwargs={"pk": case.pk}),
-        {"expected_version": registration.version},
+        {"expected_version": registration.version, "attendance_category": "FOLLOWING_TWO_DAYS"},
     )
     assert second.status_code == 302
     assert RegistrationDecision.objects.filter(registration=registration).count() == 1

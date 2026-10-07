@@ -13,6 +13,7 @@ from datetime import timedelta
 from unittest.mock import patch
 
 import pytest
+from django.contrib.auth import SESSION_KEY
 from django.db import connection
 from django.test import Client
 from django.urls import reverse
@@ -20,6 +21,7 @@ from django.utils import timezone
 
 from apps.accounts import operational_sign_in
 from apps.accounts.models import OperationalUser, OperationalUserStatus
+from apps.accounts.tests.sign_in import captcha_answer, staff_sign_in
 from apps.audit import action_codes
 from apps.audit.models import AuditEvent
 
@@ -40,7 +42,7 @@ def staff(db):
 
 
 def _post(email, password, *, address="198.51.100.10"):
-    return Client(REMOTE_ADDR=address).post(SIGN_IN, {"email": email, "password": password})
+    return staff_sign_in(Client(REMOTE_ADDR=address), email, password)
 
 
 def _codes():
@@ -81,11 +83,14 @@ def test_the_email_budget_refuses_without_checking_the_password(staff, settings)
     for _ in range(3):
         assert _post(EMAIL, WRONG).status_code == 200
 
+    clients = [Client(REMOTE_ADDR="198.51.100.10") for _ in range(4)]
     with patch("apps.accounts.operational_sign_in.authenticate") as checked:
-        refused = [_post(EMAIL, GOOD) for _ in range(4)]
+        refused = [staff_sign_in(client, EMAIL, GOOD) for client in clients]
     checked.assert_not_called()
     assert {r.status_code for r in refused} == {429}
-    assert "sessionid" not in refused[0].cookies
+    # No authenticated session for a refused attempt. (The page itself keeps an
+    # anonymous, short-lived session for its security image.)
+    assert all(SESSION_KEY not in client.session for client in clients)
     assert b"Too many sign-in attempts" in refused[0].content
     # One throttle event per email and window, however long the burst.
     assert _codes() == [FAILED] * 3 + [THROTTLED]
@@ -178,8 +183,12 @@ def test_an_inactive_account_fails_like_a_wrong_password(staff):
 def test_the_refusal_is_translated(staff, settings, language, text):
     settings.OPERATIONAL_SIGN_IN_MAX_FAILURES_PER_EMAIL = 1
     _post(EMAIL, WRONG)
-    response = Client(REMOTE_ADDR="198.51.100.10").post(
-        SIGN_IN, {"email": EMAIL, "password": WRONG}, HTTP_ACCEPT_LANGUAGE=language
+    client = Client(REMOTE_ADDR="198.51.100.10")
+    client.get(SIGN_IN)
+    response = client.post(
+        SIGN_IN,
+        {"email": EMAIL, "password": WRONG, **captcha_answer(client)},
+        HTTP_ACCEPT_LANGUAGE=language,
     )
     assert response.status_code == 429
     assert text in response.content.decode()
@@ -198,8 +207,10 @@ def test_the_email_budget_is_exact_under_concurrency(settings):
     def attempt(index):
         try:
             client = Client(REMOTE_ADDR=f"198.51.100.{20 + index}")
+            client.get(SIGN_IN)  # issues this client's security image
+            data = {"email": EMAIL, "password": WRONG, **captcha_answer(client)}
             barrier.wait(timeout=15)
-            return client.post(SIGN_IN, {"email": EMAIL, "password": WRONG}).status_code
+            return client.post(SIGN_IN, data).status_code
         finally:
             connection.close()
 

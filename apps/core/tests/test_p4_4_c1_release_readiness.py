@@ -26,10 +26,10 @@ from django.core.checks import run_checks
 from django.core.management import CommandError, call_command
 from django.db import OperationalError
 from django.test import Client
-from django.urls import reverse
 
 from apps.accounts import mfa
 from apps.accounts.models import OperationalUser, OperationalUserStatus
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.core import issuance_counter, release_readiness
 from apps.core.release_readiness import BLOCKED, NOT_ASSESSED, READY
 from apps.privacy import checks as privacy_checks
@@ -96,9 +96,7 @@ def test_the_mfa_fact_agrees_with_the_actual_sign_in_behaviour() -> None:
         email=STAFF_EMAIL, password=GOOD, status=OperationalUserStatus.ACTIVE
     )
     client = Client(REMOTE_ADDR="198.51.100.77")
-    response = client.post(
-        reverse("accounts:operational-sign-in"), {"email": STAFF_EMAIL, "password": GOOD}
-    )
+    response = staff_sign_in(client, STAFF_EMAIL, GOOD)
     assert response.status_code == 302
     password_alone_creates_a_session = SESSION_KEY in client.session
     assert mfa.OPERATIONAL_SIGN_IN_MFA_ENFORCED is (not password_alone_creates_a_session)
@@ -151,11 +149,17 @@ def test_an_enforcement_flag_without_a_loadable_provider_is_still_blocked(
 # ---------------------------------------------------------------------------
 
 
-def test_the_seeded_draft_notices_are_unresolved_legal_facts() -> None:
-    """The published drafts carry [TO BE CONFIRMED: ...] markers (C-09)."""
-    item = _items(release_readiness.assess_release_readiness())["legal_notices"]
-    assert item.status == BLOCKED
-    assert item.reasons and all("unresolved item(s) in" in reason for reason in item.reasons)
+def test_the_owner_general_wording_leaves_no_marker_and_claims_nothing_more() -> None:
+    """The owner's v3 general wording (`privacy.0005`) omits the unresolved
+    facts instead of marking them (C-09). The item then states only that no
+    marker remains -- never a legal approval -- and release stays blocked by
+    the other unresolved facts (retention, OD-007)."""
+    report = release_readiness.assess_release_readiness()
+    item = _items(report)["legal_notices"]
+    assert item.status == READY
+    assert list(item.reasons) == ["no unresolved marker in the effective published notices"]
+    assert _items(report)["retention"].status == BLOCKED
+    assert report.overall == BLOCKED
 
 
 def test_legal_reasons_are_counts_never_marker_content(monkeypatch) -> None:

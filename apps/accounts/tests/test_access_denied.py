@@ -24,6 +24,7 @@ from django.test import Client
 from django.urls import reverse
 
 from apps.accounts.models import OperationalUser, OperationalUserStatus, ScopedGroupMembership
+from apps.accounts.tests.sign_in import staff_sign_in
 
 pytestmark = pytest.mark.django_db
 
@@ -48,8 +49,7 @@ def _user(email: str, *permissions: str) -> OperationalUser:
 
 def _sign_in(user: OperationalUser, *, next_url: str | None = None) -> tuple[Client, object]:
     client = Client()
-    url = SIGN_IN if next_url is None else f"{SIGN_IN}?next={next_url}"
-    response = client.post(url, {"email": user.email_normalized, "password": PASSWORD})
+    response = staff_sign_in(client, user.email_normalized, PASSWORD, next_url=next_url)
     assert response.status_code == 302
     return client, response
 
@@ -259,9 +259,7 @@ def test_next_to_a_refused_area_ends_on_403_without_a_loop() -> None:
 def test_unsafe_next_falls_back_to_the_first_permitted_area(unsafe_next) -> None:
     user = _user(f"f3-unsafe-{uuid.uuid4().hex[:8]}@example.test", "reviews.view_reviewcase")
     client = Client()
-    response = client.post(
-        SIGN_IN, {"email": user.email_normalized, "password": PASSWORD, "next": unsafe_next}
-    )
+    response = staff_sign_in(client, user.email_normalized, PASSWORD, next=unsafe_next)
     assert response.status_code == 302
     assert response["Location"] == reverse("reviews:queue-list")
 

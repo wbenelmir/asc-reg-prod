@@ -276,6 +276,12 @@ def case_detail(request, pk):
         from apps.people.selectors.clearance import identity_clearance
 
         context["identity_clearance"] = identity_clearance(registration.pk)
+        context["attendance_choice"] = _attendance_choice_context(registration)
+    # The current attendance days of an approved registration, beside its
+    # status (the decision panel above chooses them for a new approval).
+    from apps.accreditation import attendance
+
+    context["attendance_entitlement"] = attendance.current_entitlement(registration.pk)
     if context["can_assign"]:
         context["assignment_form"] = AssignmentForm(
             assignees=eligible_review_assignees(case),
@@ -291,6 +297,30 @@ def case_detail(request, pk):
     if context["can_add_checklist"]:
         context["checklist_item_choices"] = _checklist_item_choices(case)
     return render(request, "reviews/case_detail.html", context)
+
+
+def _attendance_choice_context(registration) -> dict:
+    """What the approval panel needs to explain both attendance choices with
+    the real dates and the opening-day places left. Display only: the
+    service re-checks everything under the policy lock."""
+    from apps.accreditation import attendance
+
+    policy = attendance.policy_for(registration.event_edition_id)
+    if not attendance.is_configured(policy):
+        return {"configured": False}
+    counts = attendance.attendance_counts(registration.event_edition_id, policy)
+    opening, second, third = (
+        attendance.format_day(day) for day in attendance.conference_days(policy)
+    )
+    return {
+        "configured": True,
+        "opening_day": opening,
+        "second_day": second,
+        "third_day": third,
+        "capacity": policy.opening_day_capacity,
+        "allocated": counts.all_days,
+        "remaining": counts.opening_remaining,
+    }
 
 
 def _checklist_item_choices(case) -> list[tuple[str, str]]:
@@ -631,19 +661,30 @@ def case_decision_approve(request, pk):
     """
     case = _get_scoped_case_or_404(request, pk, codename="add_registrationdecision")
     form = ApprovedDecisionForm(request.POST)
-    if not form.is_valid():
+    if not form.is_valid() and "expected_version" in form.errors:
         return _conflict_response(
             request, _("Invalid approval request. Reload the case and try again.")
         )
+    # An absent or unknown attendance choice reaches the service as None and
+    # is refused there (audited), never defaulted.
+    attendance_category = (form.cleaned_data or {}).get("attendance_category") or None
+    from apps.accreditation.attendance import AttendanceError
+
     try:
         record_approved_decision(
             registration=case.registration,
             expected_version=form.cleaned_data["expected_version"],
             decided_by=request.user,
+            attendance_category=attendance_category,
             participant_reason_code="",
         )
     except StaleVersionError, InvalidStateTransitionError:
         return _conflict_response(request, _("This registration changed since you loaded it."))
+    except AttendanceError as refusal:
+        from apps.accreditation.presentation import attendance_error_message
+
+        messages.error(request, attendance_error_message(refusal))
+        return redirect("reviews:case-detail", pk=case.pk)
     except ApprovalRequiresAssignmentsError:
         messages.error(
             request,

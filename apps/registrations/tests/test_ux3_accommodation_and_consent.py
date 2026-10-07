@@ -16,6 +16,7 @@ from django.utils import timezone
 
 from apps.accounts import participant_auth
 from apps.accounts.models import OperationalUser, OperationalUserStatus, ScopedGroupMembership
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.audit.models import AuditEvent
 from apps.core.models import Country, Sector
 from apps.events.models import EventEdition, EventEditionStatus
@@ -328,7 +329,7 @@ def test_only_the_support_group_sees_accommodation_requests(submitted_with_suppo
 
 def _signed_in(email):
     client = Client()
-    client.post(reverse("accounts:operational-sign-in"), {"email": email, "password": PASSWORD})
+    staff_sign_in(client, email, PASSWORD)
     return client
 
 
@@ -466,13 +467,14 @@ def test_the_withdraw_url_is_scoped_to_the_signed_in_participant(submitted_with_
 @pytest.mark.parametrize("language", ["en", "fr", "ar"])
 def test_complete_official_notices_are_effective_in_every_language(language) -> None:
     # Owner correction (2026-10-04): the official v3 versions (privacy.0005)
-    # replaced the complete v2 drafts, with the same twelve sections.
+    # replaced the v2 drafts. The owner then chose a general wording of eight
+    # paragraphs (privacy.0005 module docstring), which omits the unresolved
+    # facts and the statute references; it does not claim legal completeness.
     for code in ("PRIVACY_NOTICE", "TERMS"):
         version = effective_published_version(code, language)
         assert version.version_label == "v3"
     privacy = effective_published_version("PRIVACY_NOTICE", language).content
-    assert "18-07" in privacy and "25-11" in privacy
-    assert privacy.count("\n\n") >= 11  # twelve sections
+    assert privacy.count("\n\n") >= 7  # eight paragraphs
 
 
 def test_the_replaced_versions_are_retired_not_rewritten() -> None:
@@ -483,16 +485,16 @@ def test_the_replaced_versions_are_retired_not_rewritten() -> None:
     assert all("[DRAFT -- pending Legal review]" in v.content or v.language != "en" for v in old)
 
 
-def test_no_approval_is_claimed_and_markers_block_release() -> None:
-    blockers = legal_release_blockers()
-    assert blockers, "unconfirmed institutional facts must stay visible as blockers"
-    codes = {code for code, _language, _marker in blockers}
-    assert codes == {"PRIVACY_NOTICE", "TERMS"}
+def test_no_approval_is_claimed_and_the_general_wording_leaves_no_marker() -> None:
+    # The owner's general wording omits the unresolved facts instead of marking
+    # them, so no marker blocks release any more; the retention blocker
+    # (privacy.W002) still does, and nothing claims an approval.
+    assert legal_release_blockers() == []
     english = effective_published_version("PRIVACY_NOTICE", "en").content
-    # The official v3 text carries no draft banner, and still claims no approval.
-    assert "approved by the ANPDP" not in english
-    assert "[TO BE CONFIRMED: ANPDP receipt or authorization reference]" in english
-    assert "privacy.W001" in {m.id for m in run_checks(databases=["default"])}
+    assert "approved by the ANPDP" not in english and "[TO BE CONFIRMED" not in english
+    messages = {m.id for m in run_checks(databases=["default"])}
+    assert "privacy.W001" not in messages
+    assert "privacy.W002" in messages
 
 
 def test_consent_purposes_are_localized() -> None:

@@ -33,6 +33,7 @@ dependencies = [
     { name = "celery" },
     { name = "cryptography" },
     { name = "django" },
+    { name = "django-simple-captcha" },
     { name = "django-storages", extra = ["s3"] },
     { name = "djangorestframework" },
     { name = "joserfc" },
@@ -62,6 +63,7 @@ requires-dist = [
     { name = "celery", specifier = ">=5.6.3,<6" },
     { name = "cryptography", specifier = ">=50.0.1,<51" },
     { name = "django", specifier = ">=5.2.17,<5.3" },
+    { name = "django-simple-captcha", specifier = ">=0.7.0,<0.8" },
     { name = "django-storages", extras = ["s3"], specifier = ">=1.14.6,<2" },
     { name = "djangorestframework", specifier = ">=3.16.1,<4" },
     { name = "joserfc", specifier = ">=1.7.5,<2" },
@@ -425,6 +427,29 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/d5/d8/43e9d000519adceb189620b6869ff88031e046df91c2e9da72f8f6918399/django-5.2.17.tar.gz", hash = "sha256:9d4d93be539a18ab80d058eb515900e10951e04c537c5a6b394fc49528d3251f", size = 10889740, upload-time = "2026-08-04T15:04:03.173Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/df/f8/ce120525ca78f12b07daf65786679c5d0b54a75285a8958d3ae55e39da35/django-5.2.17-py3-none-any.whl", hash = "sha256:f04fb3b36ee119e1af4fa1d397d5fd6cf12700f49321e84d4f4c642c5b1973db", size = 8315563, upload-time = "2026-08-04T15:03:59.1Z" },
+]
+
+[[package]]
+name = "django-ranged-response"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/70/e3/9372fcdca8e9c3205e7979528ccd1a14354a9a24d38efff11c1846ff8bf1/django-ranged-response-0.2.0.tar.gz", hash = "sha256:f71fff352a37316b9bead717fc76e4ddd6c9b99c4680cdf4783b9755af1cf985", size = 3021, upload-time = "2017-07-18T09:20:27.603Z" }
+
+[[package]]
+name = "django-simple-captcha"
+version = "0.7.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "django-ranged-response" },
+    { name = "pillow" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/5d/13/ce4ec095305ab1c78db0f728359cc47d3f3c1c3f706f2240dc125fba5b4d/django_simple_captcha-0.7.0.tar.gz", hash = "sha256:f2a9178d04667ebc32481ffbfbe405ec1ae4c2d30f4d2975a7e0a8de26261c1f", size = 127439, upload-time = "2026-07-30T08:38:48.532Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6d/b8/70be62610237fb307acb24b0946ff77f29e1cab58c840cfac4047a33ca96/django_simple_captcha-0.7.0-py2.py3-none-any.whl", hash = "sha256:44ee1fbdcfba2a7ab870ebf57c19d9dd8e81614b3afafb2e5689044bab9c9e0e", size = 95300, upload-time = "2026-07-30T08:38:46.29Z" },
 ]
 
 [[package]]

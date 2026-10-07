@@ -21,7 +21,19 @@
 {% elif registration.public_status == "APPROVED" %}
   <div class="asc-notice asc-notice-success asc-registration-guidance" data-registration-guidance="APPROVED">
     {% include "components/icon.html" with name="check-circle" %}
-    <div><p class="asc-registration-guidance-title"><strong>{% trans "Your participation has been approved" %}</strong></p><p>{% trans "Check your workspace and email for your invitation and attendance instructions. Approval does not mean an invitation has already been sent." %}</p></div>
+    <div><p class="asc-registration-guidance-title"><strong>{% trans "Your participation has been approved" %}</strong></p>
+      {% if registration.attendance %}
+        {# The authorized conference days, in words and dates (apps.accreditation.attendance). #}
+        <div class="asc-attendance" data-attendance="{{ registration.attendance.state }}">
+          <p class="asc-attendance-statement"><bdi>{{ registration.attendance.statement }}</bdi></p>
+          {% if not registration.attendance.is_pending %}
+            <p class="asc-attendance-label"><strong>{% trans "Authorized days" %}{% trans ":" context "label separator" %}</strong></p>
+            <ul class="asc-attendance-days">{% for day in registration.attendance.days %}<li>{{ day }}</li>{% endfor %}</ul>
+            {% if registration.attendance.excluded_day %}<p class="asc-attendance-excluded"><strong>{% trans "Not included" %}{% trans ":" context "label separator" %}</strong> {% blocktrans with day=registration.attendance.excluded_day %}the opening day, {{ day }}{% endblocktrans %}</p>{% endif %}
+          {% endif %}
+        </div>
+      {% endif %}
+      <p>{% trans "Check your workspace and email for your invitation and attendance instructions. Approval does not mean an invitation has already been sent." %}</p></div>
   </div>
 {% elif registration.public_status == "NOT_APPROVED" %}
   <div class="asc-notice asc-notice-danger asc-registration-guidance" data-registration-guidance="NOT_APPROVED">

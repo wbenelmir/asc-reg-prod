@@ -18,6 +18,7 @@ from django.utils import timezone
 
 from apps.accounts import participant_auth
 from apps.accounts.models import OperationalUser, OperationalUserStatus, ScopedGroupMembership
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.audit.models import AuditEvent
 from apps.core.models import Country, Sector
 from apps.events.apps import REGISTRATION_CHANNEL_MANAGER_GROUP_NAME
@@ -726,7 +727,7 @@ def test_the_otp_pages_stay_generic_and_available_when_closed(event) -> None:
 
 def _signed_in(email: str) -> Client:
     client = Client()
-    client.post(reverse("accounts:operational-sign-in"), {"email": email, "password": PASSWORD})
+    staff_sign_in(client, email, PASSWORD)
     return client
 
 

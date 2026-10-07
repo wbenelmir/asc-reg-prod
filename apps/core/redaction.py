@@ -129,6 +129,23 @@ _SHAPE_PATTERNS: list[tuple[re.Pattern[str], str]] = [
     # digits, the NIN shape.
     (re.compile(r"(/api/get/)[^\s/?#\"']+"), r"\1" + MASK),
     (re.compile(r"(?<![0-9])[0-9]{18}(?![0-9])"), MASK),
+    # Staff credential setup links (`/accounts/setup/<secret>/`): the first
+    # request carries the single-use secret in its path, so the WHOLE segment
+    # after `setup/` is masked in every form a log line can hold it -- a
+    # request line or bare path, a full URL, separators percent-encoded once or
+    # twice (a `next=` parameter, a proxy line), and secret characters that are
+    # themselves percent-encoded (any `%XX` inside the segment, single or
+    # double, mixed with plain characters). The segment ends only at an
+    # encoded or plain separator, a query or fragment, whitespace, a quote, `&`
+    # or `<>`; masking more than the secret is the safe side. The page that
+    # follows (`/accounts/setup/`) carries nothing and is left as it is.
+    (
+        re.compile(
+            r"(?i)(accounts(?:/|%2F|%252F)setup(?:/|%2F|%252F))"
+            r"(?:(?!%2F|%252F)[^\s/?#\"'&<>])+"
+        ),
+        r"\1" + MASK,
+    ),
 ]
 
 # Generic key=value / key: "value" secret-shaped assignment, e.g. one that

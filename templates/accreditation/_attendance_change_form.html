@@ -1,0 +1,26 @@
+{% load i18n %}
+{% comment %}
+  Classify an earlier approval, or change the attendance days of an approved
+  registration. Parameters: `registration`, `current` (its CURRENT
+  AttendanceEntitlement or None), `category_choices`, `next_url`, `suffix`
+  (unique id part). Nothing is preselected for an unclassified registration;
+  the server re-checks permission, scope, state and capacity.
+{% endcomment %}
+<form method="post" action="{% url 'accreditation:attendance-change' pk=registration.pk %}" class="asc-command asc-attendance-change" data-attendance-change>
+  {% csrf_token %}
+  <input type="hidden" name="expected_entitlement_id" value="{{ current.pk|default:'' }}">
+  <input type="hidden" name="next" value="{{ next_url }}">
+  <fieldset>
+    <legend class="form-label">{% if current %}{% trans "Change the attendance days" %}{% else %}{% trans "Classify the attendance days" %}{% endif %}</legend>
+    {% for value, label in category_choices %}
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="attendance_category" id="attendance-{{ value|lower }}-{{ suffix }}" value="{{ value }}" required{% if current.category == value %} checked{% endif %}>
+        <label class="form-check-label" for="attendance-{{ value|lower }}-{{ suffix }}">{{ label }}</label>
+      </div>
+    {% endfor %}
+  </fieldset>
+  <label class="form-label" for="attendance-reason-{{ suffix }}">{% trans "Reason" %}</label>
+  <input type="text" id="attendance-reason-{{ suffix }}" name="reason" required minlength="3" maxlength="300" class="form-control" aria-describedby="attendance-reason-help-{{ suffix }}">
+  <p class="form-text" id="attendance-reason-help-{{ suffix }}">{% trans "Short and factual. Do not include personal data." %}</p>
+  <button type="submit" class="btn btn-outline-primary">{% if current %}{% trans "Save the change" %}{% else %}{% trans "Save the classification" %}{% endif %}<span class="visually-hidden"> <bdi dir="ltr">{{ registration.public_reference }}</bdi></span></button>
+</form>

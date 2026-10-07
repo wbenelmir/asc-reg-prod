@@ -9,6 +9,7 @@ from __future__ import annotations
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from apps.accreditation.models import AttendanceCategory
 from apps.core.display_labels import CODE_LABELS
 from apps.core.forms import ScopedModelChoiceField
 
@@ -234,6 +235,14 @@ class ApprovedDecisionForm(forms.Form):
     """
 
     expected_version = forms.IntegerField(min_value=0, widget=forms.HiddenInput)
+    # The attendance days are an explicit choice with no initial value: a
+    # missing choice is refused, never defaulted (apps.accreditation.attendance).
+    attendance_category = forms.ChoiceField(
+        choices=AttendanceCategory.choices,
+        required=False,
+        widget=forms.RadioSelect,
+        label=_("Attendance days"),
+    )
 
 
 class ReasonForm(forms.Form):

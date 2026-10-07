@@ -164,8 +164,14 @@ def test_participant_workspace_never_exposes_the_operational_approve_control_or_
     from apps.people.tests.identity_fixtures import make_verified_identity_case
 
     make_verified_identity_case(registration)
+    from apps.accreditation.tests.attendance_fixtures import configure_attendance
+
+    configure_attendance(event)
     record_approved_decision(
-        registration=registration, expected_version=registration.version, decided_by=reviewer
+        registration=registration,
+        expected_version=registration.version,
+        decided_by=reviewer,
+        attendance_category="FOLLOWING_TWO_DAYS",
     )
     registration.refresh_from_db()
 

@@ -63,6 +63,7 @@
     <span>{% trans "Already registered? Use the same email address to open your registrations." %}</span>
   </p>
 {% endblock %}
+{% block auth_aside_art %}{% include "partials/auth_panel_artwork.html" %}{% endblock %}
 {% block extra_head %}
   {% if human_check_enabled %}<link rel="stylesheet" href="{% static 'vendor/altcha/altcha.css' %}">{% endif %}
 {% endblock %}

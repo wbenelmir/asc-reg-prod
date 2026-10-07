@@ -1,0 +1,16 @@
+{% load i18n %}
+{% comment %}
+  The attendance marking of a pass or printable badge: always visible words
+  and dates; the coloured edge (asc-attendance-mark-*) only assists
+  recognition and is never the sole distinction. Parameter: `attendance`
+  (apps.accreditation.attendance.ParticipantAttendance).
+{% endcomment %}
+{% if attendance.is_pending %}
+  <span class="asc-attendance-mark asc-attendance-mark-pending" data-attendance-mark="PENDING"><strong>{% trans "Attendance days being confirmed" %}</strong></span>
+{% else %}
+  <span class="asc-attendance-mark{% if attendance.state == 'ALL_CONFERENCE_DAYS' %} asc-attendance-mark-all{% else %} asc-attendance-mark-following{% endif %}" data-attendance-mark="{{ attendance.state }}">
+    <strong>{{ attendance.label }}</strong>
+    <span class="asc-attendance-mark-days">{% for day in attendance.days %}{{ day }}{% if not forloop.last %} · {% endif %}{% endfor %}</span>
+    {% if attendance.excluded_day %}<span class="asc-attendance-mark-excluded">{% blocktrans with day=attendance.excluded_day %}Not valid on the opening day, {{ day }}{% endblocktrans %}</span>{% endif %}
+  </span>
+{% endif %}

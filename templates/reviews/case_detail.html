@@ -32,6 +32,10 @@
           <dt>{% trans "Status" %}</dt><dd>{{ case.get_status_display }}</dd>
           <dt>{% trans "Public status" %}</dt><dd>{{ registration.get_public_status_display }}</dd>
           <dt>{% trans "Internal status" %}</dt><dd>{{ registration.get_internal_status_display }}</dd>
+          {% if registration.public_status == "APPROVED" %}
+            <dt>{% trans "Attendance days" %}</dt>
+            <dd data-attendance-category="{{ attendance_entitlement.category|default:'UNCLASSIFIED' }}">{% if attendance_entitlement %}{{ attendance_entitlement.get_category_display }}{% else %}<span class="asc-muted">{% trans "Not yet classified" %}</span>{% endif %}</dd>
+          {% endif %}
           {% if identity_case %}
             <dt>{% trans "Identity verification" %}</dt>
             <dd data-identity-status="{{ identity_case.status }}">{% status_chip "identity" identity_case.status identity_case.get_status_display %} <a href="{% url 'identity:case' pk=identity_case.pk %}">{% trans "Open identity review" %}</a></dd>
@@ -204,9 +208,36 @@
             {# IDV-Q1: approval requires a current, valid, verified identity (enforced by the service). #}
             <p class="asc-notice asc-notice-warning" role="status" data-identity-clearance="{{ identity_clearance.code }}">{% include "components/icon.html" with name="alert-triangle" %}<span>{{ identity_clearance.message }}</span></p>
           {% endif %}
-          <form method="post" action="{% url 'reviews:case-decision-approve' pk=case.pk %}" class="mb-2">
+          <form method="post" action="{% url 'reviews:case-decision-approve' pk=case.pk %}" class="mb-2" data-attendance-choice>
             {% csrf_token %}
             <input type="hidden" name="expected_version" value="{{ registration.version }}">
+            {% if attendance_choice.configured %}
+              {# Attendance days: a required, explicit choice with no default (apps.accreditation.attendance). #}
+              <fieldset class="asc-attendance-choice mb-3" aria-describedby="attendance-choice-help">
+                <legend class="form-label">{% trans "Attendance days" %} <span class="asc-required">{% trans "Required" %}</span></legend>
+                <p class="form-text" id="attendance-choice-help">
+                  {% blocktrans with remaining=attendance_choice.remaining capacity=attendance_choice.capacity %}Opening-day places left: {{ remaining }} of {{ capacity }}.{% endblocktrans %}
+                  {% trans "Nothing is preselected. An approval without a choice is refused." %}
+                </p>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="attendance_category" id="attendance-all" value="ALL_CONFERENCE_DAYS"{% if attendance_choice.remaining == 0 %} disabled aria-describedby="attendance-all-full"{% endif %}>
+                  <label class="form-check-label" for="attendance-all">
+                    <strong>{% trans "All three conference days" %}</strong><br>
+                    <span class="asc-muted">{% blocktrans with day1=attendance_choice.opening_day day2=attendance_choice.second_day day3=attendance_choice.third_day %}The opening day, {{ day1 }}, and the following two days, {{ day2 }} and {{ day3 }}. Uses one opening-day place.{% endblocktrans %}</span>
+                  </label>
+                  {% if attendance_choice.remaining == 0 %}<p class="form-text" id="attendance-all-full">{% trans "The opening day is full. Choose the two following days, or ask for the capacity to be reviewed." %}</p>{% endif %}
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="attendance_category" id="attendance-following" value="FOLLOWING_TWO_DAYS">
+                  <label class="form-check-label" for="attendance-following">
+                    <strong>{% trans "The two days after the opening day" %}</strong><br>
+                    <span class="asc-muted">{% blocktrans with day1=attendance_choice.opening_day day2=attendance_choice.second_day day3=attendance_choice.third_day %}{{ day2 }} and {{ day3 }} only. Not valid on the opening day, {{ day1 }}.{% endblocktrans %}</span>
+                  </label>
+                </div>
+              </fieldset>
+            {% else %}
+              <p class="asc-notice asc-notice-warning" role="status" data-attendance-not-configured>{% include "components/icon.html" with name="alert-triangle" %}<span>{% trans "The conference days and the opening-day capacity are not configured for this event. An approval needs them: ask an attendance policy manager." %}</span></p>
+            {% endif %}
             <button type="submit" class="btn btn-success asc-btn-block">{% include "components/icon.html" with name="check-circle" %}<span>{% trans "Record Approved decision" %}</span></button>
           </form>
           <a href="{% url 'reviews:case-decision' pk=case.pk %}" class="btn btn-outline-danger asc-btn-block">{% include "components/icon.html" with name="x-circle" %}<span>{% trans "Record Not Approved decision" %}</span></a>

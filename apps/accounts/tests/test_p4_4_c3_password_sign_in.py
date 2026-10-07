@@ -23,6 +23,7 @@ from django.utils import timezone
 from apps.accounts import mfa, participant_auth, session_expiry
 from apps.accounts.models import OperationalUser, OperationalUserStatus
 from apps.accounts.otp import DeterministicTestOtpGenerator
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.audit import action_codes
 from apps.audit.models import AuditEvent
 from apps.core.testing import otp_request_data
@@ -44,7 +45,7 @@ def staff():
 
 def _sign_in(password=GOOD, *, address="198.51.100.31"):
     client = Client(REMOTE_ADDR=address)
-    response = client.post(SIGN_IN, {"email": EMAIL, "password": password})
+    response = staff_sign_in(client, EMAIL, password)
     return client, response
 
 

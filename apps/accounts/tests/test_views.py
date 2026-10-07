@@ -8,6 +8,7 @@ from django.urls import reverse
 
 from apps.accounts import participant_auth
 from apps.accounts.models import OperationalUser, OperationalUserStatus
+from apps.accounts.tests.sign_in import staff_sign_in
 
 pytestmark = pytest.mark.django_db
 
@@ -49,10 +50,7 @@ def test_operational_logout_rejects_get(client: Client) -> None:
         password="__test_password__",  # noqa: S106
         status=OperationalUserStatus.ACTIVE,
     )
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": "ops-logout@example.com", "password": "__test_password__"},
-    )
+    staff_sign_in(client, "ops-logout@example.com", "__test_password__")
     response = client.get(reverse("accounts:operational-sign-out"))
     assert response.status_code == 405
 
@@ -63,10 +61,7 @@ def test_operational_logout_accepts_post(client: Client) -> None:
         password="__test_password__",  # noqa: S106
         status=OperationalUserStatus.ACTIVE,
     )
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": "ops-logout-2@example.com", "password": "__test_password__"},
-    )
+    staff_sign_in(client, "ops-logout-2@example.com", "__test_password__")
     response = client.post(reverse("accounts:operational-sign-out"))
     assert response.status_code == 302
     assert response.url == reverse("accounts:operational-sign-in")

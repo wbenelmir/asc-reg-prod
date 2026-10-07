@@ -15,6 +15,7 @@ import pytest
 from playwright.sync_api import expect
 
 from tests.browser.database import database_call
+from tests.browser.helpers import solve_staff_captcha
 
 pytestmark = pytest.mark.django_db(transaction=True)
 
@@ -101,15 +102,29 @@ def test_reviewer_completes_the_approval_journey_through_the_real_ui(live_server
     from apps.people.tests.identity_fixtures import make_verified_identity_case
 
     database_call(lambda: make_verified_identity_case(registration))
+    # Approval needs the event's attendance days (synthetic test values).
+    from apps.accreditation.tests.attendance_fixtures import configure_attendance
+
+    database_call(lambda: configure_attendance(event, capacity=1))
 
     page.goto(f"{live_server.url}/accounts/ops/sign-in/")
     page.fill("#id_email", manager.email_normalized)
     page.fill("#id_password", TEST_OPERATIONAL_PASSWORD)
+    solve_staff_captcha(page)
     page.locator("#main-content button[type=submit]").click()
     page.wait_for_load_state("networkidle")
 
     page.goto(f"{live_server.url}/ops/reviews/cases/{case.pk}/")
     page.wait_for_load_state("networkidle")
+    # Both attendance choices are explained with real dates; none is preselected.
+    choice = page.locator("[data-attendance-choice]")
+    expect(choice).to_contain_text("Opening-day places left: 1 of 1.")
+    expect(choice).to_contain_text("Saturday 5 December 2026")
+    assert page.locator("input[name=attendance_category]:checked").count() == 0
+    # Without a choice the approval is refused with a message.
+    page.get_by_role("button", name="Record Approved decision").click()
+    expect(page.locator("main")).to_contain_text("Choose the attendance days", timeout=10_000)
+    page.get_by_label("The two days after the opening day").check()
     page.get_by_role("button", name="Record Approved decision").click()
 
     # `#main-content` is htmx-boosted (`hx-boost="true"`, base.html), so the
@@ -122,6 +137,9 @@ def test_reviewer_completes_the_approval_journey_through_the_real_ui(live_server
     # The case summary is a design-system definition list (UI/UX gate CP1);
     # it is located by its stable data hook rather than Bootstrap's `dl.row`.
     expect(page.locator("[data-case-summary]")).to_contain_text("Approved")
+    expect(page.locator("[data-attendance-category]")).to_have_attribute(
+        "data-attendance-category", "FOLLOWING_TWO_DAYS"
+    )
 
     database_call(lambda: registration.refresh_from_db())
     from apps.registrations.models import RegistrationPublicStatus
@@ -179,6 +197,7 @@ def test_approve_control_renders_rtl_in_arabic(live_server, page) -> None:
     page.goto(f"{live_server.url}/accounts/ops/sign-in/")
     page.fill("#id_email", manager.email_normalized)
     page.fill("#id_password", TEST_OPERATIONAL_PASSWORD)
+    solve_staff_captcha(page)
     page.locator("#main-content button[type=submit]").click()
     page.wait_for_load_state("networkidle")
 

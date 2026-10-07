@@ -82,6 +82,18 @@ OPERATIONS_SECTIONS: tuple[OperationsSection, ...] = (
         matches=("accreditation:bulk-preview", "accreditation:bulk-execute"),
     ),
     OperationsSection(
+        key="attendance",
+        label=_("Attendance days"),
+        url_name="accreditation:attendance-overview",
+        icon="clock",
+        permission="accreditation.view_attendanceentitlement",
+        matches=(
+            "accreditation:attendance-overview",
+            "accreditation:attendance-policy",
+            "accreditation:attendance-worklist",
+        ),
+    ),
+    OperationsSection(
         key="passes",
         label=_("Pass lookup"),
         url_name="badges:fallback-reference-lookup",
@@ -124,6 +136,26 @@ OPERATIONS_SECTIONS: tuple[OperationsSection, ...] = (
         icon="mail",
         permission="communications.view_communicationmessage",
         matches=("communications",),
+    ),
+    OperationsSection(
+        key="staff-accounts",
+        label=_("Staff accounts"),
+        url_name="staff_accounts:list",
+        icon="user",
+        permission="accounts.manage_operational_accounts",
+        matches=("staff_accounts",),
+    ),
+    OperationsSection(
+        key="integrations",
+        label=_("Ministry NIN service"),
+        url_name="identity:nin-diagnostics",
+        icon="online",
+        permission="people.run_ministry_nin_diagnostics",
+        matches=(
+            "identity:nin-diagnostics",
+            "identity:nin-diagnostics-authentication",
+            "identity:nin-diagnostics-lookup",
+        ),
     ),
     OperationsSection(
         key="exports",

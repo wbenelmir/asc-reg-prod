@@ -100,5 +100,7 @@ def test_algerian_nin_registration_happy_path_reaches_confirmation(
     page.locator("#main-content button[type=submit]").click()
     page.wait_for_url("**/register/confirmation/**")
 
-    assert "Thank you for registering" in page.content()
+    assert "Registration details" in page.content()
+    assert "Request received — awaiting acceptance" in page.content()
+    assert "does not mean your participation has been approved" in page.content()
     assert page.locator("strong.ltr-embed").count() == 1

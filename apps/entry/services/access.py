@@ -16,6 +16,8 @@ every other check meaningless):
 
 1. Event Edition of the context equals the checkpoint's      (stop)
 2. Registration approved, current, not withdrawn/cancelled   (stop)
+2b. Attendance days for today, once attendance enforcement is active
+   (`apps.accreditation.attendance.admission_problem`; never overrideable)
 3. Person- or context-level security restriction (DENY)
 4. Digital Entry Pass state and validity window
 5. Current Badge Type and Access Profile assignments; pass snapshot
@@ -41,6 +43,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.utils import timezone
 
+from apps.accreditation.attendance import admission_problem as attendance_admission_problem
 from apps.accreditation.models import (
     AccessProfileAssignment,
     AccessRule,
@@ -290,6 +293,15 @@ def assess_context(
             [Blocker(EntryResult.DENIED, EntryReasonCode.REGISTRATION_NOT_APPROVED)],
             [],
         )
+
+    # 2b. Attendance days (apps.accreditation.attendance), only once
+    # enforcement is active for the edition: never overrideable, and every
+    # check below still applies (attendance never widens access).
+    attendance_problem = attendance_admission_problem(
+        registration=registration, event_edition=checkpoint.event_edition, at=now
+    )
+    if attendance_problem:
+        blockers.append(Blocker(EntryResult.DENIED, attendance_problem))
 
     # 3. Security restrictions (person-level overrides every context).
     restrictions = list(active_restrictions_for(registration, now=now))

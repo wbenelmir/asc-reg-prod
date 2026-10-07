@@ -91,3 +91,18 @@ def select_choice(page, field_id: str, value: str) -> None:
         )
     else:
         page.select_option(f"#{field_id}", value)
+
+
+def solve_staff_captcha(page) -> None:
+    """Fill the staff sign-in security image answer, read from the isolated
+    test database for the key the page carries (a real person reads the
+    image). Database work runs off Playwright's thread."""
+    from captcha.models import CaptchaStore
+
+    from tests.browser.database import database_call
+
+    key = page.locator("input[name=captcha_key]").input_value()
+    answer = database_call(
+        lambda: CaptchaStore.objects.filter(hashkey=key).values_list("response", flat=True).first()
+    )
+    page.fill("#id_captcha_answer", answer or "")

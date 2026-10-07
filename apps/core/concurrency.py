@@ -34,6 +34,12 @@ ADVISORY_LOCK_CLASS_CONTACT_IDENTITY = 5
 ADVISORY_LOCK_CLASS_OFFICIAL_IDENTIFIER = 6
 # P4-4: serializes operational sign-in attempts for one typed email.
 ADVISORY_LOCK_CLASS_OPERATIONAL_SIGN_IN = 7
+# Staff account administration: one lock for every command that can change
+# who may administer accounts (last-administrator protection).
+ADVISORY_LOCK_CLASS_ACCOUNT_ADMINISTRATION = 8
+# Ministry NIN diagnostics: at most one live check at a time, across every
+# process (session-level `pg_try_advisory_lock`, never waited for).
+ADVISORY_LOCK_CLASS_NIN_DIAGNOSTICS = 9
 
 
 def objid_from_fingerprint(digest: bytes) -> int:

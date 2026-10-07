@@ -1300,6 +1300,7 @@ def record_approved_decision(
     registration: Registration,
     expected_version: int,
     decided_by,
+    attendance_category: str | None,
     participant_reason_code: str = "",
     audit_recorder: AuditRecorder | None = None,
     correlation_id: str = "",
@@ -1321,7 +1322,23 @@ def record_approved_decision(
     before any write, with `ApprovalRequiresVerifiedIdentityError` (and a
     DENIED audit event). The identity decision itself stays in the identity
     history; the approval audit records only its status and source.
+
+    Attendance (`apps.accreditation.attendance`): `attendance_category` is
+    the explicit choice of all three conference days or only the two days
+    after the opening day. There is no default; a missing or unknown value
+    is refused (after the version, state, assignment and identity checks, so
+    their refusals keep precedence) and nothing is written. The entitlement
+    is recorded in the same
+    transaction as the decision, after the policy lock for an opening-day
+    choice, and a full opening day refuses the whole approval
+    (`OpeningDayCapacityReachedError`, audited) -- it is never downgraded.
+    The decision notification states the authorized days.
     """
+    from apps.accreditation.attendance import (
+        AttendanceError,
+        OpeningDayCapacityReachedError,
+        _record_capacity_refusal,
+    )
     from apps.accreditation.services import has_required_assignments_for_approval
 
     audit_recorder = audit_recorder or PersistentAuditRecorder()
@@ -1330,11 +1347,38 @@ def record_approved_decision(
             registration=registration,
             expected_version=expected_version,
             decided_by=decided_by,
+            attendance_category=attendance_category,
             participant_reason_code=participant_reason_code,
             audit_recorder=audit_recorder,
             correlation_id=correlation_id,
             assignment_predicate=has_required_assignments_for_approval,
         )
+    except OpeningDayCapacityReachedError:
+        from apps.accreditation.attendance import policy_for
+
+        _record_capacity_refusal(
+            recorder=audit_recorder,
+            actor=decided_by,
+            registration=registration,
+            policy=policy_for(registration.event_edition_id),
+            correlation_id=correlation_id,
+        )
+        raise
+    except AttendanceError as refusal:
+        audit_recorder.record(
+            AuditRecord(
+                actor_type="OPERATIONAL_USER",
+                actor_user_id=getattr(decided_by, "pk", None),
+                action_code=action_codes.REVIEW_APPROVAL_BLOCKED_ATTENDANCE,
+                target_type="Registration",
+                target_uuid=registration.pk,
+                event_edition_id=registration.event_edition_id,
+                result="DENIED",
+                reason_code=refusal.code,
+                correlation_id=correlation_id,
+            )
+        )
+        raise
     except ApprovalRequiresVerifiedIdentityError as refusal:
         audit_recorder.record(
             AuditRecord(
@@ -1375,11 +1419,14 @@ def _record_approved_decision_atomically(
     registration: Registration,
     expected_version: int,
     decided_by,
+    attendance_category: str,
     participant_reason_code: str,
     audit_recorder: AuditRecorder,
     correlation_id: str,
     assignment_predicate,
 ) -> RegistrationDecision:
+    from apps.accreditation import attendance
+
     with transaction.atomic():
         locked_registration = _lock_versioned(
             Registration, pk=registration.pk, expected_version=expected_version
@@ -1434,6 +1481,16 @@ def _record_approved_decision_atomically(
             event_edition_id=locked_registration.event_edition_id,
             organization_id=locked_registration.source_organization_id,
         )
+        # Attendance: after the Registration (and identity) locks, the policy
+        # lock for an opening-day choice; refused when that day is full.
+        entitlement = attendance.grant_at_approval(
+            registration=locked_registration,
+            category=attendance_category,
+            decided_by=decided_by,
+            decision_id=decision.pk,
+            audit_recorder=audit_recorder,
+            correlation_id=correlation_id,
+        )
         locked_registration.public_status = RegistrationPublicStatus.APPROVED
         locked_registration.internal_status = RegistrationInternalStatus.CLOSED
         _bump_version(locked_registration, extra_fields=["public_status", "internal_status"])
@@ -1455,20 +1512,20 @@ def _record_approved_decision_atomically(
                     "outcome": RegistrationDecisionOutcome.APPROVED,
                     "identity_status": clearance.status,
                     "identity_source": clearance.source,
+                    "attendance_category": entitlement.category,
                 },
                 correlation_id=correlation_id,
             )
         )
-        _queue_registration_communication(
+        # The decision notification states the authorized days (same
+        # idempotency key as the generic decision message it replaces). The
+        # policy row is still locked by `grant_at_approval` in this
+        # transaction, so these are exactly the days the grant accepted.
+        attendance.queue_attendance_notification(
             registration=locked_registration,
-            purpose_code=CommunicationPurpose.DECISION_STATUS,
-            context={
-                "public_reference": locked_registration.public_reference,
-                "event_name": locked_registration.event_edition.display_name(
-                    locked_registration.preferred_language
-                ),
-                "decision_label": locked_registration.get_public_status_display(),
-            },
+            entitlement=entitlement,
+            policy=attendance.policy_for(locked_registration.event_edition_id),
+            purpose_code=CommunicationPurpose.APPROVAL_ATTENDANCE,
             idempotency_key=f"decision-status:{decision.pk}",
         )
     return decision

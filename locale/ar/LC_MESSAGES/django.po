@@ -8892,3 +8892,1220 @@ msgstr "احتفظ بمرجع تسجيلك وتابع طلبك في مساحتك
 #: templates/partials/conference_identity.html
 msgid "5th edition"
 msgstr "الدورة الخامسة"
+
+msgid "Reset the password of your ASC 2026 staff account"
+msgstr "أعد تعيين كلمة مرور حساب الموظف الخاص بك في ASC 2026"
+
+msgid "A password reset was requested for your ASC 2026 staff account."
+msgstr "طُلبت إعادة تعيين كلمة مرور حساب الموظف الخاص بك في ASC 2026."
+
+msgid "Set the password of your ASC 2026 staff account"
+msgstr "عيّن كلمة مرور حساب الموظف الخاص بك في ASC 2026"
+
+msgid "A staff account was created for you on the ASC 2026 platform."
+msgstr "أُنشئ لك حساب موظف على منصة ASC 2026."
+
+#, python-format
+msgid "Open this link to choose your password. It works once and expires in %(hours)s hours:"
+msgstr "افتح هذا الرابط لاختيار كلمة المرور. يعمل مرة واحدة فقط وتنتهي صلاحيته خلال %(hours)s ساعة:"
+
+msgid "After that, sign in with your email address and password. Your account opens only once an administrator has activated it and given it a role. If you did not expect this message, ignore it."
+msgstr "بعد ذلك، سجّل الدخول باستخدام بريدك الإلكتروني وكلمة المرور. لا يُفتح حسابك إلا بعد أن يفعّله مسؤول ويمنحه دورًا. إذا لم تكن تتوقع هذه الرسالة فتجاهلها."
+
+msgid "You are not an account administrator."
+msgstr "لست مسؤولًا عن الحسابات."
+
+msgid "You cannot change your own account, status or roles. Ask another administrator."
+msgstr "لا يمكنك تغيير حسابك أو حالته أو أدواره بنفسك. اطلب ذلك من مسؤول آخر."
+
+msgid "This is outside your administration scope. Nothing was changed."
+msgstr "هذا خارج نطاق إدارتك. لم يُغيَّر شيء."
+
+msgid "This would remove the last account administrator with full scope. Nothing was changed."
+msgstr "سيؤدي هذا إلى إزالة آخر مسؤول حسابات ذي نطاق كامل. لم يُغيَّر شيء."
+
+msgid "Enter a short reason (at least 3 characters)."
+msgstr "أدخل سببًا قصيرًا (3 أحرف على الأقل)."
+
+msgid "This is not possible in the account's current status."
+msgstr "هذا غير ممكن في الحالة الحالية للحساب."
+
+msgid "The end of validity must follow its start."
+msgstr "يجب أن تأتي نهاية الصلاحية بعد بدايتها."
+
+msgid "A temporary external-security account and its roles need a future end of validity."
+msgstr "يحتاج حساب الأمن الخارجي المؤقت وأدواره إلى نهاية صلاحية في المستقبل."
+
+msgid "An account already uses this email address."
+msgstr "يستخدم حساب آخر عنوان البريد الإلكتروني هذا بالفعل."
+
+msgid "Enter a valid email address."
+msgstr "أدخل عنوان بريد إلكتروني صالحًا."
+
+msgid "Enter a display name."
+msgstr "أدخل اسم العرض."
+
+msgid "Choose an account type from the list."
+msgstr "اختر نوع الحساب من القائمة."
+
+msgid "Choose a role from the list."
+msgstr "اختر دورًا من القائمة."
+
+msgid "Choose an event edition, or every event edition."
+msgstr "اختر دورة، أو جميع الدورات."
+
+msgid "This role cannot have this scope. Check the organization and the checkpoint."
+msgstr "لا يمكن لهذا الدور أن يحمل هذا النطاق. تحقق من المؤسسة ونقطة التفتيش."
+
+msgid "This role is no longer on the account. Reload the page."
+msgstr "لم يعد هذا الدور مرتبطًا بالحساب. أعد تحميل الصفحة."
+
+msgid "This change could not be applied. Reload the page and try again."
+msgstr "تعذّر تطبيق هذا التغيير. أعد تحميل الصفحة وحاول مرة أخرى."
+
+msgid "Invited"
+msgstr "مدعو"
+
+msgid "Disabled"
+msgstr "معطّل"
+
+msgid "Cannot sign in: the account is not active or outside its validity."
+msgstr "لا يمكن تسجيل الدخول: الحساب غير نشط أو خارج فترة صلاحيته."
+
+msgid "Active, but no password set yet: send a setup link."
+msgstr "نشط، لكن لم تُعيَّن كلمة مرور بعد: أرسل رابط إعداد."
+
+msgid "Active, but no current role: the account opens no area."
+msgstr "نشط، لكن دون دور حالي: لا يفتح الحساب أي قسم."
+
+msgid "Can sign in and use its current roles."
+msgstr "يمكنه تسجيل الدخول واستخدام أدواره الحالية."
+
+msgid "In effect"
+msgstr "ساري المفعول"
+
+msgid "Starts later"
+msgstr "يبدأ لاحقًا"
+
+msgid "Ended"
+msgstr "منتهٍ"
+
+msgid "The account was created as Invited. Next: send a setup link, activate it and grant a role -- three separate steps."
+msgstr "أُنشئ الحساب بحالة «مدعو». التالي: أرسل رابط إعداد، ثم فعّله، ثم امنحه دورًا -- ثلاث خطوات منفصلة."
+
+msgid "The account was updated."
+msgstr "حُدّث الحساب."
+
+#, python-format
+msgid "The account status is now: %(status)s."
+msgstr "حالة الحساب الآن: %(status)s."
+
+msgid "A single-use link was sent to the account's email address. Any earlier link no longer works."
+msgstr "أُرسل رابط للاستخدام مرة واحدة إلى البريد الإلكتروني للحساب. لم يعد أي رابط سابق صالحًا."
+
+msgid "The role was granted. It applies on the next request."
+msgstr "مُنح الدور. يسري بدءًا من الطلب التالي."
+
+msgid "The role was ended. It no longer applies."
+msgstr "أُنهي الدور. لم يعد ساريًا."
+
+msgid "Your password is set. You can now sign in."
+msgstr "عُيّنت كلمة المرور. يمكنك الآن تسجيل الدخول."
+
+msgid "Your password is set. You can sign in once an administrator has activated your account."
+msgstr "عُيّنت كلمة المرور. يمكنك تسجيل الدخول بعد أن يفعّل مسؤول حسابك."
+
+msgid "Type the characters shown in the security image."
+msgstr "اكتب الأحرف الظاهرة في صورة التحقق."
+
+msgid "This security image is not valid for this page (it was already used, or it belongs to another page or tab). Type the characters of the new image."
+msgstr "صورة التحقق هذه غير صالحة لهذه الصفحة (استُخدمت من قبل، أو تخص صفحة أو علامة تبويب أخرى). اكتب أحرف الصورة الجديدة."
+
+msgid "The security image expired. Type the characters of the new image."
+msgstr "انتهت صلاحية صورة التحقق. اكتب أحرف الصورة الجديدة."
+
+msgid "The characters did not match the image. Type the characters of the new image."
+msgstr "الأحرف لا تطابق الصورة. اكتب أحرف الصورة الجديدة."
+
+msgid "Characters in the image"
+msgstr "الأحرف الظاهرة في الصورة"
+
+msgid "Short and factual. Do not include personal data."
+msgstr "موجز وواقعي. لا تُدرج أي بيانات شخصية."
+
+msgid "Coordinated Universal Time (UTC). Leave empty for no limit."
+msgstr "التوقيت العالمي المنسّق (UTC). اتركه فارغًا لعدم وضع حد."
+
+msgid "Internal staff"
+msgstr "موظفون داخليون"
+
+msgid "Organization staff"
+msgstr "موظفو مؤسسة"
+
+msgid "Support"
+msgstr "الدعم"
+
+msgid "External security (temporary)"
+msgstr "أمن خارجي (مؤقت)"
+
+msgid "Display name"
+msgstr "اسم العرض"
+
+msgid "Account type"
+msgstr "نوع الحساب"
+
+msgid "Starts"
+msgstr "البداية"
+
+msgid "Ends"
+msgstr "النهاية"
+
+msgid "I confirm this role applies to every event edition."
+msgstr "أؤكد أن هذا الدور يسري على جميع الدورات."
+
+msgid "Select a role"
+msgstr "اختر دورًا"
+
+msgid "Select an event edition"
+msgstr "اختر دورة"
+
+msgid "Every event edition"
+msgstr "جميع الدورات"
+
+msgid "Every organization"
+msgstr "جميع المؤسسات"
+
+msgid "Every checkpoint of the event"
+msgstr "جميع نقاط التفتيش في الحدث"
+
+msgid "Confirm that this role applies to every event edition."
+msgstr "أكّد أن هذا الدور يسري على جميع الدورات."
+
+msgid "Every status"
+msgstr "جميع الحالات"
+
+msgid "Every role"
+msgstr "جميع الأدوار"
+
+msgid "New password"
+msgstr "كلمة المرور الجديدة"
+
+msgid "At least 12 characters. Avoid common words and your name or email."
+msgstr "12 حرفًا على الأقل. تجنّب الكلمات الشائعة واسمك أو بريدك الإلكتروني."
+
+msgid "Repeat the new password"
+msgstr "أعد كتابة كلمة المرور الجديدة"
+
+msgid "The two passwords do not match."
+msgstr "كلمتا المرور غير متطابقتين."
+
+msgid "Account administrator"
+msgstr "مسؤول الحسابات"
+
+msgid "Creates staff accounts, sends setup links and grants roles within their own scope."
+msgstr "ينشئ حسابات الموظفين ويرسل روابط الإعداد ويمنح الأدوار ضمن نطاقه."
+
+msgid "Registration intake (read only)"
+msgstr "استقبال التسجيلات (قراءة فقط)"
+
+msgid "Reads registrations in scope."
+msgstr "يطّلع على التسجيلات ضمن نطاقه."
+
+msgid "Registration reviewer"
+msgstr "مراجع التسجيلات"
+
+msgid "Reviews registrations and identity documents; no final decision."
+msgstr "يراجع التسجيلات ووثائق الهوية؛ دون قرار نهائي."
+
+msgid "Accreditation manager"
+msgstr "مسؤول الاعتماد"
+
+msgid "Records decisions, chooses attendance days, reopens and cancels registrations."
+msgstr "يسجّل القرارات ويختار أيام الحضور ويعيد فتح التسجيلات ويلغيها."
+
+msgid "Accreditation coordinator"
+msgstr "منسّق الاعتماد"
+
+msgid "Assigns participant roles, badge types, access profiles and access rules."
+msgstr "يُسند أدوار المشاركين وأنواع الشارات وملفات الدخول وقواعده."
+
+msgid "Attendance policy manager"
+msgstr "مسؤول سياسة الحضور"
+
+msgid "Sets the conference days and opening-day capacity and switches enforcement."
+msgstr "يحدد أيام المؤتمر وسعة يوم الافتتاح ويفعّل التطبيق أو يوقفه."
+
+msgid "Entry pass administrator"
+msgstr "مسؤول تصاريح الدخول"
+
+msgid "Generates, activates, suspends and replaces digital entry passes."
+msgstr "ينشئ تصاريح الدخول الرقمية ويفعّلها ويعلّقها ويستبدلها."
+
+msgid "Entry pass viewer"
+msgstr "مطّلع على تصاريح الدخول"
+
+msgid "Reads digital entry passes."
+msgstr "يطّلع على تصاريح الدخول الرقمية."
+
+msgid "Credential key custodian"
+msgstr "أمين مفاتيح التصاريح"
+
+msgid "Publishes, promotes and retires entry pass verification keys."
+msgstr "ينشر مفاتيح التحقق من تصاريح الدخول ويرقّيها ويسحبها."
+
+msgid "Badge stock administrator"
+msgstr "مسؤول مخزون الشارات"
+
+msgid "Manages badge stock locations, print batches and transfers."
+msgstr "يدير مواقع مخزون الشارات ودفعات الطباعة وعمليات النقل."
+
+msgid "Badge issuer"
+msgstr "مسلّم الشارات"
+
+msgid "Hands over physical badges and records their attendance marking."
+msgstr "يسلّم الشارات المادية ويسجّل علامة أيام الحضور عليها."
+
+msgid "Entry operator"
+msgstr "مشغّل الدخول"
+
+msgid "Verifies participants and records admissions at a checkpoint."
+msgstr "يتحقق من المشاركين ويسجّل عمليات الدخول عند نقطة تفتيش."
+
+msgid "Entry supervisor"
+msgstr "مشرف الدخول"
+
+msgid "Supervises checkpoints and approves overrides."
+msgstr "يشرف على نقاط التفتيش ويوافق على الاستثناءات."
+
+msgid "Entry device administrator"
+msgstr "مسؤول أجهزة الدخول"
+
+msgid "Enrolls and manages entry devices."
+msgstr "يسجّل أجهزة الدخول ويديرها."
+
+msgid "Security restriction manager"
+msgstr "مسؤول القيود الأمنية"
+
+msgid "Manages security restrictions."
+msgstr "يدير القيود الأمنية."
+
+msgid "Registration channel manager"
+msgstr "مسؤول قنوات التسجيل"
+
+msgid "Opens, restricts or closes registration channels."
+msgstr "يفتح قنوات التسجيل أو يقيّدها أو يغلقها."
+
+msgid "Communication operator"
+msgstr "مشغّل الاتصالات"
+
+msgid "Reads and follows up outgoing messages."
+msgstr "يطّلع على الرسائل الصادرة ويتابعها."
+
+msgid "Export administrator"
+msgstr "مسؤول التصدير"
+
+msgid "Prepares purpose-bound exports."
+msgstr "يُعدّ عمليات تصدير مرتبطة بغرض محدد."
+
+msgid "Invitation manager"
+msgstr "مسؤول الدعوات"
+
+msgid "Manages invitation campaigns."
+msgstr "يدير حملات الدعوة."
+
+msgid "Organization user"
+msgstr "مستخدم مؤسسة"
+
+msgid "Follows an organization's invitations and registrations."
+msgstr "يتابع دعوات مؤسسة وتسجيلاتها."
+
+msgid "Delegation coordinator"
+msgstr "منسّق الوفود"
+
+msgid "Imports delegation lists for an organization."
+msgstr "يستورد قوائم الوفود لمؤسسة."
+
+msgid "On-behalf registrar"
+msgstr "مسجّل نيابة عن الغير"
+
+msgid "Registers participants on their behalf."
+msgstr "يسجّل المشاركين نيابة عنهم."
+
+msgid "Privacy administrator"
+msgstr "مسؤول الخصوصية"
+
+msgid "Manages legal notices and privacy operations."
+msgstr "يدير الإشعارات القانونية وعمليات الخصوصية."
+
+msgid "Accessibility support coordinator"
+msgstr "منسّق دعم إمكانية الوصول"
+
+msgid "Reads accessibility support requests in scope."
+msgstr "يطّلع على طلبات دعم إمكانية الوصول ضمن نطاقه."
+
+#, python-format
+msgid "Your participation is approved for the opening day and the following two conference days: %(day1)s, %(day2)s and %(day3)s."
+msgstr "تمت الموافقة على مشاركتك في يوم الافتتاح ويومي المؤتمر التاليين: %(day1)s و%(day2)s و%(day3)s."
+
+#, python-format
+msgid "Your participation is approved for %(day2)s and %(day3)s. This approval does not include the opening day, %(day1)s."
+msgstr "تمت الموافقة على مشاركتك يومي %(day2)s و%(day3)s. لا تشمل هذه الموافقة يوم الافتتاح، %(day1)s."
+
+msgid "Your participation is approved. The organizers are confirming which conference days it covers. The authorized days will appear here and you will be notified by email."
+msgstr "تمت الموافقة على مشاركتك. يعمل المنظمون على تأكيد أيام المؤتمر التي تشملها. ستظهر الأيام المصرّح بها هنا وسيصلك إشعار بالبريد الإلكتروني."
+
+msgid "All three conference days"
+msgstr "أيام المؤتمر الثلاثة"
+
+msgid "Days 2 and 3 only, not the opening day"
+msgstr "اليومان 2 و3 فقط، دون يوم الافتتاح"
+
+msgid "The attendance settings were saved."
+msgstr "حُفظت إعدادات الحضور."
+
+msgid "Nothing changed: the settings were already these."
+msgstr "لم يتغير شيء: كانت هذه هي الإعدادات بالفعل."
+
+msgid "Attendance enforcement is active. Admission now checks the authorized days. Offline devices must download new offline data."
+msgstr "أصبح تطبيق أيام الحضور مفعّلًا. يتحقق الدخول الآن من الأيام المصرّح بها. يجب على الأجهزة غير المتصلة تنزيل بيانات جديدة."
+
+msgid "Enter a reason to switch enforcement off."
+msgstr "أدخل سببًا لإيقاف التطبيق."
+
+msgid "Attendance enforcement is off. Admission no longer checks the authorized days; the attendance days and the capacity are kept."
+msgstr "أُوقف تطبيق أيام الحضور. لم يعد الدخول يتحقق من الأيام المصرّح بها؛ وتبقى أيام الحضور والسعة محفوظة."
+
+msgid "Not yet classified"
+msgstr "لم يُصنَّف بعد"
+
+msgid "Badge marking to record"
+msgstr "علامة شارة يجب تسجيلها"
+
+msgid "All three days"
+msgstr "الأيام الثلاثة"
+
+msgid "Two following days"
+msgstr "اليومان التاليان"
+
+msgid "All approved"
+msgstr "جميع التسجيلات المعتمدة"
+
+msgid "Nothing changed: these were already the registration's attendance days."
+msgstr "لم يتغير شيء: كانت هذه هي أيام حضور هذا التسجيل بالفعل."
+
+#, python-format
+msgid "Attendance days saved for %(reference)s: %(category)s. Admission follows them immediately and the participant is notified. If a physical badge was already handed over, record its new attendance marking on the badge page."
+msgstr "حُفظت أيام الحضور للتسجيل %(reference)s: %(category)s. يطبّقها الدخول فورًا ويُبلَّغ المشارك. إذا سُلّمت شارة مادية من قبل، فسجّل علامتها الجديدة في صفحة الشارة."
+
+msgid "Opening day"
+msgstr "يوم الافتتاح"
+
+msgid "Second conference day"
+msgstr "اليوم الثاني للمؤتمر"
+
+msgid "Third conference day"
+msgstr "اليوم الثالث للمؤتمر"
+
+msgid "Opening-day capacity"
+msgstr "سعة يوم الافتتاح"
+
+msgid "The number of approved participants who may attend the opening day. It cannot be lower than the places already allocated."
+msgstr "عدد المشاركين المعتمدين الذين يمكنهم حضور يوم الافتتاح. لا يمكن أن يقل عن الأماكن المخصصة بالفعل."
+
+msgid "Reason for the change"
+msgstr "سبب التغيير"
+
+msgid "Attendance days"
+msgstr "أيام الحضور"
+
+msgid "Choose the attendance days."
+msgstr "اختر أيام الحضور."
+
+msgid "The two days after the opening day"
+msgstr "اليومان التاليان ليوم الافتتاح"
+
+msgid "Chosen at approval"
+msgstr "اختير عند الموافقة"
+
+msgid "Classification of an earlier approval"
+msgstr "تصنيف موافقة سابقة"
+
+msgid "Change after approval"
+msgstr "تغيير بعد الموافقة"
+
+msgid "Choose the attendance days: all three conference days, or only the two days after the opening day. Nothing was approved."
+msgstr "اختر أيام الحضور: أيام المؤتمر الثلاثة، أو اليومين التاليين ليوم الافتتاح فقط. لم تتم الموافقة على شيء."
+
+msgid "The conference days and the opening-day capacity are not configured for this event yet. Ask an attendance policy manager to configure them. Nothing was approved."
+msgstr "لم تُضبط بعد أيام المؤتمر وسعة يوم الافتتاح لهذا الحدث. اطلب من مسؤول سياسة الحضور ضبطها. لم تتم الموافقة على شيء."
+
+msgid "The opening day is full: no opening-day place is left. Nothing was changed. You can explicitly choose the two days after the opening day, or ask an attendance policy manager whether the capacity can be raised."
+msgstr "يوم الافتتاح مكتمل: لم يتبق أي مكان. لم يُغيَّر شيء. يمكنك أن تختار صراحةً اليومين التاليين ليوم الافتتاح، أو أن تسأل مسؤول سياسة الحضور عن إمكانية زيادة السعة."
+
+msgid "Only an approved, current registration has attendance days. Reload the page."
+msgstr "أيام الحضور خاصة بالتسجيل المعتمد والحالي فقط. أعد تحميل الصفحة."
+
+msgid "Enter a short reason (at least 3 characters, no personal data)."
+msgstr "أدخل سببًا قصيرًا (3 أحرف على الأقل، دون بيانات شخصية)."
+
+msgid "The attendance information changed since you loaded this page. Reload and retry."
+msgstr "تغيرت معلومات الحضور منذ تحميل هذه الصفحة. أعد التحميل وحاول مجددًا."
+
+msgid "Enter all three conference days, or none."
+msgstr "أدخل أيام المؤتمر الثلاثة، أو لا شيء."
+
+msgid "The three conference days must be in order: opening day first."
+msgstr "يجب أن تكون أيام المؤتمر الثلاثة مرتبة: يوم الافتتاح أولًا."
+
+msgid "The conference days can no longer change: participants have already been given attendance days, or enforcement is active."
+msgstr "لم يعد بالإمكان تغيير أيام المؤتمر: حُدّدت أيام حضور لمشاركين بالفعل، أو التطبيق مفعّل."
+
+msgid "Enter a valid capacity (a whole number, zero or more)."
+msgstr "أدخل سعة صالحة (عددًا صحيحًا، صفرًا أو أكثر)."
+
+msgid "An opening-day capacity is required while opening-day places are allocated or enforcement is active."
+msgstr "سعة يوم الافتتاح مطلوبة ما دامت هناك أماكن مخصصة أو كان التطبيق مفعّلًا."
+
+msgid "The capacity cannot be lower than the number of opening-day places already allocated. Nothing was changed."
+msgstr "لا يمكن أن تقل السعة عن عدد أماكن يوم الافتتاح المخصصة بالفعل. لم يُغيَّر شيء."
+
+msgid "Attendance enforcement is not active."
+msgstr "تطبيق أيام الحضور غير مفعّل."
+
+msgid "Attendance enforcement was not activated: some prerequisites are not met. See the checklist."
+msgstr "لم يُفعَّل تطبيق أيام الحضور: بعض المتطلبات غير مستوفاة. راجع قائمة التحقق."
+
+msgid "This attendance operation could not be completed. Reload the page and try again."
+msgstr "تعذّر إتمام عملية الحضور هذه. أعد تحميل الصفحة وحاول مرة أخرى."
+
+msgid "The three conference days are configured"
+msgstr "أيام المؤتمر الثلاثة مضبوطة"
+
+msgid "The opening-day capacity is configured"
+msgstr "سعة يوم الافتتاح مضبوطة"
+
+msgid "Every approved registration has its attendance days"
+msgstr "لكل تسجيل معتمد أيام حضوره"
+
+msgid "Opening-day places allocated are within the capacity"
+msgstr "أماكن يوم الافتتاح المخصصة ضمن السعة"
+
+msgid "Every handed-over badge carries the marking of its current attendance days"
+msgstr "كل شارة مسلّمة تحمل علامة أيام حضورها الحالية"
+
+msgid "The event edition's own start and end dates contain the three days (advisory)"
+msgstr "تواريخ بداية الدورة ونهايتها تشمل الأيام الثلاثة (استرشادي)"
+
+msgid "No current offline package (activation revokes them so devices refresh; advisory)"
+msgstr "لا توجد حزمة حالية غير متصلة (يُلغيها التفعيل لتتحدث الأجهزة؛ استرشادي)"
+
+msgid "Attendance enforcement is active and this registration's attendance days are not classified yet. Classify them before handing over or marking a badge."
+msgstr "تطبيق أيام الحضور مفعّل ولم تُصنَّف بعد أيام حضور هذا التسجيل. صنّفها قبل تسليم شارة أو وضع علامة عليها."
+
+msgid "The marking you confirmed differs from the registration's current attendance days. Reload the page and apply the marking it shows."
+msgstr "العلامة التي أكدتها تختلف عن أيام الحضور الحالية للتسجيل. أعد تحميل الصفحة وضع العلامة المعروضة."
+
+msgid "The attendance marking could not be recorded."
+msgstr "تعذّر تسجيل علامة أيام الحضور."
+
+msgid "The attendance marking of the badge was recorded."
+msgstr "سُجّلت علامة أيام الحضور على الشارة."
+
+msgid "Approval with attendance days"
+msgstr "موافقة مع أيام الحضور"
+
+msgid "Attendance days update"
+msgstr "تحديث أيام الحضور"
+
+msgid "Staff accounts"
+msgstr "حسابات الموظفين"
+
+msgid "Approval does not include today (opening day not authorized)"
+msgstr "الموافقة لا تشمل اليوم (يوم الافتتاح غير مصرّح به)"
+
+msgid "Attendance days not yet classified"
+msgstr "أيام الحضور لم تُصنَّف بعد"
+
+msgid "Today is not a conference day"
+msgstr "اليوم ليس من أيام المؤتمر"
+
+msgid "New security image loaded. Type its characters."
+msgstr "حُمّلت صورة تحقق جديدة. اكتب أحرفها."
+
+msgid "Security check: type the characters shown in the image"
+msgstr "تحقق أمني: اكتب الأحرف الظاهرة في الصورة"
+
+#, python-format
+msgid "Security image with %(length)s letters and digits"
+msgstr "صورة تحقق تتضمن %(length)s أحرف وأرقام"
+
+msgid "New image"
+msgstr "صورة جديدة"
+
+#, python-format
+msgid "%(length)s characters, not case-sensitive. Each image works once and expires after %(minutes)s minutes; after a wrong answer a new image is shown."
+msgstr "%(length)s أحرف، لا فرق بين الأحرف الكبيرة والصغيرة. تُستخدم كل صورة مرة واحدة وتنتهي صلاحيتها بعد %(minutes)s دقائق؛ وبعد إجابة خاطئة تظهر صورة جديدة."
+
+msgid "Too many security images were requested from your network. Wait a few minutes, then reload this page."
+msgstr "طُلب عدد كبير جدًا من صور التحقق من شبكتك. انتظر بضع دقائق ثم أعد تحميل هذه الصفحة."
+
+msgid "Set your password"
+msgstr "عيّن كلمة المرور"
+
+msgid "Staff account"
+msgstr "حساب الموظف"
+
+msgid "Reset your password"
+msgstr "أعد تعيين كلمة المرور"
+
+#, python-format
+msgid "For the staff account <bdi dir=\"ltr\">%(email)s</bdi>. This link works once."
+msgstr "لحساب الموظف <bdi dir=\"ltr\">%(email)s</bdi>. يعمل هذا الرابط مرة واحدة فقط."
+
+msgid "Save the password"
+msgstr "حفظ كلمة المرور"
+
+msgid "Setting the password does not sign you in and does not activate the account."
+msgstr "تعيين كلمة المرور لا يسجّل دخولك ولا يفعّل الحساب."
+
+msgid "You then sign in with your email address, this password and a security image."
+msgstr "بعدها تسجّل الدخول ببريدك الإلكتروني وكلمة المرور هذه وصورة تحقق."
+
+msgid "Link not valid"
+msgstr "رابط غير صالح"
+
+msgid "This link is not valid"
+msgstr "هذا الرابط غير صالح"
+
+msgid "It was already used, replaced by a newer link, or it expired. Ask your account administrator to send a new one."
+msgstr "استُخدم من قبل، أو حلّ محله رابط أحدث، أو انتهت صلاحيته. اطلب من مسؤول الحسابات إرسال رابط جديد."
+
+msgid "Go to operational sign-in"
+msgstr "الانتقال إلى تسجيل الدخول التشغيلي"
+
+msgid "New staff account"
+msgstr "حساب موظف جديد"
+
+msgid "The account is created as Invited, without a password and without a role. Sending a setup link, activating it and granting roles are separate steps on the next page."
+msgstr "يُنشأ الحساب بحالة «مدعو» دون كلمة مرور ودون دور. إرسال رابط الإعداد والتفعيل ومنح الأدوار خطوات منفصلة في الصفحة التالية."
+
+msgid "A temporary external-security account needs an end of validity; its roles never last longer than the account."
+msgstr "يحتاج حساب الأمن الخارجي المؤقت إلى نهاية صلاحية؛ ولا تدوم أدواره أطول من الحساب."
+
+msgid "Create the account"
+msgstr "إنشاء الحساب"
+
+msgid "Account status"
+msgstr "حالة الحساب"
+
+msgid "This is your own account. Another administrator changes its status, validity and roles."
+msgstr "هذا حسابك الخاص. يغيّر مسؤول آخر حالته وصلاحيته وأدواره."
+
+msgid "This account has roles outside your administration scope: you can read it and grant roles in your scope, but not change its status, validity or credentials."
+msgstr "لهذا الحساب أدوار خارج نطاق إدارتك: يمكنك الاطلاع عليه ومنح أدوار ضمن نطاقك، لكن لا يمكنك تغيير حالته أو صلاحيته أو بيانات دخوله."
+
+msgid "Account"
+msgstr "الحساب"
+
+msgid "Effective access"
+msgstr "الوصول الفعلي"
+
+msgid "Set"
+msgstr "معيّنة"
+
+msgid "Not set yet"
+msgstr "غير معيّنة بعد"
+
+msgid "No limit"
+msgstr "دون حد"
+
+msgid "Setup link"
+msgstr "رابط الإعداد"
+
+#, python-format
+msgid "One unused link, valid until %(expires)s."
+msgstr "رابط واحد غير مستخدم، صالح حتى %(expires)s."
+
+msgid "No open link"
+msgstr "لا يوجد رابط مفتوح"
+
+msgid "Roles and scope"
+msgstr "الأدوار والنطاق"
+
+msgid "Validity"
+msgstr "الصلاحية"
+
+msgid "No start limit"
+msgstr "دون حد للبداية"
+
+msgid "No end"
+msgstr "دون نهاية"
+
+msgid "End this role now?"
+msgstr "إنهاء هذا الدور الآن؟"
+
+msgid "The role stops applying on the next request and stays in the history."
+msgstr "يتوقف الدور عن السريان بدءًا من الطلب التالي ويبقى في السجل."
+
+msgid "End the role"
+msgstr "إنهاء الدور"
+
+msgid "No role yet. The account opens no area until a role is granted."
+msgstr "لا يوجد دور بعد. لا يفتح الحساب أي قسم حتى يُمنح دورًا."
+
+msgid "Grant a role"
+msgstr "منح دور"
+
+msgid "Roles come from a fixed list. Choose the event edition and the organization explicitly; only scopes inside your own administration scope are accepted."
+msgstr "تأتي الأدوار من قائمة ثابتة. اختر الدورة والمؤسسة صراحةً؛ ولا تُقبل إلا النطاقات الواقعة ضمن نطاق إدارتك."
+
+msgid "Temporary external-security account: the role ends no later than the account."
+msgstr "حساب أمن خارجي مؤقت: ينتهي الدور في موعد لا يتجاوز نهاية الحساب."
+
+msgid "Grant the role"
+msgstr "منح الدور"
+
+msgid "Account actions"
+msgstr "إجراءات الحساب"
+
+msgid "Password setup"
+msgstr "إعداد كلمة المرور"
+
+msgid "Sends a single-use, expiring link to the account's own email address. A newer link replaces an older one. The link never signs in and never activates the account."
+msgstr "يرسل رابطًا للاستخدام مرة واحدة ومحدود المدة إلى بريد الحساب نفسه. يحلّ الرابط الأحدث محل الأقدم. لا يسجّل الرابط الدخول أبدًا ولا يفعّل الحساب."
+
+msgid "Send a password reset link"
+msgstr "إرسال رابط إعادة تعيين كلمة المرور"
+
+msgid "Send a setup link"
+msgstr "إرسال رابط إعداد"
+
+msgid "The account stops working on its next request. Nothing is deleted."
+msgstr "يتوقف الحساب عن العمل بدءًا من طلبه التالي. لا يُحذف شيء."
+
+msgid "Name and validity"
+msgstr "الاسم والصلاحية"
+
+msgid "Save"
+msgstr "حفظ"
+
+msgid "Create staff accounts, send single-use setup links, and grant roles within your administration scope."
+msgstr "أنشئ حسابات الموظفين وأرسل روابط إعداد للاستخدام مرة واحدة وامنح الأدوار ضمن نطاق إدارتك."
+
+msgid "Filter"
+msgstr "تصفية"
+
+msgid "Accounts"
+msgstr "الحسابات"
+
+#, python-format
+msgid "%(counter)s account"
+msgid_plural "%(counter)s accounts"
+msgstr[0] "%(counter)s حساب"
+msgstr[1] "حساب واحد (%(counter)s)"
+msgstr[2] "حسابان (%(counter)s)"
+msgstr[3] "%(counter)s حسابات"
+msgstr[4] "%(counter)s حسابًا"
+msgstr[5] "%(counter)s حساب"
+
+msgid "Current roles"
+msgstr "الأدوار الحالية"
+
+msgid "No account matches these filters."
+msgstr "لا يوجد حساب يطابق عوامل التصفية هذه."
+
+msgid "Change the attendance days"
+msgstr "تغيير أيام الحضور"
+
+msgid "Classify the attendance days"
+msgstr "تصنيف أيام الحضور"
+
+msgid "Save the change"
+msgstr "حفظ التغيير"
+
+msgid "Save the classification"
+msgstr "حفظ التصنيف"
+
+msgid "Which conference days each approval covers: all three days, or only the two days after the opening day. Opening-day places are limited."
+msgstr "أيام المؤتمر التي تشملها كل موافقة: الأيام الثلاثة، أو اليومان التاليان ليوم الافتتاح فقط. أماكن يوم الافتتاح محدودة."
+
+msgid "Events in your scope"
+msgstr "الأحداث ضمن نطاقك"
+
+msgid "Configuration"
+msgstr "الضبط"
+
+msgid "Days and capacity configured"
+msgstr "الأيام والسعة مضبوطة"
+
+msgid "Not configured"
+msgstr "غير مضبوط"
+
+msgid "Admission enforcement"
+msgstr "التطبيق عند الدخول"
+
+msgid "Not active"
+msgstr "غير مفعّل"
+
+msgid "Approved registrations"
+msgstr "التسجيلات المعتمدة"
+
+msgid "Days, capacity and enforcement"
+msgstr "الأيام والسعة والتطبيق"
+
+#, python-format
+msgid "Attendance days: %(code)s"
+msgstr "أيام الحضور: %(code)s"
+
+#, python-format
+msgid "Days are calendar dates in the event timezone (%(tz)s). The hours inside each day stay governed by the access profiles and access rules."
+msgstr "الأيام تواريخ تقويمية بحسب المنطقة الزمنية للحدث (%(tz)s). تبقى الساعات داخل كل يوم خاضعة لملفات الدخول وقواعده."
+
+msgid "Admission enforcement active"
+msgstr "التطبيق عند الدخول مفعّل"
+
+msgid "Admission enforcement not active"
+msgstr "التطبيق عند الدخول غير مفعّل"
+
+msgid "Conference days"
+msgstr "أيام المؤتمر"
+
+msgid "Opening-day places allocated"
+msgstr "أماكن يوم الافتتاح المخصصة"
+
+#, python-format
+msgid "%(remaining)s left"
+msgstr "المتبقي: %(remaining)s"
+
+msgid "Two following days only"
+msgstr "اليومان التاليان فقط"
+
+msgid "Classify them"
+msgstr "تصنيفها"
+
+msgid "Badge markings to record"
+msgstr "علامات شارات يجب تسجيلها"
+
+msgid "Show them"
+msgstr "عرضها"
+
+msgid "Days and capacity"
+msgstr "الأيام والسعة"
+
+#, python-format
+msgid "The event edition's own dates start on %(day1)s and include %(day3)s. Check the real conference days before saving; nothing is saved until you submit."
+msgstr "تبدأ تواريخ الدورة في %(day1)s وتشمل %(day3)s. تحقق من أيام المؤتمر الفعلية قبل الحفظ؛ لا يُحفظ شيء قبل أن ترسل النموذج."
+
+msgid "Save the settings"
+msgstr "حفظ الإعدادات"
+
+msgid "The days cannot change once any registration has attendance days or while enforcement is active. The capacity can never be set below the places already allocated."
+msgstr "لا يمكن تغيير الأيام بمجرد أن يحصل أي تسجيل على أيام حضور أو ما دام التطبيق مفعّلًا. ولا يمكن أبدًا ضبط السعة دون الأماكن المخصصة بالفعل."
+
+msgid "You can read these settings. Changing them needs the attendance policy manager role."
+msgstr "يمكنك الاطلاع على هذه الإعدادات. يتطلب تغييرها دور مسؤول سياسة الحضور."
+
+msgid "When active, admission refuses a participant on a day their approval does not cover, and any participant whose days are not classified."
+msgstr "عند تفعيله، يرفض الدخول المشارك في يوم لا تشمله موافقته، وأي مشارك لم تُصنَّف أيامه."
+
+msgid "required"
+msgstr "مطلوب"
+
+msgid "Switch attendance enforcement off?"
+msgstr "إيقاف تطبيق أيام الحضور؟"
+
+msgid "Admission will no longer check the authorized days. Current offline data is revoked. The attendance days and the capacity are kept."
+msgstr "لن يتحقق الدخول بعد الآن من الأيام المصرّح بها. تُلغى البيانات غير المتصلة الحالية. وتبقى أيام الحضور والسعة محفوظة."
+
+msgid "Switch off"
+msgstr "إيقاف"
+
+msgid "Switch enforcement off"
+msgstr "إيقاف التطبيق"
+
+msgid "Activate attendance enforcement?"
+msgstr "تفعيل تطبيق أيام الحضور؟"
+
+msgid "From now on admission checks the authorized days. Current offline data is revoked and devices must download new data."
+msgstr "من الآن فصاعدًا يتحقق الدخول من الأيام المصرّح بها. تُلغى البيانات غير المتصلة الحالية ويجب على الأجهزة تنزيل بيانات جديدة."
+
+msgid "Activate enforcement"
+msgstr "تفعيل التطبيق"
+
+msgid "Every required item of the checklist must be met first."
+msgstr "يجب أولًا استيفاء كل بند مطلوب في قائمة التحقق."
+
+msgid "Last activated"
+msgstr "آخر تفعيل"
+
+#, python-format
+msgid "Approved registrations: %(code)s"
+msgstr "التسجيلات المعتمدة: %(code)s"
+
+msgid "Registrations approved before attendance days existed stay unclassified until you choose their days. Nothing is assigned automatically."
+msgstr "تبقى التسجيلات المعتمدة قبل وجود أيام الحضور غير مصنّفة حتى تختار أيامها. لا يُسنَد شيء تلقائيًا."
+
+msgid "The conference days and the opening-day capacity are not configured yet. Classification is possible once they are."
+msgstr "لم تُضبط بعد أيام المؤتمر وسعة يوم الافتتاح. يصبح التصنيف ممكنًا بعد ضبطها."
+
+#, python-format
+msgid "Opening-day places: %(allocated)s allocated of %(capacity)s (%(remaining)s left)."
+msgstr "أماكن يوم الافتتاح: %(allocated)s مخصصة من أصل %(capacity)s (المتبقي %(remaining)s)."
+
+msgid "Filter the registrations"
+msgstr "تصفية التسجيلات"
+
+msgid "Physical badge marking"
+msgstr "علامة الشارة المادية"
+
+msgid "To record on the badge page"
+msgstr "يجب تسجيلها في صفحة الشارة"
+
+msgid "Nothing to do"
+msgstr "لا شيء مطلوب"
+
+msgid "Badge page"
+msgstr "صفحة الشارة"
+
+msgid "No registration matches this filter."
+msgstr "لا يوجد تسجيل يطابق عامل التصفية هذا."
+
+msgid "Attendance days apply to an approved, current registration only."
+msgstr "أيام الحضور خاصة بالتسجيل المعتمد والحالي فقط."
+
+msgid "Current attendance days"
+msgstr "أيام الحضور الحالية"
+
+msgid "What the participant sees"
+msgstr "ما يراه المشارك"
+
+msgid "Does not match: record the marking on the badge page"
+msgstr "غير مطابقة: سجّل العلامة في صفحة الشارة"
+
+msgid "Matches the current attendance days"
+msgstr "مطابقة لأيام الحضور الحالية"
+
+msgid "current"
+msgstr "حالي"
+
+msgid "Attendance days being confirmed"
+msgstr "أيام الحضور قيد التأكيد"
+
+#, python-format
+msgid "Not valid on the opening day, %(day)s"
+msgstr "غير صالحة يوم الافتتاح، %(day)s"
+
+msgid "Authorized days"
+msgstr "الأيام المصرّح بها"
+
+msgid "Attendance marking"
+msgstr "علامة أيام الحضور"
+
+msgid "Outdated: does not match the current attendance days"
+msgstr "قديمة: لا تطابق أيام الحضور الحالية"
+
+msgid "Not recorded"
+msgstr "غير مسجّلة"
+
+msgid "Record the attendance marking"
+msgstr "تسجيل علامة أيام الحضور"
+
+msgid "Apply this marking to the badge, then confirm"
+msgstr "ضع هذه العلامة على الشارة ثم أكّد"
+
+msgid "I applied this marking to the badge the participant holds."
+msgstr "وضعتُ هذه العلامة على الشارة التي يحملها المشارك."
+
+msgid "Record the marking"
+msgstr "تسجيل العلامة"
+
+msgid "I applied the attendance marking to this badge"
+msgstr "وضعتُ علامة أيام الحضور على هذه الشارة"
+
+msgid "This registration's attendance days are not classified, so no badge can be handed over while attendance enforcement is active."
+msgstr "لم تُصنَّف أيام حضور هذا التسجيل، لذا لا يمكن تسليم أي شارة ما دام تطبيق أيام الحضور مفعّلًا."
+
+msgid "Attendance days not yet classified: record the badge marking once they are."
+msgstr "أيام الحضور لم تُصنَّف بعد: سجّل علامة الشارة بعد تصنيفها."
+
+msgid "Not included"
+msgstr "غير مشمول"
+
+#, python-format
+msgid "the opening day, %(day)s"
+msgstr "يوم الافتتاح، %(day)s"
+
+#, python-format
+msgid "Opening-day places left: %(remaining)s of %(capacity)s."
+msgstr "أماكن يوم الافتتاح المتبقية: %(remaining)s من أصل %(capacity)s."
+
+msgid "Nothing is preselected. An approval without a choice is refused."
+msgstr "لا يوجد اختيار مسبق. تُرفض الموافقة دون اختيار."
+
+#, python-format
+msgid "The opening day, %(day1)s, and the following two days, %(day2)s and %(day3)s. Uses one opening-day place."
+msgstr "يوم الافتتاح، %(day1)s، واليومان التاليان، %(day2)s و%(day3)s. يستخدم مكانًا واحدًا من أماكن يوم الافتتاح."
+
+msgid "The opening day is full. Choose the two following days, or ask for the capacity to be reviewed."
+msgstr "يوم الافتتاح مكتمل. اختر اليومين التاليين، أو اطلب مراجعة السعة."
+
+#, python-format
+msgid "%(day2)s and %(day3)s only. Not valid on the opening day, %(day1)s."
+msgstr "%(day2)s و%(day3)s فقط. غير صالحة يوم الافتتاح، %(day1)s."
+
+msgid "The conference days and the opening-day capacity are not configured for this event. An approval needs them: ask an attendance policy manager."
+msgstr "لم تُضبط أيام المؤتمر وسعة يوم الافتتاح لهذا الحدث. تحتاج الموافقة إليها: تواصل مع مسؤول سياسة الحضور."
+
+msgctxt "attendance worklist"
+msgid "Find by registration reference"
+msgstr "البحث برقم مرجع التسجيل"
+
+msgctxt "attendance worklist"
+msgid "Find"
+msgstr "بحث"
+
+msgctxt "attendance history"
+msgid "History"
+msgstr "السجل"
+
+#, python-format
+msgid "%(seconds)s seconds (the token itself is never shown or kept)"
+msgstr "%(seconds)s ثانية (لا يُعرض الرمز نفسه ولا يُحتفظ به أبدًا)"
+
+msgid "(and roles outside your scope)"
+msgstr "(وأدوار خارج نطاقك)"
+
+msgid "1. Configuration"
+msgstr "1. الإعدادات"
+
+msgid "18 digits. Never use a participant's number."
+msgstr "18 رقمًا. لا تستخدم أبدًا رقم أحد المشاركين."
+
+msgid "2. Authentication"
+msgstr "2. المصادقة"
+
+msgid "3. Lookup"
+msgstr "3. الاستعلام"
+
+msgid "A cached token is not proof that authentication works now; each process keeps its own."
+msgstr "وجود رمز محفوظ مؤقتًا لا يثبت أن المصادقة تعمل الآن؛ لكل عملية رمزها الخاص."
+
+msgid "A new authentication request was accepted just now (not a cached token). This does not show that the lookup endpoint works: test a lookup for that."
+msgstr "قُبل للتو طلب مصادقة جديد (وليس رمزًا محفوظًا مؤقتًا). هذا لا يثبت أن نقطة الاستعلام تعمل: اختبر استعلامًا لذلك."
+
+msgid "A record of earlier checks, not the current state of the service."
+msgstr "سجل بالفحوصات السابقة، وليس الحالة الراهنة للخدمة."
+
+msgid "An identity number has exactly 18 digits. Nothing was sent."
+msgstr "يتكون رقم التعريف من 18 رقمًا بالضبط. لم يُرسل أي شيء."
+
+msgid "Another check is running"
+msgstr "يجري فحص آخر"
+
+msgid "Authentication"
+msgstr "المصادقة"
+
+msgid "Authentication failed"
+msgstr "فشلت المصادقة"
+
+msgid "Authentication succeeded"
+msgstr "نجحت المصادقة"
+
+msgid "Authorized test identity number (NIN)"
+msgstr "رقم التعريف الوطني التجريبي المصرح به (NIN)"
+
+msgid "Cached token in this web process"
+msgstr "الرمز المحفوظ مؤقتًا في عملية الويب هذه"
+
+msgid "Check the identity number service without submitting a registration. Each check runs only when you press its button."
+msgstr "افحص خدمة أرقام التعريف دون تقديم أي تسجيل. لا يُجرى كل فحص إلا عند الضغط على زره."
+
+msgid "Check the test number"
+msgstr "تحقق من الرقم التجريبي"
+
+msgid "Checked at"
+msgstr "وقت الفحص"
+
+msgid "Checks are limited per operator and for the whole environment. Nothing was sent."
+msgstr "عدد الفحوصات محدود لكل مشغل وللبيئة بأكملها. لم يُرسل أي شيء."
+
+msgid "Conference theme: DEEPTECH, The Real Challenge"
+msgstr "موضوع المؤتمر: DEEPTECH, The Real Challenge"
+
+msgid "Configuration incomplete"
+msgstr "الإعدادات غير مكتملة"
+
+msgid "Configured service"
+msgstr "الخدمة المضبوطة"
+
+msgid "Detail code"
+msgstr "رمز التفصيل"
+
+msgid "Earlier history not recorded (treated as enforced)"
+msgstr "سجل سابق غير مسجَّل (يُعامل على أنه مطبَّق)"
+
+msgid "Environment"
+msgstr "البيئة"
+
+msgid "HTTP status"
+msgstr "حالة HTTP"
+
+msgid "Integration diagnostics operator"
+msgstr "مشغل تشخيص الربط مع الخدمات"
+
+msgid "Integrations"
+msgstr "الربط مع الخدمات"
+
+msgid "Invalid settings"
+msgstr "إعدادات غير صالحة"
+
+msgid "Looks up one identity number you are authorized to use for testing. It checks the lookup endpoint only: it creates no registration, changes no identity and verifies nobody. The number is not stored, shown again or logged."
+msgstr "يستعلم عن رقم تعريف واحد مصرح لك باستخدامه للاختبار. يفحص نقطة الاستعلام فقط: لا ينشئ أي تسجيل ولا يغيّر أي هوية ولا يتحقق من أي شخص. لا يُحفظ الرقم ولا يُعرض مجددًا ولا يُسجَّل."
+
+msgid "Lookup"
+msgstr "الاستعلام"
+
+msgid "Lookup answered: identity found"
+msgstr "رد الاستعلام: عُثر على هوية"
+
+msgid "Lookup answered: no identity found"
+msgstr "رد الاستعلام: لم يُعثر على أي هوية"
+
+msgid "Ministry NIN service"
+msgstr "خدمة رقم التعريف الوطني للوزارة"
+
+msgid "Missing settings"
+msgstr "إعدادات ناقصة"
+
+msgid "Next step"
+msgstr "الخطوة التالية"
+
+msgid "No check yet."
+msgstr "لا يوجد فحص بعد."
+
+msgid "No usable answer arrived in time, or the connection failed."
+msgstr "لم يصل أي رد صالح في الوقت المحدد، أو فشل الاتصال."
+
+msgid "Not ready"
+msgstr "غير جاهز"
+
+msgid "Only one check runs at a time. Nothing was sent."
+msgstr "لا يُجرى إلا فحص واحد في كل مرة. لم يُرسل أي شيء."
+
+#, python-format
+msgid "Present, about %(seconds)s seconds left."
+msgstr "موجود، يتبقى نحو %(seconds)s ثانية."
+
+msgid "Read from this server's settings when the page opens. No request is sent."
+msgstr "يُقرأ من إعدادات هذا الخادم عند فتح الصفحة. لا يُرسل أي طلب."
+
+msgid "Readiness"
+msgstr "الجاهزية"
+
+msgid "Rebuilt from the last recorded switch"
+msgstr "أُعيد بناؤه من آخر تبديل مسجَّل"
+
+msgid "Recent checks"
+msgstr "الفحوصات الأخيرة"
+
+msgid "Recorded when enforcement was switched on"
+msgstr "سُجّل عند تفعيل التطبيق"
+
+msgid "Redirect refused"
+msgstr "رُفضت إعادة التوجيه"
+
+msgid "Required settings are missing or invalid. Nothing was sent."
+msgstr "إعدادات مطلوبة ناقصة أو غير صالحة. لم يُرسل أي شيء."
+
+msgid "Roles outside your administration scope are not shown."
+msgstr "لا تُعرض الأدوار الواقعة خارج نطاق إدارتك."
+
+msgid "Sends one new authentication request with the configured credentials, never a cached token. The token received is discarded. Success does not show that the lookup endpoint works."
+msgstr "يرسل طلب مصادقة جديدًا واحدًا ببيانات الاعتماد المضبوطة، وليس رمزًا محفوظًا مؤقتًا أبدًا. يُتجاهل الرمز المستلم. النجاح لا يثبت أن نقطة الاستعلام تعمل."
+
+msgid "Service unavailable or too slow"
+msgstr "الخدمة غير متاحة أو بطيئة جدًا"
+
+msgid "Settings complete"
+msgstr "الإعدادات مكتملة"
+
+msgid "Test authentication"
+msgstr "اختبار المصادقة"
+
+msgid "Test lookup"
+msgstr "اختبار الاستعلام"
+
+msgid "Tests the Ministry NIN service configuration, authentication and lookup. Platform-wide only: every event edition and every organization."
+msgstr "يختبر إعدادات خدمة رقم التعريف الوطني للوزارة ومصادقتها والاستعلام منها. على مستوى المنصة فقط: جميع الدورات وجميع المؤسسات."
+
+msgid "The answer could not be read safely and was discarded."
+msgstr "تعذرت قراءة الرد بأمان فتم تجاهله."
+
+msgid "The authentication endpoint did not accept the request."
+msgstr "لم تقبل نقطة المصادقة الطلب."
+
+msgid "The deployment team checks the configured credentials and the authentication request and response contract with the provider. Do not retry repeatedly."
+msgstr "يتحقق فريق النشر من بيانات الاعتماد المضبوطة ومن عقد طلب المصادقة والرد عليه مع المزوّد. لا تكرر المحاولة مرارًا."
+
+msgid "The deployment team checks the response contract with the provider."
+msgstr "يتحقق فريق النشر من عقد الرد مع المزوّد."
+
+msgid "The deployment team completes the settings listed under Configuration."
+msgstr "يكمل فريق النشر الإعدادات المذكورة في قسم الإعدادات."
+
+msgid "The deployment team confirms the canonical address with the provider and corrects MINISTRY_NIN_API_BASE_URL and the configured paths (including any trailing slash), or the proxy routing."
+msgstr "يؤكد فريق النشر العنوان المعتمد مع المزوّد ويصحح MINISTRY_NIN_API_BASE_URL والمسارات المضبوطة (بما في ذلك أي شرطة مائلة في النهاية)، أو توجيه الوكيل."
+
+msgid "The deployment team sets NIN_PROVIDER_BACKEND to the official adapter and configures its settings."
+msgstr "يضبط فريق النشر NIN_PROVIDER_BACKEND على المحوّل الرسمي ويضبط إعداداته."
+
+msgid "The email with the link could not be sent, so that link was cancelled. Try again in a few minutes."
+msgstr "تعذر إرسال البريد الإلكتروني الذي يحتوي على الرابط، لذا أُلغي هذا الرابط. أعد المحاولة بعد بضع دقائق."
+
+msgid "The lookup endpoint answered successfully but holds no identity for this number. This is not an authentication failure and not a decision about anyone."
+msgstr "ردت نقطة الاستعلام بنجاح لكنها لا تحتوي على أي هوية لهذا الرقم. هذا ليس فشلًا في المصادقة ولا قرارًا بشأن أي شخص."
+
+msgid "The lookup endpoint answered with an identity for this number. Nothing was recorded, and this check verifies no participant."
+msgstr "ردت نقطة الاستعلام بهوية لهذا الرقم. لم يُسجَّل أي شيء، ولا يتحقق هذا الفحص من أي مشارك."
+
+msgid "The official Ministry service is not configured here"
+msgstr "خدمة الوزارة الرسمية غير مضبوطة هنا"
+
+msgid "The provider asked to slow down"
+msgstr "طلب المزوّد إبطاء الطلبات"
+
+msgid "The service answered that too many requests were made (HTTP 429)."
+msgstr "ردت الخدمة بأن عدد الطلبات كبير جدًا (HTTP 429)."
+
+msgid "The service answered with a redirect. Redirects are never followed, so credentials and identity numbers never go to another address."
+msgstr "ردت الخدمة بإعادة توجيه. لا تُتبع عمليات إعادة التوجيه أبدًا، فلا تُرسل بيانات الاعتماد وأرقام التعريف إلى عنوان آخر أبدًا."
+
+msgid "This environment does not use the official adapter. Nothing was sent."
+msgstr "لا تستخدم هذه البيئة المحوّل الرسمي. لم يُرسل أي شيء."
+
+msgid "Token lifetime"
+msgstr "مدة صلاحية الرمز"
+
+msgid "Too many checks"
+msgstr "عدد كبير جدًا من الفحوصات"
+
+msgid "Try again in a moment."
+msgstr "أعد المحاولة بعد لحظات."
+
+msgid "Try again later. If it persists, the deployment team checks network routing, TLS and the provider's status."
+msgstr "أعد المحاولة لاحقًا. إذا استمر الأمر، يتحقق فريق النشر من توجيه الشبكة وTLS وحالة المزوّد."
+
+msgid "Unreadable or unexpected answer"
+msgstr "رد غير مقروء أو غير متوقع"
+
+msgid "Wait a few minutes before the next check."
+msgstr "انتظر بضع دقائق قبل الفحص التالي."
+
+msgid "Wait several minutes before another check."
+msgstr "انتظر عدة دقائق قبل إجراء فحص آخر."
+
+msgid "not the official Ministry adapter"
+msgstr "ليس محوّل الوزارة الرسمي"
+
+msgid "official Ministry adapter"
+msgstr "محوّل الوزارة الرسمي"

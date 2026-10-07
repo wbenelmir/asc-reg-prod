@@ -30,6 +30,7 @@ from django.test import override_settings
 from playwright.sync_api import expect
 
 from tests.browser.database import database_call, database_sync
+from tests.browser.helpers import solve_staff_captcha
 from tests.browser.test_entry_ui_prompt5 import CONTRAST_JS
 from tests.browser.test_ui_ux_checkpoint1 import (
     DESKTOP,
@@ -178,6 +179,7 @@ def _sign_in(live_server, page, user, password: str = OPS_PASSWORD) -> None:
     page.goto(f"{live_server.url}/accounts/ops/sign-in/")
     page.fill("#id_email", user.email_normalized)
     page.fill("#id_password", password)
+    solve_staff_captcha(page)
     with page.expect_navigation():
         page.locator("#main-content button[type=submit]").click()
     page.wait_for_load_state("load")
@@ -822,6 +824,7 @@ def test_anonymous_user_is_sent_to_sign_in_and_back_to_the_page(
     assert "next=" in page.url
     page.fill("#id_email", reviewer.email_normalized)
     page.fill("#id_password", OPS_PASSWORD)
+    solve_staff_captcha(page)
     with page.expect_navigation():
         page.locator("#main-content button[type=submit]").click()
     assert page.url.endswith("/ops/reviews/queue/?status=QUEUED"), page.url

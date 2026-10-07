@@ -1968,6 +1968,7 @@ def _enforce_fallback_lookup_budget(*, actor, network_fingerprint: str) -> None:
 # ---------------------------------------------------------------------------
 
 from apps.badges.services.stock import (  # noqa: E402, F401 -- re-exported for `apps.badges.services.*`
+    AttendanceMarkingError,
     CrossEventScopeError,
     DuplicateStockLocationError,
     InsufficientStockError,
@@ -1987,6 +1988,7 @@ from apps.badges.services.stock import (  # noqa: E402, F401 -- re-exported for 
     receive_print_batch,
     reconstruct_balance_from_ledger,
     record_adjustment,
+    record_attendance_marking,
     record_reconciliation,
     release_allocation,
     replace_issuance,

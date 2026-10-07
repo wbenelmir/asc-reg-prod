@@ -32,6 +32,8 @@ CODE_LABELS: dict[str, dict[str, Promise]] = {
         "ACCOUNT_ACCESS": _("Account access"),
         "DELEGATION_CLAIM": _("Delegation claim"),
         "IDENTITY_REJECTION": _("Identity rejection"),
+        "APPROVAL_ATTENDANCE": _("Approval with attendance days"),
+        "ATTENDANCE_CHANGE": _("Attendance days update"),
     },
     # apps.exports.models.ExportStatus (its model labels are not translated)
     "export_status": {

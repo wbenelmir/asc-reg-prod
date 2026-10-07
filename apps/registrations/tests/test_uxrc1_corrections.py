@@ -15,6 +15,7 @@ from django.urls import reverse
 from django.utils import timezone, translation
 
 from apps.accounts.models import OperationalUser, OperationalUserStatus, ScopedGroupMembership
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.audit.models import AuditEvent
 from apps.core.forms import localized_sort_key
 from apps.core.models import Country, Sector
@@ -662,10 +663,7 @@ def test_the_support_screen_no_longer_renders_a_withdrawn_registrations_note(
     registration = _consented_request(draft)
     _coordinator("uxrc1-screen@example.com", event)
     client = Client()
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": "uxrc1-screen@example.com", "password": PASSWORD},
-    )
+    staff_sign_in(client, "uxrc1-screen@example.com", PASSWORD)
     assert NOTE in client.get(reverse("registrations:ops-accommodation-list")).content.decode()
     withdraw_registration(
         registration=registration, person=person, expected_version=registration.version

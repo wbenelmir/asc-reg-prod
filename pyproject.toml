@@ -51,6 +51,13 @@ dependencies = [
   # is never called; no ALTCHA Cloud or other external service is used.
   "altcha>=2.1.0,<2.2",
   "waitress>=3.0.2,<4",
+  # Self-hosted distorted-letter image CAPTCHA for the STAFF sign-in only:
+  # its `CaptchaStore` table and image renderer (Pillow, already approved;
+  # pulls in django-ranged-response). Its form field, URLconf, refresh and
+  # audio views are not used; `apps.accounts.captcha_guard` generates the
+  # challenges with `secrets` and verifies them (session- and purpose-bound,
+  # single attempt, atomic consumption). No external service or key.
+  "django-simple-captcha>=0.7.0,<0.8",
 ]
 
 [dependency-groups]

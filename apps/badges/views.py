@@ -28,6 +28,7 @@ from django.views.decorators.http import require_http_methods
 from apps.accounts import participant_auth
 from apps.accounts.policies import has_scoped_permission, operational_permission_required
 from apps.accounts.selectors import scope_filtered_queryset
+from apps.accreditation.attendance import participant_attendance
 from apps.accreditation.models import AssignmentStatus, BadgeType, BadgeTypeAssignment
 from apps.badges import references
 from apps.badges.credentials.qr import QrRenderError, render_png
@@ -49,6 +50,7 @@ from apps.badges.forms import (
     ReasonedLifecycleForm,
     ReceivePrintBatchForm,
     RecordAdjustmentForm,
+    RecordAttendanceMarkingForm,
     RecordReconciliationForm,
     ReleaseAllocationForm,
     ReplaceIssuanceForm,
@@ -126,6 +128,7 @@ from apps.badges.services import (
     publish_verification_key,
     receive_print_batch,
     record_adjustment,
+    record_attendance_marking,
     record_reconciliation,
     release_allocation,
     replace_issuance,
@@ -713,6 +716,10 @@ def _participant_pass_context(request, credential) -> dict:
         ),
         "valid_from": credential.valid_from,
         "valid_until": credential.valid_until,
+        # The authorized conference days, read live (an attendance change is
+        # reflected at once; the signed QR carries no attendance claim and the
+        # server decides admission). None when not approved.
+        "attendance": participant_attendance(credential.registration),
     }
 
 
@@ -1346,7 +1353,25 @@ def registration_badge_issuance(request, pk):
         "replace_reason_choices": issuance_reason_choices(_ISSUANCE_REPLACE_REASON_CODES),
         "return_reason_choices": issuance_reason_choices(_ISSUANCE_RETURN_REASON_CODES),
     }
+    context.update(_attendance_marking_context(registration, current_issuance))
     return render(request, "badges/registration_badge_issuance.html", context)
+
+
+def _attendance_marking_context(registration, current_issuance) -> dict:
+    """The marking the operator must apply to the physical badge: the words
+    of the registration's CURRENT attendance days (the generic stock is per
+    Badge Type and never implies the days)."""
+    from apps.accreditation import attendance
+
+    entitlement = attendance.current_entitlement(registration.pk)
+    policy = attendance.policy_for(registration.event_edition_id)
+    return {
+        "attendance_entitlement": entitlement,
+        "attendance_view": attendance.participant_attendance(registration),
+        "attendance_enforced": bool(policy and policy.enforcement_active),
+        "attendance_marking_pending": current_issuance is not None
+        and (entitlement is None or current_issuance.attendance_marking != entitlement.category),
+    }
 
 
 @operational_permission_required(
@@ -1388,7 +1413,7 @@ def badge_issue(request, pk):
             pk=form.cleaned_data["allocation_id"],
         )
     try:
-        issue_badge(
+        issuance = issue_badge(
             badge_assignment=assignment,
             badge_type=badge_type,
             location=location,
@@ -1414,7 +1439,50 @@ def badge_issue(request, pk):
         messages.error(request, service_error_message(exc))
         return _redirect_to_badge_issuance(registration.pk)
     messages.success(request, _("Physical badge issued."))
+    marking = form.cleaned_data.get("attendance_marking") or ""
+    if marking:
+        # The marking confirmed with the handover is recorded as its own
+        # step: a mismatch (the days changed meanwhile) never undoes the
+        # handover, it leaves the marking to record from the badge page.
+        try:
+            record_attendance_marking(
+                issuance=issuance,
+                attendance_marking=marking,
+                actor=request.user,
+                expected_lock_version=issuance.version,
+            )
+        except StockServiceError as exc:
+            messages.warning(request, service_error_message(exc))
+        else:
+            messages.success(request, _("The attendance marking of the badge was recorded."))
     return _redirect_to_badge_issuance(registration.pk)
+
+
+@operational_permission_required(
+    "badges.issue_badgeissuance", login_url="accounts:operational-sign-in"
+)
+@require_http_methods(["POST"])
+def badge_issuance_attendance_marking(request, registration_pk, pk):
+    """Record the attendance marking (sticker, overlay or print variant)
+    applied to a handed-over badge. Scoped like every issuance command."""
+    issuance = _scoped_issuance_or_404(request, pk, codename="issue_badgeissuance")
+    if issuance.registration_id != registration_pk:
+        raise Http404
+    form = RecordAttendanceMarkingForm(request.POST)
+    if not form.is_valid():
+        return _conflict_response(request, _("Invalid request. Reload the page and try again."))
+    try:
+        record_attendance_marking(
+            issuance=issuance,
+            attendance_marking=form.cleaned_data["attendance_marking"],
+            actor=request.user,
+            expected_lock_version=form.cleaned_data["expected_lock_version"],
+        )
+    except StockServiceError as exc:
+        messages.error(request, service_error_message(exc))
+    else:
+        messages.success(request, _("The attendance marking of the badge was recorded."))
+    return _redirect_to_badge_issuance(issuance.registration_id)
 
 
 def _issuance_command(

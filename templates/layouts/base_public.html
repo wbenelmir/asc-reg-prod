@@ -13,7 +13,10 @@
   which holds the language switcher, is deliberately outside it.
 
   Blocks: `content` (the form column), `auth_aside` (the brand panel body),
-  `shell_label` (the space name beside the logo), `brand_url`.
+  `auth_aside_art` (empty; the sign-in pages put the conference artwork in
+  the panel's upper area with `partials/auth_panel_artwork.html`, which
+  replaces the stripe motif), `shell_label` (the space name beside the
+  logo), `brand_url`.
 {% endcomment %}
 
 {% block body_attrs %} class="asc-ui asc-public"{% endblock %}
@@ -42,9 +45,10 @@
           {% block content %}{% endblock %}
         </div>
         <aside class="asc-auth-aside" aria-labelledby="asc-auth-aside-title">
+          {% block auth_aside_art %}{% endblock %}
           <div class="asc-auth-aside-body">
             {% block auth_aside %}
-              <p class="asc-auth-kicker">{% trans "ASC 2026" %}</p>
+              <p class="asc-auth-kicker"><bdi dir="ltr">{% trans "ASC 2026" %}</bdi> · {% trans "5th edition" %}</p>
               <h2 class="asc-auth-aside-title" id="asc-auth-aside-title">{% trans "Participant registration" %}</h2>
               <ul class="asc-auth-facts">
                 <li>{% include "components/icon.html" with name="mail" %}<span>{% trans "Sign in with a one-time code sent to your email. No password is needed." %}</span></li>

@@ -183,3 +183,10 @@ def assign_approval_prerequisites(registration, actor) -> None:
     assign(kind="PARTICIPANT_ROLE", registration=registration, reference_obj=role, actor=actor)
     assign(kind="BADGE_TYPE", registration=registration, reference_obj=badge, actor=actor)
     assign(kind="ACCESS_PROFILE", registration=registration, reference_obj=profile, actor=actor)
+    # Approval also needs the event's attendance days and opening-day capacity
+    # (synthetic test values; a test that configures its own keeps them).
+    from apps.accreditation.models import AttendancePolicy
+    from apps.accreditation.tests.attendance_fixtures import configure_attendance
+
+    if not AttendancePolicy.objects.filter(event_edition=event).exists():
+        configure_attendance(event)

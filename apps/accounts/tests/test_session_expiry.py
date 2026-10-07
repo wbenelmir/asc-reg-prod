@@ -11,6 +11,7 @@ from django.utils import timezone
 from apps.accounts import participant_auth, session_expiry
 from apps.accounts.models import OperationalUser, OperationalUserStatus
 from apps.accounts.otp import DeterministicTestOtpGenerator
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.core.models import Country, Sector
 from apps.core.testing import otp_request_data
 from apps.events.models import EventEdition, EventEditionStatus
@@ -224,10 +225,7 @@ def _make_operational_user(email: str) -> OperationalUser:
 
 def test_operational_login_establishes_timestamps_and_activity_works(client: Client) -> None:
     _make_operational_user("ops-session@example.com")
-    response = client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": "ops-session@example.com", "password": "__test_password__"},
-    )
+    response = staff_sign_in(client, "ops-session@example.com", "__test_password__")
     assert response.status_code == 302
     session = client.session
     assert session_expiry.OPERATIONAL_ESTABLISHED_AT_KEY in session
@@ -241,10 +239,7 @@ def test_operational_login_establishes_timestamps_and_activity_works(client: Cli
 
 def test_operational_inactivity_expiry_forces_sign_in_again(client: Client) -> None:
     _make_operational_user("ops-inactive@example.com")
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": "ops-inactive@example.com", "password": "__test_password__"},
-    )
+    staff_sign_in(client, "ops-inactive@example.com", "__test_password__")
     stale = (timezone.now() - timezone.timedelta(seconds=99999)).isoformat()
     session = client.session
     session[session_expiry.OPERATIONAL_ESTABLISHED_AT_KEY] = stale
@@ -258,10 +253,7 @@ def test_operational_inactivity_expiry_forces_sign_in_again(client: Client) -> N
 
 def test_suspended_operational_account_loses_its_session_mid_use(client: Client) -> None:
     user = _make_operational_user("ops-suspended@example.com")
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": "ops-suspended@example.com", "password": "__test_password__"},
-    )
+    staff_sign_in(client, "ops-suspended@example.com", "__test_password__")
     assert client.get(reverse("registrations:ops-intake-list")).status_code == 200
 
     user.status = OperationalUserStatus.SUSPENDED
@@ -275,10 +267,7 @@ def test_time_limited_operational_account_loses_its_session_mid_use(client: Clie
     user = _make_operational_user("ops-time-limited@example.com")
     user.active_until = timezone.now() + timezone.timedelta(hours=1)
     user.save(update_fields=["active_until"])
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": "ops-time-limited@example.com", "password": "__test_password__"},
-    )
+    staff_sign_in(client, "ops-time-limited@example.com", "__test_password__")
     assert client.get(reverse("registrations:ops-intake-list")).status_code == 200
 
     user.active_until = timezone.now() - timezone.timedelta(seconds=1)
@@ -296,10 +285,7 @@ def test_participant_and_operational_session_expiry_are_independent(
     session's own timestamps in the same underlying session object, and
     vice versa -- they are stored under entirely separate keys."""
     _make_operational_user("ops-separate@example.com")
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": "ops-separate@example.com", "password": "__test_password__"},
-    )
+    staff_sign_in(client, "ops-separate@example.com", "__test_password__")
     operational_established = client.session[session_expiry.OPERATIONAL_ESTABLISHED_AT_KEY]
 
     # Corrupting PARTICIPANT keys only must not disturb the operational ones.
@@ -339,10 +325,7 @@ def test_operational_sign_out_preserves_a_valid_participant_session(
     participant_established = client.session[session_expiry.PARTICIPANT_ESTABLISHED_AT_KEY]
 
     _make_operational_user("both-ops-1@example.com")
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": "both-ops-1@example.com", "password": "__test_password__"},
-    )
+    staff_sign_in(client, "both-ops-1@example.com", "__test_password__")
 
     response = client.post(reverse("accounts:operational-sign-out"))
     assert response.status_code == 302
@@ -366,10 +349,7 @@ def test_operational_session_expiry_preserves_a_valid_participant_session(
     participant_established = client.session[session_expiry.PARTICIPANT_ESTABLISHED_AT_KEY]
 
     _make_operational_user("both-ops-2@example.com")
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": "both-ops-2@example.com", "password": "__test_password__"},
-    )
+    staff_sign_in(client, "both-ops-2@example.com", "__test_password__")
     stale = (timezone.now() - timezone.timedelta(seconds=99999)).isoformat()
     session = client.session
     session[session_expiry.OPERATIONAL_ESTABLISHED_AT_KEY] = stale
@@ -389,10 +369,7 @@ def test_operational_session_expiry_preserves_a_valid_participant_session(
 
 def test_participant_logout_preserves_a_valid_operational_session(client: Client) -> None:
     _make_operational_user("both-ops-3@example.com")
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": "both-ops-3@example.com", "password": "__test_password__"},
-    )
+    staff_sign_in(client, "both-ops-3@example.com", "__test_password__")
     operational_established = client.session[session_expiry.OPERATIONAL_ESTABLISHED_AT_KEY]
 
     session = client.session
@@ -417,10 +394,7 @@ def test_participant_expiry_preserves_a_valid_operational_session(
 ) -> None:
     _otp_login(client, "both-audiences-4@example.com", django_capture_on_commit_callbacks)
     _make_operational_user("both-ops-4@example.com")
-    client.post(
-        reverse("accounts:operational-sign-in"),
-        {"email": "both-ops-4@example.com", "password": "__test_password__"},
-    )
+    staff_sign_in(client, "both-ops-4@example.com", "__test_password__")
     operational_established = client.session[session_expiry.OPERATIONAL_ESTABLISHED_AT_KEY]
 
     stale = (timezone.now() - timezone.timedelta(seconds=99999)).isoformat()

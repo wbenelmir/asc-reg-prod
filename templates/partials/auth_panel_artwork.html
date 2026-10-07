@@ -1,0 +1,12 @@
+{% load static i18n %}
+{% comment %}
+  The conference artwork inside the navy sign-in panel (`auth_aside_art`
+  block of `layouts/base_public.html`): the supplied lockup, unaltered,
+  scaled with its aspect ratio kept. It is an illustration within the panel,
+  not a second site header (the header keeps its own logo). The alternative
+  text names only the theme: the conference name is already announced by the
+  header and the panel's own label.
+{% endcomment %}
+<div class="asc-auth-aside-art" data-panel-artwork>
+  <img class="asc-auth-aside-lockup" src="{% static 'img/brand/asc-conference-lockup.png' %}" width="1639" height="393" decoding="async" loading="lazy" alt="{% trans 'Conference theme: DEEPTECH, The Real Challenge' %}">
+</div>

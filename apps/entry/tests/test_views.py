@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from apps.accounts.models import OperationalUserAccountType
+from apps.accounts.tests.sign_in import staff_sign_in
 from apps.entry.models import (
     EntryEvent,
     EntryOperatorSession,
@@ -27,10 +28,7 @@ UNTRUSTED_INPUT = "not-a-credential"
 
 
 def _sign_in(client, user, next_url=None):
-    url = reverse("accounts:operational-sign-in")
-    if next_url:
-        url += f"?next={next_url}"
-    return client.post(url, {"email": user.email_normalized, "password": factories.TEST_PASSWORD})
+    return staff_sign_in(client, user.email_normalized, factories.TEST_PASSWORD, next_url=next_url)
 
 
 def _on_device(client, secret):

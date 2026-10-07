@@ -21,6 +21,10 @@ screen-reader accessible, which a rasterized PDF would not.
       <dd><bdi>{{ registration.event_edition.code }}</bdi></dd>
       <dt>{% trans "Status" %}</dt>
       <dd data-pass-status="{{ credential.status }}">{{ status_message }}</dd>
+      {% if attendance %}
+        <dt>{% trans "Authorized days" %}</dt>
+        <dd data-pass-attendance="{{ attendance.state }}">{% include "badges/_attendance_marking.html" with attendance=attendance %}</dd>
+      {% endif %}
       <dt>{% trans "Fallback reference" %}</dt>
       <dd><bdi><code>{{ fallback_reference_display }}</code></bdi></dd>
       <dt>{% trans "Valid from" %}</dt>

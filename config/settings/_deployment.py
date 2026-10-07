@@ -166,6 +166,10 @@ def validate_settings(namespace: dict, *, settings_module_name: str) -> None:
             celery_broker_url=namespace["CELERY_BROKER_URL"],
             celery_task_always_eager=namespace["CELERY_TASK_ALWAYS_EAGER"],
             mfa_backend=namespace["MFA_BACKEND"],
+            captcha_test_mode=bool(namespace["CAPTCHA_TEST_MODE"]),
+            atomic_requests=bool(connection.get("ATOMIC_REQUESTS", False)),
+            staff_captcha_length=namespace["STAFF_CAPTCHA_LENGTH"],
+            captcha_timeout_minutes=namespace["CAPTCHA_TIMEOUT"],
             human_check_counter_store=namespace["HUMAN_CHECK_COUNTER_STORE"],
             human_check_challenge_max_per_window=namespace["HUMAN_CHECK_CHALLENGE_MAX_PER_WINDOW"],
             human_check_challenge_fallback_max_per_window=namespace[

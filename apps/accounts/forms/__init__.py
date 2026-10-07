@@ -53,10 +53,36 @@ class OtpVerifyForm(forms.Form):
         return code
 
 
+class CaptchaAnswerInput(forms.TextInput):
+    """The typed security-image answer is never rendered back: every page
+    shows a new image with an empty field."""
+
+    def format_value(self, value):
+        return None
+
+
 class OperationalSignInForm(forms.Form):
     email = forms.EmailField(
         label=_("Email address"), widget=forms.EmailInput(attrs={"autocomplete": "username"})
     )
     password = forms.CharField(
         label=_("Password"), widget=forms.PasswordInput(attrs={"autocomplete": "current-password"})
+    )
+    # Staff sign-in image CAPTCHA (apps.accounts.captcha_guard). Not required
+    # here on purpose: the view verifies (and consumes) the session's
+    # challenge first and shows the guard's own message; the template renders
+    # these two fields itself, never with a value.
+    captcha_key = forms.CharField(required=False, max_length=40, widget=forms.HiddenInput)
+    captcha_answer = forms.CharField(
+        required=False,
+        max_length=16,
+        label=_("Characters in the image"),
+        widget=CaptchaAnswerInput(
+            attrs={
+                "autocomplete": "off",
+                "autocapitalize": "characters",
+                "spellcheck": "false",
+                "class": "asc-captcha-answer",
+            }
+        ),
     )

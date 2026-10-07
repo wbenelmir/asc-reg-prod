@@ -103,7 +103,12 @@ async (language) => {
     logos: [...document.querySelectorAll("img[src$='asc-logo.svg']")].filter(shown)
       .map((el) => {
         const r = el.getBoundingClientRect();
-        return {w: r.width, h: r.height, alt: el.alt};
+        const identity = el.closest('[data-conference-identity]');
+        return {
+          w: r.width, h: r.height, alt: el.alt,
+          decorative: el.getAttribute('aria-hidden') === 'true',
+          named: identity ? identity.innerText : '',
+        };
       }),
     headingFont: getComputedStyle(document.querySelector('h1')).fontFamily,
     bodyFont: getComputedStyle(document.body).fontFamily,
@@ -394,7 +399,15 @@ def _visual_contract(page, language: str, label: str) -> None:
     assert result["exposedIcons"] == 0, label  # every icon is decorative
     assert result["logos"], f"{label}: the ASC logo is not shown"
     for logo in result["logos"]:
-        assert logo["alt"] and abs(logo["w"] / logo["h"] - LOGO_RATIO) < 0.02, (label, logo)
+        # Either a meaningful image (the offline shell's own logo has a text
+        # alternative), or -- version 1.1 UI work package 02 (owner,
+        # 2026-10-05) -- a decorative logo beside the visible conference name
+        # and year in the shared header. Proportions stay the original.
+        if logo["alt"]:
+            assert not logo["decorative"], (label, logo)
+        else:
+            assert logo["decorative"] and "2026" in logo["named"], (label, logo)
+        assert abs(logo["w"] / logo["h"] - LOGO_RATIO) < 0.02, (label, logo)
     if language == "ar":
         assert result["thmanyahLoaded"], f"{label}: Thmanyah Sans is not loaded"
         assert result["headingFont"].startswith('"Thmanyah Sans"'), (label, result)

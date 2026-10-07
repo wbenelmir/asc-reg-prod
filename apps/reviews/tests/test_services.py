@@ -265,7 +265,10 @@ def test_not_approved_decision_sets_status_and_preserves_history(registration, m
 def test_approved_decision_is_blocked_pending_prompt4_assignments(registration, manager):
     with pytest.raises(ApprovalRequiresAssignmentsError):
         record_approved_decision(
-            registration=registration, expected_version=registration.version, decided_by=manager
+            registration=registration,
+            expected_version=registration.version,
+            decided_by=manager,
+            attendance_category="FOLLOWING_TWO_DAYS",
         )
     registration.refresh_from_db()
     # Nothing committed -- fails atomically, before any write.
@@ -290,9 +293,15 @@ def test_approved_decision_succeeds_once_prompt4_assignments_exist(
     from apps.people.tests.identity_fixtures import make_verified_identity_case
 
     make_verified_identity_case(registration)
+    from apps.accreditation.tests.attendance_fixtures import configure_attendance
+
+    configure_attendance(event)
 
     decision = record_approved_decision(
-        registration=registration, expected_version=registration.version, decided_by=manager
+        registration=registration,
+        expected_version=registration.version,
+        decided_by=manager,
+        attendance_category="FOLLOWING_TWO_DAYS",
     )
     registration.refresh_from_db()
     assert registration.public_status == RegistrationPublicStatus.APPROVED
@@ -313,6 +322,7 @@ def test_approved_decision_requires_access_profile_as_well(registration, event, 
             registration=registration,
             expected_version=registration.version,
             decided_by=manager,
+            attendance_category="FOLLOWING_TWO_DAYS",
         )
     registration.refresh_from_db()
     assert registration.public_status != RegistrationPublicStatus.APPROVED

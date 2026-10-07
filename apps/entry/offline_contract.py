@@ -199,7 +199,15 @@ WIPE_ORDER_PAYLOAD = frozenset(
 #: Exactly the risk-increasing changes a critical delta can carry (binding
 #: decision P2-B). Anything else requires a full rebuild.
 DELTA_WITHDRAWN_REASONS = frozenset(
-    {"REGISTRATION_NOT_APPROVED", "ASSIGNMENT_CHANGED", "ACCESS_RULE_CHANGED", "PASS_CHANGED"}
+    {
+        "REGISTRATION_NOT_APPROVED",
+        "ASSIGNMENT_CHANGED",
+        "ACCESS_RULE_CHANGED",
+        "PASS_CHANGED",
+        # Attendance days no longer cover the package's day (apps.accreditation.
+        # attendance); the device refuses with ATTENDANCE_DAY_NOT_AUTHORIZED.
+        "ATTENDANCE_NOT_AUTHORIZED",
+    }
 )
 DELTA_PASS_STATUSES = frozenset({"REVOKED", "REPLACED", "SUSPENDED", "EXPIRED", "INACTIVE"})
 DELTA_REBUILD_REASONS = frozenset(

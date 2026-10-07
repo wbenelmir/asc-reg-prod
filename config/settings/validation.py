@@ -156,6 +156,13 @@ class DeploymentSettingsSnapshot:
     identity_allow_simulated_provider: bool = False
     ministry_api: dict[str, object] = field(default_factory=dict)
 
+    # --- staff sign-in image CAPTCHA (apps.accounts.captcha_guard). None means
+    # "not supplied by this caller" and skips the check. ---
+    captcha_test_mode: bool | None = None
+    atomic_requests: bool | None = None
+    staff_captcha_length: int | None = None
+    captcha_timeout_minutes: int | None = None
+
     # --- identity field-encryption and blind-index HMAC keys (ADR-0006, Prompt 3) ---
     identity_encryption_active_versions: list[int] = field(default_factory=list)
     identity_encryption_write_version: int | None = None
@@ -689,6 +696,24 @@ def validate_deployment_configuration(snapshot: DeploymentSettingsSnapshot) -> N
                 errors.append("The ministry adapter configuration is incomplete (IDV-2).")
             else:
                 errors.extend(config.malformed_problems())
+
+    # Staff sign-in CAPTCHA: never the package's test answer, a consumption
+    # that commits before authentication (no ATOMIC_REQUESTS), and bounded
+    # length and lifetime.
+    if snapshot.captcha_test_mode:
+        errors.append("CAPTCHA_TEST_MODE must be False in staging/production.")
+    if snapshot.atomic_requests:
+        errors.append(
+            "DATABASES['default']['ATOMIC_REQUESTS'] must be False: the staff sign-in CAPTCHA "
+            "consumption must commit before the password is checked."
+        )
+    if snapshot.staff_captcha_length is not None and not 4 <= snapshot.staff_captcha_length <= 8:
+        errors.append("STAFF_CAPTCHA_LENGTH must be between 4 and 8 characters.")
+    if (
+        snapshot.captcha_timeout_minutes is not None
+        and not 1 <= snapshot.captcha_timeout_minutes <= 30
+    ):
+        errors.append("STAFF_CAPTCHA_TIMEOUT_MINUTES must be between 1 and 30.")
 
     _check_versioned_key_family(
         family_label="IDENTITY_BLIND_INDEX_HMAC",

@@ -14,6 +14,7 @@ from __future__ import annotations
 from django.utils.translation import gettext_lazy as _
 
 from apps.badges.services import (
+    AttendanceMarkingError,
     CrossEventScopeError,
     DuplicateStockLocationError,
     FallbackLookupThrottled,
@@ -124,6 +125,15 @@ _MESSAGES = {
         "This registration is no longer approved, so no physical badge can be issued or "
         "replaced for it."
     ),
+    (AttendanceMarkingError, "UNCLASSIFIED"): _(
+        "Attendance enforcement is active and this registration's attendance days are not "
+        "classified yet. Classify them before handing over or marking a badge."
+    ),
+    (AttendanceMarkingError, "MISMATCH"): _(
+        "The marking you confirmed differs from the registration's current attendance days. "
+        "Reload the page and apply the marking it shows."
+    ),
+    (AttendanceMarkingError, None): _("The attendance marking could not be recorded."),
     (DuplicateStockLocationError, None): _(
         "A stock location with this code already exists for this event."
     ),

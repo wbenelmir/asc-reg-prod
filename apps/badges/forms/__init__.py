@@ -312,6 +312,12 @@ class TransferStockForm(_StockCommandForm):
     note = forms.CharField(max_length=300, required=False, label=_("Note"))
 
 
+def _attendance_choices():
+    from apps.accreditation.models import AttendanceCategory
+
+    return list(AttendanceCategory.choices)
+
+
 class IssueBadgeForm(_StockCommandForm):
     badge_type_id = forms.UUIDField(widget=forms.HiddenInput)
     location_id = forms.UUIDField(widget=forms.HiddenInput)
@@ -319,6 +325,18 @@ class IssueBadgeForm(_StockCommandForm):
     optional_serial_number = forms.CharField(
         max_length=64, required=False, label=_("Serial number (optional)")
     )
+    # The attendance marking the operator confirms having applied to the badge
+    # being handed over (blank: none confirmed yet; recorded later).
+    attendance_marking = forms.ChoiceField(
+        choices=[("", ""), *_attendance_choices()], required=False
+    )
+
+
+class RecordAttendanceMarkingForm(forms.Form):
+    """Confirm the attendance marking applied to a handed-over badge."""
+
+    expected_lock_version = forms.IntegerField(min_value=0, widget=forms.HiddenInput)
+    attendance_marking = forms.ChoiceField(choices=_attendance_choices())
 
 
 class ReplaceIssuanceForm(_StockCommandForm):

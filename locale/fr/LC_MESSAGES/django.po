@@ -8800,3 +8800,1216 @@ msgstr "Conservez votre référence d’inscription et suivez votre demande dans
 #: templates/partials/conference_identity.html
 msgid "5th edition"
 msgstr "5e édition"
+
+msgid "Reset the password of your ASC 2026 staff account"
+msgstr "Réinitialisez le mot de passe de votre compte du personnel ASC 2026"
+
+msgid "A password reset was requested for your ASC 2026 staff account."
+msgstr "Une réinitialisation du mot de passe a été demandée pour votre compte du personnel ASC 2026."
+
+msgid "Set the password of your ASC 2026 staff account"
+msgstr "Définissez le mot de passe de votre compte du personnel ASC 2026"
+
+msgid "A staff account was created for you on the ASC 2026 platform."
+msgstr "Un compte du personnel a été créé pour vous sur la plateforme ASC 2026."
+
+#, python-format
+msgid "Open this link to choose your password. It works once and expires in %(hours)s hours:"
+msgstr "Ouvrez ce lien pour choisir votre mot de passe. Il ne fonctionne qu’une fois et expire dans %(hours)s heures :"
+
+msgid "After that, sign in with your email address and password. Your account opens only once an administrator has activated it and given it a role. If you did not expect this message, ignore it."
+msgstr "Connectez-vous ensuite avec votre adresse email et votre mot de passe. Votre compte ne s’ouvre qu’une fois qu’un administrateur l’a activé et lui a attribué un rôle. Si vous n’attendiez pas ce message, ignorez-le."
+
+msgid "You are not an account administrator."
+msgstr "Vous n’êtes pas administrateur des comptes."
+
+msgid "You cannot change your own account, status or roles. Ask another administrator."
+msgstr "Vous ne pouvez pas modifier votre propre compte, son statut ou ses rôles. Demandez à un autre administrateur."
+
+msgid "This is outside your administration scope. Nothing was changed."
+msgstr "Ceci sort de votre périmètre d’administration. Rien n’a été modifié."
+
+msgid "This would remove the last account administrator with full scope. Nothing was changed."
+msgstr "Cela retirerait le dernier administrateur des comptes au périmètre complet. Rien n’a été modifié."
+
+msgid "Enter a short reason (at least 3 characters)."
+msgstr "Saisissez un motif court (au moins 3 caractères)."
+
+msgid "This is not possible in the account's current status."
+msgstr "Ce n’est pas possible dans le statut actuel du compte."
+
+msgid "The end of validity must follow its start."
+msgstr "La fin de validité doit suivre son début."
+
+msgid "A temporary external-security account and its roles need a future end of validity."
+msgstr "Un compte temporaire de sécurité externe et ses rôles doivent avoir une fin de validité future."
+
+msgid "An account already uses this email address."
+msgstr "Un compte utilise déjà cette adresse email."
+
+msgid "Enter a valid email address."
+msgstr "Saisissez une adresse email valide."
+
+msgid "Enter a display name."
+msgstr "Saisissez un nom d’affichage."
+
+msgid "Choose an account type from the list."
+msgstr "Choisissez un type de compte dans la liste."
+
+msgid "Choose a role from the list."
+msgstr "Choisissez un rôle dans la liste."
+
+msgid "Choose an event edition, or every event edition."
+msgstr "Choisissez une édition, ou toutes les éditions."
+
+msgid "This role cannot have this scope. Check the organization and the checkpoint."
+msgstr "Ce rôle ne peut pas avoir ce périmètre. Vérifiez l’organisation et le point de contrôle."
+
+msgid "This role is no longer on the account. Reload the page."
+msgstr "Ce rôle n’est plus sur le compte. Rechargez la page."
+
+msgid "This change could not be applied. Reload the page and try again."
+msgstr "Cette modification n’a pas pu être appliquée. Rechargez la page et réessayez."
+
+msgid "Invited"
+msgstr "Invité"
+
+msgid "Disabled"
+msgstr "Désactivé"
+
+msgid "Cannot sign in: the account is not active or outside its validity."
+msgstr "Connexion impossible : le compte n’est pas actif ou est hors de sa période de validité."
+
+msgid "Active, but no password set yet: send a setup link."
+msgstr "Actif, mais aucun mot de passe défini : envoyez un lien de configuration."
+
+msgid "Active, but no current role: the account opens no area."
+msgstr "Actif, mais sans rôle en cours : le compte n’ouvre aucun espace."
+
+msgid "Can sign in and use its current roles."
+msgstr "Peut se connecter et utiliser ses rôles en cours."
+
+msgid "In effect"
+msgstr "En vigueur"
+
+msgid "Starts later"
+msgstr "Commence plus tard"
+
+msgid "Ended"
+msgstr "Terminé"
+
+msgid "The account was created as Invited. Next: send a setup link, activate it and grant a role -- three separate steps."
+msgstr "Le compte a été créé avec le statut Invité. Ensuite : envoyez un lien de configuration, activez-le et attribuez un rôle -- trois étapes distinctes."
+
+msgid "The account was updated."
+msgstr "Le compte a été mis à jour."
+
+#, python-format
+msgid "The account status is now: %(status)s."
+msgstr "Le statut du compte est désormais : %(status)s."
+
+msgid "A single-use link was sent to the account's email address. Any earlier link no longer works."
+msgstr "Un lien à usage unique a été envoyé à l’adresse email du compte. Tout lien antérieur ne fonctionne plus."
+
+msgid "The role was granted. It applies on the next request."
+msgstr "Le rôle a été attribué. Il s’applique dès la prochaine requête."
+
+msgid "The role was ended. It no longer applies."
+msgstr "Le rôle a pris fin. Il ne s’applique plus."
+
+msgid "Your password is set. You can now sign in."
+msgstr "Votre mot de passe est défini. Vous pouvez maintenant vous connecter."
+
+msgid "Your password is set. You can sign in once an administrator has activated your account."
+msgstr "Votre mot de passe est défini. Vous pourrez vous connecter dès qu’un administrateur aura activé votre compte."
+
+msgid "Type the characters shown in the security image."
+msgstr "Saisissez les caractères affichés dans l’image de sécurité."
+
+msgid "This security image is not valid for this page (it was already used, or it belongs to another page or tab). Type the characters of the new image."
+msgstr "Cette image de sécurité n’est pas valable pour cette page (elle a déjà été utilisée, ou elle appartient à une autre page ou à un autre onglet). Saisissez les caractères de la nouvelle image."
+
+msgid "The security image expired. Type the characters of the new image."
+msgstr "L’image de sécurité a expiré. Saisissez les caractères de la nouvelle image."
+
+msgid "The characters did not match the image. Type the characters of the new image."
+msgstr "Les caractères ne correspondaient pas à l’image. Saisissez les caractères de la nouvelle image."
+
+msgid "Characters in the image"
+msgstr "Caractères de l’image"
+
+msgid "Short and factual. Do not include personal data."
+msgstr "Court et factuel. N’incluez aucune donnée personnelle."
+
+msgid "Coordinated Universal Time (UTC). Leave empty for no limit."
+msgstr "Temps universel coordonné (UTC). Laissez vide pour aucune limite."
+
+msgid "Internal staff"
+msgstr "Personnel interne"
+
+msgid "Organization staff"
+msgstr "Personnel d’une organisation"
+
+msgid "Support"
+msgstr "Assistance"
+
+msgid "External security (temporary)"
+msgstr "Sécurité externe (temporaire)"
+
+msgid "Display name"
+msgstr "Nom d’affichage"
+
+msgid "Account type"
+msgstr "Type de compte"
+
+msgid "Starts"
+msgstr "Début"
+
+msgid "Ends"
+msgstr "Fin"
+
+msgid "I confirm this role applies to every event edition."
+msgstr "Je confirme que ce rôle s’applique à toutes les éditions."
+
+msgid "Select a role"
+msgstr "Choisissez un rôle"
+
+msgid "Select an event edition"
+msgstr "Choisissez une édition"
+
+msgid "Every event edition"
+msgstr "Toutes les éditions"
+
+msgid "Every organization"
+msgstr "Toutes les organisations"
+
+msgid "Every checkpoint of the event"
+msgstr "Tous les points de contrôle de l’événement"
+
+msgid "Confirm that this role applies to every event edition."
+msgstr "Confirmez que ce rôle s’applique à toutes les éditions."
+
+msgid "Every status"
+msgstr "Tous les statuts"
+
+msgid "Every role"
+msgstr "Tous les rôles"
+
+msgid "New password"
+msgstr "Nouveau mot de passe"
+
+msgid "At least 12 characters. Avoid common words and your name or email."
+msgstr "Au moins 12 caractères. Évitez les mots courants ainsi que votre nom ou votre email."
+
+msgid "Repeat the new password"
+msgstr "Répétez le nouveau mot de passe"
+
+msgid "The two passwords do not match."
+msgstr "Les deux mots de passe ne correspondent pas."
+
+msgid "Account administrator"
+msgstr "Administrateur des comptes"
+
+msgid "Creates staff accounts, sends setup links and grants roles within their own scope."
+msgstr "Crée les comptes du personnel, envoie les liens de configuration et attribue des rôles dans son propre périmètre."
+
+msgid "Registration intake (read only)"
+msgstr "Réception des inscriptions (lecture seule)"
+
+msgid "Reads registrations in scope."
+msgstr "Consulte les inscriptions de son périmètre."
+
+msgid "Registration reviewer"
+msgstr "Examinateur des inscriptions"
+
+msgid "Reviews registrations and identity documents; no final decision."
+msgstr "Examine les inscriptions et les pièces d’identité ; aucune décision finale."
+
+msgid "Accreditation manager"
+msgstr "Responsable de l’accréditation"
+
+msgid "Records decisions, chooses attendance days, reopens and cancels registrations."
+msgstr "Enregistre les décisions, choisit les jours de participation, rouvre et annule les inscriptions."
+
+msgid "Accreditation coordinator"
+msgstr "Coordinateur de l’accréditation"
+
+msgid "Assigns participant roles, badge types, access profiles and access rules."
+msgstr "Attribue les rôles des participants, les types de badge, les profils et les règles d’accès."
+
+msgid "Attendance policy manager"
+msgstr "Responsable des jours de participation"
+
+msgid "Sets the conference days and opening-day capacity and switches enforcement."
+msgstr "Fixe les jours de la conférence et la capacité du jour d’ouverture, et active ou désactive le contrôle."
+
+msgid "Entry pass administrator"
+msgstr "Administrateur des titres d’accès"
+
+msgid "Generates, activates, suspends and replaces digital entry passes."
+msgstr "Génère, active, suspend et remplace les titres d’accès numériques."
+
+msgid "Entry pass viewer"
+msgstr "Consultation des titres d’accès"
+
+msgid "Reads digital entry passes."
+msgstr "Consulte les titres d’accès numériques."
+
+msgid "Credential key custodian"
+msgstr "Gardien des clés des titres"
+
+msgid "Publishes, promotes and retires entry pass verification keys."
+msgstr "Publie, promeut et retire les clés de vérification des titres d’accès."
+
+msgid "Badge stock administrator"
+msgstr "Administrateur du stock de badges"
+
+msgid "Manages badge stock locations, print batches and transfers."
+msgstr "Gère les emplacements de stock, les lots d’impression et les transferts de badges."
+
+msgid "Badge issuer"
+msgstr "Remise des badges"
+
+msgid "Hands over physical badges and records their attendance marking."
+msgstr "Remet les badges physiques et enregistre leur marquage des jours de participation."
+
+msgid "Entry operator"
+msgstr "Opérateur d’entrée"
+
+msgid "Verifies participants and records admissions at a checkpoint."
+msgstr "Vérifie les participants et enregistre les admissions à un point de contrôle."
+
+msgid "Entry supervisor"
+msgstr "Superviseur d’entrée"
+
+msgid "Supervises checkpoints and approves overrides."
+msgstr "Supervise les points de contrôle et approuve les dérogations."
+
+msgid "Entry device administrator"
+msgstr "Administrateur des appareils d’entrée"
+
+msgid "Enrolls and manages entry devices."
+msgstr "Enregistre et gère les appareils d’entrée."
+
+msgid "Security restriction manager"
+msgstr "Responsable des restrictions de sécurité"
+
+msgid "Manages security restrictions."
+msgstr "Gère les restrictions de sécurité."
+
+msgid "Registration channel manager"
+msgstr "Responsable des canaux d’inscription"
+
+msgid "Opens, restricts or closes registration channels."
+msgstr "Ouvre, restreint ou ferme les canaux d’inscription."
+
+msgid "Communication operator"
+msgstr "Opérateur des communications"
+
+msgid "Reads and follows up outgoing messages."
+msgstr "Consulte et suit les messages sortants."
+
+msgid "Export administrator"
+msgstr "Administrateur des exports"
+
+msgid "Prepares purpose-bound exports."
+msgstr "Prépare des exports liés à une finalité."
+
+msgid "Invitation manager"
+msgstr "Responsable des invitations"
+
+msgid "Manages invitation campaigns."
+msgstr "Gère les campagnes d’invitation."
+
+msgid "Organization user"
+msgstr "Utilisateur d’organisation"
+
+msgid "Follows an organization's invitations and registrations."
+msgstr "Suit les invitations et les inscriptions d’une organisation."
+
+msgid "Delegation coordinator"
+msgstr "Coordinateur de délégation"
+
+msgid "Imports delegation lists for an organization."
+msgstr "Importe les listes de délégation d’une organisation."
+
+msgid "On-behalf registrar"
+msgstr "Inscripteur pour le compte de tiers"
+
+msgid "Registers participants on their behalf."
+msgstr "Inscrit des participants pour leur compte."
+
+msgid "Privacy administrator"
+msgstr "Administrateur de la confidentialité"
+
+msgid "Manages legal notices and privacy operations."
+msgstr "Gère les mentions légales et les opérations de confidentialité."
+
+msgid "Accessibility support coordinator"
+msgstr "Coordinateur de l’assistance à l’accessibilité"
+
+msgid "Reads accessibility support requests in scope."
+msgstr "Consulte les demandes d’assistance à l’accessibilité de son périmètre."
+
+#, python-format
+msgid "Your participation is approved for the opening day and the following two conference days: %(day1)s, %(day2)s and %(day3)s."
+msgstr "Votre participation est approuvée pour le jour d’ouverture et les deux jours de conférence suivants : %(day1)s, %(day2)s et %(day3)s."
+
+#, python-format
+msgid "Your participation is approved for %(day2)s and %(day3)s. This approval does not include the opening day, %(day1)s."
+msgstr "Votre participation est approuvée pour le %(day2)s et le %(day3)s. Cette approbation n’inclut pas le jour d’ouverture, le %(day1)s."
+
+msgid "Your participation is approved. The organizers are confirming which conference days it covers. The authorized days will appear here and you will be notified by email."
+msgstr "Votre participation est approuvée. Les organisateurs confirment les jours de conférence qu’elle couvre. Les jours autorisés apparaîtront ici et vous serez informé(e) par email."
+
+msgid "All three conference days"
+msgstr "Les trois jours de la conférence"
+
+msgid "Days 2 and 3 only, not the opening day"
+msgstr "Jours 2 et 3 uniquement, pas le jour d’ouverture"
+
+msgid "The attendance settings were saved."
+msgstr "Les paramètres de participation ont été enregistrés."
+
+msgid "Nothing changed: the settings were already these."
+msgstr "Rien n’a changé : les paramètres étaient déjà ceux-ci."
+
+msgid "Attendance enforcement is active. Admission now checks the authorized days. Offline devices must download new offline data."
+msgstr "Le contrôle des jours de participation est actif. L’admission vérifie désormais les jours autorisés. Les appareils hors ligne doivent télécharger de nouvelles données hors ligne."
+
+msgid "Enter a reason to switch enforcement off."
+msgstr "Saisissez un motif pour désactiver le contrôle."
+
+msgid "Attendance enforcement is off. Admission no longer checks the authorized days; the attendance days and the capacity are kept."
+msgstr "Le contrôle des jours de participation est désactivé. L’admission ne vérifie plus les jours autorisés ; les jours de participation et la capacité sont conservés."
+
+msgid "Not yet classified"
+msgstr "Pas encore classé"
+
+msgid "Badge marking to record"
+msgstr "Marquage du badge à enregistrer"
+
+msgid "All three days"
+msgstr "Les trois jours"
+
+msgid "Two following days"
+msgstr "Deux jours suivants"
+
+msgid "All approved"
+msgstr "Toutes les inscriptions approuvées"
+
+msgid "Nothing changed: these were already the registration's attendance days."
+msgstr "Rien n’a changé : c’étaient déjà les jours de participation de cette inscription."
+
+#, python-format
+msgid "Attendance days saved for %(reference)s: %(category)s. Admission follows them immediately and the participant is notified. If a physical badge was already handed over, record its new attendance marking on the badge page."
+msgstr "Jours de participation enregistrés pour %(reference)s : %(category)s. L’admission les applique immédiatement et le participant est informé. Si un badge physique a déjà été remis, enregistrez son nouveau marquage sur la page du badge."
+
+msgid "Opening day"
+msgstr "Jour d’ouverture"
+
+msgid "Second conference day"
+msgstr "Deuxième jour de conférence"
+
+msgid "Third conference day"
+msgstr "Troisième jour de conférence"
+
+msgid "Opening-day capacity"
+msgstr "Capacité du jour d’ouverture"
+
+msgid "The number of approved participants who may attend the opening day. It cannot be lower than the places already allocated."
+msgstr "Le nombre de participants approuvés pouvant assister au jour d’ouverture. Elle ne peut pas être inférieure aux places déjà attribuées."
+
+msgid "Reason for the change"
+msgstr "Motif de la modification"
+
+msgid "Attendance days"
+msgstr "Jours de participation"
+
+msgid "Choose the attendance days."
+msgstr "Choisissez les jours de participation."
+
+msgid "The two days after the opening day"
+msgstr "Les deux jours après le jour d’ouverture"
+
+msgid "Chosen at approval"
+msgstr "Choisi lors de l’approbation"
+
+msgid "Classification of an earlier approval"
+msgstr "Classement d’une approbation antérieure"
+
+msgid "Change after approval"
+msgstr "Modification après l’approbation"
+
+msgid "Choose the attendance days: all three conference days, or only the two days after the opening day. Nothing was approved."
+msgstr "Choisissez les jours de participation : les trois jours de la conférence, ou seulement les deux jours après le jour d’ouverture. Rien n’a été approuvé."
+
+msgid "The conference days and the opening-day capacity are not configured for this event yet. Ask an attendance policy manager to configure them. Nothing was approved."
+msgstr "Les jours de la conférence et la capacité du jour d’ouverture ne sont pas encore configurés pour cet événement. Demandez à un responsable des jours de participation de les configurer. Rien n’a été approuvé."
+
+msgid "The opening day is full: no opening-day place is left. Nothing was changed. You can explicitly choose the two days after the opening day, or ask an attendance policy manager whether the capacity can be raised."
+msgstr "Le jour d’ouverture est complet : il ne reste aucune place. Rien n’a été modifié. Vous pouvez choisir explicitement les deux jours après le jour d’ouverture, ou demander à un responsable des jours de participation si la capacité peut être augmentée."
+
+msgid "Only an approved, current registration has attendance days. Reload the page."
+msgstr "Seule une inscription approuvée et en cours a des jours de participation. Rechargez la page."
+
+msgid "Enter a short reason (at least 3 characters, no personal data)."
+msgstr "Saisissez un motif court (au moins 3 caractères, sans donnée personnelle)."
+
+msgid "The attendance information changed since you loaded this page. Reload and retry."
+msgstr "Les informations de participation ont changé depuis le chargement de cette page. Rechargez et réessayez."
+
+msgid "Enter all three conference days, or none."
+msgstr "Saisissez les trois jours de la conférence, ou aucun."
+
+msgid "The three conference days must be in order: opening day first."
+msgstr "Les trois jours de la conférence doivent être dans l’ordre : le jour d’ouverture en premier."
+
+msgid "The conference days can no longer change: participants have already been given attendance days, or enforcement is active."
+msgstr "Les jours de la conférence ne peuvent plus changer : des participants ont déjà reçu des jours de participation, ou le contrôle est actif."
+
+msgid "Enter a valid capacity (a whole number, zero or more)."
+msgstr "Saisissez une capacité valide (un nombre entier, zéro ou plus)."
+
+msgid "An opening-day capacity is required while opening-day places are allocated or enforcement is active."
+msgstr "Une capacité du jour d’ouverture est requise tant que des places sont attribuées ou que le contrôle est actif."
+
+msgid "The capacity cannot be lower than the number of opening-day places already allocated. Nothing was changed."
+msgstr "La capacité ne peut pas être inférieure au nombre de places du jour d’ouverture déjà attribuées. Rien n’a été modifié."
+
+msgid "Attendance enforcement is not active."
+msgstr "Le contrôle des jours de participation n’est pas actif."
+
+msgid "Attendance enforcement was not activated: some prerequisites are not met. See the checklist."
+msgstr "Le contrôle des jours de participation n’a pas été activé : certains prérequis ne sont pas remplis. Consultez la liste de vérification."
+
+msgid "This attendance operation could not be completed. Reload the page and try again."
+msgstr "Cette opération de participation n’a pas pu aboutir. Rechargez la page et réessayez."
+
+msgid "The three conference days are configured"
+msgstr "Les trois jours de la conférence sont configurés"
+
+msgid "The opening-day capacity is configured"
+msgstr "La capacité du jour d’ouverture est configurée"
+
+msgid "Every approved registration has its attendance days"
+msgstr "Chaque inscription approuvée a ses jours de participation"
+
+msgid "Opening-day places allocated are within the capacity"
+msgstr "Les places attribuées pour le jour d’ouverture respectent la capacité"
+
+msgid "Every handed-over badge carries the marking of its current attendance days"
+msgstr "Chaque badge remis porte le marquage de ses jours de participation en cours"
+
+msgid "The event edition's own start and end dates contain the three days (advisory)"
+msgstr "Les dates de début et de fin de l’édition contiennent les trois jours (indicatif)"
+
+msgid "No current offline package (activation revokes them so devices refresh; advisory)"
+msgstr "Aucun paquet hors ligne en cours (l’activation les révoque pour que les appareils se mettent à jour ; indicatif)"
+
+msgid "Attendance enforcement is active and this registration's attendance days are not classified yet. Classify them before handing over or marking a badge."
+msgstr "Le contrôle des jours de participation est actif et les jours de cette inscription ne sont pas encore classés. Classez-les avant de remettre ou de marquer un badge."
+
+msgid "The marking you confirmed differs from the registration's current attendance days. Reload the page and apply the marking it shows."
+msgstr "Le marquage confirmé diffère des jours de participation en cours de l’inscription. Rechargez la page et appliquez le marquage indiqué."
+
+msgid "The attendance marking could not be recorded."
+msgstr "Le marquage des jours de participation n’a pas pu être enregistré."
+
+msgid "The attendance marking of the badge was recorded."
+msgstr "Le marquage des jours de participation du badge a été enregistré."
+
+msgid "Approval with attendance days"
+msgstr "Approbation avec jours de participation"
+
+msgid "Attendance days update"
+msgstr "Mise à jour des jours de participation"
+
+msgid "Staff accounts"
+msgstr "Comptes du personnel"
+
+msgid "Approval does not include today (opening day not authorized)"
+msgstr "L’approbation n’inclut pas aujourd’hui (jour d’ouverture non autorisé)"
+
+msgid "Attendance days not yet classified"
+msgstr "Jours de participation pas encore classés"
+
+msgid "Today is not a conference day"
+msgstr "Aujourd’hui n’est pas un jour de conférence"
+
+msgid "New security image loaded. Type its characters."
+msgstr "Nouvelle image de sécurité chargée. Saisissez ses caractères."
+
+msgid "Security check: type the characters shown in the image"
+msgstr "Vérification de sécurité : saisissez les caractères affichés dans l’image"
+
+#, python-format
+msgid "Security image with %(length)s letters and digits"
+msgstr "Image de sécurité contenant %(length)s lettres et chiffres"
+
+msgid "New image"
+msgstr "Nouvelle image"
+
+#, python-format
+msgid "%(length)s characters, not case-sensitive. Each image works once and expires after %(minutes)s minutes; after a wrong answer a new image is shown."
+msgstr "%(length)s caractères, sans distinction de casse. Chaque image ne fonctionne qu’une fois et expire après %(minutes)s minutes ; après une réponse erronée, une nouvelle image s’affiche."
+
+msgid "Too many security images were requested from your network. Wait a few minutes, then reload this page."
+msgstr "Trop d’images de sécurité ont été demandées depuis votre réseau. Patientez quelques minutes, puis rechargez cette page."
+
+msgid "Set your password"
+msgstr "Définissez votre mot de passe"
+
+msgid "Staff account"
+msgstr "Compte du personnel"
+
+msgid "Reset your password"
+msgstr "Réinitialisez votre mot de passe"
+
+#, python-format
+msgid "For the staff account <bdi dir=\"ltr\">%(email)s</bdi>. This link works once."
+msgstr "Pour le compte du personnel <bdi dir=\"ltr\">%(email)s</bdi>. Ce lien ne fonctionne qu’une fois."
+
+msgid "Save the password"
+msgstr "Enregistrer le mot de passe"
+
+msgid "Setting the password does not sign you in and does not activate the account."
+msgstr "Définir le mot de passe ne vous connecte pas et n’active pas le compte."
+
+msgid "You then sign in with your email address, this password and a security image."
+msgstr "Vous vous connectez ensuite avec votre adresse email, ce mot de passe et une image de sécurité."
+
+msgid "Link not valid"
+msgstr "Lien non valable"
+
+msgid "This link is not valid"
+msgstr "Ce lien n’est pas valable"
+
+msgid "It was already used, replaced by a newer link, or it expired. Ask your account administrator to send a new one."
+msgstr "Il a déjà été utilisé, remplacé par un lien plus récent, ou il a expiré. Demandez à votre administrateur des comptes d’en envoyer un nouveau."
+
+msgid "Go to operational sign-in"
+msgstr "Aller à la connexion opérationnelle"
+
+msgid "New staff account"
+msgstr "Nouveau compte du personnel"
+
+msgid "The account is created as Invited, without a password and without a role. Sending a setup link, activating it and granting roles are separate steps on the next page."
+msgstr "Le compte est créé avec le statut Invité, sans mot de passe ni rôle. L’envoi d’un lien de configuration, l’activation et l’attribution de rôles sont des étapes distinctes sur la page suivante."
+
+msgid "A temporary external-security account needs an end of validity; its roles never last longer than the account."
+msgstr "Un compte temporaire de sécurité externe doit avoir une fin de validité ; ses rôles ne durent jamais plus longtemps que le compte."
+
+msgid "Create the account"
+msgstr "Créer le compte"
+
+msgid "Account status"
+msgstr "Statut du compte"
+
+msgid "This is your own account. Another administrator changes its status, validity and roles."
+msgstr "Il s’agit de votre propre compte. Un autre administrateur en modifie le statut, la validité et les rôles."
+
+msgid "This account has roles outside your administration scope: you can read it and grant roles in your scope, but not change its status, validity or credentials."
+msgstr "Ce compte a des rôles hors de votre périmètre d’administration : vous pouvez le consulter et attribuer des rôles dans votre périmètre, mais pas modifier son statut, sa validité ou ses identifiants."
+
+msgid "Account"
+msgstr "Compte"
+
+msgid "Effective access"
+msgstr "Accès effectif"
+
+msgid "Set"
+msgstr "Défini"
+
+msgid "Not set yet"
+msgstr "Pas encore défini"
+
+msgid "No limit"
+msgstr "Aucune limite"
+
+msgid "Setup link"
+msgstr "Lien de configuration"
+
+#, python-format
+msgid "One unused link, valid until %(expires)s."
+msgstr "Un lien non utilisé, valable jusqu’au %(expires)s."
+
+msgid "No open link"
+msgstr "Aucun lien en cours"
+
+msgid "Roles and scope"
+msgstr "Rôles et périmètre"
+
+msgid "Validity"
+msgstr "Validité"
+
+msgid "No start limit"
+msgstr "Pas de limite de début"
+
+msgid "No end"
+msgstr "Sans fin"
+
+msgid "End this role now?"
+msgstr "Mettre fin à ce rôle maintenant ?"
+
+msgid "The role stops applying on the next request and stays in the history."
+msgstr "Le rôle cesse de s’appliquer dès la prochaine requête et reste dans l’historique."
+
+msgid "End the role"
+msgstr "Mettre fin au rôle"
+
+msgid "No role yet. The account opens no area until a role is granted."
+msgstr "Aucun rôle pour l’instant. Le compte n’ouvre aucun espace tant qu’aucun rôle n’est attribué."
+
+msgid "Grant a role"
+msgstr "Attribuer un rôle"
+
+msgid "Roles come from a fixed list. Choose the event edition and the organization explicitly; only scopes inside your own administration scope are accepted."
+msgstr "Les rôles proviennent d’une liste fixe. Choisissez explicitement l’édition et l’organisation ; seuls les périmètres compris dans votre propre périmètre d’administration sont acceptés."
+
+msgid "Temporary external-security account: the role ends no later than the account."
+msgstr "Compte temporaire de sécurité externe : le rôle prend fin au plus tard avec le compte."
+
+msgid "Grant the role"
+msgstr "Attribuer le rôle"
+
+msgid "Account actions"
+msgstr "Actions sur le compte"
+
+msgid "Password setup"
+msgstr "Configuration du mot de passe"
+
+msgid "Sends a single-use, expiring link to the account's own email address. A newer link replaces an older one. The link never signs in and never activates the account."
+msgstr "Envoie un lien à usage unique et à durée limitée à l’adresse email du compte. Un lien plus récent remplace le précédent. Le lien ne connecte jamais et n’active jamais le compte."
+
+msgid "Send a password reset link"
+msgstr "Envoyer un lien de réinitialisation"
+
+msgid "Send a setup link"
+msgstr "Envoyer un lien de configuration"
+
+msgid "The account stops working on its next request. Nothing is deleted."
+msgstr "Le compte cesse de fonctionner dès sa prochaine requête. Rien n’est supprimé."
+
+msgid "Name and validity"
+msgstr "Nom et validité"
+
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "Create staff accounts, send single-use setup links, and grant roles within your administration scope."
+msgstr "Créez des comptes du personnel, envoyez des liens de configuration à usage unique et attribuez des rôles dans votre périmètre d’administration."
+
+msgid "Filter"
+msgstr "Filtrer"
+
+msgid "Accounts"
+msgstr "Comptes"
+
+#, python-format
+msgid "%(counter)s account"
+msgid_plural "%(counter)s accounts"
+msgstr[0] "%(counter)s compte"
+msgstr[1] "%(counter)s comptes"
+
+msgid "Current roles"
+msgstr "Rôles en cours"
+
+msgid "No account matches these filters."
+msgstr "Aucun compte ne correspond à ces filtres."
+
+msgid "Change the attendance days"
+msgstr "Modifier les jours de participation"
+
+msgid "Classify the attendance days"
+msgstr "Classer les jours de participation"
+
+msgid "Save the change"
+msgstr "Enregistrer la modification"
+
+msgid "Save the classification"
+msgstr "Enregistrer le classement"
+
+msgid "Which conference days each approval covers: all three days, or only the two days after the opening day. Opening-day places are limited."
+msgstr "Les jours de conférence couverts par chaque approbation : les trois jours, ou seulement les deux jours après le jour d’ouverture. Les places du jour d’ouverture sont limitées."
+
+msgid "Events in your scope"
+msgstr "Événements de votre périmètre"
+
+msgid "Configuration"
+msgstr "Configuration"
+
+msgid "Days and capacity configured"
+msgstr "Jours et capacité configurés"
+
+msgid "Not configured"
+msgstr "Non configuré"
+
+msgid "Admission enforcement"
+msgstr "Contrôle à l’admission"
+
+msgid "Not active"
+msgstr "Inactif"
+
+msgid "Approved registrations"
+msgstr "Inscriptions approuvées"
+
+msgid "Days, capacity and enforcement"
+msgstr "Jours, capacité et contrôle"
+
+#, python-format
+msgid "Attendance days: %(code)s"
+msgstr "Jours de participation : %(code)s"
+
+#, python-format
+msgid "Days are calendar dates in the event timezone (%(tz)s). The hours inside each day stay governed by the access profiles and access rules."
+msgstr "Les jours sont des dates calendaires dans le fuseau horaire de l’événement (%(tz)s). Les heures de chaque jour restent régies par les profils et les règles d’accès."
+
+msgid "Admission enforcement active"
+msgstr "Contrôle à l’admission actif"
+
+msgid "Admission enforcement not active"
+msgstr "Contrôle à l’admission inactif"
+
+msgid "Conference days"
+msgstr "Jours de la conférence"
+
+msgid "Opening-day places allocated"
+msgstr "Places attribuées pour le jour d’ouverture"
+
+#, python-format
+msgid "%(remaining)s left"
+msgstr "%(remaining)s restantes"
+
+msgid "Two following days only"
+msgstr "Deux jours suivants uniquement"
+
+msgid "Classify them"
+msgstr "Les classer"
+
+msgid "Badge markings to record"
+msgstr "Marquages de badge à enregistrer"
+
+msgid "Show them"
+msgstr "Les afficher"
+
+msgid "Days and capacity"
+msgstr "Jours et capacité"
+
+#, python-format
+msgid "The event edition's own dates start on %(day1)s and include %(day3)s. Check the real conference days before saving; nothing is saved until you submit."
+msgstr "Les dates de l’édition commencent le %(day1)s et incluent le %(day3)s. Vérifiez les jours réels de la conférence avant d’enregistrer ; rien n’est enregistré avant votre envoi."
+
+msgid "Save the settings"
+msgstr "Enregistrer les paramètres"
+
+msgid "The days cannot change once any registration has attendance days or while enforcement is active. The capacity can never be set below the places already allocated."
+msgstr "Les jours ne peuvent plus changer dès qu’une inscription a des jours de participation ou tant que le contrôle est actif. La capacité ne peut jamais être inférieure aux places déjà attribuées."
+
+msgid "You can read these settings. Changing them needs the attendance policy manager role."
+msgstr "Vous pouvez consulter ces paramètres. Leur modification nécessite le rôle de responsable des jours de participation."
+
+msgid "When active, admission refuses a participant on a day their approval does not cover, and any participant whose days are not classified."
+msgstr "Lorsqu’il est actif, l’admission refuse un participant un jour non couvert par son approbation, ainsi que tout participant dont les jours ne sont pas classés."
+
+msgid "required"
+msgstr "requis"
+
+msgid "Switch attendance enforcement off?"
+msgstr "Désactiver le contrôle des jours de participation ?"
+
+msgid "Admission will no longer check the authorized days. Current offline data is revoked. The attendance days and the capacity are kept."
+msgstr "L’admission ne vérifiera plus les jours autorisés. Les données hors ligne en cours sont révoquées. Les jours de participation et la capacité sont conservés."
+
+msgid "Switch off"
+msgstr "Désactiver"
+
+msgid "Switch enforcement off"
+msgstr "Désactiver le contrôle"
+
+msgid "Activate attendance enforcement?"
+msgstr "Activer le contrôle des jours de participation ?"
+
+msgid "From now on admission checks the authorized days. Current offline data is revoked and devices must download new data."
+msgstr "Dorénavant, l’admission vérifie les jours autorisés. Les données hors ligne en cours sont révoquées et les appareils doivent télécharger de nouvelles données."
+
+msgid "Activate enforcement"
+msgstr "Activer le contrôle"
+
+msgid "Every required item of the checklist must be met first."
+msgstr "Chaque élément requis de la liste de vérification doit d’abord être rempli."
+
+msgid "Last activated"
+msgstr "Dernière activation"
+
+#, python-format
+msgid "Approved registrations: %(code)s"
+msgstr "Inscriptions approuvées : %(code)s"
+
+msgid "Registrations approved before attendance days existed stay unclassified until you choose their days. Nothing is assigned automatically."
+msgstr "Les inscriptions approuvées avant l’existence des jours de participation restent non classées jusqu’à ce que vous choisissiez leurs jours. Rien n’est attribué automatiquement."
+
+msgid "The conference days and the opening-day capacity are not configured yet. Classification is possible once they are."
+msgstr "Les jours de la conférence et la capacité du jour d’ouverture ne sont pas encore configurés. Le classement sera possible une fois qu’ils le seront."
+
+#, python-format
+msgid "Opening-day places: %(allocated)s allocated of %(capacity)s (%(remaining)s left)."
+msgstr "Places du jour d’ouverture : %(allocated)s attribuées sur %(capacity)s (%(remaining)s restantes)."
+
+msgid "Filter the registrations"
+msgstr "Filtrer les inscriptions"
+
+msgid "Physical badge marking"
+msgstr "Marquage du badge physique"
+
+msgid "To record on the badge page"
+msgstr "À enregistrer sur la page du badge"
+
+msgid "Nothing to do"
+msgstr "Rien à faire"
+
+msgid "Badge page"
+msgstr "Page du badge"
+
+msgid "No registration matches this filter."
+msgstr "Aucune inscription ne correspond à ce filtre."
+
+msgid "Attendance days apply to an approved, current registration only."
+msgstr "Les jours de participation ne s’appliquent qu’à une inscription approuvée et en cours."
+
+msgid "Current attendance days"
+msgstr "Jours de participation en cours"
+
+msgid "What the participant sees"
+msgstr "Ce que voit le participant"
+
+msgid "Does not match: record the marking on the badge page"
+msgstr "Ne correspond pas : enregistrez le marquage sur la page du badge"
+
+msgid "Matches the current attendance days"
+msgstr "Correspond aux jours de participation en cours"
+
+msgid "current"
+msgstr "en cours"
+
+msgid "Attendance days being confirmed"
+msgstr "Jours de participation en cours de confirmation"
+
+#, python-format
+msgid "Not valid on the opening day, %(day)s"
+msgstr "Non valable le jour d’ouverture, le %(day)s"
+
+msgid "Authorized days"
+msgstr "Jours autorisés"
+
+msgid "Attendance marking"
+msgstr "Marquage des jours de participation"
+
+msgid "Outdated: does not match the current attendance days"
+msgstr "Obsolète : ne correspond pas aux jours de participation en cours"
+
+msgid "Not recorded"
+msgstr "Non enregistré"
+
+msgid "Record the attendance marking"
+msgstr "Enregistrer le marquage des jours de participation"
+
+msgid "Apply this marking to the badge, then confirm"
+msgstr "Appliquez ce marquage sur le badge, puis confirmez"
+
+msgid "I applied this marking to the badge the participant holds."
+msgstr "J’ai appliqué ce marquage sur le badge que détient le participant."
+
+msgid "Record the marking"
+msgstr "Enregistrer le marquage"
+
+msgid "I applied the attendance marking to this badge"
+msgstr "J’ai appliqué le marquage des jours de participation sur ce badge"
+
+msgid "This registration's attendance days are not classified, so no badge can be handed over while attendance enforcement is active."
+msgstr "Les jours de participation de cette inscription ne sont pas classés : aucun badge ne peut être remis tant que le contrôle des jours de participation est actif."
+
+msgid "Attendance days not yet classified: record the badge marking once they are."
+msgstr "Jours de participation pas encore classés : enregistrez le marquage du badge une fois qu’ils le seront."
+
+msgid "Not included"
+msgstr "Non inclus"
+
+#, python-format
+msgid "the opening day, %(day)s"
+msgstr "le jour d’ouverture, le %(day)s"
+
+#, python-format
+msgid "Opening-day places left: %(remaining)s of %(capacity)s."
+msgstr "Places restantes pour le jour d’ouverture : %(remaining)s sur %(capacity)s."
+
+msgid "Nothing is preselected. An approval without a choice is refused."
+msgstr "Rien n’est présélectionné. Une approbation sans choix est refusée."
+
+#, python-format
+msgid "The opening day, %(day1)s, and the following two days, %(day2)s and %(day3)s. Uses one opening-day place."
+msgstr "Le jour d’ouverture, le %(day1)s, et les deux jours suivants, le %(day2)s et le %(day3)s. Utilise une place du jour d’ouverture."
+
+msgid "The opening day is full. Choose the two following days, or ask for the capacity to be reviewed."
+msgstr "Le jour d’ouverture est complet. Choisissez les deux jours suivants, ou demandez une révision de la capacité."
+
+#, python-format
+msgid "%(day2)s and %(day3)s only. Not valid on the opening day, %(day1)s."
+msgstr "Le %(day2)s et le %(day3)s uniquement. Non valable le jour d’ouverture, le %(day1)s."
+
+msgid "The conference days and the opening-day capacity are not configured for this event. An approval needs them: ask an attendance policy manager."
+msgstr "Les jours de la conférence et la capacité du jour d’ouverture ne sont pas configurés pour cet événement. Une approbation en a besoin : adressez-vous à un responsable des jours de participation."
+
+msgctxt "attendance worklist"
+msgid "Find by registration reference"
+msgstr "Rechercher par référence d’inscription"
+
+msgctxt "attendance worklist"
+msgid "Find"
+msgstr "Rechercher"
+
+msgctxt "attendance history"
+msgid "History"
+msgstr "Historique"
+
+#, python-format
+msgid "%(seconds)s seconds (the token itself is never shown or kept)"
+msgstr "%(seconds)s secondes (le jeton lui-même n’est jamais affiché ni conservé)"
+
+msgid "(and roles outside your scope)"
+msgstr "(et des rôles hors de votre périmètre)"
+
+msgid "1. Configuration"
+msgstr "1. Configuration"
+
+msgid "18 digits. Never use a participant's number."
+msgstr "18 chiffres. N’utilisez jamais le numéro d’un participant."
+
+msgid "2. Authentication"
+msgstr "2. Authentification"
+
+msgid "3. Lookup"
+msgstr "3. Consultation"
+
+msgid "A cached token is not proof that authentication works now; each process keeps its own."
+msgstr "Un jeton en cache ne prouve pas que l’authentification fonctionne maintenant ; chaque processus garde le sien."
+
+msgid "A new authentication request was accepted just now (not a cached token). This does not show that the lookup endpoint works: test a lookup for that."
+msgstr "Une nouvelle demande d’authentification vient d’être acceptée (pas un jeton en cache). Cela ne montre pas que le point de consultation fonctionne : testez une consultation pour cela."
+
+msgid "A record of earlier checks, not the current state of the service."
+msgstr "Un relevé des vérifications précédentes, pas l’état actuel du service."
+
+msgid "An identity number has exactly 18 digits. Nothing was sent."
+msgstr "Un numéro d’identification comporte exactement 18 chiffres. Rien n’a été envoyé."
+
+msgid "Another check is running"
+msgstr "Une autre vérification est en cours"
+
+msgid "Authentication"
+msgstr "Authentification"
+
+msgid "Authentication failed"
+msgstr "Échec de l’authentification"
+
+msgid "Authentication succeeded"
+msgstr "Authentification réussie"
+
+msgid "Authorized test identity number (NIN)"
+msgstr "Numéro d’identification de test autorisé (NIN)"
+
+msgid "Cached token in this web process"
+msgstr "Jeton en cache dans ce processus web"
+
+msgid "Check the identity number service without submitting a registration. Each check runs only when you press its button."
+msgstr "Vérifiez le service des numéros d’identification sans soumettre d’inscription. Chaque vérification ne s’exécute que lorsque vous appuyez sur son bouton."
+
+msgid "Check the test number"
+msgstr "Vérifiez le numéro de test"
+
+msgid "Checked at"
+msgstr "Vérifié le"
+
+msgid "Checks are limited per operator and for the whole environment. Nothing was sent."
+msgstr "Les vérifications sont limitées par opérateur et pour l’ensemble de l’environnement. Rien n’a été envoyé."
+
+msgid "Conference theme: DEEPTECH, The Real Challenge"
+msgstr "Thème de la conférence : DEEPTECH, The Real Challenge"
+
+msgid "Configuration incomplete"
+msgstr "Configuration incomplète"
+
+msgid "Configured service"
+msgstr "Service configuré"
+
+msgid "Detail code"
+msgstr "Code de détail"
+
+msgid "Earlier history not recorded (treated as enforced)"
+msgstr "Historique antérieur non enregistré (traité comme appliqué)"
+
+msgid "Environment"
+msgstr "Environnement"
+
+msgid "HTTP status"
+msgstr "Statut HTTP"
+
+msgid "Integration diagnostics operator"
+msgstr "Opérateur de diagnostic des intégrations"
+
+msgid "Integrations"
+msgstr "Intégrations"
+
+msgid "Invalid settings"
+msgstr "Paramètres invalides"
+
+msgid "Looks up one identity number you are authorized to use for testing. It checks the lookup endpoint only: it creates no registration, changes no identity and verifies nobody. The number is not stored, shown again or logged."
+msgstr "Consulte un numéro d’identification que vous êtes autorisé à utiliser pour les tests. Seul le point de consultation est vérifié : aucune inscription n’est créée, aucune identité n’est modifiée et personne n’est vérifié. Le numéro n’est ni conservé, ni réaffiché, ni journalisé."
+
+msgid "Lookup"
+msgstr "Consultation"
+
+msgid "Lookup answered: identity found"
+msgstr "Réponse de la consultation : identité trouvée"
+
+msgid "Lookup answered: no identity found"
+msgstr "Réponse de la consultation : aucune identité trouvée"
+
+msgid "Ministry NIN service"
+msgstr "Service NIN du ministère"
+
+msgid "Missing settings"
+msgstr "Paramètres manquants"
+
+msgid "Next step"
+msgstr "Étape suivante"
+
+msgid "No check yet."
+msgstr "Aucune vérification pour le moment."
+
+msgid "No usable answer arrived in time, or the connection failed."
+msgstr "Aucune réponse exploitable n’est arrivée à temps, ou la connexion a échoué."
+
+msgid "Not ready"
+msgstr "Pas prêt"
+
+msgid "Only one check runs at a time. Nothing was sent."
+msgstr "Une seule vérification s’exécute à la fois. Rien n’a été envoyé."
+
+#, python-format
+msgid "Present, about %(seconds)s seconds left."
+msgstr "Présent, environ %(seconds)s secondes restantes."
+
+msgid "Read from this server's settings when the page opens. No request is sent."
+msgstr "Lu dans les paramètres de ce serveur à l’ouverture de la page. Aucune requête n’est envoyée."
+
+msgid "Readiness"
+msgstr "Disponibilité"
+
+msgid "Rebuilt from the last recorded switch"
+msgstr "Reconstitué à partir du dernier basculement enregistré"
+
+msgid "Recent checks"
+msgstr "Vérifications récentes"
+
+msgid "Recorded when enforcement was switched on"
+msgstr "Enregistré lors de l’activation de l’application"
+
+msgid "Redirect refused"
+msgstr "Redirection refusée"
+
+msgid "Required settings are missing or invalid. Nothing was sent."
+msgstr "Des paramètres requis manquent ou sont invalides. Rien n’a été envoyé."
+
+msgid "Roles outside your administration scope are not shown."
+msgstr "Les rôles hors de votre périmètre d’administration ne sont pas affichés."
+
+msgid "Sends one new authentication request with the configured credentials, never a cached token. The token received is discarded. Success does not show that the lookup endpoint works."
+msgstr "Envoie une nouvelle demande d’authentification avec les identifiants configurés, jamais un jeton en cache. Le jeton reçu est écarté. Un succès ne montre pas que le point de consultation fonctionne."
+
+msgid "Service unavailable or too slow"
+msgstr "Service indisponible ou trop lent"
+
+msgid "Settings complete"
+msgstr "Paramètres complets"
+
+msgid "Test authentication"
+msgstr "Tester l’authentification"
+
+msgid "Test lookup"
+msgstr "Tester une consultation"
+
+msgid "Tests the Ministry NIN service configuration, authentication and lookup. Platform-wide only: every event edition and every organization."
+msgstr "Teste la configuration, l’authentification et la consultation du service NIN du ministère. Uniquement pour toute la plateforme : toutes les éditions et toutes les organisations."
+
+msgid "The answer could not be read safely and was discarded."
+msgstr "La réponse n’a pas pu être lue en toute sécurité et a été écartée."
+
+msgid "The authentication endpoint did not accept the request."
+msgstr "Le point d’authentification n’a pas accepté la demande."
+
+msgid "The deployment team checks the configured credentials and the authentication request and response contract with the provider. Do not retry repeatedly."
+msgstr "L’équipe de déploiement vérifie les identifiants configurés ainsi que le contrat de requête et de réponse d’authentification avec le fournisseur. Ne réessayez pas en boucle."
+
+msgid "The deployment team checks the response contract with the provider."
+msgstr "L’équipe de déploiement vérifie le contrat de réponse avec le fournisseur."
+
+msgid "The deployment team completes the settings listed under Configuration."
+msgstr "L’équipe de déploiement complète les paramètres indiqués sous Configuration."
+
+msgid "The deployment team confirms the canonical address with the provider and corrects MINISTRY_NIN_API_BASE_URL and the configured paths (including any trailing slash), or the proxy routing."
+msgstr "L’équipe de déploiement confirme l’adresse canonique avec le fournisseur et corrige MINISTRY_NIN_API_BASE_URL et les chemins configurés (y compris une éventuelle barre oblique finale), ou le routage du proxy."
+
+msgid "The deployment team sets NIN_PROVIDER_BACKEND to the official adapter and configures its settings."
+msgstr "L’équipe de déploiement règle NIN_PROVIDER_BACKEND sur l’adaptateur officiel et configure ses paramètres."
+
+msgid "The email with the link could not be sent, so that link was cancelled. Try again in a few minutes."
+msgstr "L’e-mail contenant le lien n’a pas pu être envoyé ; ce lien a donc été annulé. Réessayez dans quelques minutes."
+
+msgid "The lookup endpoint answered successfully but holds no identity for this number. This is not an authentication failure and not a decision about anyone."
+msgstr "Le point de consultation a répondu correctement mais ne détient aucune identité pour ce numéro. Ce n’est ni un échec d’authentification ni une décision concernant qui que ce soit."
+
+msgid "The lookup endpoint answered with an identity for this number. Nothing was recorded, and this check verifies no participant."
+msgstr "Le point de consultation a répondu avec une identité pour ce numéro. Rien n’a été enregistré et cette vérification ne vérifie aucun participant."
+
+msgid "The official Ministry service is not configured here"
+msgstr "Le service officiel du ministère n’est pas configuré ici"
+
+msgid "The provider asked to slow down"
+msgstr "Le fournisseur demande de ralentir"
+
+msgid "The service answered that too many requests were made (HTTP 429)."
+msgstr "Le service a répondu que trop de requêtes ont été faites (HTTP 429)."
+
+msgid "The service answered with a redirect. Redirects are never followed, so credentials and identity numbers never go to another address."
+msgstr "Le service a répondu par une redirection. Les redirections ne sont jamais suivies : les identifiants et les numéros d’identification ne partent jamais vers une autre adresse."
+
+msgid "This environment does not use the official adapter. Nothing was sent."
+msgstr "Cet environnement n’utilise pas l’adaptateur officiel. Rien n’a été envoyé."
+
+msgid "Token lifetime"
+msgstr "Durée de validité du jeton"
+
+msgid "Too many checks"
+msgstr "Trop de vérifications"
+
+msgid "Try again in a moment."
+msgstr "Réessayez dans un instant."
+
+msgid "Try again later. If it persists, the deployment team checks network routing, TLS and the provider's status."
+msgstr "Réessayez plus tard. Si le problème persiste, l’équipe de déploiement vérifie le routage réseau, TLS et l’état du fournisseur."
+
+msgid "Unreadable or unexpected answer"
+msgstr "Réponse illisible ou inattendue"
+
+msgid "Wait a few minutes before the next check."
+msgstr "Attendez quelques minutes avant la prochaine vérification."
+
+msgid "Wait several minutes before another check."
+msgstr "Attendez plusieurs minutes avant une autre vérification."
+
+msgid "not the official Ministry adapter"
+msgstr "pas l’adaptateur officiel du ministère"
+
+msgid "official Ministry adapter"
+msgstr "adaptateur officiel du ministère"

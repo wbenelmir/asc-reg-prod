@@ -541,14 +541,15 @@ def test_arabic_pages_name_the_event_in_full_and_the_footer_is_empty_under_a10(
     switch_language(page, "ar")
     footer = page.locator("footer.asc-footer")
     text = footer.inner_text()
-    assert "المؤتمر الإفريقي للمؤسسات الناشئة" in text or ARABIC_EVENT_NAME in (
-        page.locator("img[alt]").first.get_attribute("alt") or ""
-    )
+    assert "المؤتمر الإفريقي للمؤسسات الناشئة" in text
     # P4-4, FOOTER-01 option (a), amendment A-10: no footer link until the
     # developer supplies a new footer design (replaces the M23 link checks).
     assert footer.locator("a").count() == 0
     assert footer.locator("bdi.asc-footer-host").count() == 0
-    assert page.locator("img[alt]").first.get_attribute("alt") == ARABIC_EVENT_NAME
+    # Version 1.1 UI work package 02 (owner, 2026-10-05): the header names the
+    # event in visible text beside a decorative logo (no image text to read).
+    identity = page.locator("header [data-conference-identity]").first.inner_text()
+    assert ARABIC_EVENT_NAME.removesuffix(" ASC") in identity and "2026" in identity
     _shot(page, "footer-ar-desktop")
 
 

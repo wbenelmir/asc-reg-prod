@@ -11,7 +11,7 @@ from __future__ import annotations
 import pytest
 
 from tests.browser.database import database_call
-from tests.browser.helpers import switch_language
+from tests.browser.helpers import solve_staff_captcha, switch_language
 
 pytestmark = pytest.mark.django_db(transaction=True)
 
@@ -116,6 +116,7 @@ def test_workspace_dashboard_shows_only_scoped_campaigns_in_a_real_browser(
     page.goto(f"{live_server.url}/accounts/ops/sign-in/")
     page.fill("#id_email", user.email_normalized)
     page.fill("#id_password", TEST_OPERATIONAL_PASSWORD)
+    solve_staff_captcha(page)
     page.locator("#main-content button[type=submit]").click()
     page.wait_for_load_state("networkidle")
 

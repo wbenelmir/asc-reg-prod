@@ -10,7 +10,7 @@ from __future__ import annotations
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from .models import BulkAssignmentKind
+from .models import AttendanceCategory, BulkAssignmentKind
 
 
 class BulkPreviewForm(forms.Form):
@@ -91,3 +91,74 @@ class BulkPreviewForm(forms.Form):
             else:
                 cleaned["reference_obj"] = match
         return cleaned
+
+
+# ---------------------------------------------------------------------------
+# Attendance entitlements (apps.accreditation.attendance)
+# ---------------------------------------------------------------------------
+
+_REASON_HELP = _("Short and factual. Do not include personal data.")
+
+
+class AttendancePolicyForm(forms.Form):
+    """The three conference days (local dates in the event timezone) and the
+    opening-day capacity. Validation of order, locks and capacity happens in
+    `apps.accreditation.attendance.update_policy`."""
+
+    opening_date = forms.DateField(
+        required=False,
+        label=_("Opening day"),
+        widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
+    )
+    second_date = forms.DateField(
+        required=False,
+        label=_("Second conference day"),
+        widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
+    )
+    third_date = forms.DateField(
+        required=False,
+        label=_("Third conference day"),
+        widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
+    )
+    opening_day_capacity = forms.IntegerField(
+        required=False,
+        min_value=0,
+        label=_("Opening-day capacity"),
+        help_text=_(
+            "The number of approved participants who may attend the opening day. It cannot be "
+            "lower than the places already allocated."
+        ),
+    )
+    reason = forms.CharField(
+        min_length=3, max_length=300, label=_("Reason for the change"), help_text=_REASON_HELP
+    )
+    expected_version = forms.IntegerField(min_value=1, widget=forms.HiddenInput, required=False)
+
+
+class AttendanceChangeForm(forms.Form):
+    """Classify an earlier approval, or change the attendance days of one."""
+
+    attendance_category = forms.ChoiceField(
+        choices=AttendanceCategory.choices,
+        widget=forms.RadioSelect,
+        label=_("Attendance days"),
+        error_messages={"required": _("Choose the attendance days.")},
+    )
+    reason = forms.CharField(
+        min_length=3, max_length=300, label=_("Reason"), help_text=_REASON_HELP
+    )
+    expected_entitlement_id = forms.CharField(
+        required=False, max_length=36, widget=forms.HiddenInput
+    )
+    next = forms.CharField(required=False, max_length=500, widget=forms.HiddenInput)
+
+
+class AttendanceActivationForm(forms.Form):
+    expected_version = forms.IntegerField(min_value=1, widget=forms.HiddenInput)
+
+
+class AttendanceDeactivationForm(forms.Form):
+    expected_version = forms.IntegerField(min_value=1, widget=forms.HiddenInput)
+    reason = forms.CharField(
+        min_length=3, max_length=300, label=_("Reason"), help_text=_REASON_HELP
+    )

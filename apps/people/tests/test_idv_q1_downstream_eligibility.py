@@ -74,7 +74,10 @@ def _approved_with_verified_identity(idv_event, legal_versions, manager):
     assign_approval_prerequisites(registration, manager)
     registration.refresh_from_db()
     record_approved_decision(
-        registration=registration, expected_version=registration.version, decided_by=manager
+        registration=registration,
+        expected_version=registration.version,
+        decided_by=manager,
+        attendance_category="FOLLOWING_TWO_DAYS",
     )
     registration.refresh_from_db()
     assert registration.public_status == RegistrationPublicStatus.APPROVED

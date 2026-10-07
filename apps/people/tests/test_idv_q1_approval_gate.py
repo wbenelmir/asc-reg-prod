@@ -63,7 +63,10 @@ def _approve(registration, manager):
 
     registration.refresh_from_db()
     return record_approved_decision(
-        registration=registration, expected_version=registration.version, decided_by=manager
+        registration=registration,
+        expected_version=registration.version,
+        decided_by=manager,
+        attendance_category="FOLLOWING_TWO_DAYS",
     )
 
 
@@ -295,7 +298,10 @@ def test_an_identity_invalidated_by_a_correction_elsewhere_blocks_approval(
 
     with pytest.raises(ApprovalRequiresVerifiedIdentityError) as refusal:
         record_approved_decision(
-            registration=registration, expected_version=loaded_version, decided_by=manager
+            registration=registration,
+            expected_version=loaded_version,
+            decided_by=manager,
+            attendance_category="FOLLOWING_TWO_DAYS",
         )
     assert refusal.value.code == "IDENTITY_NOT_VERIFIED"
     registration.refresh_from_db()

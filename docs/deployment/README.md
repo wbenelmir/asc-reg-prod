@@ -187,6 +187,28 @@ python manage.py release_readiness       # records the state; BLOCKED is expecte
   print "In sync"), and `privacy.0005_official_registration_notices_v3`
   publishes the official `v3` Privacy Notice and Registration Terms and retires
   `v2-draft` without editing it.
+* The attendance, staff-account and sign-in image update adds
+  `accounts.0005_staff_credential_setup`, `accreditation.0006_attendance_entitlements`,
+  `badges.0007_badgeissuance_attendance_marking`, `entry.0006_attendance_reason_codes`
+  (choices only), `communications.0008_attendance_templates` (the
+  `APPROVAL_ATTENDANCE` and `ATTENDANCE_CHANGE` messages) and the
+  `django-simple-captcha` package's own `captcha.0001`/`0002` (its challenge
+  table). All are additive; existing approvals stay unclassified. Install the
+  locked dependencies before the new code starts. Operator steps after the
+  migration: [attendance days](../operations/attendance_days.md),
+  [staff accounts](../operations/staff_accounts.md). Reversing
+  `communications.0008` refuses once any of its messages exists; reversing
+  `accreditation.0006` deletes every attendance decision and must not be done
+  while enforcement is active -- switch enforcement off instead.
+* The review corrections of 2026-10-07 add `accounts.0006_operationaluser_created_by`
+  (a nullable column), `accreditation.0007_attendance_enforcement_intervals`
+  (the enforcement history table, rebuilt from the existing settings without
+  inventing lost periods) and `people.0006_ministry_nin_diagnostics_permission`
+  (one permission; `post_migrate` creates the "Integration Diagnostics
+  Operators" group). All are additive. See the
+  [Ministry NIN diagnostics page](../operations/ministry_nin_diagnostics.md)
+  and, for the reverse proxy, the access-log requirement for staff setup links
+  ([staff accounts §6](../operations/staff_accounts.md)).
 * **Rollback limits.** Never reverse migrations on a database that holds test
   data without the owner's approval: reversing `people` to `0002` destroys the
   identity history, and `communications.0007` refuses to reverse once any
@@ -198,7 +220,9 @@ python manage.py release_readiness       # records the state; BLOCKED is expecte
   cannot be recalled by any rollback. Prefer a new artifact (roll forward) or a restore of the
   pre-migration backup.
 * `release_readiness` reports production-release prerequisites. Expected in
-  staging: `legal_notices` and `retention` BLOCKED (owner/legal inputs),
+  staging: `retention` BLOCKED (owner/legal inputs; `legal_notices` reports
+  only whether a `[TO BE CONFIRMED]` marker remains -- the owner's general v3
+  wording has none, which is not a statement of legal completeness),
   `sensitive_operation_step_up` BLOCKED without an `MFA_BACKEND`,
   `identity_verification_provider` BLOCKED while the ministry adapter is
   disabled, and `challenge_issuance_counter` READY only after a real counter
@@ -219,7 +243,7 @@ proxy's addresses; the proxy must set `X-Forwarded-Proto` and
 | `python manage.py check --deploy` | no error; `entry.W001` without `MFA_BACKEND`, `people.W001` while the ministry adapter is disabled |
 | `python -m celery -A config inspect ping` | every worker answers |
 | `python -m celery -A config inspect registered` | lists `people.dispatch_due_identity_verification_jobs` |
-| beat log | the identity sweep fires every 60 s, the outbox sweep every 5 min |
+| beat log | the identity sweep fires every 60 s, the outbox sweep every 5 min, the expired sign-in image sweep (`accounts.purge_expired_staff_captchas`) every 15 min |
 
 ## 9. Staging accounts and test data
 
@@ -273,8 +297,9 @@ python manage.py changepassword uat-reviewer@<domain>             # once per acc
    Output is the verdict only.
 3. SMTP: request a participant code at `/accounts/start/` for a test mailbox;
    one email arrives from `DEFAULT_FROM_EMAIL`; the code works once.
-4. Staff sign-in at `/accounts/ops/sign-in/` with a provisioned account
-   (password only; no MFA prompt).
+4. Staff sign-in at `/accounts/ops/sign-in/` with a provisioned account:
+   email, password and the characters of the security image; no MFA prompt
+   ([staff sign-in image](../security/staff_sign_in_captcha.md)).
 5. Upload a synthetic identity image during a test registration; staff see it
    in the identity review; with clamd stopped the upload is refused with a
    "try again later" message and nothing is stored.
@@ -295,6 +320,9 @@ python manage.py changepassword uat-reviewer@<domain>             # once per acc
 
 ## 12. Related documents
 
+* [Attendance days, opening-day capacity and enforcement](../operations/attendance_days.md)
+* [Staff accounts and scoped access](../operations/staff_accounts.md)
+* [Staff sign-in security image](../security/staff_sign_in_captcha.md)
 * [Beta release notes and verification summary](beta_release_notes.md)
 * [Beta backlog and open decisions](beta_backlog.md)
 * [Manual GitHub handoff for the owner](github_handoff.md)

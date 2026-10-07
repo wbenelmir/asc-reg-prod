@@ -24,7 +24,6 @@ __pycache__/
 .mypy_cache/
 .coverage
 .coverage.*
-htmlcov/
 
 # Local runtime state: private document storage, the local mail sink, and the
 # browser and performance test artifacts. May hold uploaded documents and
@@ -42,6 +41,7 @@ logs/
 celerybeat-schedule*
 tmp/
 /tmp/
+_local_handoff
 
 # Generated static files and build artifacts
 staticfiles/
