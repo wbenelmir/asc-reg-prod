@@ -10013,3 +10013,23 @@ msgstr "pas l’adaptateur officiel du ministère"
 
 msgid "official Ministry adapter"
 msgstr "adaptateur officiel du ministère"
+
+#: templates/partials/appearance_switcher.html
+msgid "Appearance"
+msgstr "Apparence"
+
+#: templates/partials/appearance_switcher.html
+msgid "Aurora Dark"
+msgstr "Aurore sombre"
+
+#: templates/partials/appearance_switcher.html
+msgid "Fresh Light"
+msgstr "Clair frais"
+
+#: templates/partials/appearance_switcher.html
+msgid "Glass Dark"
+msgstr "Verre sombre"
+
+#: templates/partials/appearance_switcher.html
+msgid "Color & Card"
+msgstr "Couleur et carte"

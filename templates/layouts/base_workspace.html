@@ -4,9 +4,11 @@
   Participant workspace shell (TRD §7.2 `base_workspace`; UI/UX §4.3, §7).
   Adaptive: a light application bar (UI/UX §13.4: light participant
   surfaces) with the official logo, the participant's own navigation, the
-  language switcher and sign-out.
+  language switcher and sign-out. The Appearance menu beside the language
+  switcher chooses the participant theme (see `js/asc-appearance.js`).
 {% endcomment %}
 
+{% block html_attrs %} data-asc-appearance-scope="participant"{% endblock %}
 {% block body_attrs %} class="asc-ui asc-workspace"{% endblock %}
 
 {% block header %}
@@ -25,6 +27,7 @@
         </ul>
       </nav>
       <div class="asc-appbar-end">
+        {% include "partials/appearance_switcher.html" with compact=True %}
         {% include "partials/language_switcher.html" %}
         {% if participant_authenticated %}
           <form method="post" action="{% url 'accounts:participant-sign-out' %}" class="m-0">

@@ -17,8 +17,15 @@
   the panel's upper area with `partials/auth_panel_artwork.html`, which
   replaces the stripe motif), `shell_label` (the space name beside the
   logo), `brand_url`.
+
+  Participant appearance: `html_attrs` marks the page as a participant page
+  and `appearance_control` adds the Appearance menu beside the language
+  control. The staff pages that share this shell (operational sign-in,
+  credential setup) override both blocks to empty, so they keep the
+  standard presentation.
 {% endcomment %}
 
+{% block html_attrs %} data-asc-appearance-scope="participant"{% endblock %}
 {% block body_attrs %} class="asc-ui asc-public"{% endblock %}
 
 {% block header %}
@@ -28,10 +35,13 @@
         {% include "partials/conference_identity.html" %}
         {% block shell_label %}{% endblock %}
       </a>
-      {# The language versions of this page are its only navigation. #}
-      <nav class="asc-appbar-end" aria-label="{% trans 'Language' %}">
-        {% include "partials/language_switcher.html" %}
-      </nav>
+      <div class="asc-appbar-end">
+        {% block appearance_control %}{% include "partials/appearance_switcher.html" %}{% endblock %}
+        {# The language versions of this page are its only navigation. #}
+        <nav aria-label="{% trans 'Language' %}">
+          {% include "partials/language_switcher.html" %}
+        </nav>
+      </div>
     </div>
   </header>
 {% endblock %}

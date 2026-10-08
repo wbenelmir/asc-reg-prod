@@ -3,10 +3,19 @@
   i18n context processor: the 400 and 500 pages are rendered without a
   request context (static-safe), and must still be localized and RTL.
 {% endcomment %}{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}<!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
+<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}"{% block html_attrs %}{% endblock %}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% comment %}
+    Participant appearance (responsive themes): the participant shells mark
+    <html> with data-asc-appearance-scope="participant" through `html_attrs`.
+    This small same-origin script runs before the first paint and sets the
+    saved or default theme on <html>, so no wrong theme flashes; on any
+    other page it does nothing. It is loaded on every page because a boosted
+    swap keeps the first page's <head>.
+  {% endcomment %}
+  <script src="{% static 'js/asc-appearance.js' %}?v=1"></script>
   <title>{% block title %}{% trans "Registration" %}{% endblock %}{% block title_suffix %} &middot; {% trans "ASC 2026" %}{% endblock %}</title>
   {% comment %}
     Search-engine posture (UX-1, S-05): every page is `noindex, nofollow` by
@@ -44,6 +53,8 @@
     semantic hooks only; no rule in asc-ui.css may depend on them.
   {% endcomment %}
   <link rel="stylesheet" href="{% static 'css/asc-ui.css' %}?v=1.1-ui-03">
+  {# Participant themes: every rule is scoped to <html data-asc-theme>, set only on participant pages. #}
+  <link rel="stylesheet" href="{% static 'css/asc-appearance.css' %}?v=1">
   {% if LANGUAGE_BIDI %}
     <link rel="preload" href="{% static 'vendor/thmanyah/thmanyahsans-Regular.woff2' %}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{% static 'vendor/thmanyah/thmanyahsans-Bold.woff2' %}" as="font" type="font/woff2" crossorigin>

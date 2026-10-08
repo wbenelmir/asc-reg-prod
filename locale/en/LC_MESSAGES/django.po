@@ -5525,3 +5525,23 @@ msgstr "Keep your Registration Reference and follow your request in your workspa
 #: templates/partials/conference_identity.html
 msgid "5th edition"
 msgstr "5th edition"
+
+#: templates/partials/appearance_switcher.html
+msgid "Appearance"
+msgstr "Appearance"
+
+#: templates/partials/appearance_switcher.html
+msgid "Aurora Dark"
+msgstr "Aurora Dark"
+
+#: templates/partials/appearance_switcher.html
+msgid "Fresh Light"
+msgstr "Fresh Light"
+
+#: templates/partials/appearance_switcher.html
+msgid "Glass Dark"
+msgstr "Glass Dark"
+
+#: templates/partials/appearance_switcher.html
+msgid "Color & Card"
+msgstr "Color & Card"

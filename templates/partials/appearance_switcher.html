@@ -1,0 +1,51 @@
+{% load i18n %}
+{% comment %}
+  Participant Appearance menu (responsive themes), beside the language
+  control in the participant headers.
+
+  A disclosure button opens a small panel holding one native radio group:
+  the browser provides the labels, the checked state and arrow-key
+  selection. `static/js/asc-appearance.js` reveals the control, marks the
+  current theme, applies a choice immediately to <html> (no request, no
+  navigation, no form) and returns focus to the button when the panel
+  closes. The radios belong to no form, so nothing here is ever submitted.
+  Without JavaScript the control stays hidden and the page keeps the
+  standard presentation.
+
+  `compact`: the workspace header (more controls) shows only the colour
+  dot below 1400 px; the name stays the button's accessible name and tooltip.
+
+  Theme identifiers (aurora, fresh, glass, color) are the only values the
+  script keeps on the device.
+{% endcomment %}
+<div class="asc-appearance{% if compact %} asc-appearance-compact{% endif %}" data-asc-appearance hidden>
+  <button type="button" class="asc-appbar-btn asc-appearance-trigger" title="{% trans 'Appearance' %}" aria-expanded="false" aria-controls="asc-appearance-menu" data-asc-appearance-trigger>
+    <span class="asc-appearance-dot" aria-hidden="true"></span>
+    <span class="asc-appearance-trigger-text">{% trans "Appearance" %}</span><span class="visually-hidden">: <span data-asc-appearance-current></span></span>
+  </button>
+  <div class="asc-appearance-menu" id="asc-appearance-menu" data-asc-appearance-menu hidden>
+    <fieldset>
+      <legend class="asc-appearance-legend">{% trans "Appearance" %}</legend>
+      <label class="asc-appearance-option">
+        <input class="asc-appearance-input" type="radio" name="asc_appearance" value="aurora">
+        <span class="asc-appearance-swatch asc-appearance-swatch-aurora" aria-hidden="true"></span>
+        <span class="asc-appearance-name">{% trans "Aurora Dark" %}</span>
+      </label>
+      <label class="asc-appearance-option">
+        <input class="asc-appearance-input" type="radio" name="asc_appearance" value="fresh">
+        <span class="asc-appearance-swatch asc-appearance-swatch-fresh" aria-hidden="true"></span>
+        <span class="asc-appearance-name">{% trans "Fresh Light" %}</span>
+      </label>
+      <label class="asc-appearance-option">
+        <input class="asc-appearance-input" type="radio" name="asc_appearance" value="glass">
+        <span class="asc-appearance-swatch asc-appearance-swatch-glass" aria-hidden="true"></span>
+        <span class="asc-appearance-name">{% trans "Glass Dark" %}</span>
+      </label>
+      <label class="asc-appearance-option">
+        <input class="asc-appearance-input" type="radio" name="asc_appearance" value="color">
+        <span class="asc-appearance-swatch asc-appearance-swatch-color" aria-hidden="true"></span>
+        <span class="asc-appearance-name">{% filter force_escape %}{% trans "Color & Card" %}{% endfilter %}</span>
+      </label>
+    </fieldset>
+  </div>
+</div>

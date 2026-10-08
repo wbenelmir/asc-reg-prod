@@ -1,0 +1,798 @@
+/*
+ * ASC 2026 participant appearance: four responsive themes. Project-owned.
+ *
+ *   aurora  Aurora Dark   (mobile default)  near-black blue-green, soft
+ *                                           green/teal/cyan ambient light
+ *   fresh   Fresh Light                     white and light mint surfaces
+ *   glass   Glass Dark                      dark blue, logo stripes, a lightly
+ *                                           translucent card (solid fallback)
+ *   color   Color & Card  (desktop default) green/cyan/blue gradient header,
+ *                                           light cards, pale background
+ *
+ * Scope. `static/js/asc-appearance.js` sets `data-asc-theme` and
+ * `data-asc-tone` (dark | light) on <html> on participant pages only
+ * (layouts/base_public.html, layouts/base_workspace.html and the wizard).
+ * Staff, operations and error pages never carry them, so nothing here
+ * applies there. Every rule sits inside `@media screen`: printed pages (the
+ * entry pass included) keep the standard monochrome presentation.
+ *
+ * Method. The page structure is shared by all themes; a theme only
+ * redefines the design tokens of asc-ui.css on `body.asc-ui`, plus the few
+ * surfaces that carry the theme's identity (application bar, sign-in panel,
+ * cards, primary action) and one fixed decorative layer behind the content
+ * (`body::before`: static gradients, no animation, no layout overflow).
+ * Status colours keep their meanings: the semantic tones are remapped for
+ * dark surfaces, never swapped. The QR code always stays on white.
+ *
+ * Contrast (WCAG 2.2 AA) of the main pairs, computed from the values below:
+ *   aurora  text #d4e6e6 / muted #a3bfc2 / link #5cd0e6 on surface #0c2127:
+ *           12.4 / 8.4 / 8.9; field border #4f7f8a on it: 3.7;
+ *           primary label #03222a on #36c3ea..#34e0b4: 7.9..9.6
+ *   glass   text #d5e0f2 / muted #a6b7d3 / link #6cc8f0 on #0f2546: 11.5 / 7.5 / 8.3
+ *   fresh   text #33484c / muted #56696d / link #0b7a85 on white: 9.6 / 5.8 / 5.2;
+ *           white on primary #0b7a85: 5.2
+ *   color   white on header #0f7a52..#0a6f86..#2457a8: 5.4..5.8..7.0;
+ *           link #0a7480 on white: 5.4
+ */
+
+@media screen {
+  /* ---------------------------------------------------------------- */
+  /* The Appearance menu (participant headers)                        */
+  /* ---------------------------------------------------------------- */
+
+  [data-asc-appearance-scope="participant"] .asc-ui .asc-appbar-inner {
+    position: relative;
+  }
+
+  .asc-ui .asc-appearance-trigger {
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .asc-ui .asc-appearance-dot,
+  .asc-ui .asc-appearance-swatch {
+    flex: 0 0 auto;
+    display: inline-block;
+    border: 1px solid rgba(17, 24, 39, 0.28);
+  }
+
+  .asc-ui .asc-appearance-dot {
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 50%;
+    background: var(--asc-appearance-current, linear-gradient(135deg, #65b54d, #029cbc 55%, #326eb5));
+  }
+
+  /* Anchored to the header row's inline end: never clipped at 320 px. */
+  .asc-ui .asc-appearance-menu {
+    position: absolute;
+    inset-block-start: calc(100% - 0.25rem);
+    inset-inline-end: 0.75rem;
+    z-index: calc(var(--asc-z-appbar) + 1);
+    width: min(18rem, calc(100% - 1.5rem));
+    padding: 0.5rem;
+    background: var(--asc-surface);
+    color: var(--asc-text);
+    border: 1px solid var(--asc-border-strong);
+    border-radius: var(--asc-radius-lg);
+    box-shadow: 0 0.75rem 2rem -0.5rem rgba(4, 16, 24, 0.35);
+  }
+
+  .asc-ui .asc-appearance-menu fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .asc-ui .asc-appearance-legend {
+    float: none;
+    width: auto;
+    margin: 0;
+    padding: 0.25rem 0.5rem 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--asc-text-muted);
+  }
+
+  .asc-ui .asc-appearance-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: var(--asc-target);
+    padding: 0.375rem 0.5rem;
+    border-radius: var(--asc-radius);
+    color: var(--asc-heading);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .asc-ui .asc-appearance-option:hover {
+    background: var(--asc-surface-sunken);
+  }
+
+  .asc-ui .asc-appearance-option:has(input:checked) {
+    background: var(--asc-blue-subtle);
+  }
+
+  .asc-ui .asc-appearance-input {
+    flex: 0 0 auto;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin: 0;
+    accent-color: var(--asc-blue);
+  }
+
+  .asc-ui .asc-appearance-input:focus-visible {
+    outline: 3px solid var(--asc-focus) !important;
+    outline-offset: 2px !important;
+  }
+
+  .asc-ui .asc-appearance-swatch {
+    width: 2.5rem;
+    height: 1.625rem;
+    border-radius: 0.375rem;
+  }
+
+  /* Small previews of each theme (background, accent, action). */
+  .asc-ui .asc-appearance-swatch-aurora {
+    background:
+      radial-gradient(circle at 80% 20%, #34e0b4 0 0.25rem, transparent 0.6rem),
+      linear-gradient(135deg, #061418 40%, #0d4a4f 75%, #36c3ea);
+  }
+
+  .asc-ui .asc-appearance-swatch-fresh {
+    background:
+      radial-gradient(circle at 78% 30%, #a6e6d3 0 0.3rem, transparent 0.65rem),
+      linear-gradient(135deg, #ffffff 45%, #dff5ee 70%, #0b7a85 70% 100%);
+  }
+
+  .asc-ui .asc-appearance-swatch-glass {
+    background:
+      repeating-linear-gradient(115deg, transparent 0 0.3rem, rgba(99, 197, 227, 0.55) 0.3rem 0.45rem),
+      linear-gradient(135deg, #06142b, #12305c);
+  }
+
+  .asc-ui .asc-appearance-swatch-color {
+    background:
+      linear-gradient(180deg, transparent 55%, #eef8f5 55%),
+      linear-gradient(100deg, #0f7a52, #0a6f86 50%, #2457a8);
+  }
+
+  [data-asc-theme="aurora"] .asc-ui .asc-appearance-dot { background: linear-gradient(135deg, #061418 35%, #1b8f86 70%, #36c3ea); }
+  [data-asc-theme="fresh"] .asc-ui .asc-appearance-dot { background: linear-gradient(135deg, #ffffff 40%, #bfeee0 65%, #0b7a85); }
+  [data-asc-theme="glass"] .asc-ui .asc-appearance-dot { background: linear-gradient(135deg, #06142b 35%, #1f4f8f 70%, #63c5e3); }
+  [data-asc-theme="color"] .asc-ui .asc-appearance-dot { background: linear-gradient(135deg, #0f7a52, #0a6f86 50%, #2457a8); }
+
+  /* Narrow phones, and the busier workspace header below 1400 px: the
+     trigger shows its colour dot; its name stays the accessible name (and
+     the tooltip). */
+  @media (max-width: 359.98px) {
+    .asc-ui .asc-appearance-trigger {
+      padding-inline: 0.75rem;
+    }
+  }
+
+  @media (max-width: 1399.98px) {
+    .asc-ui .asc-appearance-compact .asc-appearance-trigger {
+      padding-inline: 0.75rem;
+    }
+  }
+
+  @media (max-width: 359.98px) {
+    .asc-ui .asc-appearance-trigger-text {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+  }
+
+  @media (max-width: 1399.98px) {
+    .asc-ui .asc-appearance-compact .asc-appearance-trigger-text {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+  }
+
+  /* The header controls sit closer together, so the extra button keeps
+     the workspace header on one row wherever it fitted before. */
+  [data-asc-theme] .asc-ui .asc-appbar-end {
+    gap: 0.5rem;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Shared frame for every theme                                      */
+  /* ---------------------------------------------------------------- */
+
+  /* One fixed, non-interactive decorative layer behind the content. It
+     never takes part in layout, so it cannot cause horizontal overflow. */
+  [data-asc-theme] body.asc-ui::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--asc-theme-backdrop, none);
+  }
+
+  [data-asc-theme] .asc-ui .asc-footer {
+    background: var(--asc-theme-footer, var(--asc-surface));
+  }
+
+  /* While a theme is applied (asc-appearance.js sets the attribute for two
+     frames), nothing fades from the previous theme's colours: a hovered
+     control would otherwise briefly keep the old surface under the new
+     text colour. */
+  [data-asc-theme-switching] *,
+  [data-asc-theme-switching] *::before,
+  [data-asc-theme-switching] *::after {
+    transition: none !important;
+  }
+
+  /* Header controls (Appearance, language, sign-out): every state keeps a
+     readable pair. The focus ring (3 px outline) is unchanged. */
+  [data-asc-theme] .asc-ui .asc-appbar-light .asc-appbar-btn:hover,
+  [data-asc-theme] .asc-ui .asc-appbar-light .asc-appbar-btn:active,
+  [data-asc-theme] .asc-ui .asc-appbar-light .asc-appbar-btn[aria-expanded="true"] {
+    background: var(--asc-theme-control-hover, var(--asc-surface-sunken));
+    color: var(--asc-theme-control-fg, var(--asc-heading));
+  }
+
+  /* Readable field text on phones (no zoom-on-focus, at least 16 px). */
+  [data-asc-theme] .asc-ui .form-control,
+  [data-asc-theme] .asc-ui .form-select {
+    font-size: max(1rem, 16px);
+  }
+
+  [data-asc-theme] .asc-ui .asc-appbar .form-select {
+    font-size: 0.9375rem;
+  }
+
+  /* The entry-pass print view stays a plain document on screen too. */
+  [data-asc-theme] .asc-ui .pass-print-sheet {
+    background: #fff;
+    color: #111827;
+    --asc-heading: #111827;
+    --asc-text: #3f4652;
+  }
+
+  /* ================================================================ */
+  /* Dark tone (aurora, glass): shared component adjustments          */
+  /* ================================================================ */
+
+  [data-asc-tone="dark"] {
+    color-scheme: dark;
+  }
+
+  [data-asc-tone="light"] {
+    color-scheme: light;
+  }
+
+  [data-asc-tone="dark"] body.asc-ui {
+    --asc-on-accent: #03222a;
+    /* Header control hover/active/open: a slightly lighter dark surface. */
+    --asc-theme-control-hover: rgba(255, 255, 255, 0.1);
+    --asc-shadow-sm: 0 0.375rem 1.5rem rgba(0, 0, 0, 0.28);
+    --asc-shadow: 0 0.75rem 2rem -0.25rem rgba(0, 0, 0, 0.45);
+    --asc-theme-footer: rgba(0, 0, 0, 0.22);
+
+    /* Semantic tones for dark surfaces: same meanings, light text on deep
+       tinted backgrounds (every -fg is above 7:1 on its -bg). Filled
+       (-solid) buttons keep their white-text colours. */
+    --asc-success-fg: #8ee6b3;
+    --asc-success-bg: #0d2e22;
+    --asc-success-edge: #3fbf7f;
+    --asc-info-fg: #9be2f0;
+    --asc-info-bg: #0e3039;
+    --asc-info-edge: #3cbfd9;
+    --asc-warning-fg: #ffc98a;
+    --asc-warning-bg: #33240f;
+    --asc-warning-edge: #e59a3a;
+    --asc-danger-fg: #ffaaa3;
+    --asc-danger-bg: #3a1715;
+    --asc-danger-edge: #f0645a;
+    --asc-neutral-fg: #cfdcdf;
+    --asc-neutral-bg: #17313a;
+    --asc-neutral-edge: #8aa3a9;
+
+    --bs-body-color: var(--asc-text);
+    --bs-body-bg: var(--asc-canvas);
+    --bs-emphasis-color: var(--asc-heading);
+    --bs-secondary-color: var(--asc-text-muted);
+    --bs-heading-color: var(--asc-heading);
+    --bs-border-color: var(--asc-border);
+    --bs-secondary-bg: var(--asc-surface-sunken);
+    --bs-tertiary-bg: var(--asc-surface-sunken);
+    --bs-tertiary-color: var(--asc-text-muted);
+    --bs-link-color: var(--asc-blue);
+    --bs-link-hover-color: var(--asc-blue-strong);
+    --bs-focus-ring-color: rgba(127, 227, 242, 0.4);
+    --altcha-color-primary-content: var(--asc-on-accent);
+  }
+
+  [data-asc-tone="dark"] .asc-ui .form-control::placeholder {
+    color: #8fa9ad;
+  }
+
+  [data-asc-tone="dark"] .asc-ui .form-select {
+    --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23e3eef0' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  }
+
+  [data-asc-tone="dark"] .asc-ui .form-select option {
+    background: var(--asc-surface);
+    color: var(--asc-heading);
+  }
+
+  /* Checked boxes and radios: a light accent fill with a dark mark. */
+  [data-asc-tone="dark"] .asc-ui .form-check-input {
+    background-color: var(--asc-surface-sunken);
+    border-color: var(--asc-border-strong);
+  }
+
+  [data-asc-tone="dark"] .asc-ui .form-check-input:checked {
+    background-color: var(--asc-blue);
+    border-color: var(--asc-blue);
+  }
+
+  [data-asc-tone="dark"] .asc-ui .form-check-input:checked[type="checkbox"] {
+    --bs-form-check-bg-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%2303222a' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
+  }
+
+  [data-asc-tone="dark"] .asc-ui .form-check-input:checked[type="radio"] {
+    --bs-form-check-bg-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2' fill='%2303222a'/%3e%3c/svg%3e");
+  }
+
+  /* Primary action: the cyan/teal gradient with a dark label. */
+  [data-asc-tone="dark"] .asc-ui .btn-primary {
+    --bs-btn-color: var(--asc-on-accent);
+    --bs-btn-bg: #36c3ea;
+    --bs-btn-border-color: transparent;
+    --bs-btn-hover-color: var(--asc-on-accent);
+    --bs-btn-hover-bg: #6fd6ef;
+    --bs-btn-hover-border-color: transparent;
+    --bs-btn-active-color: var(--asc-on-accent);
+    --bs-btn-active-bg: #8be0f2;
+    --bs-btn-active-border-color: transparent;
+    --bs-btn-disabled-color: var(--asc-on-accent);
+    --bs-btn-disabled-bg: #36c3ea;
+    --bs-btn-disabled-border-color: transparent;
+    background-image: linear-gradient(90deg, #36c3ea, #34e0b4);
+  }
+
+  [data-asc-tone="dark"] .asc-ui .btn-primary:hover,
+  [data-asc-tone="dark"] .asc-ui .btn-primary:active {
+    background-image: linear-gradient(90deg, #6fd6ef, #6ae9c8);
+  }
+
+  [data-asc-tone="dark"] .asc-ui .btn-outline-primary {
+    --bs-btn-hover-color: var(--asc-on-accent);
+    --bs-btn-active-color: var(--asc-on-accent);
+    --bs-btn-active-bg: var(--asc-blue-strong);
+    --bs-btn-active-border-color: var(--asc-blue-strong);
+  }
+
+  [data-asc-tone="dark"] .asc-ui .btn-outline-secondary {
+    --bs-btn-active-bg: var(--asc-surface-sunken);
+  }
+
+  [data-asc-tone="dark"] .asc-ui .btn-outline-warning {
+    --bs-btn-active-bg: var(--asc-warning-bg);
+  }
+
+  [data-asc-tone="dark"] .asc-ui .btn-outline-danger {
+    --bs-btn-color: var(--asc-danger-fg);
+    --bs-btn-border-color: var(--asc-danger-edge);
+  }
+
+  /* Wizard progress markers on the light accent. */
+  [data-asc-tone="dark"] .asc-ui .asc-step-done .asc-step-marker,
+  [data-asc-tone="dark"] .asc-ui .asc-step-current .asc-step-marker {
+    color: var(--asc-on-accent);
+  }
+
+  [data-asc-tone="dark"] .asc-ui .asc-step-current .asc-step-marker {
+    box-shadow: 0 0 0 3px rgba(92, 208, 230, 0.25);
+  }
+
+  /* Former near-white panels and hover rows. */
+  [data-asc-tone="dark"] .asc-ui .asc-subpanel,
+  [data-asc-tone="dark"] .asc-ui .asc-fieldset,
+  [data-asc-tone="dark"] .asc-ui .asc-command {
+    background: var(--asc-surface-sunken);
+  }
+
+  [data-asc-tone="dark"] .asc-ui .asc-table > tbody > tr:hover > * {
+    background: var(--asc-surface-sunken);
+  }
+
+  [data-asc-tone="dark"] .asc-ui .table {
+    --bs-table-color: var(--asc-text);
+    --bs-table-bg: transparent;
+    --bs-table-border-color: var(--asc-border);
+    --bs-table-striped-color: var(--asc-text);
+    --bs-table-hover-color: var(--asc-text);
+  }
+
+  [data-asc-tone="dark"] .asc-ui .asc-conn[data-state="checking"] {
+    background: var(--asc-neutral-bg);
+  }
+
+  /* Application bar on the dark backdrop. */
+  [data-asc-tone="dark"] .asc-ui .asc-appbar-light {
+    background: var(--asc-theme-appbar);
+    border-bottom-color: var(--asc-border);
+    color: var(--asc-heading);
+  }
+
+  [data-asc-tone="dark"] .asc-ui .asc-appbar-light .asc-conference-year {
+    color: var(--asc-blue);
+  }
+
+  [data-asc-tone="dark"] .asc-ui .asc-appbar-light a:focus-visible,
+  [data-asc-tone="dark"] .asc-ui .asc-appbar-light button:focus-visible,
+  [data-asc-tone="dark"] .asc-ui .asc-appbar-light select:focus-visible {
+    outline-color: var(--asc-focus) !important;
+  }
+
+  [data-asc-tone="dark"] .asc-ui .asc-appbar-light .form-select,
+  [data-asc-tone="dark"] .asc-ui .asc-appbar-light .asc-appbar-btn {
+    background-color: transparent;
+    color: var(--asc-heading);
+    border-color: var(--asc-border-strong);
+  }
+
+  [data-asc-tone="dark"] .asc-ui .asc-appbar-light .form-select {
+    --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23e3eef0' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  }
+
+  [data-asc-tone="dark"] .asc-ui .asc-motif {
+    opacity: 0.4;
+  }
+
+  /* The sign-in panel's text sits on the theme's own dark panel. */
+  [data-asc-tone="dark"] .asc-ui .asc-auth-aside {
+    border: 1px solid var(--asc-border);
+    background: var(--asc-theme-panel);
+  }
+
+  [data-asc-tone="dark"] .asc-ui .asc-auth-kicker,
+  [data-asc-tone="dark"] .asc-ui .asc-auth-facts .asc-icon {
+    color: var(--asc-blue);
+  }
+
+  /* ================================================================ */
+  /* 1. Aurora Dark                                                    */
+  /* ================================================================ */
+
+  [data-asc-theme="aurora"] body.asc-ui {
+    --asc-canvas: #061418;
+    --asc-surface: #0c2127;
+    --asc-surface-sunken: #08191e;
+    --asc-border: #1f3d45;
+    --asc-border-strong: #4f7f8a;
+    --asc-heading: #f1fbfa;
+    --asc-text: #d4e6e6;
+    --asc-text-muted: #a3bfc2;
+    --asc-blue: #5cd0e6;
+    --asc-blue-strong: #8fe0ef;
+    --asc-blue-subtle: #0f3640;
+    --asc-focus: #7fe3f2;
+    --bs-link-color-rgb: 92, 208, 230;
+    --bs-link-hover-color-rgb: 143, 224, 239;
+    --asc-theme-appbar: rgba(6, 20, 24, 0.94);
+    --asc-theme-panel:
+      radial-gradient(90% 70% at 100% 0%, rgba(52, 224, 180, 0.26), transparent 65%),
+      radial-gradient(80% 60% at 0% 100%, rgba(54, 195, 234, 0.22), transparent 65%),
+      #08191e;
+    --asc-theme-backdrop:
+      radial-gradient(60rem 30rem at 100% -6rem, rgba(52, 224, 180, 0.26), transparent 62%),
+      radial-gradient(50rem 28rem at -12% 38%, rgba(2, 156, 188, 0.2), transparent 62%),
+      radial-gradient(70rem 26rem at 50% 112%, rgba(101, 181, 77, 0.2), transparent 60%),
+      #061418;
+  }
+
+  [data-asc-theme="aurora"] .asc-ui .asc-auth-card,
+  [data-asc-theme="aurora"] .asc-ui .asc-card,
+  [data-asc-theme="aurora"] .asc-ui .asc-stepper {
+    border-color: #1d3b43;
+    background: rgba(12, 33, 39, 0.92);
+  }
+
+  /* ================================================================ */
+  /* 3. Glass Dark                                                     */
+  /* ================================================================ */
+
+  [data-asc-theme="glass"] body.asc-ui {
+    --asc-canvas: #06142b;
+    --asc-surface: #0f2546;
+    --asc-surface-sunken: #0a1d3a;
+    --asc-border: #223f6b;
+    --asc-border-strong: #5a7db0;
+    --asc-heading: #f3f7ff;
+    --asc-text: #d5e0f2;
+    --asc-text-muted: #a6b7d3;
+    --asc-blue: #6cc8f0;
+    --asc-blue-strong: #9adcf7;
+    --asc-blue-subtle: #12345e;
+    --asc-focus: #8fdaf7;
+    --asc-info-bg: #0f2c52;
+    --asc-neutral-bg: #162e52;
+    --bs-link-color-rgb: 108, 200, 240;
+    --bs-link-hover-color-rgb: 154, 220, 247;
+    --asc-theme-appbar: rgba(6, 20, 43, 0.9);
+    --asc-theme-glass: rgba(20, 44, 82, 0.62);
+    --asc-theme-panel:
+      repeating-linear-gradient(115deg, transparent 0 1.6rem, rgba(99, 197, 227, 0.09) 1.6rem 2.1rem),
+      radial-gradient(90% 70% at 100% 0%, rgba(50, 110, 181, 0.45), transparent 62%),
+      #0a1d3a;
+    --asc-theme-backdrop:
+      radial-gradient(60rem 26rem at 50% 112%, rgba(2, 156, 188, 0.22), transparent 62%),
+      radial-gradient(48rem 28rem at 105% -5%, rgba(50, 110, 181, 0.32), transparent 62%),
+      #06142b;
+  }
+
+  /* The logo-inspired stripes: a corner of the backdrop, faded out. */
+  [data-asc-theme="glass"] body.asc-ui::after {
+    content: "";
+    position: fixed;
+    inset-block-start: 0;
+    inset-inline-end: 0;
+    z-index: -1;
+    width: min(34rem, 70vw);
+    height: min(26rem, 55vh);
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      115deg,
+      rgba(2, 156, 188, 0.3) 0 0.7rem,
+      transparent 0.7rem 1.6rem,
+      rgba(101, 181, 77, 0.24) 1.6rem 2.3rem,
+      transparent 2.3rem 3.2rem,
+      rgba(50, 110, 181, 0.32) 3.2rem 3.9rem,
+      transparent 3.9rem 4.8rem
+    );
+    -webkit-mask-image: radial-gradient(100% 100% at 100% 0%, #000 20%, transparent 75%);
+    mask-image: radial-gradient(100% 100% at 100% 0%, #000 20%, transparent 75%);
+  }
+
+  [dir="rtl"][data-asc-theme="glass"] body.asc-ui::after {
+    transform: scaleX(-1);
+  }
+
+  /* Lightly translucent cards; a solid surface where blur is unsupported. */
+  [data-asc-theme="glass"] .asc-ui .asc-auth-card,
+  [data-asc-theme="glass"] .asc-ui .asc-card,
+  [data-asc-theme="glass"] .asc-ui .asc-stepper {
+    border-color: rgba(154, 220, 247, 0.22);
+    background: var(--asc-surface);
+  }
+
+  @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    [data-asc-theme="glass"] .asc-ui .asc-auth-card,
+    [data-asc-theme="glass"] .asc-ui .asc-card,
+    [data-asc-theme="glass"] .asc-ui .asc-stepper {
+      background: var(--asc-theme-glass);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+    }
+  }
+
+  /* ================================================================ */
+  /* Light tone (fresh, color): shared adjustments                     */
+  /* ================================================================ */
+
+  [data-asc-tone="light"] body.asc-ui {
+    --asc-heading: #0f2a2e;
+    --asc-text: #33484c;
+    --asc-text-muted: #56696d;
+    --asc-surface: #ffffff;
+    --asc-surface-sunken: #eef6f4;
+    --asc-border: #d8e7e3;
+    --asc-border-strong: #a7bfb9;
+    --asc-focus: #0b5f8a;
+    --asc-on-accent: #ffffff;
+    --bs-focus-ring-color: rgba(11, 95, 138, 0.35);
+  }
+
+  /* The supplied lockup has white lettering drawn for the navy panel: on
+     the light themes it is shown, unaltered, on a navy plate. */
+  [data-asc-tone="light"] .asc-ui .asc-auth-aside-art {
+    flex: 0 0 auto;
+    margin: clamp(1.5rem, 3vw, 3rem) clamp(1.5rem, 3vw, 3rem) 0;
+    padding: clamp(1rem, 2vw, 1.75rem);
+    border-radius: 1rem;
+    background:
+      radial-gradient(90% 120% at 100% 0%, rgba(50, 110, 181, 0.4), transparent 60%),
+      #102b3a;
+  }
+
+  /* ================================================================ */
+  /* 2. Fresh Light                                                    */
+  /* ================================================================ */
+
+  [data-asc-theme="fresh"] body.asc-ui {
+    --asc-canvas: #f6fbfa;
+    --asc-blue: #0b7a85;
+    --asc-blue-strong: #075f68;
+    --asc-blue-subtle: #e2f4f2;
+    --bs-link-color-rgb: 11, 122, 133;
+    --bs-link-hover-color-rgb: 7, 95, 104;
+    --asc-theme-footer: #ffffff;
+    --asc-theme-backdrop:
+      radial-gradient(40rem 22rem at 100% 0%, rgba(166, 230, 211, 0.45), transparent 65%),
+      radial-gradient(36rem 20rem at 0% 100%, rgba(99, 197, 227, 0.22), transparent 65%),
+      #f6fbfa;
+  }
+
+  [data-asc-theme="fresh"] .asc-ui .asc-appbar-light {
+    background: rgba(255, 255, 255, 0.94);
+    border-bottom-color: #d8e7e3;
+  }
+
+  [data-asc-theme="fresh"] .asc-ui .asc-appbar-light .asc-conference-year {
+    color: var(--asc-blue-strong);
+  }
+
+  [data-asc-theme="fresh"] .asc-ui .asc-auth-card,
+  [data-asc-theme="fresh"] .asc-ui .asc-card,
+  [data-asc-theme="fresh"] .asc-ui .asc-stepper {
+    border-color: #d8e7e3;
+  }
+
+  /* The sign-in panel: light mint, dark text. */
+  [data-asc-theme="fresh"] .asc-ui .asc-auth-aside {
+    border: 1px solid #cfe9e1;
+    background:
+      radial-gradient(90% 70% at 100% 0%, rgba(99, 197, 227, 0.28), transparent 62%),
+      radial-gradient(80% 60% at 0% 100%, rgba(101, 181, 77, 0.2), transparent 62%),
+      #e8f7f2;
+    color: var(--asc-heading);
+  }
+
+  [data-asc-theme="fresh"] .asc-ui .asc-auth-aside-title {
+    color: var(--asc-heading);
+  }
+
+  [data-asc-theme="fresh"] .asc-ui .asc-auth-facts li {
+    color: var(--asc-text);
+  }
+
+  [data-asc-theme="fresh"] .asc-ui .asc-auth-kicker,
+  [data-asc-theme="fresh"] .asc-ui .asc-auth-facts .asc-icon {
+    color: var(--asc-blue-strong);
+  }
+
+  [data-asc-theme="fresh"] .asc-ui .asc-auth-aside-motif {
+    opacity: 0.32;
+  }
+
+  /* ================================================================ */
+  /* 4. Color & Card                                                   */
+  /* ================================================================ */
+
+  [data-asc-theme="color"] body.asc-ui {
+    --asc-canvas: #eef8f5;
+    --asc-blue: #0a7480;
+    --asc-blue-strong: #075a63;
+    --asc-blue-subtle: #e0f3f1;
+    --bs-link-color-rgb: 10, 116, 128;
+    --bs-link-hover-color-rgb: 7, 90, 99;
+    --asc-shadow-sm: 0 0.75rem 2rem -0.75rem rgba(15, 60, 70, 0.22);
+    --asc-theme-gradient: linear-gradient(100deg, #0f7a52 0%, #0a6f86 50%, #2457a8 100%);
+    --asc-theme-control-hover: rgba(4, 32, 40, 0.38);
+    --asc-theme-control-fg: #fff;
+    --asc-theme-footer: #ffffff;
+    --asc-theme-backdrop:
+      radial-gradient(48rem 20rem at 50% -6rem, rgba(10, 111, 134, 0.14), transparent 70%),
+      #eef8f5;
+  }
+
+  /* The compact gradient header: white text (5.4:1 or more everywhere). */
+  [data-asc-theme="color"] .asc-ui .asc-appbar-light {
+    background: var(--asc-theme-gradient);
+    border-bottom: 0;
+    color: #fff;
+  }
+
+  [data-asc-theme="color"] .asc-ui .asc-appbar-light .asc-brand,
+  [data-asc-theme="color"] .asc-ui .asc-appbar-light .asc-space-label {
+    color: #fff;
+  }
+
+  [data-asc-theme="color"] .asc-ui .asc-appbar-light .asc-conference-year {
+    color: #d4f7ea;
+  }
+
+  /* The official logo keeps its colours on a white plate. The plate's
+     margin is a box-shadow spread, so the image box keeps the logo's own
+     proportions (asserted by the UI evidence tests). */
+  [data-asc-theme="color"] .asc-ui .asc-appbar-light .asc-conference-brand > img {
+    margin-inline: 0.25rem;
+    border-radius: 0.25rem;
+    background: #fff;
+    box-shadow: 0 0 0 0.25rem #fff;
+  }
+
+  [data-asc-theme="color"] .asc-ui .asc-appbar-light .form-select,
+  [data-asc-theme="color"] .asc-ui .asc-appbar-light .asc-appbar-btn {
+    background-color: rgba(4, 32, 40, 0.2);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+
+  [data-asc-theme="color"] .asc-ui .asc-appbar-light .form-select {
+    --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  }
+
+  [data-asc-theme="color"] .asc-ui .asc-appbar-light .form-select option {
+    color: var(--asc-heading);
+    background: #fff;
+  }
+
+  [data-asc-theme="color"] .asc-ui .asc-appbar-light a:focus-visible,
+  [data-asc-theme="color"] .asc-ui .asc-appbar-light button:focus-visible,
+  [data-asc-theme="color"] .asc-ui .asc-appbar-light select:focus-visible {
+    outline-color: #fff !important;
+  }
+
+  [data-asc-theme="color"] .asc-ui .asc-appbar-light .asc-topnav a {
+    color: #fff;
+  }
+
+  [data-asc-theme="color"] .asc-ui .asc-appbar-light .asc-topnav a:hover {
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+  }
+
+  [data-asc-theme="color"] .asc-ui .asc-appbar-light .asc-topnav a[aria-current] {
+    background: #fff;
+    color: var(--asc-blue-strong);
+  }
+
+  [data-asc-theme="color"] .asc-ui .asc-appbar-light .asc-motif {
+    display: none;
+  }
+
+  /* Light cards on the pale background. */
+  [data-asc-theme="color"] .asc-ui .asc-auth-card,
+  [data-asc-theme="color"] .asc-ui .asc-card,
+  [data-asc-theme="color"] .asc-ui .asc-stepper {
+    border-color: #dcebe7;
+    border-radius: 1rem;
+    box-shadow: var(--asc-shadow-sm);
+  }
+
+  /* The conference artwork area: the same gradient, the artwork on a
+     white plate, white panel text. */
+  [data-asc-theme="color"] .asc-ui .asc-auth-aside {
+    background:
+      radial-gradient(90% 70% at 100% 100%, rgba(255, 255, 255, 0.12), transparent 60%),
+      var(--asc-theme-gradient);
+  }
+
+  [data-asc-theme="color"] .asc-ui .asc-auth-kicker,
+  [data-asc-theme="color"] .asc-ui .asc-auth-facts .asc-icon {
+    color: #d4f7ea;
+  }
+
+  [data-asc-theme="color"] .asc-ui .asc-auth-facts li {
+    color: #fff;
+  }
+
+  [data-asc-theme="color"] .asc-ui .asc-auth-aside-motif {
+    opacity: 0.18;
+    filter: brightness(2.2);
+  }
+}

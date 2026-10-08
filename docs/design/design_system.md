@@ -155,3 +155,31 @@ tables stay tables inside a horizontal scroller with edge shadows (the
 scroller is the containing block for visually hidden labels, which otherwise
 widened the page). No page scrolls horizontally at 390 px (asserted for
 every mobile capture).
+
+## 9. Participant appearance themes
+
+Participant pages (the public shell's participant pages, the workspace and
+the registration wizard) offer four themes from the **Appearance** menu
+beside the language control: Aurora Dark, Fresh Light, Glass Dark and
+Color & Card. Staff, operations and error pages are not themed; the staff
+pages that share the public shell (operational sign-in, credential setup)
+opt out through the `html_attrs` and `appearance_control` blocks.
+
+* Layout categories use the project's mobile breakpoint, `max-width:
+  767.98px` (Bootstrap md): narrower is "mobile", 768 px and wider (tablets
+  included) is "desktop". Defaults: Aurora Dark on mobile, Color & Card on
+  desktop. Each category keeps its own choice on the device
+  (`localStorage` keys `asc2026.appearance.mobile` and
+  `asc2026.appearance.desktop`, theme identifiers only).
+* `static/js/asc-appearance.js` runs from `<head>` before the stylesheets
+  and sets `data-asc-theme`, `data-asc-tone` and `data-asc-layout` on
+  `<html>`, so no other theme flashes first. A choice changes only those
+  attributes: no request, navigation, submission or re-render.
+* `static/css/asc-appearance.css` redefines the tokens of section 3 per
+  theme, plus the application bar, sign-in panel, cards, primary action and
+  one fixed decorative layer. Status tones keep their meanings (dark themes
+  use dark-surface variants). Every rule is inside `@media screen`, so print
+  output (the entry pass included) is unchanged, and the QR code stays on
+  white.
+* The conference lockup has white lettering; on the light themes it sits on
+  a navy plate, unaltered.

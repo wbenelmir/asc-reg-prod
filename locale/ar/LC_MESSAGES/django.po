@@ -10109,3 +10109,23 @@ msgstr "ليس محوّل الوزارة الرسمي"
 
 msgid "official Ministry adapter"
 msgstr "محوّل الوزارة الرسمي"
+
+#: templates/partials/appearance_switcher.html
+msgid "Appearance"
+msgstr "المظهر"
+
+#: templates/partials/appearance_switcher.html
+msgid "Aurora Dark"
+msgstr "الشفق الداكن"
+
+#: templates/partials/appearance_switcher.html
+msgid "Fresh Light"
+msgstr "فاتح منعش"
+
+#: templates/partials/appearance_switcher.html
+msgid "Glass Dark"
+msgstr "زجاجي داكن"
+
+#: templates/partials/appearance_switcher.html
+msgid "Color & Card"
+msgstr "ألوان وبطاقة"
