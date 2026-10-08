@@ -129,6 +129,19 @@
     }
   });
 
+  // A boosted swap parses the response with scripting disabled
+  // (Document.parseHTMLUnsafe / DOMParser), so a <noscript> no-JavaScript
+  // consent box (components/confirm_fallback.html) arrives as real, hidden
+  // elements. Its unchecked `required` checkbox then fails the form's
+  // constraint validation, the submit event never fires and the dialog
+  // never opens. Scripting is running here, so that content is emptied; a
+  // full page load parses it as text and has nothing to empty.
+  function clearParsedNoscript(scope) {
+    Array.prototype.forEach.call(scope.querySelectorAll("noscript"), function (node) {
+      if (node.firstElementChild) node.replaceChildren();
+    });
+  }
+
   // Escape fires `cancel`, then `close`; both paths end here.
   document.addEventListener(
     "close",
@@ -867,6 +880,7 @@
 
   function setupEnhancements(root) {
     var scope = root || document;
+    clearParsedNoscript(scope);
     Array.prototype.forEach.call(scope.querySelectorAll("[data-asc-picker]"), setupPicker);
     Array.prototype.forEach.call(scope.querySelectorAll("select[data-group-follows]"), setupGroupFollow);
     Array.prototype.forEach.call(scope.querySelectorAll("input[data-asc-otp]"), setupOtp);
