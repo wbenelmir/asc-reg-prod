@@ -80,6 +80,8 @@
       <span>{% trans "ASC 2026 Registration Platform" %}</span>
       <span>{% trans "African Startup Conference" %}</span>
       {% include "partials/footer_official.html" %}
+      {# Shown by js/asc-analytics.js only on pages with GA4 (production public pages). #}
+      {% if analytics_measurement_id %}<button type="button" class="asc-footer-consent" data-asc-analytics-open hidden>{% trans "Analytics preferences" %}</button>{% endif %}
     </div>
   </footer>
 {% endblock %}

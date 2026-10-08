@@ -91,5 +91,10 @@ def configured_public_base_url() -> str:
 
 
 def site_metadata(request: HttpRequest) -> dict:
-    """Public-page metadata context: the configured public origin, if any."""
-    return {"configured_public_base_url": configured_public_base_url()}
+    """Public-page metadata context: the configured public origin, if any, and
+    the GA4 measurement ID (empty unless production configures it; only the
+    public pages that include `partials/analytics.html` use it)."""
+    return {
+        "configured_public_base_url": configured_public_base_url(),
+        "analytics_measurement_id": getattr(settings, "ANALYTICS_GA4_MEASUREMENT_ID", ""),
+    }

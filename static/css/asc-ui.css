@@ -4553,3 +4553,62 @@ body.asc-ui :lang(ar) {
   padding: 0;
   list-style: none;
 }
+
+/* ------------------------------------------------------------------ */
+/* Analytics consent (partials/analytics.html, production public pages) */
+/* In the page flow below the header, never an overlay over the form.  */
+/* ------------------------------------------------------------------ */
+
+.asc-ui .asc-consent {
+  border-bottom: 1px solid var(--asc-border);
+  background: var(--asc-surface);
+  color: var(--asc-text);
+}
+
+.asc-ui .asc-consent-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding-block: 0.875rem;
+}
+
+.asc-ui .asc-consent-text {
+  flex: 1 1 26rem;
+  min-width: 0;
+}
+
+.asc-ui .asc-consent-title {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.asc-ui .asc-consent-text p {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.asc-ui .asc-consent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.asc-ui .asc-footer-consent {
+  min-height: var(--asc-target);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+  text-decoration: underline;
+}
+
+@media (max-width: 575.98px) {
+  .asc-ui .asc-consent-actions,
+  .asc-ui .asc-consent-actions .btn {
+    flex: 1 1 100%;
+  }
+}

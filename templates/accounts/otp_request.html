@@ -64,6 +64,8 @@
   </p>
 {% endblock %}
 {% block auth_aside_art %}{% include "partials/auth_panel_artwork.html" %}{% endblock %}
+{# Public visitor page: GA4 in production, after analytics consent (fixed path and title only). #}
+{% block analytics %}{% url 'accounts:otp-request' as analytics_path %}{% include "partials/analytics.html" with page_path=analytics_path page_title="Start registration" %}{% endblock %}
 {% block extra_head %}
   {% if human_check_enabled %}<link rel="stylesheet" href="{% static 'vendor/altcha/altcha.css' %}">{% endif %}
 {% endblock %}

@@ -49,7 +49,7 @@ SIZES = {
     "tablet": {"width": 820, "height": 1180},
 }
 THEMES = ("aurora", "fresh", "glass", "color")
-DEFAULTS = {"mobile": "aurora", "desktop": "color"}
+DEFAULTS = {"mobile": "glass", "desktop": "color"}
 KEYS = {"mobile": "asc2026.appearance.mobile", "desktop": "asc2026.appearance.desktop"}
 NAMES = {
     "en": {
@@ -626,7 +626,7 @@ def test_the_entry_pass_keeps_its_qr_and_print_presentation(live_server, page) -
     page.set_viewport_size(SIZES["mobile"])
     page.goto(f"{live_server.url}/my-passes/")
     page.wait_for_load_state("load")
-    assert _state(page)["theme"] == "aurora"
+    assert _state(page)["theme"] == DEFAULTS["mobile"]
     page.wait_for_function(
         "() => { const i = document.querySelector('img[data-pass-qr]');"
         " return i && i.complete && i.naturalWidth > 0; }"
@@ -635,7 +635,7 @@ def test_the_entry_pass_keeps_its_qr_and_print_presentation(live_server, page) -
         "node => getComputedStyle(node).backgroundColor"
     )
     assert qr_background == "rgb(255, 255, 255)", "the QR code stays on white"
-    _shot(page, "entry-pass-mobile-en-aurora")
+    _shot(page, "entry-pass-mobile-en-default")
 
     page.goto(f"{live_server.url}/my-passes/{series_public_id}/print/")
     page.wait_for_load_state("load")

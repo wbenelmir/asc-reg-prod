@@ -5545,3 +5545,23 @@ msgstr "Glass Dark"
 #: templates/partials/appearance_switcher.html
 msgid "Color & Card"
 msgstr "Color & Card"
+
+#: templates/partials/analytics.html
+msgid "Analytics cookies"
+msgstr "Analytics cookies"
+
+#: templates/partials/analytics.html
+msgid "With your permission, this page uses Google Analytics cookies to count visits and improve the registration service. No form content or personal details are sent. You can change your choice at any time with “Analytics preferences” at the bottom of the page."
+msgstr "With your permission, this page uses Google Analytics cookies to count visits and improve the registration service. No form content or personal details are sent. You can change your choice at any time with “Analytics preferences” at the bottom of the page."
+
+#: templates/partials/analytics.html
+msgid "Accept analytics"
+msgstr "Accept analytics"
+
+#: templates/partials/analytics.html
+msgid "Decline analytics"
+msgstr "Decline analytics"
+
+#: templates/layouts/base_public.html
+msgid "Analytics preferences"
+msgstr "Analytics preferences"

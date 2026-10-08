@@ -1,0 +1,31 @@
+{% load i18n static %}
+{% comment %}
+  Google Analytics 4 for one public visitor page (production only).
+
+  Included by the `analytics` block of the public start page and the legal
+  information page, with:
+    page_path   the fixed path reported to GA4 (never the real URL, so no
+                query string or token can be sent)
+    page_title  a fixed, non-sensitive English title
+
+  Renders nothing unless `ANALYTICS_GA4_MEASUREMENT_ID` is set (production).
+  Google's script is not requested until the visitor accepts analytics in
+  the banner below; `static/js/asc-analytics.js` keeps the choice on the
+  device and loads Google only then. No inline script (CSP).
+{% endcomment %}
+{% if analytics_measurement_id %}
+  <div data-asc-analytics data-measurement-id="{{ analytics_measurement_id }}" data-page-path="{{ page_path }}" data-page-title="{{ page_title }}" hidden></div>
+  <section class="asc-consent" data-asc-analytics-banner aria-labelledby="asc-consent-title" hidden>
+    <div class="container-xl asc-consent-inner">
+      <div class="asc-consent-text">
+        <h2 class="asc-consent-title" id="asc-consent-title">{% trans "Analytics cookies" %}</h2>
+        <p>{% trans "With your permission, this page uses Google Analytics cookies to count visits and improve the registration service. No form content or personal details are sent. You can change your choice at any time with “Analytics preferences” at the bottom of the page." %}</p>
+      </div>
+      <div class="asc-consent-actions">
+        <button type="button" class="btn btn-outline-primary" data-asc-analytics-choice="granted">{% trans "Accept analytics" %}</button>
+        <button type="button" class="btn btn-outline-primary" data-asc-analytics-choice="denied">{% trans "Decline analytics" %}</button>
+      </div>
+    </div>
+  </section>
+  <script src="{% static 'js/asc-analytics.js' %}?v=1"></script>
+{% endif %}

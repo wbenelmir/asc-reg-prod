@@ -11,7 +11,7 @@
  * Layout categories follow the project's mobile breakpoint (Bootstrap md,
  * the `max-width: 767.98px` queries of asc-ui.css): narrower is "mobile",
  * anything wider (tablets included) is "desktop". Each category has its own
- * preference and default: Aurora Dark on mobile, Color & Card on desktop.
+ * preference and default: Glass Dark on mobile, Color & Card on desktop.
  *
  * Kept on the device (localStorage), and only ever a theme identifier from
  * THEMES: `asc2026.appearance.mobile` and `asc2026.appearance.desktop`.
@@ -36,7 +36,7 @@
 
   var root = document.documentElement;
   var THEMES = { aurora: "dark", fresh: "light", glass: "dark", color: "light" };
-  var DEFAULTS = { mobile: "aurora", desktop: "color" };
+  var DEFAULTS = { mobile: "glass", desktop: "color" };
   var KEYS = { mobile: "asc2026.appearance.mobile", desktop: "asc2026.appearance.desktop" };
   var SCOPE = "data-asc-appearance-scope";
   var mobileQuery = window.matchMedia ? window.matchMedia("(max-width: 767.98px)") : null;

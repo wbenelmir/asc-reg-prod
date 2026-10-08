@@ -1056,6 +1056,12 @@ CONTENT_SECURITY_POLICY = {
 }
 # Staging and production (HTTPS only) add `upgrade-insecure-requests`.
 CONTENT_SECURITY_POLICY_UPGRADE_INSECURE_REQUESTS = False
+
+# Google Analytics 4: OFF everywhere except production (config/settings/
+# production.py sets the measurement ID and adds Google's hosts to the CSP).
+# Even then it runs only on the public start and legal pages, and loads only
+# after the visitor accepts analytics (`static/js/asc-analytics.js`).
+ANALYTICS_GA4_MEASUREMENT_ID = ""
 # No page uses these browser features. Browser camera scanning (plan R4) is a
 # requirement gap; enabling it must change `camera` deliberately.
 PERMISSIONS_POLICY = (

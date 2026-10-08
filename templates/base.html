@@ -15,7 +15,7 @@
     other page it does nothing. It is loaded on every page because a boosted
     swap keeps the first page's <head>.
   {% endcomment %}
-  <script src="{% static 'js/asc-appearance.js' %}?v=1"></script>
+  <script src="{% static 'js/asc-appearance.js' %}?v=2"></script>
   <title>{% block title %}{% trans "Registration" %}{% endblock %}{% block title_suffix %} &middot; {% trans "ASC 2026" %}{% endblock %}</title>
   {% comment %}
     Search-engine posture (UX-1, S-05): every page is `noindex, nofollow` by
@@ -52,9 +52,9 @@
     on either of them. Shell classes (asc-entry, asc-operations, …) are
     semantic hooks only; no rule in asc-ui.css may depend on them.
   {% endcomment %}
-  <link rel="stylesheet" href="{% static 'css/asc-ui.css' %}?v=1.1-ui-03">
+  <link rel="stylesheet" href="{% static 'css/asc-ui.css' %}?v=1.1-ui-04">
   {# Participant themes: every rule is scoped to <html data-asc-theme>, set only on participant pages. #}
-  <link rel="stylesheet" href="{% static 'css/asc-appearance.css' %}?v=1">
+  <link rel="stylesheet" href="{% static 'css/asc-appearance.css' %}?v=2">
   {% if LANGUAGE_BIDI %}
     <link rel="preload" href="{% static 'vendor/thmanyah/thmanyahsans-Regular.woff2' %}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{% static 'vendor/thmanyah/thmanyahsans-Bold.woff2' %}" as="font" type="font/woff2" crossorigin>
@@ -78,6 +78,14 @@
       </div>
     </header>
   {% endblock %}
+
+  {% comment %}
+    Google Analytics 4 (production only): empty by default. Only the public
+    visitor pages (start, legal information) fill it with
+    partials/analytics.html; staff, OTP code entry, signed-in, registration
+    and diagnostics pages never do.
+  {% endcomment %}
+  {% block analytics %}{% endblock %}
 
   <div id="status-region" class="visually-hidden" aria-live="polite" role="status">
     {% if messages %}{% for message in messages %}{{ message }}. {% endfor %}{% endif %}

@@ -10033,3 +10033,23 @@ msgstr "Verre sombre"
 #: templates/partials/appearance_switcher.html
 msgid "Color & Card"
 msgstr "Couleur et carte"
+
+#: templates/partials/analytics.html
+msgid "Analytics cookies"
+msgstr "Cookies de mesure d’audience"
+
+#: templates/partials/analytics.html
+msgid "With your permission, this page uses Google Analytics cookies to count visits and improve the registration service. No form content or personal details are sent. You can change your choice at any time with “Analytics preferences” at the bottom of the page."
+msgstr "Avec votre accord, cette page utilise les cookies de Google Analytics pour compter les visites et améliorer le service d’inscription. Aucun contenu de formulaire ni aucune donnée personnelle n’est transmis. Vous pouvez modifier votre choix à tout moment avec « Préférences de mesure d’audience » en bas de la page."
+
+#: templates/partials/analytics.html
+msgid "Accept analytics"
+msgstr "Accepter la mesure d’audience"
+
+#: templates/partials/analytics.html
+msgid "Decline analytics"
+msgstr "Refuser la mesure d’audience"
+
+#: templates/layouts/base_public.html
+msgid "Analytics preferences"
+msgstr "Préférences de mesure d’audience"

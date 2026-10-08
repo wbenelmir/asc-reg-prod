@@ -167,7 +167,7 @@ opt out through the `html_attrs` and `appearance_control` blocks.
 
 * Layout categories use the project's mobile breakpoint, `max-width:
   767.98px` (Bootstrap md): narrower is "mobile", 768 px and wider (tablets
-  included) is "desktop". Defaults: Aurora Dark on mobile, Color & Card on
+  included) is "desktop". Defaults: Glass Dark on mobile, Color & Card on
   desktop. Each category keeps its own choice on the device
   (`localStorage` keys `asc2026.appearance.mobile` and
   `asc2026.appearance.desktop`, theme identifiers only).

@@ -10,6 +10,8 @@
   `Cache-Control: private, no-store` (the view). Reading it records nothing.
 {% endcomment %}
 {% block title %}{% trans "Privacy Notice and Terms" %}{% endblock %}
+{# Public visitor page: GA4 in production, after analytics consent (fixed path and title only). #}
+{% block analytics %}{% url 'privacy:legal-information' as analytics_path %}{% include "partials/analytics.html" with page_path=analytics_path page_title="Privacy Notice and Terms" %}{% endblock %}
 {% block main %}
   <main id="main-content" class="asc-main" hx-boost="true">
     <div class="container-xl">
