@@ -305,7 +305,9 @@ def test_an_identity_invalidated_by_a_correction_elsewhere_blocks_approval(
         )
     assert refusal.value.code == "IDENTITY_NOT_VERIFIED"
     registration.refresh_from_db()
-    assert registration.public_status == RegistrationPublicStatus.SUBMITTED
+    # Unchanged by the refusal: still waiting in review since its verification.
+    assert registration.public_status == RegistrationPublicStatus.UNDER_REVIEW
+    assert not registration.decisions.exists()
 
 
 # ---------------------------------------------------------------------------

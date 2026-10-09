@@ -7,6 +7,13 @@ from apps.accounts.tests.sign_in import staff_sign_in
 from apps.core.models import Country, Sector
 from apps.events.models import EventEdition
 from apps.organizations.models import Organization, OrganizationType
+
+# The identity tests' submission fixtures, re-exported for the review-entry tests.
+from apps.people.tests.conftest import (  # noqa: F401
+    idv_event,
+    idv_reference_data,
+    legal_versions,
+)
 from apps.registrations.models import (
     Registration,
     RegistrationInternalStatus,

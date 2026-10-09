@@ -75,6 +75,16 @@ REVIEW_APPROVAL_BLOCKED_IDENTITY = "REV_APPROVAL_BLOCKED_IDENTITY"
 REVIEW_REGISTRATION_REOPENED = "REV_REGISTRATION_REOPENED"
 REVIEW_PARTICIPANT_WITHDRAWAL = "REV_PARTICIPANT_WITHDRAWAL"
 REVIEW_OPERATIONAL_CANCELLATION = "REV_OPERATIONAL_CANCELLATION"
+# A verified registration entered participation review (`apps.reviews.intake`):
+# reason code = the trigger, summaries = statuses and whether a case was reused.
+REVIEW_CASE_ENQUEUED = "REV_CASE_ENQUEUED"
+# Decision workbook (`apps.reviews.workbook`): counts and ids only, never a
+# participant name, reference list or note.
+REVIEW_DECISION_WORKBOOK_EXPORTED = "REV_DECISION_WORKBOOK_EXPORTED"
+REVIEW_DECISION_WORKBOOK_PREVIEWED = "REV_DECISION_WORKBOOK_PREVIEWED"
+REVIEW_DECISION_WORKBOOK_REFUSED = "REV_DECISION_WORKBOOK_REFUSED"
+REVIEW_DECISION_WORKBOOK_APPLIED = "REV_DECISION_WORKBOOK_APPLIED"
+REVIEW_DECISION_WORKBOOK_APPLY_REFUSED = "REV_DECISION_WORKBOOK_APPLY_REFUSED"
 # Protected-document view/download audit reuses the EXISTING
 # `apps.documents.views.document_stream` evidence path (its own
 # "DOCUMENT_STREAMED" audit event, already scoped by

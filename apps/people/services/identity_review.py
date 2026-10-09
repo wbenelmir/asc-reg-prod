@@ -16,7 +16,9 @@ Every command:
 * writes one append-only `IdentityDecision`, one audit event without civil
   data, and never changes participation status beyond the documented mapping
   (return for correction <-> Additional Information Required; a final
-  rejection -> a NOT_APPROVED participation decision, owner decision IDV-Q2).
+  rejection -> a NOT_APPROVED participation decision, owner decision IDV-Q2;
+  a verification -> an eligible registration enters participation review,
+  SUBMITTED -> UNDER_REVIEW with its STANDARD case, `apps.reviews.intake`).
 
 Identity confirmation never approves participation (IDV-10); approval checks
 the identity itself (owner decision IDV-Q1, `apps.people.selectors.clearance`).
@@ -475,6 +477,17 @@ def verify_identity_manually(
             actor_user=actor,
             reason_code=reason_code,
             after={"status": locked.status, "source": source},
+            correlation_id=correlation_id,
+        )
+        # Every manual route (document, passport, NIN exemption, staff
+        # exception) then waits for its participation decision, in this
+        # transaction. Identity confirmation still never approves (IDV-10).
+        from apps.reviews.intake import EntryTrigger, enqueue_for_participation_review
+
+        enqueue_for_participation_review(
+            registration.pk,
+            trigger=EntryTrigger.IDENTITY_MANUALLY_VERIFIED,
+            actor=actor,
             correlation_id=correlation_id,
         )
     return locked

@@ -10053,3 +10053,373 @@ msgstr "Refuser la mesure d’audience"
 #: templates/layouts/base_public.html
 msgid "Analytics preferences"
 msgstr "Préférences de mesure d’audience"
+
+msgid "Review decision workbook"
+msgstr "Classeur de décisions d’examen"
+
+msgid "Exports the review queue to Excel and applies a validated workbook of decisions. Each row still needs the accreditation manager's decision permission in scope."
+msgstr "Exporte la file d’examen vers Excel et applique un classeur de décisions validé. Chaque ligne exige toujours la permission de décision du responsable de l’accréditation dans son périmètre."
+
+msgid "Previewed, not applied"
+msgstr "Aperçu, non appliqué"
+
+msgid "Refused at final validation, nothing applied"
+msgstr "Refusé à la validation finale, rien n’a été appliqué"
+
+msgid "Expired, nothing applied"
+msgstr "Expiré, rien n’a été appliqué"
+
+msgid "No change"
+msgstr "Aucun changement"
+
+msgid "Valid proposed decision"
+msgstr "Décision proposée valide"
+
+#, python-format
+msgid "%(count)s rows match these filters; one workbook holds at most %(limit)s. Narrow the filters and export again."
+msgstr "%(count)s lignes correspondent à ces filtres ; un classeur en contient au plus %(limit)s. Affinez les filtres et exportez de nouveau."
+
+msgid "The workbook could not be exported."
+msgstr "Le classeur n’a pas pu être exporté."
+
+msgid "Choose the completed workbook (.xlsx) to import."
+msgstr "Choisissez le classeur complété (.xlsx) à importer."
+
+msgid "The workbook could not be imported."
+msgstr "Le classeur n’a pas pu être importé."
+
+#, python-format
+msgid "row %(row)s: %(problem)s"
+msgstr "ligne %(row)s : %(problem)s"
+
+#, python-format
+msgid "%(count)s decision was validated and applied."
+msgid_plural "%(count)s decisions were validated and applied."
+msgstr[0] "%(count)s décision a été validée et appliquée."
+msgstr[1] "%(count)s décisions ont été validées et appliquées."
+
+msgid "The file is larger than the accepted size."
+msgstr "Le fichier dépasse la taille acceptée."
+
+msgid "The file is not an Excel workbook (.xlsx)."
+msgstr "Le fichier n’est pas un classeur Excel (.xlsx)."
+
+msgid "The workbook could not be read safely."
+msgstr "Le classeur n’a pas pu être lu en toute sécurité."
+
+msgid "Workbooks with macros are not accepted."
+msgstr "Les classeurs contenant des macros ne sont pas acceptés."
+
+msgid "Workbooks with external links are not accepted."
+msgstr "Les classeurs contenant des liens externes ne sont pas acceptés."
+
+msgid "The workbook has more rows than one import accepts."
+msgstr "Le classeur contient plus de lignes qu’une importation n’en accepte."
+
+msgid "The Decisions or Instructions sheet is missing."
+msgstr "La feuille Decisions ou Instructions est manquante."
+
+msgid "The Decisions sheet columns were changed."
+msgstr "Les colonnes de la feuille Decisions ont été modifiées."
+
+msgid "This workbook template version is not supported."
+msgstr "Cette version du modèle de classeur n’est pas prise en charge."
+
+msgid "This workbook does not come from an export of this queue."
+msgstr "Ce classeur ne provient pas d’un export de cette file."
+
+msgid "This export has expired. Export the queue again."
+msgstr "Cet export a expiré. Exportez de nouveau la file."
+
+msgid "This workbook was exported by another account. Import your own export."
+msgstr "Ce classeur a été exporté par un autre compte. Importez votre propre export."
+
+msgid "The Decisions sheet has no rows."
+msgstr "La feuille Decisions ne contient aucune ligne."
+
+msgid "Too many rows match these filters for one workbook. Narrow the filters and export again."
+msgstr "Trop de lignes correspondent à ces filtres pour un seul classeur. Affinez les filtres et exportez de nouveau."
+
+msgid "No row awaiting a decision matches these filters."
+msgstr "Aucune ligne en attente de décision ne correspond à ces filtres."
+
+msgid "A cell holds a formula; type plain values only."
+msgstr "Une cellule contient une formule ; saisissez uniquement des valeurs simples."
+
+msgid "This row is not part of the export."
+msgstr "Cette ligne ne fait pas partie de l’export."
+
+msgid "The same registration or case appears on several rows."
+msgstr "La même inscription ou le même dossier figure sur plusieurs lignes."
+
+msgid "The reference or technical columns were changed."
+msgstr "La référence ou les colonnes techniques ont été modifiées."
+
+msgid "This row belongs to another export or template."
+msgstr "Cette ligne appartient à un autre export ou à un autre modèle."
+
+msgid "Decision must be KEEP, ACCEPT or REJECT."
+msgstr "La décision doit être KEEP, ACCEPT ou REJECT."
+
+msgid "KEEP was chosen but a profile, reason or note was filled in. Clear them or choose a decision."
+msgstr "KEEP a été choisi mais un profil, un motif ou une note a été saisi. Effacez-les ou choisissez une décision."
+
+msgid "ACCEPT requires an attendance profile."
+msgstr "ACCEPT exige un profil de participation."
+
+msgid "Attendance profile must be ALL_DAYS or FOLLOWING_TWO_DAYS."
+msgstr "Le profil de participation doit être ALL_DAYS ou FOLLOWING_TWO_DAYS."
+
+msgid "A rejection reason cannot accompany ACCEPT."
+msgstr "Un motif de refus ne peut pas accompagner ACCEPT."
+
+msgid "An internal note can be recorded only with REJECT."
+msgstr "Une note interne ne peut être enregistrée qu’avec REJECT."
+
+msgid "REJECT requires a rejection reason."
+msgstr "REJECT exige un motif de refus."
+
+msgid "The rejection reason must be plain text of at most 64 characters."
+msgstr "Le motif de refus doit être un texte simple de 64 caractères au plus."
+
+msgid "The internal note must be plain text of at most 2000 characters."
+msgstr "La note interne doit être un texte simple de 2000 caractères au plus."
+
+msgid "An attendance profile cannot accompany REJECT."
+msgstr "Un profil de participation ne peut pas accompagner REJECT."
+
+msgid "You are not authorized to decide this registration."
+msgstr "Vous n’êtes pas autorisé à décider de cette inscription."
+
+msgid "The registration, its case or its identity changed since the export."
+msgstr "L’inscription, son dossier ou son identité a changé depuis l’export."
+
+msgid "The registration is no longer awaiting a participation decision."
+msgstr "L’inscription n’attend plus de décision de participation."
+
+msgid "Approval needs a current participant role, badge type and access profile first."
+msgstr "L’approbation exige d’abord un rôle de participant, un type de badge et un profil d’accès en vigueur."
+
+msgid "The attendance days and opening-day capacity are not configured for this event."
+msgstr "Les jours de participation et la capacité du jour d’ouverture ne sont pas configurés pour cet événement."
+
+msgid "Not enough opening-day places remain for every ALL_DAYS approval of this event."
+msgstr "Il ne reste pas assez de places pour le jour d’ouverture pour toutes les approbations ALL_DAYS de cet événement."
+
+msgid "Something changed since the preview. Nothing was applied. Export the queue again."
+msgstr "Un élément a changé depuis l’aperçu. Rien n’a été appliqué. Exportez de nouveau la file."
+
+msgid "This preview has expired. Nothing was applied."
+msgstr "Cet aperçu a expiré. Rien n’a été appliqué."
+
+msgid "The preview has invalid rows. Nothing was applied."
+msgstr "L’aperçu contient des lignes invalides. Rien n’a été appliqué."
+
+msgid "The preview has no proposed decision."
+msgstr "L’aperçu ne contient aucune décision proposée."
+
+msgid "This preview can no longer be applied."
+msgstr "Cet aperçu ne peut plus être appliqué."
+
+msgid "A decision was refused at final validation. Nothing was applied. Export the queue again."
+msgstr "Une décision a été refusée à la validation finale. Rien n’a été appliqué. Exportez de nouveau la file."
+
+msgid "The registration is not submitted."
+msgstr "L’inscription n’est pas soumise."
+
+msgid "The registration was withdrawn or cancelled."
+msgstr "L’inscription a été retirée ou annulée."
+
+msgid "The registration already has a participation decision."
+msgstr "L’inscription a déjà une décision de participation."
+
+msgid "The registration was replaced by a newer one."
+msgstr "L’inscription a été remplacée par une plus récente."
+
+msgid "A correction or additional information is requested from the participant."
+msgstr "Une correction ou des informations complémentaires sont demandées au participant."
+
+msgid "The registration's internal status does not allow it."
+msgstr "Le statut interne de l’inscription ne le permet pas."
+
+msgid "A duplicate review is pending."
+msgstr "Un examen de doublon est en attente."
+
+msgid "A duplicate, restricted or specialist review is open."
+msgstr "Un examen de doublon, restreint ou spécialisé est ouvert."
+
+msgid "Several open review cases exist; resolve them first."
+msgstr "Plusieurs dossiers d’examen sont ouverts ; réglez-les d’abord."
+
+msgid "no filter (whole decision scope)"
+msgstr "aucun filtre (tout le périmètre de décision)"
+
+msgid "ASC 2026 review decisions workbook"
+msgstr "Classeur des décisions d’examen ASC 2026"
+
+msgid "Exported at (UTC)"
+msgstr "Exporté le (UTC)"
+
+msgid "Scope"
+msgstr "Périmètre"
+
+msgid "Valid until (UTC)"
+msgstr "Valable jusqu’au (UTC)"
+
+msgid "How to use"
+msgstr "Mode d’emploi"
+
+msgid "Edit only the yellow columns of the Decisions sheet."
+msgstr "Modifiez uniquement les colonnes jaunes de la feuille Decisions."
+
+msgid "KEEP (default) changes nothing. ACCEPT approves. REJECT records a Not Approved decision."
+msgstr "KEEP (par défaut) ne change rien. ACCEPT approuve. REJECT enregistre une décision de refus."
+
+msgid "Required for ACCEPT: ALL_DAYS (all three conference days, including the opening day) or FOLLOWING_TWO_DAYS (the two days after the opening day). Leave empty for KEEP and REJECT."
+msgstr "Obligatoire pour ACCEPT : ALL_DAYS (les trois jours de la conférence, jour d’ouverture compris) ou FOLLOWING_TWO_DAYS (les deux jours après le jour d’ouverture). Laissez vide pour KEEP et REJECT."
+
+msgid "Required for REJECT: a short internal reason code (at most 64 characters)."
+msgstr "Obligatoire pour REJECT : un court code de motif interne (64 caractères au plus)."
+
+msgid "Optional, REJECT only. Internal: never shown to the participant."
+msgstr "Facultatif, REJECT uniquement. Interne : jamais montré au participant."
+
+msgid "Technical columns"
+msgstr "Colonnes techniques"
+
+msgid "Do not change the reference or the grey technical columns; the server checks them."
+msgstr "Ne modifiez ni la référence ni les colonnes techniques grises ; le serveur les vérifie."
+
+msgid "Import"
+msgstr "Importation"
+
+msgid "Upload the saved workbook from the review queue. The preview only checks it: nothing is decided until you choose “Validate and apply decisions”."
+msgstr "Téléversez le classeur enregistré depuis la file d’examen. L’aperçu ne fait que le vérifier : rien n’est décidé tant que vous n’avez pas choisi « Valider et appliquer les décisions »."
+
+msgid "All or nothing"
+msgstr "Tout ou rien"
+
+msgid "If any row is invalid or anything changed since the export, no decision is applied. Export again and repeat your decisions."
+msgstr "Si une ligne est invalide ou si un élément a changé depuis l’export, aucune décision n’est appliquée. Exportez de nouveau et reprenez vos décisions."
+
+msgid "Decision import preview"
+msgstr "Aperçu de l’importation des décisions"
+
+msgid "Decisions in Excel"
+msgstr "Décisions dans Excel"
+
+msgid "Every row was checked against the export and the current registrations."
+msgstr "Chaque ligne a été vérifiée par rapport à l’export et aux inscriptions actuelles."
+
+msgid "Preview only: no decision has been applied yet."
+msgstr "Aperçu uniquement : aucune décision n’a encore été appliquée."
+
+msgid "Valid rows are proposals. Nothing changes until you choose “Validate and apply decisions”; then every decision is checked again and all are applied, or none."
+msgstr "Les lignes valides sont des propositions. Rien ne change tant que vous n’avez pas choisi « Valider et appliquer les décisions » ; chaque décision est alors vérifiée de nouveau et toutes sont appliquées, ou aucune."
+
+#, python-format
+msgid "%(counter)s decision was applied through the normal decision service."
+msgid_plural "%(counter)s decisions were applied through the normal decision service."
+msgstr[0] "%(counter)s décision a été appliquée par le service de décision habituel."
+msgstr[1] "%(counter)s décisions ont été appliquées par le service de décision habituel."
+
+msgid "This preview can no longer be applied. Nothing was applied."
+msgstr "Cet aperçu ne peut plus être appliqué. Rien n’a été appliqué."
+
+msgid "Preview statistics"
+msgstr "Statistiques de l’aperçu"
+
+msgid "Rows read"
+msgstr "Lignes lues"
+
+msgid "No change (KEEP)"
+msgstr "Aucun changement (KEEP)"
+
+msgid "Approve: all three days"
+msgstr "Approuver : les trois jours"
+
+msgid "Approve: the following two days"
+msgstr "Approuver : les deux jours suivants"
+
+msgid "Reject"
+msgstr "Refuser"
+
+msgid "Invalid rows"
+msgstr "Lignes invalides"
+
+msgid "Valid proposed changes"
+msgstr "Changements proposés valides"
+
+#, python-format
+msgid "Among the invalid rows: %(stale)s changed since the export, %(scope)s outside your decision scope."
+msgstr "Parmi les lignes invalides : %(stale)s ont changé depuis l’export, %(scope)s sont hors de votre périmètre de décision."
+
+msgid "Proposed decisions and invalid rows"
+msgstr "Décisions proposées et lignes invalides"
+
+msgid "Download the error report"
+msgstr "Télécharger le rapport d’erreurs"
+
+msgid "Attendance profile"
+msgstr "Profil de participation"
+
+msgid "Problems"
+msgstr "Problèmes"
+
+msgid "Every row keeps its current state (KEEP)."
+msgstr "Chaque ligne garde son état actuel (KEEP)."
+
+msgid "Validate and apply these decisions?"
+msgstr "Valider et appliquer ces décisions ?"
+
+#, python-format
+msgid "%(counter)s decision will be checked again and recorded, with its normal notification."
+msgid_plural "%(counter)s decisions will be checked again and recorded, with their normal notifications. If any of them fails, none is recorded."
+msgstr[0] "%(counter)s décision sera vérifiée de nouveau et enregistrée, avec sa notification habituelle."
+msgstr[1] "%(counter)s décisions seront vérifiées de nouveau et enregistrées, avec leurs notifications habituelles. Si l’une d’elles échoue, aucune n’est enregistrée."
+
+msgid "Validate and apply decisions"
+msgstr "Valider et appliquer les décisions"
+
+msgid "Correct the invalid rows in the workbook and import it again: a batch with an invalid row cannot be applied."
+msgstr "Corrigez les lignes invalides dans le classeur et importez-le de nouveau : un lot contenant une ligne invalide ne peut pas être appliqué."
+
+msgid "There is no decision to apply."
+msgstr "Il n’y a aucune décision à appliquer."
+
+msgid "This preview has expired. Import the workbook again."
+msgstr "Cet aperçu a expiré. Importez de nouveau le classeur."
+
+msgid "Review cases by decision state"
+msgstr "Dossiers d’examen par état de décision"
+
+msgid "Awaiting decision"
+msgstr "En attente de décision"
+
+msgid "Completed history"
+msgstr "Historique terminé"
+
+msgid "All cases"
+msgstr "Tous les dossiers"
+
+msgid "Export the cases awaiting a decision, choose KEEP, ACCEPT (with the attendance days) or REJECT (with a reason) in the yellow columns, then import the workbook. The import only shows a preview: no decision is recorded until you choose “Validate and apply decisions”, and then all decisions are applied or none."
+msgstr "Exportez les dossiers en attente de décision, choisissez KEEP, ACCEPT (avec les jours de participation) ou REJECT (avec un motif) dans les colonnes jaunes, puis importez le classeur. L’importation n’affiche qu’un aperçu : aucune décision n’est enregistrée tant que vous n’avez pas choisi « Valider et appliquer les décisions », et alors toutes les décisions sont appliquées, ou aucune."
+
+msgid "Rows to export"
+msgstr "Lignes à exporter"
+
+msgid "every page, your decision scope only"
+msgstr "toutes les pages, votre périmètre de décision uniquement"
+
+msgid "Export Excel"
+msgstr "Exporter vers Excel"
+
+msgid "Completed workbook (.xlsx)"
+msgstr "Classeur complété (.xlsx)"
+
+msgid "Import Excel and preview"
+msgstr "Importer le fichier Excel et prévisualiser"
+
+msgctxt "decision workbook"
+msgid "Rejection reason"
+msgstr "Motif de refus"

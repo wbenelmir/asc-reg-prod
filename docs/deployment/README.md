@@ -322,6 +322,8 @@ python manage.py changepassword uat-reviewer@<domain>             # once per acc
 
 * [Attendance days, opening-day capacity and enforcement](../operations/attendance_days.md)
 * [Staff accounts and scoped access](../operations/staff_accounts.md)
+* [Review queue entry and Excel decisions](../operations/review_decision_workbook.md)
+  ([release procedure: backup, migrate, backfill, reconcile](REVIEW_QUEUE_RELEASE.md))
 * [Staff sign-in security image](../security/staff_sign_in_captcha.md)
 * [Beta release notes and verification summary](beta_release_notes.md)
 * [Beta backlog and open decisions](beta_backlog.md)

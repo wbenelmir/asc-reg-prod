@@ -8,6 +8,31 @@ app_name = "reviews"
 
 urlpatterns = [
     path("ops/reviews/queue/", views.queue_list, name="queue-list"),
+    path(
+        "ops/reviews/queue/decisions/export/",
+        views.decision_workbook_export,
+        name="decision-workbook-export",
+    ),
+    path(
+        "ops/reviews/queue/decisions/import/",
+        views.decision_workbook_import,
+        name="decision-workbook-import",
+    ),
+    path(
+        "ops/reviews/queue/decisions/imports/<uuid:pk>/",
+        views.decision_import_detail,
+        name="decision-import-detail",
+    ),
+    path(
+        "ops/reviews/queue/decisions/imports/<uuid:pk>/apply/",
+        views.decision_import_apply,
+        name="decision-import-apply",
+    ),
+    path(
+        "ops/reviews/queue/decisions/imports/<uuid:pk>/errors.csv",
+        views.decision_import_report,
+        name="decision-import-report",
+    ),
     path("ops/reviews/cases/<uuid:pk>/", views.case_detail, name="case-detail"),
     path("ops/reviews/cases/<uuid:pk>/assign/", views.case_assign, name="case-assign"),
     path(

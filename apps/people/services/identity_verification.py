@@ -1311,6 +1311,15 @@ def _apply_lookup_result(*, job_id, token, outcome, provider, attempt_number, du
         job.lease_expires_at = None
         job.last_outcome = outcome.kind
         job.save()
+        if source:
+            # The verified registration waits for its participation decision, in
+            # this transaction (Registration and case already locked). Never an
+            # approval, a notification or a provider call.
+            from apps.reviews.intake import EntryTrigger, enqueue_for_participation_review
+
+            enqueue_for_participation_review(
+                registration.pk, trigger=EntryTrigger.IDENTITY_API_VERIFIED
+            )
         _audit(
             action_codes.IDENTITY_PROVIDER_RESULT_APPLIED,
             verification=verification,

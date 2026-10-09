@@ -86,6 +86,7 @@ Operational permissions per module (generated from the inventory):
 | `ops/reviews` | `reviews.add_internalreviewnote` | 1 |
 | `ops/reviews` | `reviews.add_registrationdecision` | 2 |
 | `ops/reviews` | `reviews.assign_reviewcase` | 1 |
+| `ops/reviews` | `reviews.bulk_registrationdecision` | 5 |
 | `ops/reviews` | `reviews.cancel_registration` | 1 |
 | `ops/reviews` | `reviews.change_informationrequest` | 3 |
 | `ops/reviews` | `reviews.change_reviewcase_status` | 1 |

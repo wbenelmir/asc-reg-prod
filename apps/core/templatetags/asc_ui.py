@@ -116,6 +116,18 @@ _STATUS_TONES: dict[str, dict[str, tuple[str, str]]] = {
         "SUCCEEDED": ("success", "check-circle"),
         "FAILED": ("danger", "x-circle"),
     },
+    # Review decision workbook: the preview and its rows (apps.reviews.workbook).
+    "decision_import": {
+        "PREVIEWED": ("info", "clock"),
+        "APPLIED": ("success", "check-circle"),
+        "REFUSED": ("danger", "x-circle"),
+        "EXPIRED": ("neutral", "lock"),
+    },
+    "decision_row": {
+        "NO_CHANGE": ("neutral", "info"),
+        "VALID": ("success", "check"),
+        "INVALID": ("danger", "x-circle"),
+    },
 }
 
 _DEFAULT_TONE = ("neutral", "info")

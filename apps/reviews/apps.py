@@ -98,9 +98,22 @@ IDENTITY_PERMISSION_CODENAMES: tuple[str, ...] = (
     "apply_identity_exception",
 )
 
+#: The decision workbook (Excel export, import preview, all-or-nothing final
+#: validation) is its own capability, ON TOP of the ordinary decision
+#: permission that every row still requires in its own scope. No existing
+#: group receives it and nobody is granted it automatically: an account
+#: administrator grants this role explicitly, normally to an Accreditation
+#: Manager, with the same event/organization scope
+#: (docs/operations/review_decision_workbook.md).
+REVIEW_DECISION_WORKBOOK_GROUP_NAME = "Review Decision Workbook Operators"
+REVIEW_DECISION_WORKBOOK_PERMISSIONS: tuple[tuple[str, str], ...] = (
+    ("reviews", "bulk_registrationdecision"),
+)
+
 _ALL_GROUPS: tuple[tuple[str, tuple[tuple[str, str], ...]], ...] = (
     (REGISTRATION_REVIEWERS_GROUP_NAME, REGISTRATION_REVIEWERS_PERMISSIONS),
     (ACCREDITATION_MANAGERS_GROUP_NAME, ACCREDITATION_MANAGERS_PERMISSIONS),
+    (REVIEW_DECISION_WORKBOOK_GROUP_NAME, REVIEW_DECISION_WORKBOOK_PERMISSIONS),
 )
 
 

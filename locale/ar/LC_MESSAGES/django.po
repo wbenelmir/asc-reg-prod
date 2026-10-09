@@ -10149,3 +10149,385 @@ msgstr "رفض التحليلات"
 #: templates/layouts/base_public.html
 msgid "Analytics preferences"
 msgstr "تفضيلات التحليلات"
+
+msgid "Review decision workbook"
+msgstr "مصنف قرارات المراجعة"
+
+msgid "Exports the review queue to Excel and applies a validated workbook of decisions. Each row still needs the accreditation manager's decision permission in scope."
+msgstr "يصدّر قائمة المراجعة إلى Excel ويطبّق مصنف قرارات تم التحقق منه. يظل كل سطر بحاجة إلى صلاحية القرار الخاصة بمسؤول الاعتماد ضمن نطاقه."
+
+msgid "Previewed, not applied"
+msgstr "معاينة، لم يُطبّق"
+
+msgid "Refused at final validation, nothing applied"
+msgstr "رُفض عند التحقق النهائي، لم يُطبّق أي شيء"
+
+msgid "Expired, nothing applied"
+msgstr "منتهي الصلاحية، لم يُطبّق أي شيء"
+
+msgid "No change"
+msgstr "بلا تغيير"
+
+msgid "Valid proposed decision"
+msgstr "قرار مقترح صالح"
+
+#, python-format
+msgid "%(count)s rows match these filters; one workbook holds at most %(limit)s. Narrow the filters and export again."
+msgstr "يطابق هذه المرشحات %(count)s سطرًا؛ ولا يتسع المصنف الواحد لأكثر من %(limit)s. ضيّق المرشحات ثم صدّر من جديد."
+
+msgid "The workbook could not be exported."
+msgstr "تعذّر تصدير المصنف."
+
+msgid "Choose the completed workbook (.xlsx) to import."
+msgstr "اختر المصنف المكتمل (.xlsx) لاستيراده."
+
+msgid "The workbook could not be imported."
+msgstr "تعذّر استيراد المصنف."
+
+#, python-format
+msgid "row %(row)s: %(problem)s"
+msgstr "السطر %(row)s: %(problem)s"
+
+#, python-format
+msgid "%(count)s decision was validated and applied."
+msgid_plural "%(count)s decisions were validated and applied."
+msgstr[0] "لم يُتحقق من أي قرار ولم يُطبّق (%(count)s)."
+msgstr[1] "تم التحقق من قرار واحد (%(count)s) وتطبيقه."
+msgstr[2] "تم التحقق من قرارين (%(count)s) وتطبيقهما."
+msgstr[3] "تم التحقق من %(count)s قرارات وتطبيقها."
+msgstr[4] "تم التحقق من %(count)s قرارًا وتطبيقها."
+msgstr[5] "تم التحقق من %(count)s قرار وتطبيقها."
+
+msgid "The file is larger than the accepted size."
+msgstr "حجم الملف أكبر من الحجم المقبول."
+
+msgid "The file is not an Excel workbook (.xlsx)."
+msgstr "الملف ليس مصنف Excel ‏(.xlsx)."
+
+msgid "The workbook could not be read safely."
+msgstr "تعذّرت قراءة المصنف بأمان."
+
+msgid "Workbooks with macros are not accepted."
+msgstr "لا تُقبل المصنفات التي تحتوي على وحدات ماكرو."
+
+msgid "Workbooks with external links are not accepted."
+msgstr "لا تُقبل المصنفات التي تحتوي على روابط خارجية."
+
+msgid "The workbook has more rows than one import accepts."
+msgstr "يحتوي المصنف على أسطر أكثر مما يقبله استيراد واحد."
+
+msgid "The Decisions or Instructions sheet is missing."
+msgstr "ورقة Decisions أو Instructions مفقودة."
+
+msgid "The Decisions sheet columns were changed."
+msgstr "تم تغيير أعمدة ورقة Decisions."
+
+msgid "This workbook template version is not supported."
+msgstr "إصدار قالب المصنف هذا غير مدعوم."
+
+msgid "This workbook does not come from an export of this queue."
+msgstr "هذا المصنف لا يأتي من تصدير لهذه القائمة."
+
+msgid "This export has expired. Export the queue again."
+msgstr "انتهت صلاحية هذا التصدير. صدّر القائمة من جديد."
+
+msgid "This workbook was exported by another account. Import your own export."
+msgstr "صُدّر هذا المصنف من حساب آخر. استورد التصدير الخاص بك."
+
+msgid "The Decisions sheet has no rows."
+msgstr "لا تحتوي ورقة Decisions على أي سطر."
+
+msgid "Too many rows match these filters for one workbook. Narrow the filters and export again."
+msgstr "عدد الأسطر المطابقة لهذه المرشحات أكبر من أن يتسع له مصنف واحد. ضيّق المرشحات ثم صدّر من جديد."
+
+msgid "No row awaiting a decision matches these filters."
+msgstr "لا يوجد سطر في انتظار قرار يطابق هذه المرشحات."
+
+msgid "A cell holds a formula; type plain values only."
+msgstr "تحتوي خلية على صيغة؛ أدخل قيمًا بسيطة فقط."
+
+msgid "This row is not part of the export."
+msgstr "هذا السطر ليس جزءًا من التصدير."
+
+msgid "The same registration or case appears on several rows."
+msgstr "يظهر التسجيل نفسه أو الملف نفسه في عدة أسطر."
+
+msgid "The reference or technical columns were changed."
+msgstr "تم تغيير المرجع أو الأعمدة التقنية."
+
+msgid "This row belongs to another export or template."
+msgstr "ينتمي هذا السطر إلى تصدير آخر أو قالب آخر."
+
+msgid "Decision must be KEEP, ACCEPT or REJECT."
+msgstr "يجب أن يكون القرار KEEP أو ACCEPT أو REJECT."
+
+msgid "KEEP was chosen but a profile, reason or note was filled in. Clear them or choose a decision."
+msgstr "اختير KEEP لكن تم إدخال ملف حضور أو سبب أو ملاحظة. امسحها أو اختر قرارًا."
+
+msgid "ACCEPT requires an attendance profile."
+msgstr "يتطلب ACCEPT ملف حضور."
+
+msgid "Attendance profile must be ALL_DAYS or FOLLOWING_TWO_DAYS."
+msgstr "يجب أن يكون ملف الحضور ALL_DAYS أو FOLLOWING_TWO_DAYS."
+
+msgid "A rejection reason cannot accompany ACCEPT."
+msgstr "لا يمكن أن يرافق سبب الرفض القرار ACCEPT."
+
+msgid "An internal note can be recorded only with REJECT."
+msgstr "لا يمكن تسجيل ملاحظة داخلية إلا مع REJECT."
+
+msgid "REJECT requires a rejection reason."
+msgstr "يتطلب REJECT سبب رفض."
+
+msgid "The rejection reason must be plain text of at most 64 characters."
+msgstr "يجب أن يكون سبب الرفض نصًا بسيطًا لا يتجاوز 64 حرفًا."
+
+msgid "The internal note must be plain text of at most 2000 characters."
+msgstr "يجب أن تكون الملاحظة الداخلية نصًا بسيطًا لا يتجاوز 2000 حرف."
+
+msgid "An attendance profile cannot accompany REJECT."
+msgstr "لا يمكن أن يرافق ملف الحضور القرار REJECT."
+
+msgid "You are not authorized to decide this registration."
+msgstr "لست مخولًا باتخاذ قرار بشأن هذا التسجيل."
+
+msgid "The registration, its case or its identity changed since the export."
+msgstr "تغيّر التسجيل أو ملفه أو هويته منذ التصدير."
+
+msgid "The registration is no longer awaiting a participation decision."
+msgstr "لم يعد التسجيل في انتظار قرار المشاركة."
+
+msgid "Approval needs a current participant role, badge type and access profile first."
+msgstr "تتطلب الموافقة أولًا دور مشارك ونوع شارة وملف وصول ساريًا."
+
+msgid "The attendance days and opening-day capacity are not configured for this event."
+msgstr "لم تُضبط أيام الحضور وسعة يوم الافتتاح لهذا الحدث."
+
+msgid "Not enough opening-day places remain for every ALL_DAYS approval of this event."
+msgstr "لا تكفي الأماكن المتبقية في يوم الافتتاح لكل موافقات ALL_DAYS لهذا الحدث."
+
+msgid "Something changed since the preview. Nothing was applied. Export the queue again."
+msgstr "تغيّر شيء ما منذ المعاينة. لم يُطبّق أي شيء. صدّر القائمة من جديد."
+
+msgid "This preview has expired. Nothing was applied."
+msgstr "انتهت صلاحية هذه المعاينة. لم يُطبّق أي شيء."
+
+msgid "The preview has invalid rows. Nothing was applied."
+msgstr "تحتوي المعاينة على أسطر غير صالحة. لم يُطبّق أي شيء."
+
+msgid "The preview has no proposed decision."
+msgstr "لا تحتوي المعاينة على أي قرار مقترح."
+
+msgid "This preview can no longer be applied."
+msgstr "لم يعد من الممكن تطبيق هذه المعاينة."
+
+msgid "A decision was refused at final validation. Nothing was applied. Export the queue again."
+msgstr "رُفض قرار عند التحقق النهائي. لم يُطبّق أي شيء. صدّر القائمة من جديد."
+
+msgid "The registration is not submitted."
+msgstr "التسجيل غير مُرسل."
+
+msgid "The registration was withdrawn or cancelled."
+msgstr "سُحب التسجيل أو أُلغي."
+
+msgid "The registration already has a participation decision."
+msgstr "للتسجيل قرار مشاركة بالفعل."
+
+msgid "The registration was replaced by a newer one."
+msgstr "استُبدل التسجيل بتسجيل أحدث."
+
+msgid "A correction or additional information is requested from the participant."
+msgstr "طُلب من المشارك تصحيح أو معلومات إضافية."
+
+msgid "The registration's internal status does not allow it."
+msgstr "لا تسمح الحالة الداخلية للتسجيل بذلك."
+
+msgid "A duplicate review is pending."
+msgstr "مراجعة تكرار قيد الانتظار."
+
+msgid "A duplicate, restricted or specialist review is open."
+msgstr "توجد مراجعة تكرار أو مقيدة أو متخصصة مفتوحة."
+
+msgid "Several open review cases exist; resolve them first."
+msgstr "توجد عدة ملفات مراجعة مفتوحة؛ عالجها أولًا."
+
+msgid "no filter (whole decision scope)"
+msgstr "بلا مرشح (نطاق القرار بأكمله)"
+
+msgid "ASC 2026 review decisions workbook"
+msgstr "مصنف قرارات المراجعة ASC 2026"
+
+msgid "Exported at (UTC)"
+msgstr "تاريخ التصدير (UTC)"
+
+msgid "Scope"
+msgstr "النطاق"
+
+msgid "Valid until (UTC)"
+msgstr "صالح حتى (UTC)"
+
+msgid "How to use"
+msgstr "طريقة الاستخدام"
+
+msgid "Edit only the yellow columns of the Decisions sheet."
+msgstr "عدّل الأعمدة الصفراء فقط في ورقة Decisions."
+
+msgid "KEEP (default) changes nothing. ACCEPT approves. REJECT records a Not Approved decision."
+msgstr "KEEP (الافتراضي) لا يغيّر شيئًا. ACCEPT يوافق. REJECT يسجّل قرار عدم الموافقة."
+
+msgid "Required for ACCEPT: ALL_DAYS (all three conference days, including the opening day) or FOLLOWING_TWO_DAYS (the two days after the opening day). Leave empty for KEEP and REJECT."
+msgstr "مطلوب مع ACCEPT: ‏ALL_DAYS (أيام المؤتمر الثلاثة، بما فيها يوم الافتتاح) أو FOLLOWING_TWO_DAYS (اليومان التاليان ليوم الافتتاح). اتركه فارغًا مع KEEP وREJECT."
+
+msgid "Required for REJECT: a short internal reason code (at most 64 characters)."
+msgstr "مطلوب مع REJECT: رمز سبب داخلي قصير (64 حرفًا على الأكثر)."
+
+msgid "Optional, REJECT only. Internal: never shown to the participant."
+msgstr "اختياري، مع REJECT فقط. داخلي: لا يُعرض على المشارك أبدًا."
+
+msgid "Technical columns"
+msgstr "الأعمدة التقنية"
+
+msgid "Do not change the reference or the grey technical columns; the server checks them."
+msgstr "لا تغيّر المرجع ولا الأعمدة التقنية الرمادية؛ يتحقق منها الخادم."
+
+msgid "Import"
+msgstr "الاستيراد"
+
+msgid "Upload the saved workbook from the review queue. The preview only checks it: nothing is decided until you choose “Validate and apply decisions”."
+msgstr "ارفع المصنف المحفوظ من قائمة المراجعة. المعاينة تتحقق منه فقط: لا يُتخذ أي قرار حتى تختار «التحقق من القرارات وتطبيقها»."
+
+msgid "All or nothing"
+msgstr "الكل أو لا شيء"
+
+msgid "If any row is invalid or anything changed since the export, no decision is applied. Export again and repeat your decisions."
+msgstr "إذا كان أي سطر غير صالح أو تغيّر شيء منذ التصدير، فلا يُطبّق أي قرار. صدّر من جديد وأعد إدخال قراراتك."
+
+msgid "Decision import preview"
+msgstr "معاينة استيراد القرارات"
+
+msgid "Decisions in Excel"
+msgstr "القرارات في Excel"
+
+msgid "Every row was checked against the export and the current registrations."
+msgstr "تم التحقق من كل سطر مقارنةً بالتصدير والتسجيلات الحالية."
+
+msgid "Preview only: no decision has been applied yet."
+msgstr "معاينة فقط: لم يُطبّق أي قرار بعد."
+
+msgid "Valid rows are proposals. Nothing changes until you choose “Validate and apply decisions”; then every decision is checked again and all are applied, or none."
+msgstr "الأسطر الصالحة مجرد مقترحات. لا يتغيّر شيء حتى تختار «التحقق من القرارات وتطبيقها»؛ عندها يُتحقق من كل قرار مجددًا وتُطبّق القرارات كلها، أو لا يُطبّق أي منها."
+
+#, python-format
+msgid "%(counter)s decision was applied through the normal decision service."
+msgid_plural "%(counter)s decisions were applied through the normal decision service."
+msgstr[0] "لم يُطبّق أي قرار (%(counter)s) عبر خدمة القرار المعتادة."
+msgstr[1] "طُبّق قرار واحد (%(counter)s) عبر خدمة القرار المعتادة."
+msgstr[2] "طُبّق قراران (%(counter)s) عبر خدمة القرار المعتادة."
+msgstr[3] "طُبّقت %(counter)s قرارات عبر خدمة القرار المعتادة."
+msgstr[4] "طُبّق %(counter)s قرارًا عبر خدمة القرار المعتادة."
+msgstr[5] "طُبّق %(counter)s قرار عبر خدمة القرار المعتادة."
+
+msgid "This preview can no longer be applied. Nothing was applied."
+msgstr "لم يعد من الممكن تطبيق هذه المعاينة. لم يُطبّق أي شيء."
+
+msgid "Preview statistics"
+msgstr "إحصاءات المعاينة"
+
+msgid "Rows read"
+msgstr "الأسطر المقروءة"
+
+msgid "No change (KEEP)"
+msgstr "بلا تغيير (KEEP)"
+
+msgid "Approve: all three days"
+msgstr "موافقة: الأيام الثلاثة"
+
+msgid "Approve: the following two days"
+msgstr "موافقة: اليومان التاليان"
+
+msgid "Reject"
+msgstr "رفض"
+
+msgid "Invalid rows"
+msgstr "أسطر غير صالحة"
+
+msgid "Valid proposed changes"
+msgstr "تغييرات مقترحة صالحة"
+
+#, python-format
+msgid "Among the invalid rows: %(stale)s changed since the export, %(scope)s outside your decision scope."
+msgstr "من بين الأسطر غير الصالحة: %(stale)s تغيّر منذ التصدير، و%(scope)s خارج نطاق قرارك."
+
+msgid "Proposed decisions and invalid rows"
+msgstr "القرارات المقترحة والأسطر غير الصالحة"
+
+msgid "Download the error report"
+msgstr "تنزيل تقرير الأخطاء"
+
+msgid "Attendance profile"
+msgstr "ملف الحضور"
+
+msgid "Problems"
+msgstr "المشكلات"
+
+msgid "Every row keeps its current state (KEEP)."
+msgstr "يحتفظ كل سطر بحالته الحالية (KEEP)."
+
+msgid "Validate and apply these decisions?"
+msgstr "هل تريد التحقق من هذه القرارات وتطبيقها؟"
+
+#, python-format
+msgid "%(counter)s decision will be checked again and recorded, with its normal notification."
+msgid_plural "%(counter)s decisions will be checked again and recorded, with their normal notifications. If any of them fails, none is recorded."
+msgstr[0] "لن يُتحقق من أي قرار (%(counter)s)."
+msgstr[1] "سيُتحقق من قرار واحد (%(counter)s) مجددًا ويُسجّل مع إشعاره المعتاد."
+msgstr[2] "سيُتحقق من قرارين (%(counter)s) مجددًا ويُسجّلان مع إشعاراتهما المعتادة. إذا فشل أحدهما، لا يُسجّل أي منهما."
+msgstr[3] "سيُتحقق من %(counter)s قرارات مجددًا وتُسجّل مع إشعاراتها المعتادة. إذا فشل أحدها، لا يُسجّل أي منها."
+msgstr[4] "سيُتحقق من %(counter)s قرارًا مجددًا وتُسجّل مع إشعاراتها المعتادة. إذا فشل أحدها، لا يُسجّل أي منها."
+msgstr[5] "سيُتحقق من %(counter)s قرار مجددًا وتُسجّل مع إشعاراتها المعتادة. إذا فشل أحدها، لا يُسجّل أي منها."
+
+msgid "Validate and apply decisions"
+msgstr "التحقق من القرارات وتطبيقها"
+
+msgid "Correct the invalid rows in the workbook and import it again: a batch with an invalid row cannot be applied."
+msgstr "صحّح الأسطر غير الصالحة في المصنف واستورده من جديد: لا يمكن تطبيق دفعة تحتوي على سطر غير صالح."
+
+msgid "There is no decision to apply."
+msgstr "لا يوجد قرار لتطبيقه."
+
+msgid "This preview has expired. Import the workbook again."
+msgstr "انتهت صلاحية هذه المعاينة. استورد المصنف من جديد."
+
+msgid "Review cases by decision state"
+msgstr "ملفات المراجعة حسب حالة القرار"
+
+msgid "Awaiting decision"
+msgstr "في انتظار القرار"
+
+msgid "Completed history"
+msgstr "السجل المكتمل"
+
+msgid "All cases"
+msgstr "كل الملفات"
+
+msgid "Export the cases awaiting a decision, choose KEEP, ACCEPT (with the attendance days) or REJECT (with a reason) in the yellow columns, then import the workbook. The import only shows a preview: no decision is recorded until you choose “Validate and apply decisions”, and then all decisions are applied or none."
+msgstr "صدّر الملفات التي تنتظر قرارًا، واختر KEEP أو ACCEPT (مع أيام الحضور) أو REJECT (مع سبب) في الأعمدة الصفراء، ثم استورد المصنف. يعرض الاستيراد معاينة فقط: لا يُسجّل أي قرار حتى تختار «التحقق من القرارات وتطبيقها»، وعندها تُطبّق القرارات كلها أو لا يُطبّق أي منها."
+
+msgid "Rows to export"
+msgstr "الأسطر المراد تصديرها"
+
+msgid "every page, your decision scope only"
+msgstr "كل الصفحات، ضمن نطاق قرارك فقط"
+
+msgid "Export Excel"
+msgstr "تصدير إلى Excel"
+
+msgid "Completed workbook (.xlsx)"
+msgstr "المصنف المكتمل (.xlsx)"
+
+msgid "Import Excel and preview"
+msgstr "استيراد ملف Excel ومعاينته"
+
+msgctxt "decision workbook"
+msgid "Rejection reason"
+msgstr "سبب الرفض"

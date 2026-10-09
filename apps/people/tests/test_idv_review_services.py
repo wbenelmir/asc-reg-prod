@@ -111,9 +111,11 @@ def test_manual_verification_after_not_found_records_source_actor_and_evidence(
     assert card.verified_by_user == reviewer
     # The unsuccessful API outcome is preserved beside the manual one.
     assert case.registration.verification_attempts.filter(outcome="NOT_FOUND").exists()
-    # Identity verification never approves participation (IDV-10).
+    # Identity verification never approves participation (IDV-10): the
+    # registration only enters participation review (apps.reviews.intake).
     case.registration.refresh_from_db()
-    assert case.registration.public_status == RegistrationPublicStatus.SUBMITTED
+    assert case.registration.public_status == RegistrationPublicStatus.UNDER_REVIEW
+    assert not case.registration.decisions.exists()
 
 
 def test_manual_verification_needs_reviewable_evidence(not_found_case, reviewer) -> None:

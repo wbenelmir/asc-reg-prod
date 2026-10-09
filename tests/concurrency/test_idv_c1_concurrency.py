@@ -292,7 +292,20 @@ def test_a_withdrawal_racing_a_ministry_result_does_not_deadlock(
         {"worker": lambda: idv.process_identity_job(job.pk), "withdraw": withdraw}
     )
 
-    assert errors == []
+    from apps.reviews.services import StaleVersionError
+
+    # Never a deadlock. The verified registration now enters participation
+    # review in the worker's transaction (apps.reviews.intake), which versions
+    # the Registration: a withdrawal loaded before that result is a visible
+    # conflict, and the reloaded withdrawal succeeds.
+    assert all(isinstance(error, StaleVersionError) for error in errors), errors
+    if errors:
+        registration.refresh_from_db()
+        withdraw_registration(
+            registration=registration,
+            person=registration.person,
+            expected_version=registration.version,
+        )
     registration.refresh_from_db()
     assert registration.public_status == RegistrationPublicStatus.WITHDRAWN
     final = case_for(registration)

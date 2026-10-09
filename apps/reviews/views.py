@@ -10,6 +10,7 @@ from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 from django.views.decorators.http import require_http_methods
 
 from apps.accounts import participant_auth
@@ -110,57 +111,93 @@ def _get_scoped_registration_or_404(request, pk, *, codename: str) -> Registrati
 # ---------------------------------------------------------------------------
 
 
-@operational_permission_required(
-    "reviews.view_reviewcase", login_url="accounts:operational-sign-in"
+#: Queue tabs: cases awaiting a decision (open), completed history (closed), or all.
+QUEUE_VIEWS = ("awaiting", "history", "all")
+#: Bounded filter keys shared by the queue page and the workbook export.
+QUEUE_FILTER_KEYS = (
+    "q",
+    "case_type",
+    "queue_code",
+    "status",
+    "public_status",
+    "internal_status",
+    "organization",
+    "assignment",
+    "view",
 )
-def queue_list(request):
-    """Scoped, paginated, filtered review-case queue (Phase 2 Prompt 3 §6).
+
+
+def _queue_filters(source) -> dict:
+    """The queue filters from a GET or POST mapping, bounded."""
+    return {key: (source.get(key, "") or "").strip()[:64] for key in QUEUE_FILTER_KEYS}
+
+
+def _filtered_cases(user, filters: dict):
+    """The scoped case queryset for `filters`, and the effective tab.
 
     Every filter is bounded and applied at the queryset level; the search
     box requires a minimum length and matches only the Registration
-    Reference or a name field, never an unbounded table scan.
+    Reference or a name field, never an unbounded table scan. Without an
+    explicit tab, a status filter shows every case and otherwise the cases
+    awaiting a decision come first.
     """
-    queryset = (
-        review_cases_visible_to(request.user)
-        .select_related("registration", "registration__profile", "event_edition", "organization")
-        .prefetch_related("assignments")
-        .order_by("-priority", "opened_at")
-    )
+    import uuid
 
-    query = request.GET.get("q", "").strip()
+    from django.db.models import Q
+
+    queryset = review_cases_visible_to(user)
+    query = filters["q"]
     if len(query) >= 2:
-        from django.db.models import Q
-
         queryset = queryset.filter(
             Q(registration__public_reference__istartswith=query)
             | Q(registration__profile__submitted_given_names__istartswith=query)
             | Q(registration__profile__submitted_family_name__istartswith=query)
         )
-    case_type = request.GET.get("case_type", "")
-    if case_type:
-        queryset = queryset.filter(case_type=case_type)
-    queue_code = request.GET.get("queue_code", "")
-    if queue_code:
-        queryset = queryset.filter(queue_code=queue_code)
-    status = request.GET.get("status", "")
-    if status:
-        queryset = queryset.filter(status=status)
-    public_status = request.GET.get("public_status", "")
-    if public_status:
-        queryset = queryset.filter(registration__public_status=public_status)
-    internal_status = request.GET.get("internal_status", "")
-    if internal_status:
-        queryset = queryset.filter(registration__internal_status=internal_status)
-    organization_id = request.GET.get("organization", "")
-    if organization_id:
-        queryset = queryset.filter(organization_id=organization_id)
-    assignment = request.GET.get("assignment", "")
-    if assignment == "unassigned":
+    if filters["case_type"]:
+        queryset = queryset.filter(case_type=filters["case_type"])
+    if filters["queue_code"]:
+        queryset = queryset.filter(queue_code=filters["queue_code"])
+    if filters["status"]:
+        queryset = queryset.filter(status=filters["status"])
+    if filters["public_status"]:
+        queryset = queryset.filter(registration__public_status=filters["public_status"])
+    if filters["internal_status"]:
+        queryset = queryset.filter(registration__internal_status=filters["internal_status"])
+    if filters["organization"]:
+        try:
+            queryset = queryset.filter(organization_id=uuid.UUID(filters["organization"]))
+        except ValueError:
+            queryset = queryset.none()
+    if filters["assignment"] == "unassigned":
         queryset = queryset.exclude(assignments__is_current=True)
-    elif assignment == "mine":
-        queryset = queryset.filter(
-            assignments__is_current=True, assignments__assigned_user=request.user
+    elif filters["assignment"] == "mine":
+        queryset = queryset.filter(assignments__is_current=True, assignments__assigned_user=user)
+    view = filters["view"] if filters["view"] in QUEUE_VIEWS else ""
+    if not view:
+        view = "all" if filters["status"] else "awaiting"
+    if view == "awaiting":
+        queryset = queryset.filter(status__in=ReviewCaseStatus.open_statuses())
+    elif view == "history":
+        queryset = queryset.exclude(status__in=ReviewCaseStatus.open_statuses())
+    return queryset, view
+
+
+@operational_permission_required(
+    "reviews.view_reviewcase", login_url="accounts:operational-sign-in"
+)
+def queue_list(request):
+    """Scoped, paginated, filtered review-case queue (Phase 2 Prompt 3 §6),
+    with tabs for cases awaiting a decision and completed history, and the
+    decision workbook panel for operators who hold the workbook role."""
+    filters = _queue_filters(request.GET)
+    queryset, view = _filtered_cases(request.user, filters)
+    queryset = (
+        queryset.select_related(
+            "registration", "registration__profile", "event_edition", "organization"
         )
+        .prefetch_related("assignments")
+        .order_by("-priority", "opened_at")
+    )
 
     page_number = request.GET.get("page", 1)
     paginator = Paginator(queryset, PAGE_SIZE)
@@ -168,6 +205,23 @@ def queue_list(request):
 
     querystring = request.GET.copy()
     querystring.pop("page", None)
+    tab_querystring = querystring.copy()
+    tab_querystring.pop("view", None)
+
+    from . import workbook
+
+    workbook_panel = None
+    if workbook.can_use_workbook(request.user):
+        export_cases, _view = _filtered_cases(request.user, {**filters, "view": "all"})
+        actionable, _facts = workbook.actionable_cases(request.user, export_cases)
+        workbook_panel = {
+            "export_count": len(actionable),
+            "max_rows": workbook.max_rows(),
+            "filters": {key: value for key, value in filters.items() if value and key != "view"},
+            "scope": workbook.filter_codes(
+                {key: value for key, value in filters.items() if key != "view"}
+            ),
+        }
 
     return render(
         request,
@@ -175,9 +229,12 @@ def queue_list(request):
         {
             "page": page,
             "querystring": querystring.urlencode(),
+            "tab_querystring": tab_querystring.urlencode(),
+            "view": view,
             "case_types": ReviewCase._meta.get_field("case_type").choices,
             "queue_codes": ReviewCase._meta.get_field("queue_code").choices,
             "statuses": ReviewCaseStatus.choices,
+            "workbook": workbook_panel,
         },
     )
 
@@ -893,3 +950,197 @@ def my_registration_withdraw(request, pk):
         return redirect("registrations:workspace")
     messages.info(request, _("Your registration has been withdrawn."))
     return redirect("registrations:workspace")
+
+
+# ---------------------------------------------------------------------------
+# Decision workbook (Excel export -> upload preview -> final validation)
+# ---------------------------------------------------------------------------
+
+XLSX_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+
+def _queue_redirect(filters: dict):
+    from urllib.parse import urlencode
+
+    from django.urls import reverse
+
+    query = urlencode({key: value for key, value in filters.items() if value})
+    url = reverse("reviews:queue-list")
+    return redirect(f"{url}?{query}" if query else url)
+
+
+@operational_permission_required(
+    "reviews.bulk_registrationdecision", login_url="accounts:operational-sign-in"
+)
+@require_http_methods(["POST"])
+def decision_workbook_export(request):
+    """Download every actionable row matching the posted queue filters as a
+    decision workbook (all pages, the operator's decision scope only)."""
+    from django.utils import timezone
+
+    from . import workbook
+
+    filters = _queue_filters(request.POST)
+    cases, _view = _filtered_cases(request.user, {**filters, "view": "all"})
+    try:
+        export, content = workbook.export_decision_workbook(
+            user=request.user,
+            cases_queryset=cases,
+            filters={key: value for key, value in filters.items() if key != "view"},
+        )
+    except workbook.WorkbookTooLargeError as error:
+        messages.error(
+            request,
+            _(
+                "%(count)s rows match these filters; one workbook holds at most %(limit)s. "
+                "Narrow the filters and export again."
+            )
+            % {"count": error.count, "limit": workbook.max_rows()},
+        )
+        return _queue_redirect(filters)
+    except workbook.WorkbookError as error:
+        messages.error(
+            request,
+            workbook.FILE_ERROR_MESSAGES.get(error.code, _("The workbook could not be exported.")),
+        )
+        return _queue_redirect(filters)
+    stamp = timezone.now().strftime("%Y%m%d-%H%M")
+    response = HttpResponse(content, content_type=XLSX_CONTENT_TYPE)
+    response["Content-Disposition"] = f'attachment; filename="asc-review-decisions-{stamp}.xlsx"'
+    response["X-Content-Type-Options"] = "nosniff"
+    response["Cache-Control"] = "private, no-store"
+    response["X-ASC-Export-Rows"] = str(export.row_count)
+    return response
+
+
+@operational_permission_required(
+    "reviews.bulk_registrationdecision", login_url="accounts:operational-sign-in"
+)
+@require_http_methods(["POST"])
+def decision_workbook_import(request):
+    """Upload a completed workbook: parse, validate and show the preview.
+    Nothing is decided here."""
+    from django.conf import settings
+
+    from . import workbook
+
+    filters = _queue_filters(request.POST)
+    upload = request.FILES.get("workbook")
+    if upload is None:
+        messages.error(request, _("Choose the completed workbook (.xlsx) to import."))
+        return _queue_redirect(filters)
+    limit = int(settings.REVIEW_DECISION_WORKBOOK_MAX_BYTES)
+    if upload.size > limit:
+        messages.error(request, workbook.FILE_ERROR_MESSAGES["FILE_TOO_LARGE"])
+        return _queue_redirect(filters)
+    data = upload.read(limit + 1)
+    try:
+        decision_import = workbook.preview_decision_workbook(
+            user=request.user, data=data, filename=upload.name or ""
+        )
+    except workbook.WorkbookError as error:
+        messages.error(
+            request,
+            workbook.FILE_ERROR_MESSAGES.get(error.code, _("The workbook could not be imported.")),
+        )
+        return _queue_redirect(filters)
+    return redirect("reviews:decision-import-detail", pk=decision_import.pk)
+
+
+def _own_import_or_404(request, pk):
+    from .models import ReviewDecisionImport
+
+    return get_object_or_404(
+        ReviewDecisionImport.objects.select_related("export"), pk=pk, uploaded_by=request.user
+    )
+
+
+@operational_permission_required(
+    "reviews.bulk_registrationdecision", login_url="accounts:operational-sign-in"
+)
+@require_http_methods(["GET"])
+def decision_import_detail(request, pk):
+    """The preview (or the outcome) of one uploaded workbook, for its uploader only."""
+    from . import workbook
+    from .models import ReviewDecisionImportRowOutcome
+
+    decision_import = _own_import_or_404(request, pk)
+    rows = []
+    for row in decision_import.rows.exclude(outcome=ReviewDecisionImportRowOutcome.NO_CHANGE):
+        rows.append(
+            {
+                "row": row,
+                "profile": workbook.CATEGORY_TO_PROFILE.get(row.attendance_category, ""),
+                "messages": [workbook.row_error_message(code) for code in row.error_codes],
+            }
+        )
+    return render(
+        request,
+        "reviews/decision_import_preview.html",
+        {
+            "decision_import": decision_import,
+            "counts": decision_import.counts or {},
+            "rows": rows,
+            "applicable": workbook.is_applicable(decision_import),
+            "refusal_message": workbook.APPLY_REFUSAL_MESSAGES.get(
+                decision_import.refusal_code, ""
+            ),
+        },
+    )
+
+
+@operational_permission_required(
+    "reviews.bulk_registrationdecision", login_url="accounts:operational-sign-in"
+)
+@require_http_methods(["POST"])
+def decision_import_apply(request, pk):
+    """Final validation: apply exactly the stored preview, all or nothing."""
+    from . import workbook
+
+    decision_import = _own_import_or_404(request, pk)
+    try:
+        applied = workbook.apply_decision_import(
+            decision_import_id=decision_import.pk, user=request.user
+        )
+    except workbook.ApplyRefused as refusal:
+        message = workbook.APPLY_REFUSAL_MESSAGES.get(refusal.code, "")
+        details = "; ".join(
+            _("row %(row)s: %(problem)s")
+            % {
+                "row": row_number,
+                "problem": ", ".join(workbook.row_error_message(code) for code in codes),
+            }
+            for row_number, codes in refusal.rows[:10]
+            if row_number
+        )
+        messages.error(request, f"{message} {details}".strip())
+        return redirect("reviews:decision-import-detail", pk=decision_import.pk)
+    count = (applied.counts or {}).get("applied", 0)
+    messages.success(
+        request,
+        ngettext(
+            "%(count)s decision was validated and applied.",
+            "%(count)s decisions were validated and applied.",
+            count,
+        )
+        % {"count": count},
+    )
+    return redirect("reviews:decision-import-detail", pk=decision_import.pk)
+
+
+@operational_permission_required(
+    "reviews.bulk_registrationdecision", login_url="accounts:operational-sign-in"
+)
+@require_http_methods(["GET"])
+def decision_import_report(request, pk):
+    """The invalid rows of a preview as a CSV correction report (no names, no notes)."""
+    from . import workbook
+
+    decision_import = _own_import_or_404(request, pk)
+    response = HttpResponse(workbook.error_report_csv(decision_import), content_type="text/csv")
+    response["Content-Disposition"] = (
+        f'attachment; filename="asc-review-decisions-errors-{decision_import.pk}.csv"'
+    )
+    response["X-Content-Type-Options"] = "nosniff"
+    response["Cache-Control"] = "private, no-store"
+    return response

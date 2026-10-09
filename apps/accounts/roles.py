@@ -76,6 +76,16 @@ STAFF_ROLES: tuple[StaffRole, ...] = (
         frozenset({ORGANIZATION}),
     ),
     StaffRole(
+        "review-decision-workbook",
+        "Review Decision Workbook Operators",
+        _("Review decision workbook"),
+        _(
+            "Exports the review queue to Excel and applies a validated workbook of decisions. "
+            "Each row still needs the accreditation manager's decision permission in scope."
+        ),
+        frozenset({ORGANIZATION}),
+    ),
+    StaffRole(
         "accreditation-coordinator",
         "Accreditation Coordinators",
         _("Accreditation coordinator"),

@@ -604,3 +604,144 @@ class RegistrationDecision(UUIDPrimaryKeyModel, TimestampedModel):
 
     def __str__(self) -> str:  # pragma: no cover - trivial
         return f"decision:{self.registration_id}:{self.sequence}:{self.outcome}"
+
+
+# ---------------------------------------------------------------------------
+# Decision workbook: export manifest, import preview and its rows
+# (`apps.reviews.workbook`). A decision workflow, never a registration import:
+# nothing here holds participant details, and an import only ever applies
+# decisions through the ordinary decision services.
+# ---------------------------------------------------------------------------
+
+
+class ReviewDecisionExport(UUIDPrimaryKeyModel, TimestampedModel):
+    """The server-side manifest of one exported decision workbook.
+
+    `rows` binds every exported row to the exact records and versions it was
+    exported from: `{"r": registration id, "c": review case id, "rv":
+    registration version, "cv": case version, "iv": identity case version}`.
+    An import is compared with THIS manifest and with the current records,
+    never with what the spreadsheet claims. No name, reference or note.
+    """
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+"
+    )
+    template_version = models.CharField(max_length=32)
+    filters = models.JSONField(default=dict, blank=True)
+    row_count = models.PositiveIntegerField(default=0)
+    rows = models.JSONField(default=list, blank=True)
+    content_sha256 = models.CharField(max_length=64, blank=True, default="")
+    expires_at = models.DateTimeField()
+
+    class Meta:
+        db_table = "reviews_decision_workbook_export"
+        indexes = [models.Index(fields=["created_by", "created_at"], name="rev_wbexport_user_idx")]
+
+    def __str__(self) -> str:  # pragma: no cover - trivial
+        return f"decision-workbook-export:{self.pk}"
+
+
+class ReviewDecisionImportStatus(models.TextChoices):
+    PREVIEWED = "PREVIEWED", _("Previewed, not applied")
+    APPLIED = "APPLIED", _("Applied")
+    REFUSED = "REFUSED", _("Refused at final validation, nothing applied")
+    EXPIRED = "EXPIRED", _("Expired, nothing applied")
+
+
+class ReviewDecisionImport(UUIDPrimaryKeyModel, TimestampedModel):
+    """One uploaded decision workbook and its server-validated preview.
+
+    The uploaded file itself is never stored: only its hash, the counts and the
+    per-row outcome. `uploaded_by` is the only account that may apply it, and
+    applying uses these rows, never a new client-submitted payload.
+    """
+
+    export = models.ForeignKey(
+        ReviewDecisionExport, on_delete=models.PROTECT, related_name="imports"
+    )
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+"
+    )
+    content_sha256 = models.CharField(max_length=64)
+    status = models.CharField(
+        max_length=16,
+        choices=ReviewDecisionImportStatus.choices,
+        default=ReviewDecisionImportStatus.PREVIEWED,
+    )
+    counts = models.JSONField(default=dict, blank=True)
+    expires_at = models.DateTimeField()
+    applied_at = models.DateTimeField(null=True, blank=True)
+    refusal_code = models.CharField(max_length=64, blank=True, default="")
+
+    class Meta:
+        db_table = "reviews_decision_workbook_import"
+        # A distinct permission for the bulk workbook, on top of the ordinary
+        # decision permission checked for every row. Granted only through the
+        # "Review Decision Workbook Operators" role; no existing group has it.
+        permissions = [
+            (
+                "bulk_registrationdecision",
+                "Can export and apply review decision workbooks",
+            )
+        ]
+        indexes = [
+            models.Index(fields=["uploaded_by", "created_at"], name="rev_wbimport_user_idx"),
+            models.Index(fields=["status", "expires_at"], name="rev_wbimport_status_idx"),
+        ]
+
+    def __str__(self) -> str:  # pragma: no cover - trivial
+        return f"decision-workbook-import:{self.pk}:{self.status}"
+
+
+class ReviewDecisionImportRowOutcome(models.TextChoices):
+    NO_CHANGE = "NO_CHANGE", _("No change")
+    VALID = "VALID", _("Valid proposed decision")
+    INVALID = "INVALID", _("Invalid")
+
+
+class ReviewDecisionImportRow(UUIDPrimaryKeyModel):
+    """One workbook row's validated outcome. `reference_text` is the
+    registration reference shown back to the operator (bounded, sanitized);
+    `internal_note_encrypted` is an internal note for a rejection, encrypted
+    at rest and never shown to the participant."""
+
+    decision_import = models.ForeignKey(
+        ReviewDecisionImport, on_delete=models.CASCADE, related_name="rows"
+    )
+    row_number = models.PositiveIntegerField()
+    reference_text = models.CharField(max_length=40, blank=True, default="")
+    registration = models.ForeignKey(
+        "registrations.Registration",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="+",
+    )
+    review_case = models.ForeignKey(
+        ReviewCase, null=True, blank=True, on_delete=models.PROTECT, related_name="+"
+    )
+    decision = models.CharField(max_length=8, blank=True, default="")
+    attendance_category = models.CharField(max_length=32, blank=True, default="")
+    rejection_reason_code = models.CharField(max_length=64, blank=True, default="")
+    internal_note_encrypted = EncryptedTextField(blank=True, default="")
+    registration_version = models.PositiveIntegerField(null=True, blank=True)
+    case_version = models.PositiveIntegerField(null=True, blank=True)
+    identity_version = models.PositiveIntegerField(null=True, blank=True)
+    outcome = models.CharField(max_length=16, choices=ReviewDecisionImportRowOutcome.choices)
+    error_codes = models.JSONField(default=list, blank=True)
+    applied_decision = models.ForeignKey(
+        RegistrationDecision, null=True, blank=True, on_delete=models.PROTECT, related_name="+"
+    )
+
+    class Meta:
+        db_table = "reviews_decision_workbook_import_row"
+        ordering = ["row_number"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["decision_import", "row_number"], name="rev_wbimportrow_row_uq"
+            ),
+        ]
+
+    def __str__(self) -> str:  # pragma: no cover - trivial
+        return f"decision-workbook-row:{self.decision_import_id}:{self.row_number}"

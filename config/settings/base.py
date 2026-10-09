@@ -447,6 +447,27 @@ DELEGATION_ROW_RETENTION_SECONDS = env_int(
     "DELEGATION_ROW_RETENTION_SECONDS", default=90 * 24 * 60 * 60
 )
 
+# ---------------------------------------------------------------------------
+# Review decision workbook (`apps.reviews.workbook`): export -> edit -> upload
+# preview -> explicit final validation. The uploaded file is never stored.
+# The size bound mirrors the delegation CSV; the row bound keeps one
+# all-or-nothing application short. An export can be imported for
+# REVIEW_DECISION_EXPORT_TTL_SECONDS; a preview can be applied for
+# REVIEW_DECISION_PREVIEW_TTL_SECONDS, after which its rows' internal notes are
+# purged (`manage.py purge_review_decision_workbooks`).
+# ---------------------------------------------------------------------------
+
+REVIEW_DECISION_WORKBOOK_MAX_BYTES = env_int(
+    "REVIEW_DECISION_WORKBOOK_MAX_BYTES", default=2 * 1024 * 1024
+)
+REVIEW_DECISION_WORKBOOK_MAX_ROWS = env_int("REVIEW_DECISION_WORKBOOK_MAX_ROWS", default=1000)
+REVIEW_DECISION_EXPORT_TTL_SECONDS = env_int(
+    "REVIEW_DECISION_EXPORT_TTL_SECONDS", default=3 * 24 * 60 * 60
+)
+REVIEW_DECISION_PREVIEW_TTL_SECONDS = env_int(
+    "REVIEW_DECISION_PREVIEW_TTL_SECONDS", default=2 * 60 * 60
+)
+
 # On-behalf claim link lifetime (AF-ORG-03/04, Phase 2 Prompt 2).
 ON_BEHALF_CLAIM_TTL_SECONDS = env_int("ON_BEHALF_CLAIM_TTL_SECONDS", default=14 * 24 * 60 * 60)
 

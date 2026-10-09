@@ -1,0 +1,148 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% comment %}
+  Decision workbook preview (apps.reviews.workbook). The server validated the
+  upload; nothing is decided until "Validate and apply decisions", which
+  applies exactly these stored rows, all or nothing. Rows without a change
+  are only counted. No participant name or note is shown here.
+{% endcomment %}
+{% block title %}{% trans "Decision import preview" %}{% endblock %}
+{% block breadcrumbs %}{% url 'reviews:queue-list' as queue_url %}{% trans "Review queue" as queue_label %}{% trans "Decision import preview" as current %}{% include "components/breadcrumb_trail.html" with parent_label=queue_label parent_url=queue_url current=current %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Decisions in Excel" %} · {% status_chip "decision_import" decision_import.status decision_import.get_status_display %}</p>
+      <h1>{% trans "Decision import preview" %}</h1>
+      <p>{% trans "Every row was checked against the export and the current registrations." %}</p>
+    </div>
+  </div>
+
+  {% if decision_import.status == "PREVIEWED" %}
+    <div class="asc-notice asc-notice-warning mb-3" data-preview-not-applied>
+      {% include "components/icon.html" with name="alert-triangle" %}
+      <p><strong>{% trans "Preview only: no decision has been applied yet." %}</strong> {% trans "Valid rows are proposals. Nothing changes until you choose “Validate and apply decisions”; then every decision is checked again and all are applied, or none." %}</p>
+    </div>
+  {% elif decision_import.status == "APPLIED" %}
+    <div class="asc-notice asc-notice-success mb-3" data-preview-applied>
+      {% include "components/icon.html" with name="check-circle" %}
+      <p>{% blocktrans count counter=counts.applied|default:0 %}{{ counter }} decision was applied through the normal decision service.{% plural %}{{ counter }} decisions were applied through the normal decision service.{% endblocktrans %}</p>
+    </div>
+  {% else %}
+    <div class="asc-notice asc-notice-danger mb-3" data-preview-refused>
+      {% include "components/icon.html" with name="x-circle" %}
+      <p>{% if refusal_message %}{{ refusal_message }}{% else %}{% trans "This preview can no longer be applied. Nothing was applied." %}{% endif %}</p>
+    </div>
+  {% endif %}
+
+  <div class="asc-kpis mb-3" role="group" aria-label="{% trans 'Preview statistics' %}" data-preview-counts>
+    <div class="asc-kpi">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="list" size="sm" %}{% trans "Rows read" %}</span>
+      <span class="asc-kpi-value" data-count="total_rows">{{ counts.total_rows|default:0 }}</span>
+    </div>
+    <div class="asc-kpi">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="info" size="sm" %}{% trans "No change (KEEP)" %}</span>
+      <span class="asc-kpi-value" data-count="no_change">{{ counts.no_change|default:0 }}</span>
+    </div>
+    <div class="asc-kpi asc-kpi-success">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="check-circle" size="sm" %}{% trans "Approve: all three days" %}</span>
+      <span class="asc-kpi-value" data-count="accept_all_days">{{ counts.accept_all_days|default:0 }}</span>
+    </div>
+    <div class="asc-kpi asc-kpi-success">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="check-circle" size="sm" %}{% trans "Approve: the following two days" %}</span>
+      <span class="asc-kpi-value" data-count="accept_following_two_days">{{ counts.accept_following_two_days|default:0 }}</span>
+    </div>
+    <div class="asc-kpi">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="x-circle" size="sm" %}{% trans "Reject" %}</span>
+      <span class="asc-kpi-value" data-count="reject">{{ counts.reject|default:0 }}</span>
+    </div>
+    <div class="asc-kpi{% if counts.invalid %} asc-kpi-danger{% endif %}">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="alert-triangle" size="sm" %}{% trans "Invalid rows" %}</span>
+      <span class="asc-kpi-value" data-count="invalid">{{ counts.invalid|default:0 }}</span>
+    </div>
+    <div class="asc-kpi">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="layers" size="sm" %}{% trans "Valid proposed changes" %}</span>
+      <span class="asc-kpi-value" data-count="valid_changes">{{ counts.valid_changes|default:0 }}</span>
+    </div>
+  </div>
+  {% if counts.invalid %}
+    <p class="asc-muted" data-invalid-detail>{% blocktrans with stale=counts.invalid_stale|default:0 scope=counts.invalid_out_of_scope|default:0 %}Among the invalid rows: {{ stale }} changed since the export, {{ scope }} outside your decision scope.{% endblocktrans %}</p>
+  {% endif %}
+
+  <section class="asc-card asc-card-flush" aria-labelledby="rows-heading">
+    <div class="asc-card-toolbar">
+      <h2 class="asc-card-toolbar-title" id="rows-heading">{% trans "Proposed decisions and invalid rows" %}</h2>
+      {% if counts.invalid %}<a class="btn btn-sm btn-outline-secondary" href="{% url 'reviews:decision-import-report' pk=decision_import.pk %}" data-error-report>{% include "components/icon.html" with name="download" %}<span>{% trans "Download the error report" %}</span></a>{% endif %}
+    </div>
+    {% if rows %}
+      <div class="asc-table-wrap asc-wide-only">
+        <table class="asc-table" aria-labelledby="rows-heading">
+          <thead>
+            <tr>
+              <th scope="col" class="asc-num">{% trans "Row" %}</th>
+              <th scope="col">{% trans "Reference" %}</th>
+              <th scope="col">{% trans "Decision" %}</th>
+              <th scope="col">{% trans "Attendance profile" %}</th>
+              <th scope="col">{% trans "Rejection reason" context "decision workbook" %}</th>
+              <th scope="col">{% trans "Result" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in rows %}
+              <tr data-row-number="{{ item.row.row_number }}" data-row-outcome="{{ item.row.outcome }}">
+                <td class="asc-num">{{ item.row.row_number }}</td>
+                <th scope="row"><bdi dir="ltr" class="asc-code">{{ item.row.reference_text|default:"—" }}</bdi></th>
+                <td><bdi dir="ltr" class="asc-code">{{ item.row.decision|default:"—" }}</bdi></td>
+                <td><bdi dir="ltr" class="asc-code">{{ item.profile|default:"—" }}</bdi></td>
+                <td><bdi dir="ltr">{{ item.row.rejection_reason_code|default:"—" }}</bdi></td>
+                <td>
+                  {% status_chip "decision_row" item.row.outcome item.row.get_outcome_display %}
+                  {% if item.messages %}<ul class="asc-plain-list mb-0">{% for message in item.messages %}<li>{{ message }}</li>{% endfor %}</ul>{% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <ul class="asc-records asc-narrow-only" aria-labelledby="rows-heading">
+        {% for item in rows %}
+          <li class="asc-record" data-record>
+            <div class="asc-record-head">
+              <h3 class="asc-record-title"><bdi dir="ltr" class="asc-code">{{ item.row.reference_text|default:"—" }}</bdi></h3>
+              <p class="asc-record-meta">{% trans "Row" %}{% trans ":" context "label separator" %} {{ item.row.row_number }}</p>
+            </div>
+            <dl class="asc-record-fields">
+              <div class="asc-record-wide"><dt>{% trans "Result" %}</dt><dd>{% status_chip "decision_row" item.row.outcome item.row.get_outcome_display %}</dd></div>
+              <div><dt>{% trans "Decision" %}</dt><dd><bdi dir="ltr">{{ item.row.decision|default:"—" }}</bdi></dd></div>
+              <div><dt>{% trans "Attendance profile" %}</dt><dd><bdi dir="ltr">{{ item.profile|default:"—" }}</bdi></dd></div>
+              {% if item.row.rejection_reason_code %}<div class="asc-record-wide"><dt>{% trans "Rejection reason" context "decision workbook" %}</dt><dd><bdi dir="ltr">{{ item.row.rejection_reason_code }}</bdi></dd></div>{% endif %}
+              {% if item.messages %}<div class="asc-record-wide"><dt>{% trans "Problems" %}</dt><dd><ul class="asc-plain-list mb-0">{% for message in item.messages %}<li>{{ message }}</li>{% endfor %}</ul></dd></div>{% endif %}
+            </dl>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="asc-empty">
+        <span class="asc-tile">{% include "components/icon.html" with name="inbox" %}</span>
+        <h3>{% trans "Every row keeps its current state (KEEP)." %}</h3>
+      </div>
+    {% endif %}
+    {% if applicable %}
+      <div class="asc-card-foot">
+        <form method="post" action="{% url 'reviews:decision-import-apply' pk=decision_import.pk %}" class="m-0" data-apply-form
+              data-confirm-title="{% trans 'Validate and apply these decisions?' %}"
+              data-confirm="{% blocktrans count counter=counts.valid_changes %}{{ counter }} decision will be checked again and recorded, with its normal notification.{% plural %}{{ counter }} decisions will be checked again and recorded, with their normal notifications. If any of them fails, none is recorded.{% endblocktrans %}"
+              data-confirm-action="{% trans 'Validate and apply decisions' %}">
+          {% csrf_token %}
+          {% trans "I have checked the preview." as fallback_label %}
+          {% include "components/confirm_fallback.html" with id="decision-apply-confirm" label=fallback_label %}
+          <button type="submit" class="btn btn-danger">{% include "components/icon.html" with name="check-circle" %}<span>{% trans "Validate and apply decisions" %}</span></button>
+        </form>
+      </div>
+    {% elif decision_import.status == "PREVIEWED" %}
+      <div class="asc-card-foot">
+        <p class="asc-muted mb-0" data-apply-blocked>{% if counts.invalid %}{% trans "Correct the invalid rows in the workbook and import it again: a batch with an invalid row cannot be applied." %}{% elif not counts.valid_changes %}{% trans "There is no decision to apply." %}{% else %}{% trans "This preview has expired. Import the workbook again." %}{% endif %}</p>
+      </div>
+    {% endif %}
+  </section>
+  <p><a href="{% url 'reviews:queue-list' %}">{% trans "Back to the review queue" %}</a></p>
+{% endblock %}

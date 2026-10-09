@@ -9,7 +9,47 @@
     </div>
   </div>
 
+  {# Participation decisions only; identity verification stays its own queue. #}
+  <nav aria-label="{% trans 'Review cases by decision state' %}">
+    <ul class="asc-tabs nav" data-queue-tabs>
+      <li class="nav-item"><a class="nav-link{% if view == 'awaiting' %} active{% endif %}"{% if view == 'awaiting' %} aria-current="page"{% endif %} href="?view=awaiting{% if tab_querystring %}&amp;{{ tab_querystring }}{% endif %}" data-queue-tab="awaiting">{% trans "Awaiting decision" %}</a></li>
+      <li class="nav-item"><a class="nav-link{% if view == 'history' %} active{% endif %}"{% if view == 'history' %} aria-current="page"{% endif %} href="?view=history{% if tab_querystring %}&amp;{{ tab_querystring }}{% endif %}" data-queue-tab="history">{% trans "Completed history" %}</a></li>
+      <li class="nav-item"><a class="nav-link{% if view == 'all' %} active{% endif %}"{% if view == 'all' %} aria-current="page"{% endif %} href="?view=all{% if tab_querystring %}&amp;{{ tab_querystring }}{% endif %}" data-queue-tab="all">{% trans "All cases" %}</a></li>
+    </ul>
+  </nav>
+
+  {% if workbook %}
+    <section class="asc-card" aria-labelledby="workbook-heading" data-decision-workbook>
+      <h2 class="asc-card-title" id="workbook-heading">{% include "components/icon.html" with name="layers" %}{% trans "Decisions in Excel" %}</h2>
+      <div class="asc-notice asc-notice-neutral mb-3">
+        {% include "components/icon.html" with name="info" %}
+        <p>{% trans "Export the cases awaiting a decision, choose KEEP, ACCEPT (with the attendance days) or REJECT (with a reason) in the yellow columns, then import the workbook. The import only shows a preview: no decision is recorded until you choose “Validate and apply decisions”, and then all decisions are applied or none." %}</p>
+      </div>
+      <dl class="asc-dl">
+        <dt>{% trans "Rows to export" %}</dt><dd data-workbook-export-count>{{ workbook.export_count }}</dd>
+        <dt>{% trans "Scope" %}</dt><dd>{% if workbook.scope %}<bdi dir="ltr" class="asc-code">{{ workbook.scope }}</bdi>{% else %}{% trans "no filter (whole decision scope)" %}{% endif %} · {% trans "every page, your decision scope only" %}</dd>
+      </dl>
+      <div class="asc-actions-row">
+        <form method="post" action="{% url 'reviews:decision-workbook-export' %}" class="m-0" data-workbook-export>
+          {% csrf_token %}
+          {% for key, value in workbook.filters.items %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endfor %}
+          <button type="submit" class="btn btn-outline-primary"{% if not workbook.export_count %} disabled{% endif %}>{% include "components/icon.html" with name="download" %}<span>{% trans "Export Excel" %}</span></button>
+        </form>
+      </div>
+      <form method="post" action="{% url 'reviews:decision-workbook-import' %}" enctype="multipart/form-data" class="mt-3" data-workbook-import>
+        {% csrf_token %}
+        {% for key, value in workbook.filters.items %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endfor %}
+        <label for="id_workbook" class="form-label">{% trans "Completed workbook (.xlsx)" %}</label>
+        <div class="asc-actions-row">
+          <input type="file" id="id_workbook" name="workbook" class="form-control" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required>
+          <button type="submit" class="btn btn-primary">{% include "components/icon.html" with name="inbox" %}<span>{% trans "Import Excel and preview" %}</span></button>
+        </div>
+      </form>
+    </section>
+  {% endif %}
+
   <form method="get" class="asc-card asc-filters" role="search" aria-label="{% trans 'Filter the review queue' %}">
+    <input type="hidden" name="view" value="{{ view }}">
     <div class="asc-filters-grid">
       <div class="asc-filter-search">
         <label for="id_q" class="form-label">{% trans "Search" %}</label>

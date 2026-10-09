@@ -173,8 +173,11 @@ def test_a_simulated_match_verifies_without_approving_participation(
     assert attempt.official_family_name_latin == "BENTEST"
     assert attempt.official_birth_date == "1990-03-07"
     registration.refresh_from_db()
-    assert registration.public_status == RegistrationPublicStatus.SUBMITTED
+    # The verified registration enters participation review (apps.reviews.intake):
+    # it waits for a decision, which identity verification never records.
+    assert registration.public_status == RegistrationPublicStatus.UNDER_REVIEW
     assert registration.internal_status == RegistrationInternalStatus.PENDING_ASSIGNMENT
+    assert not registration.decisions.exists()
     # IDV-C1 (R-IDV-02): a case- or spacing-only difference takes the
     # official form, recorded as a revision; the originals stay in the
     # immutable submission snapshot (apps/people/tests/test_idv_c1_official_names.py).
