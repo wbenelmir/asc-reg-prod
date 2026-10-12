@@ -11,7 +11,9 @@
   Renders nothing unless `ANALYTICS_GA4_MEASUREMENT_ID` is set (production).
   Google's script is not requested until the visitor accepts analytics in
   the banner below; `static/js/asc-analytics.js` keeps the choice on the
-  device and loads Google only then. No inline script (CSP).
+  device and loads Google only then. No inline script (CSP). Once loaded,
+  the tag is sealed before any htmx navigation, so it never measures the
+  next page (see the script's header).
 {% endcomment %}
 {% if analytics_measurement_id %}
   <div data-asc-analytics data-measurement-id="{{ analytics_measurement_id }}" data-page-path="{{ page_path }}" data-page-title="{{ page_title }}" hidden></div>
@@ -27,5 +29,5 @@
       </div>
     </div>
   </section>
-  <script src="{% static 'js/asc-analytics.js' %}?v=1"></script>
+  <script src="{% static 'js/asc-analytics.js' %}?v=2"></script>
 {% endif %}

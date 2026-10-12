@@ -14,6 +14,18 @@
     </div>
   </div>
 
+  {% if can_manage_organizations %}
+    <section class="asc-card mb-3" aria-labelledby="org-management-heading" data-organization-management>
+      <h2 class="asc-card-title" id="org-management-heading">{% include "components/icon.html" with name="building" %}{% trans "Organizations" %}</h2>
+      <p class="asc-section-lead">{% blocktrans count counter=organization_count %}{{ counter }} organization. Open one to manage its campaigns, registration links, delegation lists and registrations.{% plural %}{{ counter }} organizations. Open one to manage its campaigns, registration links, delegation lists and registrations.{% endblocktrans %}</p>
+      {% if current_event is None %}<p class="form-text">{% trans "No event edition is open for registration: campaigns and delegation lists can be prepared once one is open." %}</p>{% endif %}
+      <div class="asc-actions-row">
+        <a class="btn btn-primary" href="{% url 'organizations:list' %}">{% include "components/icon.html" with name="list" %}<span>{% trans "Manage organizations" %}</span></a>
+        {% if can_create_organization %}<a class="btn btn-outline-primary" href="{% url 'organizations:create' %}">{% include "components/icon.html" with name="building" %}<span>{% trans "Create organization" %}</span></a>{% endif %}
+      </div>
+    </section>
+  {% endif %}
+
   <section class="asc-card asc-card-flush" aria-labelledby="campaigns-heading">
     <div class="asc-card-toolbar">
       <h2 class="asc-card-toolbar-title" id="campaigns-heading">{% trans "Invitation campaigns" %}</h2>
@@ -63,7 +75,7 @@
       <div class="asc-empty">
         <span class="asc-tile">{% include "components/icon.html" with name="mail" %}</span>
         <h3>{% trans "No campaigns are currently visible to you." %}</h3>
-        <p>{% trans "Find an organization to create its first invitation campaign." %}</p>
+        <p>{% if can_manage_organizations %}{% trans "Open an organization under Manage organizations (or create one), then create its first invitation campaign there." %}{% else %}{% trans "Find an organization to create its first invitation campaign." %}{% endif %}</p>
       </div>
     {% endif %}
   </section>

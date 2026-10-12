@@ -451,7 +451,7 @@ def test_a_released_withdrawn_registration_cannot_be_reopened_by_staff(event, le
     withdrawn = _withdraw(_submitted(event, legal))
     _register_again(withdrawn)
     released = Registration.objects.get(pk=withdrawn.pk)
-    with pytest.raises(ValueError, match="replaced by a newer registration"):
+    with pytest.raises(ValueError, match="cannot be reopened"):
         reopen_registration(
             registration=released,
             expected_version=released.version,
@@ -461,20 +461,27 @@ def test_a_released_withdrawn_registration_cannot_be_reopened_by_staff(event, le
     assert Registration.objects.get(pk=withdrawn.pk).public_status == "WITHDRAWN"
 
 
-def test_a_withdrawn_registration_that_was_not_replaced_can_still_be_reopened(event, legal) -> None:
+def test_a_withdrawn_registration_is_never_reopened_and_can_be_registered_again(
+    event, legal
+) -> None:
+    """UPD-01 (2026-10-12): staff never reactivate a withdrawn registration,
+    even one not yet replaced; the participant registers again instead."""
     from apps.reviews.services import reopen_registration
 
     withdrawn = _withdraw(_submitted(event, legal))
-    reopen_registration(
-        registration=withdrawn,
-        expected_version=withdrawn.version,
-        reason="Synthetic reopen",
-        actor=None,
-    )
-    reopened = Registration.objects.get(pk=withdrawn.pk)
-    assert reopened.public_status == "UNDER_REVIEW"
-    with pytest.raises(RegistrationNotRestartable):
-        start_registration_after_withdrawal(registration=reopened, person=reopened.person)
+    with pytest.raises(ValueError, match="cannot be reopened"):
+        reopen_registration(
+            registration=withdrawn,
+            expected_version=withdrawn.version,
+            reason="Synthetic reopen",
+            actor=None,
+        )
+    still = Registration.objects.get(pk=withdrawn.pk)
+    assert still.public_status == "WITHDRAWN"
+    assert still.version == withdrawn.version
+    draft = start_registration_after_withdrawal(registration=still, person=still.person)
+    assert draft.pk != still.pk
+    assert Registration.objects.get(pk=withdrawn.pk).public_status == "WITHDRAWN"
 
 
 def test_another_origin_of_the_same_event_is_not_a_conflict(event, legal) -> None:

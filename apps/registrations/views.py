@@ -654,6 +654,7 @@ def notices_step(request):
                     ),
                     session_reference=request.session.session_key or "",
                     idempotency_key=idempotency_key,
+                    submission_language=language,
                 )
             except IncompleteRegistrationError as exc:
                 messages.error(
@@ -949,21 +950,133 @@ def register_again(request, pk):
 # ---------------------------------------------------------------------------
 
 
+def _ops_list_querystring(filters: dict[str, str], *, without: tuple[str, ...] = ()) -> str:
+    from django.utils.http import urlencode
+
+    from .ops_list import LIST_FILTER_KEYS
+
+    return urlencode(
+        {key: filters[key] for key in LIST_FILTER_KEYS if filters.get(key) and key not in without}
+    )
+
+
+def _ops_list_url(filters: dict[str, str]) -> str:
+    from django.urls import reverse
+
+    querystring = _ops_list_querystring(filters)
+    url = reverse("registrations:ops-intake-list")
+    return f"{url}?{querystring}" if querystring else url
+
+
 @operational_permission_required(
     "registrations.view_registration", login_url="accounts:operational-sign-in"
 )
 def ops_intake_list(request):
-    registrations = registrations_visible_to(request.user).select_related("event_edition")
-    # IDV-Q3 procedure: staff find the draft a participant names by its exact
-    # registration reference (never a name or an identifier), within scope.
-    reference = (request.GET.get("reference") or "").strip()[:32]
-    if reference:
-        registrations = registrations.filter(public_reference__iexact=reference)
-    return render(
+    """UPD-05: every registration in the reader's scope (cancelled and
+    historical ones included), filtered and searched before pagination,
+    50 per page, newest first (`apps.registrations.ops_list`)."""
+    from django.core.paginator import Paginator
+
+    from apps.people.search_context import search_context_for
+
+    from . import ops_list, reporting
+    from .models import RegistrationSourceKind
+
+    filters = ops_list.clean_list_filters(request.GET)
+    search, search_expired = None, False
+    if filters.get("ctx"):
+        search = search_context_for(
+            request.session, request.user, filters["ctx"], ops_list.SEARCH_NAMESPACE
+        )
+        if search is None:
+            filters.pop("ctx")
+            search_expired = True
+    page = Paginator(
+        ops_list.list_queryset(request.user, filters, search=search), ops_list.PAGE_SIZE
+    ).get_page(request.GET.get("page", 1))
+    scope_total = ops_list.scope_total(request.user)
+    choices = ops_list.filter_choices(request.user)
+    from apps.accreditation.models import AttendanceCategory
+
+    response = render(
         request,
         "registrations/ops_intake_list.html",
-        {"registrations": registrations.order_by("-created_at")[:200], "reference": reference},
+        {
+            "page": page,
+            "registrations": page.object_list,
+            "filters": filters,
+            "querystring": _ops_list_querystring(filters),
+            "filtered": any(key != "ctx" for key in filters) or search is not None,
+            "search": search,
+            "search_expired": search_expired,
+            "scope_total": scope_total,
+            "matching_total": page.paginator.count,
+            "choices": choices,
+            "status_choices": [
+                *RegistrationPublicStatus.choices,
+                (ops_list.STATUS_WITHDRAWN_BY_PARTICIPANT, _("Withdrawn by the participant")),
+                (ops_list.STATUS_CANCELLED_BY_TEAM, _("Cancelled by the team")),
+            ],
+            "segment_choices": [(key, reporting.segment_label(key)) for key in reporting.SEGMENTS],
+            "source_choices": RegistrationSourceKind.choices,
+            "attendance_choices": AttendanceCategory.choices,
+            "missing": ops_list.MISSING,
+            # Filters without a control on this page (they come from a campaign,
+            # a delegation list or the statistics) are kept when filtering.
+            "hidden_filter_keys": ("link", "batch", "role", "attendance", "day", "residence"),
+            "segment_label": reporting.segment_label(filters["segment"])
+            if filters.get("segment")
+            else "",
+        },
     )
+    response["Cache-Control"] = "private, no-store"
+    return response
+
+
+@operational_permission_required(
+    "registrations.view_registration", login_url="accounts:operational-sign-in"
+)
+@require_http_methods(["POST"])
+def ops_registration_search(request):
+    """UPD-05: a private name or e-mail search, resolved once on the server.
+    The text comes in a CSRF-protected POST body and is never put in a URL,
+    a log or the audit trail; the matching ids are kept in the reader's
+    session under a random reference (`ctx`). `action=clear` forgets it."""
+    from apps.audit import action_codes
+    from apps.audit.contracts import AuditRecord
+    from apps.audit.services import PersistentAuditRecorder
+    from apps.people.search_context import clear_search_context, store_search_context
+
+    from . import ops_list
+
+    filters = ops_list.clean_list_filters(request.POST)
+    reference = filters.pop("ctx", "")
+    if request.POST.get("action") == "clear":
+        clear_search_context(request.session, request.user, reference, ops_list.SEARCH_NAMESPACE)
+        return redirect(_ops_list_url(filters))
+    kind, ids, truncated = ops_list.resolve_private_search(request.user, request.POST.get("q", ""))
+    if kind:
+        filters["ctx"] = store_search_context(
+            request.session,
+            request.user,
+            kind=kind,
+            case_ids=ids,
+            truncated=truncated,
+            namespace=ops_list.SEARCH_NAMESPACE,
+        )
+        PersistentAuditRecorder().record(
+            AuditRecord(
+                actor_type="OPERATIONAL_USER",
+                actor_user_id=request.user.pk,
+                action_code=action_codes.REGISTRATION_LIST_SEARCHED,
+                target_type="RegistrationList",
+                result="SUCCESS",
+                after_summary={"kind": kind, "matches": len(ids), "truncated": truncated},
+            )
+        )
+    else:
+        messages.info(request, _("Enter at least 2 characters to search."))
+    return redirect(_ops_list_url(filters))
 
 
 @operational_permission_required(

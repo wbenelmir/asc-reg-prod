@@ -35,6 +35,43 @@
         </dl>
       </div>
     </section>
+    {% with identity=presented.result.identity %}
+      {% if identity %}
+        {# UPD-04: the returned identity details, shown in this response only (never stored, logged or audited). #}
+        <section class="asc-card mb-3" aria-labelledby="nin-identity-heading" data-diagnostic-identity>
+          <h2 class="asc-card-title" id="nin-identity-heading">{% include "components/icon.html" with name="id-card" %}{% trans "Identity returned by the Ministry service" %}</h2>
+          <p class="asc-muted">{% trans "For checking only. This lookup changes no registration and verifies nobody; corrections are made in the identity review. Nothing below is stored." %}</p>
+          {% if not identity.nin_matches_request %}
+            <div class="asc-notice asc-notice-danger mb-3" role="alert" data-identity-nin-mismatch>{% include "components/icon.html" with name="alert-octagon" %}<div><p class="mb-0">{% trans "The service answered for a different number than the one entered. Do not use these details for that number." %}</p></div></div>
+          {% endif %}
+          <dl class="asc-dl" data-identity-fields>
+            <dt>{% trans "Last name (Latin)" %}</dt><dd data-identity-field="family_name_latin">{% if identity.family_name_latin %}<bdi dir="ltr">{{ identity.family_name_latin }}</bdi>{% else %}<span class="asc-muted">{% trans "Not supplied" %}</span>{% endif %}</dd>
+            <dt>{% trans "First name(s) (Latin)" %}</dt><dd data-identity-field="given_names_latin">{% if identity.given_names_latin %}<bdi dir="ltr">{{ identity.given_names_latin }}</bdi>{% else %}<span class="asc-muted">{% trans "Not supplied" %}</span>{% endif %}</dd>
+            <dt>{% trans "Last name (Arabic)" %}</dt><dd data-identity-field="family_name_arabic">{% if identity.family_name_arabic %}<bdi dir="rtl" lang="ar">{{ identity.family_name_arabic }}</bdi>{% else %}<span class="asc-muted">{% trans "Not supplied" %}</span>{% endif %}</dd>
+            <dt>{% trans "First name(s) (Arabic)" %}</dt><dd data-identity-field="given_names_arabic">{% if identity.given_names_arabic %}<bdi dir="rtl" lang="ar">{{ identity.given_names_arabic }}</bdi>{% else %}<span class="asc-muted">{% trans "Not supplied" %}</span>{% endif %}</dd>
+            <dt>{% trans "Date of birth" %}</dt>
+            <dd data-identity-field="birth_date" data-birth-date-kind="{{ identity.birth_date.kind }}">
+              {% if identity.birth_date.kind == "complete" %}<bdi dir="ltr">{{ identity.birth_date.value|date:"d/m/Y" }}</bdi>
+              {% elif identity.birth_date.kind == "partial" %}<bdi dir="ltr" class="asc-code">{{ identity.birth_date.text }}</bdi> <span class="asc-muted">{% trans "(incomplete: only the parts shown are known; nothing is completed)" %}</span>
+              {% elif identity.birth_date.kind == "unreadable" %}{% if identity.birth_date.text %}<bdi dir="ltr" class="asc-code">{{ identity.birth_date.text }}</bdi> {% endif %}<span class="asc-muted">{% trans "(format not recognized; shown exactly as received)" %}</span>
+              {% else %}<span class="asc-muted">{% trans "Not supplied" %}</span>{% endif %}
+            </dd>
+            <dt>{% trans "Presumed date" %}</dt>
+            <dd data-identity-field="presume" data-presume="{{ identity.presume }}">
+              {% if identity.presume == "true" %}<strong>{% trans "Yes" %}</strong>
+              {% elif identity.presume == "false" %}{% trans "No" %}
+              {% elif identity.presume == "missing" %}<span class="asc-muted">{% trans "Not supplied" %}</span>
+              {% else %}<span class="asc-muted">{% trans "Not recognized" %}</span>{% endif %}
+            </dd>
+          </dl>
+          {% if identity.presume == "true" %}
+            <div class="asc-notice asc-notice-warning mb-0" data-identity-presumed>{% include "components/icon.html" with name="alert-triangle" %}<div><p class="mb-0">{% trans "The Ministry marks this birth date as presumed: the day or the month may not be known, so the date may not be the real one. It never replaces a date a participant or a reviewer entered, and it is never completed." %}</p></div></div>
+          {% elif identity.birth_date.kind == "partial" %}
+            <div class="asc-notice asc-notice-warning mb-0">{% include "components/icon.html" with name="alert-triangle" %}<div><p class="mb-0">{% trans "The Ministry date is incomplete. No day or month is invented." %}</p></div></div>
+          {% endif %}
+        </section>
+      {% endif %}
+    {% endwith %}
   {% endif %}
 
   <div class="asc-detail-layout">
@@ -65,7 +102,7 @@
 
       <section class="asc-card" aria-labelledby="nin-lookup-heading" data-diagnostic-section="lookup">
         <h2 class="asc-card-title" id="nin-lookup-heading">{% include "components/icon.html" with name="search" %}{% trans "3. Lookup" %}</h2>
-        <p>{% trans "Looks up one identity number you are authorized to use for testing. It checks the lookup endpoint only: it creates no registration, changes no identity and verifies nobody. The number is not stored, shown again or logged." %}</p>
+        <p>{% trans "Looks up one identity number you are authorized to look up. A returned identity is shown with its names, birth date and presumed-date flag. It creates no registration, changes no identity and verifies nobody. The number and the details are not stored, shown again or logged." %}</p>
         <form method="post" action="{% url 'identity:nin-diagnostics-lookup' %}" class="asc-card-form" autocomplete="off" novalidate>
           {% csrf_token %}
           <div class="mb-3">

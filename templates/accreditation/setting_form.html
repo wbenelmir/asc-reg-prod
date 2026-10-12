@@ -1,0 +1,28 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% block title %}{% if object %}{% trans "Edit setting" %}{% else %}{% trans "Add setting" %}{% endif %} · {{ kind.label }}{% endblock %}
+{% block breadcrumbs %}{% url 'accreditation:settings' as parent_url %}{% trans "Accreditation settings" as parent_label %}{% include "components/breadcrumb_trail.html" with parent_label=parent_label parent_url=parent_url current=kind.label %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{{ kind.label }} · <bdi dir="ltr">{{ event.code }}</bdi></p>
+      <h1>{% if object %}{% blocktrans with code=object.code %}Edit {{ code }}{% endblocktrans %}{% else %}{% blocktrans with kind=kind.label %}Add: {{ kind }}{% endblocktrans %}{% endif %}</h1>
+    </div>
+  </div>
+  {% include "components/error_summary.html" %}
+  <form method="post" class="asc-card asc-form-narrow" novalidate data-setting-form="{{ kind.slug }}">
+    {% csrf_token %}
+    <input type="hidden" name="event" value="{{ event.pk }}">
+    {% for field in form %}
+      {% if field.name == "code" or field.name == "valid_from" or field.name == "valid_until" %}
+        {% include "components/field.html" with field=field control="ltr" %}
+      {% else %}
+        {% include "components/field.html" with field=field %}
+      {% endif %}
+    {% endfor %}
+    <div class="asc-form-actions">
+      <button type="submit" class="btn btn-primary"><span>{% if object %}{% trans "Save changes" %}{% else %}{% trans "Add" %}{% endif %}</span></button>
+      <a class="btn btn-outline-secondary" href="{% url 'accreditation:settings' %}?event={{ event.pk }}">{% trans "Cancel" %}</a>
+    </div>
+  </form>
+{% endblock %}

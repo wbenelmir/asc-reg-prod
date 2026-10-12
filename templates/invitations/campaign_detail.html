@@ -11,6 +11,11 @@
         <li>{% status_chip "campaign" campaign.status campaign.get_status_display %}</li>
       </ul>
     </div>
+    <div class="asc-actions-row mt-0">
+      {% if can_edit %}<a class="btn btn-outline-primary" href="{% url 'invitations:campaign-edit' pk=campaign.pk %}" data-campaign-edit>{% include "components/icon.html" with name="edit" %}<span>{% trans "Edit" %}</span></a>{% endif %}
+      {% if can_view_registrations %}<a class="btn btn-outline-secondary" href="{% url 'registrations:ops-intake-list' %}?campaign={{ campaign.pk }}" data-campaign-registrations>{% include "components/icon.html" with name="list" %}<span>{% trans "View registrations" %}</span></a>{% endif %}
+      {% if can_export %}<a class="btn btn-outline-secondary" href="{% url 'exports:workspace' %}?event={{ campaign.event_edition_id }}&amp;organization={{ campaign.organization_id }}&amp;campaign={{ campaign.pk }}" data-campaign-export>{% include "components/icon.html" with name="download" %}<span>{% trans "Export" %}</span></a>{% endif %}
+    </div>
   </div>
 
   {% if issued_url %}
@@ -19,7 +24,8 @@
       <div>
         <strong>{% trans "Share this link now. It will not be shown again:" %}</strong>
         <div class="asc-secret">
-          <code class="asc-secret-value" dir="ltr">{{ issued_url }}</code>
+          <code class="asc-secret-value" dir="ltr" id="issued-link-value">{{ issued_url }}</code>
+          <p class="mb-2"><button type="button" class="btn btn-sm btn-outline-primary" data-copy-target="issued-link-value" data-copy-done="{% trans 'Copied' %}">{% include "components/icon.html" with name="check" %}<span>{% trans "Copy link" %}</span></button></p>
           <p class="small mb-0">{% trans "Copy the link into your message to the organization. Anyone with this link can start a registration for this campaign." %}</p>
         </div>
       </div>
@@ -36,10 +42,50 @@
           <dt>{% trans "Event edition" %}</dt><dd><bdi>{{ campaign.event_edition.name }}</bdi></dd>
           <dt>{% trans "Status" %}</dt><dd>{{ campaign.get_status_display }}</dd>
           <dt>{% trans "Capacity" %}</dt><dd>{% if campaign.capacity is not None %}{{ campaign.capacity }}{% else %}{% trans "Unlimited" %}{% endif %}</dd>
+          <dt>{% trans "Places used" %}</dt><dd data-campaign-places="{{ usage.submitted }}">{% if campaign.capacity is not None %}{% blocktrans with used=usage.submitted capacity=campaign.capacity remaining=usage.remaining %}{{ used }} of {{ capacity }} ({{ remaining }} left){% endblocktrans %}{% else %}{{ usage.submitted }}{% endif %}<div class="asc-muted small">{% trans "A submitted registration keeps its place, even when withdrawn or cancelled later." %}</div></dd>
+          <dt>{% trans "Registrations" %}</dt><dd data-campaign-registration-count="{{ registration_count }}">{{ registration_count }}</dd>
           <dt>{% trans "Default language" %}</dt><dd>{{ campaign.language|code_label:"language" }}</dd>
           {% if campaign.valid_from %}<dt>{% trans "Valid from" %}</dt><dd><time datetime="{{ campaign.valid_from|date:'c' }}">{{ campaign.valid_from }}</time></dd>{% endif %}
           {% if campaign.valid_until %}<dt>{% trans "Valid until" %}</dt><dd><time datetime="{{ campaign.valid_until|date:'c' }}">{{ campaign.valid_until }}</time></dd>{% endif %}
         </dl>
+      </section>
+
+      <section class="asc-card asc-card-flush" aria-labelledby="campaign-links-heading" data-campaign-links>
+        <div class="asc-card-toolbar">
+          <h2 class="asc-card-toolbar-title" id="campaign-links-heading">{% trans "Registration links" %}</h2>
+          <span class="asc-count">{% blocktrans count counter=links|length %}{{ counter }} link{% plural %}{{ counter }} links{% endblocktrans %}</span>
+        </div>
+        {% if links %}
+          <div class="asc-table-wrap">
+            <table class="asc-table" aria-labelledby="campaign-links-heading">
+              <thead>
+                <tr>
+                  <th scope="col">{% trans "Issued" %}</th>
+                  <th scope="col">{% trans "Status" %}</th>
+                  <th scope="col">{% trans "Validity" %}</th>
+                  <th scope="col" class="asc-num">{% trans "Started" %}</th>
+                  <th scope="col" class="asc-num">{% trans "Submitted" %}</th>
+                  <th scope="col"><span class="visually-hidden">{% trans "Actions" %}</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for link in links %}
+                  <tr data-link-row="{{ link.status }}">
+                    <td><time datetime="{{ link.created_at|date:'c' }}">{{ link.created_at }}</time></td>
+                    <td>{% status_chip "invitation_link" link.status link.get_status_display %}</td>
+                    <td>{% if link.status == "ACTIVE" %}{% if link.expires_at %}{% blocktrans with until=link.expires_at %}Until {{ until }}{% endblocktrans %}{% else %}{% trans "As long as the campaign is open and valid" %}{% endif %}{% elif link.revoked_at %}{% blocktrans with when=link.revoked_at %}Disabled {{ when }}{% endblocktrans %}{% else %}{% trans "No longer usable" %}{% endif %}</td>
+                    <td class="asc-num">{{ link.started }}</td>
+                    <td class="asc-num">{{ link.submitted }}</td>
+                    <td class="asc-cell-action">{% if can_view_registrations and link.started %}<a class="btn btn-sm btn-outline-primary" href="{% url 'registrations:ops-intake-list' %}?link={{ link.pk }}">{% trans "View registrations" %}</a>{% endif %}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <p class="asc-card-note">{% trans "A replaced or disabled link no longer starts registrations; the registrations it started keep this campaign and organization." %}</p>
+        {% else %}
+          <p class="asc-card-note">{% trans "No link was issued yet. Open the campaign, then issue its link." %}</p>
+        {% endif %}
       </section>
     </div>
 
@@ -59,6 +105,15 @@
               {% trans "The current link stops working immediately." as fallback_label %}
               {% include "components/confirm_fallback.html" with id="rotate-link-confirm" label=fallback_label %}
               <button type="submit" class="btn btn-outline-primary">{% include "components/icon.html" with name="refresh" %}<span>{% trans "Rotate link" %}</span></button>
+            </form>
+          {% endif %}
+          {% if can_revoke_link %}
+            <form method="post" action="{% url 'invitations:campaign-revoke-link' pk=campaign.pk %}" class="mt-2"
+                  data-confirm-title="{% trans 'Disable the invitation link?' %}"
+                  data-confirm="{% trans 'The link stops working immediately and no new link is issued. Registrations already started keep their campaign.' %}"
+                  data-confirm-action="{% trans 'Disable link' %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-danger" data-link-revoke>{% include "components/icon.html" with name="ban" %}<span>{% trans "Disable link" %}</span></button>
             </form>
           {% endif %}
         {% else %}

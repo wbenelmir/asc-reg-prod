@@ -10,12 +10,15 @@ touches a participant:
    official adapter (`MinistryNinProvider.probe_authentication`): never the
    cached token, and the token obtained is discarded. Success proves only that
    the authentication endpoint accepted the configured credentials.
-3. **Lookup** -- one lookup of an operator-supplied, authorized test NIN
+3. **Lookup** -- one lookup of an operator-supplied, authorized NIN
    through the same adapter as registrations (`lookup`), reusing its
    validation, transport, token cache and response parsing. It creates and
    changes nothing: no registration, person, identity case, decision, pass,
-   badge or notification. Only the kind of answer is reported, never the
-   identity data.
+   badge or notification. UPD-04: for a returned identity the page also
+   shows the requested identity details (Latin and Arabic names, birth date,
+   presume flag) to the operator, from memory, in that response only; they
+   are never stored, logged or audited, and nothing else of the response is
+   shown. Registration changes go through the identity review (UPD-02).
 
 Every check needs `people.run_ministry_nin_diagnostics` through a GLOBAL
 membership (no event, organization or checkpoint limit) or a superuser,
@@ -188,6 +191,9 @@ class CheckResult:
     token_lifetime_seconds: int | None = None
     #: Whether a request was sent to the provider.
     reached_provider: bool = False
+    #: UPD-04: the returned identity's display details (lookup only). Shown
+    #: in the response page, never audited or stored.
+    identity: object = None
 
 
 def _outcome_for(
@@ -329,7 +335,9 @@ def _run(user, action: str, probe, *, correlation_id: str) -> CheckResult:
     environment = environment_label()
     started = time.monotonic()
 
-    def finish(outcome, detail="", status=None, *, lifetime=None, reached=False, code=""):
+    def finish(
+        outcome, detail="", status=None, *, lifetime=None, reached=False, code="", identity=None
+    ):
         result = CheckResult(
             action=action,
             outcome=outcome,
@@ -341,7 +349,9 @@ def _run(user, action: str, probe, *, correlation_id: str) -> CheckResult:
             provider_code=code,
             token_lifetime_seconds=lifetime,
             reached_provider=reached,
+            identity=identity,
         )
+        # The audit records the outcome metadata only, never `identity`.
         _audit(user, result, correlation_id)
         return result
 
@@ -362,7 +372,10 @@ def _run(user, action: str, probe, *, correlation_id: str) -> CheckResult:
         started = time.monotonic()
         outcome, lifetime, success_status = probe(provider)
     mapped, detail, status = _outcome_for(action, outcome, success_status)
-    return finish(mapped, detail, status, lifetime=lifetime, reached=True, code=code)
+    identity = getattr(outcome, "diagnostic", None) if outcome is not None else None
+    return finish(
+        mapped, detail, status, lifetime=lifetime, reached=True, code=code, identity=identity
+    )
 
 
 def run_authentication_check(user, *, correlation_id: str = "") -> CheckResult:
@@ -396,10 +409,17 @@ def run_lookup_check(user, nin: str, *, correlation_id: str = "") -> CheckResult
         return result  # nothing was sent; not audited (no provider contact)
 
     def probe(provider):
-        outcome = provider.lookup(nin)
-        # Keep only what the diagnostics show: kind, detail, status.
+        outcome = provider.lookup(nin, include_diagnostic=True)
+        # Keep only what the diagnostics show: kind, detail, status and the
+        # requested identity details (UPD-04). The matching facts and the
+        # returned number itself are dropped here.
         return (
-            LookupOutcome(outcome.kind, detail=outcome.detail, http_status=outcome.http_status),
+            LookupOutcome(
+                outcome.kind,
+                detail=outcome.detail,
+                http_status=outcome.http_status,
+                diagnostic=outcome.diagnostic,
+            ),
             None,
             None,
         )

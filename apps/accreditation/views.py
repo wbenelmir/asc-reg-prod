@@ -375,6 +375,8 @@ def bulk_preview(request):
         "form": form,
         "idempotency_key": token,
         "has_references": any(references_by_kind.values()),
+        # UPD-07: why nothing can be assigned, and the population per event.
+        "prerequisites": _bulk_prerequisites(request.user, references_by_kind),
     }
     if request.method != "POST" or not form.is_valid():
         return render(request, "accreditation/bulk_preview.html", context)
@@ -390,9 +392,14 @@ def bulk_preview(request):
         messages.error(request, _("You are not authorized to bulk-assign this."))
         return render(request, "accreditation/bulk_preview.html", context)
 
+    # UPD-07: the population is the final-approved, live registrations of the
+    # setting's event in the caller's scope for this exact action.
+    from apps.registrations.reporting import final_approved_q
+
     scoped_registration_ids = list(
         registrations_visible_for_accreditation_action(request.user, codename=add_codename)
-        .filter(event_edition_id=reference_obj.event_edition_id, public_status="APPROVED")
+        .filter(final_approved_q(), event_edition_id=reference_obj.event_edition_id)
+        .order_by("public_reference")
         .values_list("pk", flat=True)
     )
     operation = preview_bulk_assignment(
@@ -414,9 +421,52 @@ def bulk_preview(request):
                 row["registration_id"] for row in operation.preview_results
             ),
             "eligible_count": len(operation.target_registration_ids),
+            "population_count": len(operation.preview_results),
+            "already_count": sum(
+                1 for row in operation.preview_results if row.get("reason") == "ALREADY_CURRENT"
+            ),
         }
     )
     return render(request, "accreditation/bulk_preview.html", context)
+
+
+def _bulk_prerequisites(user, references_by_kind) -> dict:
+    """UPD-07: the specific missing prerequisite behind an empty bulk page,
+    and the final-approved population per event the user may assign in."""
+    from apps.registrations.reporting import final_approved_q
+
+    from .models import AccessProfile, AccessRule, BadgeType, ParticipantRole
+    from .selectors import events_with_any_scoped_permission
+
+    events = set()
+    for codename in _KIND_ADD_CODENAME.values():
+        events |= set(events_with_any_scoped_permission(user, f"accreditation.{codename}"))
+    events = sorted(events, key=lambda event: event.starts_at, reverse=True)
+    event_ids = [event.pk for event in events]
+    configured = sum(
+        model.objects.filter(event_edition_id__in=event_ids).count()
+        for model in (ParticipantRole, BadgeType, AccessProfile, AccessRule)
+    )
+    active = sum(len(objects) for objects in references_by_kind.values())
+    populations = []
+    for event in events[:5]:
+        codename = _KIND_ADD_CODENAME[BulkAssignmentKind.BADGE_TYPE]
+        populations.append(
+            {
+                "event": event,
+                "count": registrations_visible_for_accreditation_action(user, codename=codename)
+                .filter(final_approved_q(), event_edition_id=event.pk)
+                .count(),
+            }
+        )
+    return {
+        "events": events,
+        "configured": configured,
+        "active": active,
+        "populations": populations,
+        "can_manage_settings": has_scoped_permission(user, "accreditation.add_participantrole"),
+        "can_view_settings": has_scoped_permission(user, "accreditation.view_participantrole"),
+    }
 
 
 @operational_permission_required(
@@ -433,6 +483,8 @@ def bulk_execute(request, pk):
     ):
         messages.error(request, _("You are not authorized to execute this bulk operation."))
         return redirect("accreditation:bulk-preview")
+    # UPD-07: the executor's CURRENT scope, re-derived now; a row that left it
+    # since the preview is skipped (NOT_AUTHORIZED), never silently applied.
     authorized_target_ids = {
         str(value)
         for value in registrations_visible_for_accreditation_action(
@@ -441,18 +493,31 @@ def bulk_execute(request, pk):
         .filter(pk__in=operation.target_registration_ids)
         .values_list("pk", flat=True)
     }
-    if authorized_target_ids != set(operation.target_registration_ids):
-        raise Http404
-    executed = execute_bulk_assignment(operation=operation, actor=request.user)
+    executed = execute_bulk_assignment(
+        operation=operation,
+        actor=request.user,
+        authorized_registration_ids=authorized_target_ids,
+        require_final_approved=True,
+    )
     rows = executed.execution_results or []
+    from .services import bulk_result_counts
+
+    counts = bulk_result_counts(rows)
+    reference_model = _KIND_REFERENCE_MODEL[executed.kind]
     return render(
         request,
         "accreditation/bulk_result.html",
         {
             "operation": executed,
             "kind_label": BulkAssignmentKind(executed.kind).label,
+            "reference_obj": reference_model.objects.filter(
+                pk=executed.reference_object_id
+            ).first(),
             "references": registration_references(row["registration_id"] for row in rows),
-            "success_count": sum(1 for row in rows if row.get("success")),
-            "failure_count": sum(1 for row in rows if not row.get("success")),
+            "success_count": counts["applied"],
+            "failure_count": counts["skipped"] + counts["errors"],
+            "applied_count": counts["applied"],
+            "skipped_count": counts["skipped"],
+            "error_count": counts["errors"],
         },
     )

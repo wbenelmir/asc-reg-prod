@@ -65,13 +65,24 @@ OPERATIONS_SECTIONS: tuple[OperationsSection, ...] = (
         permission="people.view_identityverification",
         matches=("identity",),
     ),
+    # UPD-08: the statistics and ready-to-export reports, scoped like the
+    # registrations list.
+    OperationsSection(
+        key="statistics",
+        label=_("Statistics"),
+        url_name="registrations:statistics",
+        icon="layers",
+        permission="registrations.view_registration",
+        matches=("registrations:statistics", "registrations:statistics-export"),
+    ),
     OperationsSection(
         key="organizations",
         label=_("Organizations"),
         url_name="invitations:workspace-dashboard",
         icon="building",
         permission="invitations.view_invitationcampaign",
-        matches=("invitations",),
+        # UPD-06: the organization management pages belong to this area.
+        matches=("invitations", "organizations"),
     ),
     OperationsSection(
         key="accreditation",
@@ -80,6 +91,19 @@ OPERATIONS_SECTIONS: tuple[OperationsSection, ...] = (
         icon="layers",
         permission="accreditation.add_bulkassignmentoperation",
         matches=("accreditation:bulk-preview", "accreditation:bulk-execute"),
+    ),
+    # UPD-07: participant accreditation settings (not staff roles).
+    OperationsSection(
+        key="accreditation-settings",
+        label=_("Accreditation settings"),
+        url_name="accreditation:settings",
+        icon="badge",
+        permission="accreditation.view_participantrole",
+        matches=(
+            "accreditation:settings",
+            "accreditation:setting-create",
+            "accreditation:setting-edit",
+        ),
     ),
     OperationsSection(
         key="attendance",

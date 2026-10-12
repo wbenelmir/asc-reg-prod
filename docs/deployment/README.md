@@ -90,6 +90,13 @@ Key points the validation enforces:
   [identity provider guide](../operations/identity_provider_integration_guide.md);
   the authentication response contract (API-01) is still open, and no real
   call has been made.
+* **Google Analytics 4 (production only):** `ANALYTICS_GA4_MEASUREMENT_ID`,
+  optional. Under `config.settings.production`, unset means the production
+  web stream `G-FDXGG6H52P`; an empty value switches analytics off; any other
+  value must look like `G-XXXXXXXXXX` or start-up stops. Staging, development
+  and tests never load Google's tag. Behaviour, consent, CSP and the owner's
+  Google Analytics settings:
+  [Google Analytics](../operations/google_analytics.md).
 
 ## 5. PostgreSQL roles
 
@@ -324,6 +331,11 @@ python manage.py changepassword uat-reviewer@<domain>             # once per acc
 * [Staff accounts and scoped access](../operations/staff_accounts.md)
 * [Review queue entry and Excel decisions](../operations/review_decision_workbook.md)
   ([release procedure: backup, migrate, backfill, reconcile](REVIEW_QUEUE_RELEASE.md))
+* Consolidated update 2026-10-12: [release procedure](CONSOLIDATED_UPDATE_2026_10_RELEASE.md),
+  [identity review corrections](../operations/identity_review_corrections.md),
+  [registration list and statistics](../operations/registration_list_and_statistics.md),
+  [organizations and accreditation settings](../operations/organizations_and_accreditation_settings.md),
+  [Google Analytics](../operations/google_analytics.md)
 * [Staff sign-in security image](../security/staff_sign_in_captcha.md)
 * [Beta release notes and verification summary](beta_release_notes.md)
 * [Beta backlog and open decisions](beta_backlog.md)

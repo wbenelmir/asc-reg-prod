@@ -29,10 +29,14 @@
         </li>
       {% endfor %}
       <li class="nav-item">
-        <a class="nav-link{% if filters.status == all_statuses %} active{% endif %}"{% if filters.status == all_statuses %} aria-current="page"{% endif %} href="?status={{ all_statuses }}" data-status-tab="ALL">{% trans "All" %} <span class="asc-count">{{ total_count }}</span></a>
+        <a class="nav-link{% if filters.status == closed_registrations %} active{% endif %}"{% if filters.status == closed_registrations %} aria-current="page"{% endif %} href="?status={{ closed_registrations }}{% if tab_querystring %}&amp;{{ tab_querystring }}{% endif %}" data-status-tab="CLOSED">{% trans "Closed registrations" %} <span class="asc-count" data-status-count="CLOSED">{{ closed_count }}</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link{% if filters.status == all_statuses %} active{% endif %}"{% if filters.status == all_statuses %} aria-current="page"{% endif %} href="?status={{ all_statuses }}" data-status-tab="ALL">{% trans "All" %} <span class="asc-count" data-status-count="ALL">{{ total_count }}</span></a>
       </li>
     </ul>
   </nav>
+  <p class="form-text" data-idv-tabs-note>{% trans "Status tabs count the cases of active registrations only. Cases of withdrawn, cancelled or not-approved registrations are kept as history under Closed registrations; identity counts are not application or approval counts." %}</p>
 
   <form method="post" action="{% url 'identity:search' %}" class="asc-card asc-filters asc-idv-search" role="search" aria-label="{% trans 'Search identity cases' %}" data-idv-search-form>
     {% csrf_token %}
@@ -141,7 +145,7 @@
               <tr data-idv-row="{{ case.pk }}">
                 <th scope="row"><a href="{% url 'identity:case' pk=case.pk %}{% if querystring %}?{{ querystring }}{% endif %}" data-idv-open><bdi dir="ltr" class="asc-code">{{ case.registration.public_reference }}</bdi></a></th>
                 <td><bdi>{{ case.registration.profile.submitted_given_names }} {{ case.registration.profile.submitted_family_name }}</bdi></td>
-                <td>{% status_chip "identity" case.status case.get_status_display %}{% if case.verification_source %}<div class="asc-muted small">{{ case.get_verification_source_display }}</div>{% endif %}</td>
+                <td>{% status_chip "identity" case.status case.get_status_display %}{% if case.verification_source %}<div class="asc-muted small">{{ case.get_verification_source_display }}</div>{% endif %}{% if case.registration_closed %}<div data-idv-registration-closed-row>{% include "registrations/_registration_status_chip.html" with registration=case.registration %}</div>{% endif %}</td>
                 <td>{% if case.reason_code %}{{ case.get_reason_code_display }}{% else %}<span class="asc-muted">—</span>{% endif %}</td>
                 <td>{{ case.get_route_display }} <bdi dir="ltr" class="asc-code">{{ case.current_revision.identifier.masked_value }}</bdi></td>
                 <td>{{ case.nationality.localized_name }}</td>
@@ -159,7 +163,7 @@
               <p class="asc-record-meta"><bdi>{{ case.registration.profile.submitted_given_names }} {{ case.registration.profile.submitted_family_name }}</bdi></p>
             </div>
             <dl class="asc-record-fields">
-              <div class="asc-record-wide"><dt>{% trans "Identity status" %}</dt><dd>{% status_chip "identity" case.status case.get_status_display %}</dd></div>
+              <div class="asc-record-wide"><dt>{% trans "Identity status" %}</dt><dd>{% status_chip "identity" case.status case.get_status_display %}{% if case.registration_closed %} {% include "registrations/_registration_status_chip.html" with registration=case.registration %}{% endif %}</dd></div>
               <div><dt>{% trans "Reason" %}</dt><dd>{% if case.reason_code %}{{ case.get_reason_code_display }}{% else %}—{% endif %}</dd></div>
               <div><dt>{% trans "Document" %}</dt><dd>{{ case.get_route_display }}</dd></div>
               <div class="asc-record-wide"><dt>{% trans "Since" %}</dt><dd><time datetime="{{ case.status_changed_at|date:'c' }}">{{ case.status_changed_at }}</time></dd></div>

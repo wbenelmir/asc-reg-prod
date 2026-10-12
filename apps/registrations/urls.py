@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from django.urls import path
 
-from . import views
+from . import statistics_views, views
 
 app_name = "registrations"
 
@@ -23,6 +23,14 @@ urlpatterns = [
     path("register/notices/", views.notices_step, name="step-notices"),
     path("register/confirmation/<str:reference>/", views.confirmation, name="confirmation"),
     path("ops/registrations/", views.ops_intake_list, name="ops-intake-list"),
+    path("ops/registrations/search/", views.ops_registration_search, name="ops-search"),
+    # UPD-08: statistics and ready-to-export reports.
+    path("ops/statistics/", statistics_views.statistics_page, name="statistics"),
+    path(
+        "ops/statistics/export/<str:report_kind>.<str:file_format>",
+        statistics_views.statistics_export,
+        name="statistics-export",
+    ),
     path(
         "ops/accommodation-requests/",
         views.ops_accommodation_list,

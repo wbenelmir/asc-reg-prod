@@ -11,6 +11,9 @@ after `SEARCH_CONTEXT_TTL`, and at most `SEARCH_CONTEXTS_PER_SESSION` are kept.
 It only narrows the queue: scope (and, for a NIN search, the evidence
 permission) is applied again by the selectors on every use. HTTP session
 state only; no business logic.
+
+UPD-05: the operations registrations list keeps its own private searches the
+same way, under its own session key (`namespace`), holding registration ids.
 """
 
 from __future__ import annotations
@@ -36,11 +39,11 @@ class SearchContext:
     truncated: bool
 
 
-def _live_contexts(session, user) -> dict:
+def _live_contexts(session, user, namespace: str = SEARCH_SESSION_KEY) -> dict:
     """This reviewer's unexpired contexts; everything else is dropped."""
     now = timezone.now()
     live = {}
-    for reference, entry in (session.get(SEARCH_SESSION_KEY) or {}).items():
+    for reference, entry in (session.get(namespace) or {}).items():
         try:
             created = datetime.datetime.fromisoformat(entry["created"])
         except KeyError, TypeError, ValueError:
@@ -50,9 +53,11 @@ def _live_contexts(session, user) -> dict:
     return live
 
 
-def store_search_context(session, user, *, kind: str, case_ids, truncated: bool) -> str:
+def store_search_context(
+    session, user, *, kind: str, case_ids, truncated: bool, namespace: str = SEARCH_SESSION_KEY
+) -> str:
     """Keep a resolved search; returns its new random reference."""
-    contexts = _live_contexts(session, user)
+    contexts = _live_contexts(session, user, namespace)
     reference = secrets.token_urlsafe(18)
     contexts[reference] = {
         "user": str(user.pk),
@@ -62,16 +67,18 @@ def store_search_context(session, user, *, kind: str, case_ids, truncated: bool)
         "created": timezone.now().isoformat(),
     }
     newest = sorted(contexts.items(), key=lambda item: item[1]["created"])
-    session[SEARCH_SESSION_KEY] = dict(newest[-SEARCH_CONTEXTS_PER_SESSION:])
+    session[namespace] = dict(newest[-SEARCH_CONTEXTS_PER_SESSION:])
     return reference
 
 
-def search_context_for(session, user, reference: str) -> SearchContext | None:
+def search_context_for(
+    session, user, reference: str, namespace: str = SEARCH_SESSION_KEY
+) -> SearchContext | None:
     """The reviewer's own live context `reference`, or None (unknown, expired,
     another reviewer's). Expired and foreign entries are forgotten."""
-    contexts = _live_contexts(session, user)
-    if contexts != (session.get(SEARCH_SESSION_KEY) or {}):
-        session[SEARCH_SESSION_KEY] = contexts
+    contexts = _live_contexts(session, user, namespace)
+    if contexts != (session.get(namespace) or {}):
+        session[namespace] = contexts
     if not reference or not REFERENCE_PATTERN.fullmatch(reference):
         return None
     entry = contexts.get(reference)
@@ -85,7 +92,9 @@ def search_context_for(session, user, reference: str) -> SearchContext | None:
     )
 
 
-def clear_search_context(session, user, reference: str) -> None:
-    contexts = _live_contexts(session, user)
+def clear_search_context(
+    session, user, reference: str, namespace: str = SEARCH_SESSION_KEY
+) -> None:
+    contexts = _live_contexts(session, user, namespace)
     contexts.pop(reference, None)
-    session[SEARCH_SESSION_KEY] = contexts
+    session[namespace] = contexts

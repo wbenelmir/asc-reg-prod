@@ -33,6 +33,11 @@ class CommunicationPurpose:
     # later classification or change of those days.
     APPROVAL_ATTENDANCE = "APPROVAL_ATTENDANCE"
     ATTENDANCE_CHANGE = "ATTENDANCE_CHANGE"
+    # UPD-03 (2026-10-12): an identity correction request, with the team's
+    # optional note, in the participant's submission language. Seeded by
+    # `communications.0009`. The generic INFORMATION_REQUEST stays for the
+    # review information requests.
+    IDENTITY_CORRECTION_REQUEST = "IDENTITY_CORRECTION_REQUEST"
     # Staff credential setup and reset links are NOT queued here: like the
     # participant OTP they are sent directly and never stored in a message
     # row (`apps.accounts.administration.deliver_setup_link`).

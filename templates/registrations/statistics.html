@@ -1,0 +1,146 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% block title %}{% trans "Registration statistics" %}{% endblock %}
+{% block content %}
+  {% comment %}
+    UPD-08: server-computed statistics of the reader's authorized scope
+    (apps.registrations.statistics), recomputed when the page opens or the
+    filters change. Every figure links to the registrations list of the same
+    population; every chart has its exact table.
+  {% endcomment %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Statistics" %}</p>
+      <h1>{% trans "Registration statistics" %}</h1>
+      <p>{% trans "Where registrations stand, how processing progresses and who is approved to attend, for your authorized scope." %}</p>
+      <p class="form-text mb-0" data-stats-generated>{% blocktrans with when=generated_label %}Computed at {{ when }} from the current data.{% endblocktrans %} {% blocktrans count counter=report.scope_total %}{{ counter }} registration in your scope.{% plural %}{{ counter }} registrations in your scope.{% endblocktrans %}</p>
+    </div>
+  </div>
+
+  <form method="get" class="asc-card asc-filters" aria-label="{% trans 'Statistics filters' %}" data-stats-filters>
+    <div class="asc-filters-grid">
+      <div>
+        <label for="id_stats_event" class="form-label">{% trans "Event" %}</label>
+        <select id="id_stats_event" name="event" class="form-select">
+          <option value="">{% trans "All events in your scope" %}</option>
+          {% for event in list_choices.events %}<option value="{{ event.pk }}"{% if filters.event == event.pk|stringformat:'s' %} selected{% endif %}>{{ event.code }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="id_stats_from" class="form-label">{% trans "From (submission or event date)" %}</label>
+        <input type="date" id="id_stats_from" name="submitted_from" value="{{ filters.submitted_from|default:'' }}" class="form-control" dir="ltr">
+      </div>
+      <div>
+        <label for="id_stats_to" class="form-label">{% trans "Until" %}</label>
+        <input type="date" id="id_stats_to" name="submitted_to" value="{{ filters.submitted_to|default:'' }}" class="form-control" dir="ltr">
+      </div>
+      <div>
+        <label for="id_stats_period" class="form-label">{% trans "Chart period" %}</label>
+        <select id="id_stats_period" name="period" class="form-select">
+          <option value="">{% trans "Automatic" %}</option>
+          <option value="day"{% if filters.period == "day" %} selected{% endif %}>{% trans "Day" %}</option>
+          <option value="week"{% if filters.period == "week" %} selected{% endif %}>{% trans "Week" %}</option>
+        </select>
+      </div>
+      <div>
+        <label for="id_stats_status" class="form-label">{% trans "Applicant status" %}</label>
+        <select id="id_stats_status" name="status" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          {% for value, label in status_choices %}<option value="{{ value }}"{% if filters.status == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="id_stats_source" class="form-label">{% trans "Source" %}</label>
+        <select id="id_stats_source" name="source" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          {% for value, label in source_choices %}<option value="{{ value }}"{% if filters.source == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="id_stats_role" class="form-label">{% trans "Participation category" %}</label>
+        <select id="id_stats_role" name="role" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          <option value="{{ missing }}"{% if filters.role == missing %} selected{% endif %}>{% trans "No current role" %}</option>
+          {% for role in list_choices.roles %}<option value="{{ role.pk }}"{% if filters.role == role.pk|stringformat:'s' %} selected{% endif %}>{{ role.localized_name }} ({{ role.code }})</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="id_stats_organization" class="form-label">{% trans "Organization" %}</label>
+        <select id="id_stats_organization" name="organization" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          <option value="{{ missing }}"{% if filters.organization == missing %} selected{% endif %}>{% trans "No organization" %}</option>
+          {% for organization in list_choices.organizations %}<option value="{{ organization.pk }}"{% if filters.organization == organization.pk|stringformat:'s' %} selected{% endif %}>{{ organization.official_name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="id_stats_campaign" class="form-label">{% trans "Invitation campaign" %}</label>
+        <select id="id_stats_campaign" name="campaign" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          <option value="{{ missing }}"{% if filters.campaign == missing %} selected{% endif %}>{% trans "No campaign" %}</option>
+          {% for campaign in list_choices.campaigns %}<option value="{{ campaign.pk }}"{% if filters.campaign == campaign.pk|stringformat:'s' %} selected{% endif %}>{{ campaign.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="id_stats_nationality" class="form-label">{% trans "Nationality" %}</label>
+        <select id="id_stats_nationality" name="nationality" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          {% for country in list_choices.nationalities %}<option value="{{ country.pk }}"{% if filters.nationality == country.pk %} selected{% endif %}>{{ country.localized_name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="id_stats_residence" class="form-label">{% trans "Country of residence" %}</label>
+        <select id="id_stats_residence" name="residence" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          {% for country in list_choices.nationalities %}<option value="{{ country.pk }}"{% if filters.residence == country.pk %} selected{% endif %}>{{ country.localized_name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="id_stats_attendance" class="form-label">{% trans "Approved attendance days" %}</label>
+        <select id="id_stats_attendance" name="attendance" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          {% for value, label in attendance_choices %}<option value="{{ value }}"{% if filters.attendance == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+          <option value="{{ missing }}"{% if filters.attendance == missing %} selected{% endif %}>{% trans "Not classified yet" %}</option>
+        </select>
+      </div>
+      <div>
+        <label for="id_stats_day" class="form-label">{% trans "Conference day" %}</label>
+        <select id="id_stats_day" name="day" class="form-select">
+          <option value="">{% trans "Any" %}</option>
+          {% for day in "123" %}<option value="{{ day }}"{% if filters.day == day %} selected{% endif %}>{% blocktrans %}Day {{ day }}{% endblocktrans %}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="asc-filters-actions">
+      <button type="submit" class="btn btn-primary">{% include "components/icon.html" with name="filter" %}<span>{% trans "Apply filters" %}</span></button>
+      <a class="btn btn-outline-secondary" href="{% url 'registrations:statistics' %}">{% trans "Clear filters" %}</a>
+    </div>
+  </form>
+
+  {% if filter_summary %}
+    <p class="form-text" data-stats-filter-summary>{% trans "Active filters:" %} {% for label, value in filter_summary %}<span class="asc-chip asc-chip-neutral">{{ label }}: <bdi>{{ value }}</bdi></span> {% endfor %}</p>
+  {% endif %}
+
+  <section class="asc-card" aria-labelledby="stats-exports-heading" data-stats-exports>
+    <h2 class="asc-card-title" id="stats-exports-heading">{% include "components/icon.html" with name="download" %}{% trans "Ready-to-export reports" %}</h2>
+    <p class="asc-section-lead">{% trans "Each report covers every registration matching these filters (not only what this page shows), with the event, the generation time and the definitions. PDF opens a print-ready report: choose Save as PDF in the print dialog." %}</p>
+    <div class="asc-stats-export-grid">
+      {% for kind, title in export_kinds %}
+        <div class="asc-stats-export" data-stats-export="{{ kind }}">
+          <p class="mb-1"><strong>{{ title }}</strong></p>
+          <div class="asc-actions-row">
+            <a class="btn btn-sm btn-outline-primary" href="{% url 'registrations:statistics-export' report_kind=kind file_format='pdf' %}{% if querystring %}?{{ querystring }}{% endif %}" target="_blank" rel="noopener" data-export-pdf="{{ kind }}">{% include "components/icon.html" with name="download" %}<span>PDF</span></a>
+            <a class="btn btn-sm btn-outline-primary" href="{% url 'registrations:statistics-export' report_kind=kind file_format='xlsx' %}{% if querystring %}?{{ querystring }}{% endif %}" data-export-xlsx="{{ kind }}">{% include "components/icon.html" with name="download" %}<span>XLSX</span></a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    {% if attendee_access.status == "none" %}<p class="form-text mb-0" data-attendee-scope="none">{% trans "The final-approved report includes the attendee list only for holders of the export permission in this scope." %}</p>{% elif attendee_access.status == "partial" %}<p class="form-text mb-0" data-attendee-scope="partial">{% blocktrans trimmed with withheld=attendee_access.withheld total=attendee_access.total %}The attendee list covers only the registrations inside your export scope: {{ withheld }} of {{ total }} final-approved registrations are not listed.{% endblocktrans %}</p>{% endif %}
+  </section>
+
+  {% include "registrations/statistics/_overview.html" %}
+  {% include "registrations/statistics/_final_approved.html" %}
+  {% include "registrations/statistics/_workload.html" %}
+  {% include "registrations/statistics/_trends.html" %}
+  {% include "registrations/statistics/_sources.html" %}
+  {% include "registrations/statistics/_definitions.html" %}
+{% endblock %}

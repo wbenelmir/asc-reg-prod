@@ -2241,8 +2241,14 @@ def submit_full_registration(
     sensitive_data_consent_granted: bool = False,
     session_reference: str,
     idempotency_key: str,
+    submission_language: str | None = None,
 ) -> RegistrationSubmission:
     """Record required legal acceptances, optional consent, and the submission (AF-REG-06).
+
+    UPD-03: `submission_language` is the interface language of the final
+    submission (the view passes the request's language; without it the
+    active language is used). It is stored once, on the first submission,
+    and later tells staff which language to write to the participant in.
 
     The explicit consent to personal-data processing (D-11) is required for
     every new submission (UX-C1, UX-F02): `data_processing_consent_granted`
@@ -2418,6 +2424,13 @@ def submit_full_registration(
             registration=locked_registration,
         )
 
+    # UPD-03: the submission language, recorded once with the submission (the
+    # row is locked; no version change, since nothing else reads it as state).
+    from apps.registrations.language import normalize_language
+
+    Registration.objects.filter(pk=locked_registration.pk, submission_language="").update(
+        submission_language=normalize_language(submission_language)
+    )
     submission = record_registration_submission(
         registration=locked_registration,
         snapshot=snapshot,

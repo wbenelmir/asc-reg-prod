@@ -1,0 +1,18 @@
+{% load i18n %}{# A breakdown table: label, count, a single-hue bar of the share, optional link. `rows`, `caption`, `column`. #}
+<div class="asc-table-wrap">
+  <table class="asc-table asc-stats-table" aria-label="{{ caption }}">
+    <thead><tr><th scope="col">{{ column }}</th><th scope="col" class="asc-num">{% trans "Count" %}</th><th scope="col" class="asc-num">%</th><th scope="col" class="asc-stats-bar-col"><span class="visually-hidden">{% trans "Share" %}</span></th></tr></thead>
+    <tbody>
+      {% for row in rows %}
+        <tr{% if row.missing %} class="asc-stats-missing"{% endif %}>
+          <th scope="row">{% if row.url %}<a href="{{ row.url }}"><bdi>{{ row.label }}</bdi></a>{% else %}<bdi>{{ row.label }}</bdi>{% endif %}</th>
+          <td class="asc-num">{{ row.count }}</td>
+          <td class="asc-num">{{ row.share }}</td>
+          <td class="asc-stats-bar-col"><svg class="asc-hbar" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect class="asc-hbar-track" width="100" height="8" rx="2"></rect><rect class="asc-hbar-fill" width="{{ row.share|stringformat:'.2f' }}" height="8" rx="2"><title>{{ row.label }}: {{ row.count }} ({{ row.share }} %)</title></rect></svg></td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4" class="asc-table-empty">{% trans "None in this population." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

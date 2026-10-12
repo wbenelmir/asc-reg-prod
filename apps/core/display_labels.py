@@ -34,6 +34,7 @@ CODE_LABELS: dict[str, dict[str, Promise]] = {
         "IDENTITY_REJECTION": _("Identity rejection"),
         "APPROVAL_ATTENDANCE": _("Approval with attendance days"),
         "ATTENDANCE_CHANGE": _("Attendance days update"),
+        "IDENTITY_CORRECTION_REQUEST": _("Identity correction request"),
     },
     # apps.exports.models.ExportStatus (its model labels are not translated)
     "export_status": {
@@ -53,6 +54,12 @@ CODE_LABELS: dict[str, dict[str, Promise]] = {
         "UNDELIVERABLE": pgettext_lazy("message status", "Undeliverable"),
         "SUPPRESSED": pgettext_lazy("message status", "Suppressed"),
         "CANCELLED": pgettext_lazy("message status", "Cancelled"),
+    },
+    # apps.organizations.models.OrganizationStatus (its model labels are not translated)
+    "organization_status": {
+        "ACTIVE": pgettext_lazy("organization status", "Active"),
+        "INACTIVE": pgettext_lazy("organization status", "Inactive"),
+        "MERGED": pgettext_lazy("organization status", "Merged"),
     },
     # settings.LANGUAGES codes, as stored on messages and campaigns
     "language": {
@@ -81,6 +88,9 @@ CODE_LABELS: dict[str, dict[str, Promise]] = {
         "ALREADY_CURRENT": _("Already has this assignment"),
         "STALE_REGISTRATION": _("Changed since the preview"),
         "INVALID_TARGET": _("Can no longer receive this assignment"),
+        # UPD-07: execution-time revalidation.
+        "NO_LONGER_ELIGIBLE": _("No longer final-approved (withdrawn, cancelled or decided)"),
+        "NOT_AUTHORIZED": _("No longer in your authorized scope"),
     },
     # apps.reviews.services.ALLOWED_CHECKLIST_ITEM_CODES
     "checklist_item": {

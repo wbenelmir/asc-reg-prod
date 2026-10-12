@@ -10531,3 +10531,1363 @@ msgstr "استيراد ملف Excel ومعاينته"
 msgctxt "decision workbook"
 msgid "Rejection reason"
 msgstr "سبب الرفض"
+
+msgid "Capital letters, digits, - and _ (for example SPEAKER). It cannot be changed later."
+msgstr "أحرف لاتينية كبيرة وأرقام و- و_ (مثلًا SPEAKER). لا يمكن تغييره لاحقًا."
+
+msgid "Show this badge type to the participant"
+msgstr "عرض نوع الشارة هذا للمشارك"
+
+msgid "Re-entry"
+msgstr "إعادة الدخول"
+
+msgid "Access profile (optional)"
+msgstr "ملف الوصول (اختياري)"
+
+msgid "Zone (optional)"
+msgstr "المنطقة (اختياري)"
+
+msgid "Gate (optional)"
+msgstr "البوابة (اختياري)"
+
+msgid "Applies to"
+msgstr "ينطبق على"
+
+msgid "Effect"
+msgstr "الأثر"
+
+msgid "Valid from (optional)"
+msgstr "صالح ابتداءً من (اختياري)"
+
+msgid "Valid until (optional)"
+msgstr "صالح حتى (اختياري)"
+
+msgid "Badge types"
+msgstr "أنواع الشارات"
+
+msgid "Use 2 to 64 capital letters, digits, - or _ for the code."
+msgstr "استخدم من 2 إلى 64 حرفًا لاتينيًا كبيرًا أو رقمًا أو - أو _ للرمز."
+
+msgid "This code is already used in this event."
+msgstr "هذا الرمز مستخدم بالفعل في هذه الفعالية."
+
+msgid "The profile, zone and gate must belong to the same event."
+msgstr "يجب أن ينتمي الملف والمنطقة والبوابة إلى الفعالية نفسها."
+
+msgid "Choose the zone of the gate."
+msgstr "اختر منطقة البوابة."
+
+msgid "The end of the validity must be after its start."
+msgstr "يجب أن تكون نهاية الصلاحية بعد بدايتها."
+
+msgid "Check the values entered."
+msgstr "تحقق من القيم المدخلة."
+
+msgid "Setting created and active."
+msgstr "تم إنشاء الإعداد وهو نشط."
+
+msgid "Setting updated."
+msgstr "تم تحديث الإعداد."
+
+msgid "Setting activated."
+msgstr "تم تفعيل الإعداد."
+
+msgid "Setting deactivated. Existing assignments are unchanged."
+msgstr "تم تعطيل الإعداد. لا تتغير التعيينات الموجودة."
+
+msgid "Identity correction request"
+msgstr "طلب تصحيح الهوية"
+
+msgctxt "organization status"
+msgid "Active"
+msgstr "نشطة"
+
+msgctxt "organization status"
+msgid "Inactive"
+msgstr "غير نشطة"
+
+msgctxt "organization status"
+msgid "Merged"
+msgstr "مدمجة"
+
+msgid "No longer final-approved (withdrawn, cancelled or decided)"
+msgstr "لم يعد معتمدًا نهائيًا (مسحوب أو ملغى أو صدر بشأنه قرار آخر)"
+
+msgid "No longer in your authorized scope"
+msgstr "لم يعد ضمن نطاقك المصرح به"
+
+msgid "Statistics"
+msgstr "الإحصاءات"
+
+msgid "Accreditation settings"
+msgstr "إعدادات الاعتماد"
+
+msgid "Every campaign"
+msgstr "كل الحملات"
+
+msgid "Select a campaign from the list."
+msgstr "اختر حملة من القائمة."
+
+msgid "This campaign belongs to another event or organization."
+msgstr "تنتمي هذه الحملة إلى فعالية أو هيئة أخرى."
+
+msgid "This organization is inactive. Activate it before starting anything new for it."
+msgstr "هذه الهيئة غير نشطة. فعّلها قبل بدء أي شيء جديد لها."
+
+msgid "The campaign changed since you opened this page. Nothing was saved."
+msgstr "تغيّرت الحملة منذ فتح هذه الصفحة. لم يُحفظ أي شيء."
+
+msgid "A closed campaign cannot be edited."
+msgstr "لا يمكن تعديل حملة مغلقة."
+
+msgid "The new limit is lower than the places already used. No registration is removed; the link accepts no new submission."
+msgstr "الحد الجديد أقل من الأماكن المستخدمة بالفعل. لا يُحذف أي تسجيل؛ ولن يقبل الرابط أي إرسال جديد."
+
+msgid "Campaign updated."
+msgstr "تم تحديث الحملة."
+
+msgid "This campaign has no active link to disable."
+msgstr "ليس لهذه الحملة رابط نشط لتعطيله."
+
+msgid "The link is disabled. Earlier registrations are unchanged."
+msgstr "تم تعطيل الرابط. لا تتغير التسجيلات السابقة."
+
+msgid "Official name"
+msgstr "الاسم الرسمي"
+
+msgid "Country"
+msgstr "البلد"
+
+msgid "Create it anyway: this is a different organization."
+msgstr "أنشئها رغم ذلك: إنها هيئة مختلفة."
+
+msgid "Enter the organization's official name."
+msgstr "أدخل الاسم الرسمي للهيئة."
+
+msgid "An organization with the same name exists. Open it instead, or confirm that this is a different organization."
+msgstr "توجد هيئة بالاسم نفسه. افتحها بدلًا من ذلك، أو أكد أنها هيئة مختلفة."
+
+msgid "Organization created."
+msgstr "تم إنشاء الهيئة."
+
+msgid "Organization updated."
+msgstr "تم تحديث الهيئة."
+
+msgid "A merged organization cannot change status."
+msgstr "لا يمكن تغيير حالة هيئة مدمجة."
+
+msgid "Organization activated."
+msgstr "تم تفعيل الهيئة."
+
+msgid "Organization deactivated."
+msgstr "تم تعطيل الهيئة."
+
+msgid "Note to participant (optional)"
+msgstr "ملاحظة للمشارك (اختياري)"
+
+msgid "Shown to the participant with this request and included in the e-mail. Write it in the submission language shown above; it is not translated."
+msgstr "تُعرض على المشارك مع هذا الطلب وتُدرج في البريد الإلكتروني. اكتبها بلغة الإرسال المبيّنة أعلاه؛ فهي لا تُترجم."
+
+msgid "Language of the e-mail and note"
+msgstr "لغة البريد الإلكتروني والملاحظة"
+
+msgid "The submission language of this registration is not recorded. Choose the language the participant should be written to; nothing is inferred from nationality or from the staff interface."
+msgstr "لغة إرسال هذا التسجيل غير مسجلة. اختر اللغة التي تُكتب بها الرسالة إلى المشارك؛ لا يُستنتج شيء من الجنسية أو من واجهة الموظفين."
+
+msgid "First name(s)"
+msgstr "الاسم (الأسماء) الشخصي"
+
+msgid "Last name"
+msgstr "اللقب"
+
+msgid "NIN (18 digits)"
+msgstr "رقم التعريف الوطني (18 رقمًا)"
+
+msgid "A changed NIN is checked again with the Ministry service before saving."
+msgstr "يُتحقق من رقم التعريف الوطني المعدّل مجددًا لدى خدمة الوزارة قبل الحفظ."
+
+msgid "Staff correction from evidence"
+msgstr "تصحيح من الموظفين استنادًا إلى الوثائق"
+
+msgid "Corrected and verified by staff"
+msgstr "صُحّحت وتُحقق منها من قبل الموظفين"
+
+msgid "Message from the registration team:"
+msgstr "رسالة من فريق التسجيل:"
+
+msgid "The submitted data was corrected from the identity document, which confirms the identity"
+msgstr "صُحّحت البيانات المقدمة استنادًا إلى وثيقة الهوية التي تؤكد الهوية"
+
+msgid "A typing error was corrected; the document confirms the identity"
+msgstr "صُحّح خطأ في الكتابة؛ وتؤكد الوثيقة الهوية"
+
+msgid "This registration was withdrawn or cancelled, so its identity processing has stopped. Nothing was saved. Its history stays available under Closed registrations."
+msgstr "سُحب هذا التسجيل أو أُلغي، لذا توقفت معالجة هويته. لم يُحفظ أي شيء. يبقى سجله متاحًا ضمن التسجيلات المغلقة."
+
+msgid "Use Latin letters for the names, exactly as on the identity document."
+msgstr "استخدم الأحرف اللاتينية للأسماء، تمامًا كما في وثيقة الهوية."
+
+msgid "Enter a date of birth that meets the event's age rule."
+msgstr "أدخل تاريخ ميلاد يستوفي شرط السن الخاص بالفعالية."
+
+msgid "The note to the participant is too long."
+msgstr "الملاحظة الموجهة للمشارك طويلة جدًا."
+
+msgid "The note to the participant contains characters that are not allowed."
+msgstr "تحتوي الملاحظة الموجهة للمشارك على أحرف غير مسموح بها."
+
+msgid "A NIN applies only to Algerian participants on the NIN route."
+msgstr "رقم التعريف الوطني يخص فقط المشاركين الجزائريين في مسار رقم التعريف الوطني."
+
+msgid "Corrections saved and identity verified. The registration now waits for its participation decision, which is taken separately."
+msgstr "حُفظت التصحيحات وتُحقق من الهوية. ينتظر التسجيل الآن قرار المشاركة الذي يُتخذ بشكل منفصل."
+
+msgid "All applications (submitted)"
+msgstr "كل الطلبات (المقدمة)"
+
+msgid "Active applications"
+msgstr "الطلبات النشطة"
+
+msgid "Final-approved"
+msgstr "المعتمدة نهائيًا"
+
+msgid "In processing"
+msgstr "قيد المعالجة"
+
+msgid "Withdrawn or cancelled"
+msgstr "مسحوبة أو ملغاة"
+
+msgid "Cancelled by the team"
+msgstr "ألغاه الفريق"
+
+msgid "Withdrawn by the participant"
+msgstr "سحبه المشارك"
+
+msgid "Identity check pending"
+msgstr "التحقق من الهوية قيد الانتظار"
+
+msgid "Identity manual review"
+msgstr "المراجعة اليدوية للهوية"
+
+msgid "Waiting for the participant"
+msgstr "في انتظار المشارك"
+
+msgid "Waiting for the participation decision"
+msgstr "في انتظار قرار المشاركة"
+
+msgid "Identity verified, no participation-review work"
+msgstr "تم التحقق من الهوية دون عمل مراجعة للمشاركة"
+
+msgctxt "registration segment"
+msgid "Drafts (not submitted)"
+msgstr "المسودات (غير المقدمة)"
+
+msgid "Total applications"
+msgstr "إجمالي الطلبات"
+
+msgid "Every submitted registration, including withdrawn, cancelled and replaced ones."
+msgstr "كل التسجيلات المقدمة، بما فيها المسحوبة والملغاة والمستبدلة."
+
+msgid "Registration: first submission time"
+msgstr "التسجيل: وقت الإرسال الأول"
+
+msgid "Registration cohort"
+msgstr "مجموعة التسجيلات"
+
+msgid "Submitted and not withdrawn, cancelled or not approved."
+msgstr "مقدمة وغير مسحوبة أو ملغاة أو مرفوضة."
+
+msgid "Registration status"
+msgstr "حالة التسجيل"
+
+msgid "Registration cohort, current state"
+msgstr "مجموعة التسجيلات، الحالة الحالية"
+
+msgid "Current decision Approved, registration approved, current, not withdrawn or cancelled. A person who registered again is counted once."
+msgstr "القرار الحالي «معتمد»، والتسجيل معتمد وحالي وغير مسحوب أو ملغى. يُحسب الشخص الذي سجّل من جديد مرة واحدة."
+
+msgid "Current participation decision and registration status"
+msgstr "قرار المشاركة الحالي وحالة التسجيل"
+
+msgid "Submitted, under review or waiting for the participant; no final outcome."
+msgstr "مقدمة أو قيد المراجعة أو في انتظار المشارك؛ دون نتيجة نهائية."
+
+msgid "Current decision Not approved (an identity rejection included)."
+msgstr "القرار الحالي «غير معتمد» (بما في ذلك رفض الهوية)."
+
+msgid "Current participation decision"
+msgstr "قرار المشاركة الحالي"
+
+msgid "Withdrawn by the participant or cancelled by the team; kept as history."
+msgstr "سحبها المشارك أو ألغاها الفريق؛ محفوظة في السجل."
+
+msgid "Registration status and withdrawal or cancellation time"
+msgstr "حالة التسجيل ووقت السحب أو الإلغاء"
+
+msgid "Unique participants"
+msgstr "المشاركون الفريدون"
+
+msgid "Distinct persons among the applications (several applications, one person)."
+msgstr "الأشخاص المختلفون بين الطلبات (عدة طلبات، شخص واحد)."
+
+msgid "Registration person"
+msgstr "صاحب التسجيل"
+
+msgid "Approved persons"
+msgstr "الأشخاص المعتمدون"
+
+msgid "Distinct persons with a final-approved registration."
+msgstr "الأشخاص المختلفون الذين لديهم تسجيل معتمد نهائيًا."
+
+msgid "Active registrations whose Ministry check is queued or running."
+msgstr "تسجيلات نشطة ينتظر فحصها لدى الوزارة أو يجري حاليًا."
+
+msgid "Identity verification status"
+msgstr "حالة التحقق من الهوية"
+
+msgid "Current state; waiting since the last identity status change"
+msgstr "الحالة الحالية؛ في الانتظار منذ آخر تغيير في حالة الهوية"
+
+msgid "Active registrations whose identity waits for a reviewer."
+msgstr "تسجيلات نشطة تنتظر هويتها مراجعًا."
+
+msgid "An identity correction or an information request is open."
+msgstr "هناك تصحيح هوية أو طلب معلومات مفتوح."
+
+msgid "Current state; waiting since the request was sent"
+msgstr "الحالة الحالية؛ في الانتظار منذ إرسال الطلب"
+
+msgid "Identity verified, no current decision yet."
+msgstr "تم التحقق من الهوية، ولا يوجد قرار حالي بعد."
+
+msgid "Identity status and decision history"
+msgstr "حالة الهوية وسجل القرارات"
+
+msgid "Current state; waiting since the review case opened"
+msgstr "الحالة الحالية؛ في الانتظار منذ فتح ملف المراجعة"
+
+msgid "Verified without review work"
+msgstr "متحقق منها دون عمل مراجعة"
+
+msgid "Identity verified and undecided, but no open participation-review case."
+msgstr "الهوية متحقق منها ودون قرار، لكن لا يوجد ملف مراجعة مشاركة مفتوح."
+
+msgid "Identity status, review cases and decisions"
+msgstr "حالة الهوية وملفات المراجعة والقرارات"
+
+msgid "since the identity status changed"
+msgstr "منذ تغيّر حالة الهوية"
+
+msgid "since the correction or information request was sent"
+msgstr "منذ إرسال طلب التصحيح أو المعلومات"
+
+msgid "since the participation-review case opened"
+msgstr "منذ فتح ملف مراجعة المشاركة"
+
+msgid "No reason recorded"
+msgstr "لا يوجد سبب مسجل"
+
+msgid "No current role"
+msgstr "لا يوجد دور حالي"
+
+msgid "No current badge type"
+msgstr "لا يوجد نوع شارة حالي"
+
+msgid "No organization"
+msgstr "دون هيئة"
+
+msgid "Not classified yet"
+msgstr "غير مصنف بعد"
+
+msgid "Current access profile"
+msgstr "ملف وصول حالي"
+
+msgid "Digital entry pass active"
+msgstr "تصريح الدخول الرقمي نشط"
+
+msgid "Pass generated, not active"
+msgstr "تصريح مُنشأ وغير نشط"
+
+msgid "No digital entry pass yet"
+msgstr "لا يوجد تصريح دخول رقمي بعد"
+
+msgid "Physical badge handed over"
+msgstr "تم تسليم الشارة المادية"
+
+msgid "No campaign"
+msgstr "دون حملة"
+
+msgid "Not provided"
+msgstr "غير مقدم"
+
+msgid "General registration situation"
+msgstr "الوضع العام للتسجيلات"
+
+msgid "Final-approved attendees"
+msgstr "المشاركون المعتمدون نهائيًا"
+
+msgid "Processing workload and exceptions"
+msgstr "عبء المعالجة والاستثناءات"
+
+msgid "None (not provided)"
+msgstr "لا شيء (غير مقدم)"
+
+msgid "Submitted from"
+msgstr "مقدمة ابتداءً من"
+
+msgid "Submitted until"
+msgstr "مقدمة حتى"
+
+msgid "Population"
+msgstr "الفئة"
+
+msgid "Participation category"
+msgstr "فئة المشاركة"
+
+msgid "Approved attendance days"
+msgstr "أيام الحضور المعتمدة"
+
+msgid "Conference day"
+msgstr "يوم المؤتمر"
+
+#, python-format
+msgid "Day %(day)s"
+msgstr "اليوم %(day)s"
+
+msgid "Generated at"
+msgstr "أُنشئ في"
+
+msgid "Dataset"
+msgstr "البيانات"
+
+msgid "every registration in the authorized scope that matches the filters below"
+msgstr "كل التسجيلات ضمن النطاق المصرح به المطابقة للمرشحات أدناه"
+
+msgid "Date basis"
+msgstr "أساس التواريخ"
+
+msgid "counts are registrations first submitted within the date range, in their current state; trends count events dated within the range"
+msgstr "تخص الأعداد التسجيلات المقدمة لأول مرة خلال الفترة، بحالتها الحالية؛ وتحسب الاتجاهات الأحداث المؤرخة خلال الفترة"
+
+msgid "Filters"
+msgstr "المرشحات"
+
+msgid "none"
+msgstr "لا يوجد"
+
+msgid "Report"
+msgstr "التقرير"
+
+msgid "Definitions"
+msgstr "التعريفات"
+
+msgid "Metric"
+msgstr "المؤشر"
+
+msgid "Denominator"
+msgstr "المقام"
+
+msgid "Time basis"
+msgstr "الأساس الزمني"
+
+msgid "Delegation list"
+msgstr "قائمة الوفد"
+
+msgid "Percentage of applications"
+msgstr "النسبة المئوية من الطلبات"
+
+msgid "Processing stages"
+msgstr "مراحل المعالجة"
+
+msgid "Stage"
+msgstr "المرحلة"
+
+msgid "Progress over time"
+msgstr "التطور عبر الزمن"
+
+msgid "Period start"
+msgstr "بداية الفترة"
+
+msgid "New applications"
+msgstr "الطلبات الجديدة"
+
+msgid "Approval decisions"
+msgstr "قرارات الاعتماد"
+
+msgid "Not-approved decisions"
+msgstr "قرارات عدم الاعتماد"
+
+msgid "Withdrawals and cancellations"
+msgstr "السحوبات والإلغاءات"
+
+msgid "Cumulative applications"
+msgstr "الطلبات التراكمية"
+
+msgid "Cumulative approval decisions"
+msgstr "قرارات الاعتماد التراكمية"
+
+msgid "Sources"
+msgstr "المصادر"
+
+msgid "Dimension"
+msgstr "البُعد"
+
+msgid "Value"
+msgstr "القيمة"
+
+msgid "Applications"
+msgstr "الطلبات"
+
+msgid "Composition"
+msgstr "التركيبة"
+
+msgid "Generated, not active"
+msgstr "مُنشأ وغير نشط"
+
+msgid "Final-approved registrations"
+msgstr "التسجيلات المعتمدة نهائيًا"
+
+#, python-format
+msgid "Day %(day)s (overlapping)"
+msgstr "اليوم %(day)s (متداخل)"
+
+msgid "The attendee list is included only for holders of the export permission in this scope."
+msgstr "لا تُدرج قائمة الحاضرين إلا لحاملي صلاحية التصدير في هذا النطاق."
+
+msgid "Summary"
+msgstr "الملخص"
+
+msgid "Attendance"
+msgstr "الحضور"
+
+msgid "Participation categories"
+msgstr "فئات المشاركة"
+
+msgid "Attendees"
+msgstr "الحاضرون"
+
+msgid "Approved on"
+msgstr "اعتُمد في"
+
+msgid "Digital entry pass"
+msgstr "تصريح الدخول الرقمي"
+
+msgid "Identity manual review reason"
+msgstr "سبب المراجعة اليدوية للهوية"
+
+msgid "Identity correction requests per registration"
+msgstr "طلبات تصحيح الهوية لكل تسجيل"
+
+msgid "Information requests per registration"
+msgstr "طلبات المعلومات لكل تسجيل"
+
+msgid "Workload"
+msgstr "العبء"
+
+msgid "Oldest waiting since"
+msgstr "أقدم انتظار منذ"
+
+msgid "Average wait (days)"
+msgstr "متوسط الانتظار (أيام)"
+
+msgid "Waiting time basis"
+msgstr "أساس وقت الانتظار"
+
+msgid "Oldest items"
+msgstr "أقدم العناصر"
+
+msgid "Waiting since"
+msgstr "في الانتظار منذ"
+
+msgid "Exceptions"
+msgstr "الاستثناءات"
+
+msgid "Exception"
+msgstr "الاستثناء"
+
+msgid "Enter at least 2 characters to search."
+msgstr "أدخل حرفين على الأقل للبحث."
+
+msgid "Assign one role, badge type, access profile or access rule to every final-approved registration in your scope. Nothing changes until you execute the preview."
+msgstr "عيّن دورًا أو نوع شارة أو ملف وصول أو قاعدة وصول لكل تسجيل معتمد نهائيًا ضمن نطاقك. لا يتغير شيء حتى تنفّذ المعاينة."
+
+#, python-format
+msgid "%(event)s: %(counter)s final-approved registration in your scope"
+msgid_plural "%(event)s: %(counter)s final-approved registrations in your scope"
+msgstr[0] "%(event)s: %(counter)s تسجيل معتمد نهائيًا ضمن نطاقك"
+msgstr[1] "%(event)s: تسجيل واحد (%(counter)s) معتمد نهائيًا ضمن نطاقك"
+msgstr[2] "%(event)s: تسجيلان (%(counter)s) معتمدان نهائيًا ضمن نطاقك"
+msgstr[3] "%(event)s: %(counter)s تسجيلات معتمدة نهائيًا ضمن نطاقك"
+msgstr[4] "%(event)s: %(counter)s تسجيلًا معتمدًا نهائيًا ضمن نطاقك"
+msgstr[5] "%(event)s: %(counter)s تسجيل معتمد نهائيًا ضمن نطاقك"
+
+msgid "Missing prerequisite: your roles do not let you assign accreditation in any event edition."
+msgstr "شرط مسبق ناقص: لا تسمح لك أدوارك بتعيين الاعتماد في أي دورة من الفعالية."
+
+msgid "Missing prerequisite: no participant role, badge type, access profile or access rule is configured for your events yet."
+msgstr "شرط مسبق ناقص: لم يُضبط بعد أي دور مشارك أو نوع شارة أو ملف وصول أو قاعدة وصول لفعالياتك."
+
+msgid "Missing prerequisite: every participant role, badge type, access profile and access rule of your events is inactive."
+msgstr "شرط مسبق ناقص: كل أدوار المشاركين وأنواع الشارات وملفات الوصول وقواعد الوصول في فعالياتك غير نشطة."
+
+msgid "Configure accreditation settings"
+msgstr "ضبط إعدادات الاعتماد"
+
+msgid "Ask the superadmin to configure them."
+msgstr "اطلب من المسؤول الأعلى ضبطها."
+
+msgid "Final-approved registrations in your scope: current decision Approved, not withdrawn or cancelled."
+msgstr "التسجيلات المعتمدة نهائيًا ضمن نطاقك: القرار الحالي «معتمد»، وغير مسحوبة أو ملغاة."
+
+#, python-format
+msgid "%(counter)s registration."
+msgid_plural "%(counter)s registrations."
+msgstr[0] "%(counter)s تسجيل."
+msgstr[1] "تسجيل واحد (%(counter)s)."
+msgstr[2] "تسجيلان (%(counter)s)."
+msgstr[3] "%(counter)s تسجيلات."
+msgstr[4] "%(counter)s تسجيلًا."
+msgstr[5] "%(counter)s تسجيل."
+
+msgid "Will be assigned"
+msgstr "سيُعيَّن"
+
+#, python-format
+msgid "%(counter)s already has it (unchanged)"
+msgid_plural "%(counter)s already have it (unchanged)"
+msgstr[0] "%(counter)s لديه بالفعل (دون تغيير)"
+msgstr[1] "تسجيل واحد (%(counter)s) لديه بالفعل (دون تغيير)"
+msgstr[2] "تسجيلان (%(counter)s) لديهما بالفعل (دون تغيير)"
+msgstr[3] "%(counter)s لديها بالفعل (دون تغيير)"
+msgstr[4] "%(counter)s لديها بالفعل (دون تغيير)"
+msgstr[5] "%(counter)s لديها بالفعل (دون تغيير)"
+
+msgid "Nothing is changed by this preview. At execution, each registration is checked again: one withdrawn, cancelled, decided differently or no longer in your scope is skipped."
+msgstr "لا تغيّر هذه المعاينة شيئًا. عند التنفيذ يُتحقق من كل تسجيل مجددًا: يُتجاوز التسجيل المسحوب أو الملغى أو الذي صدر بشأنه قرار آخر أو الذي لم يعد ضمن نطاقك."
+
+msgid "No final-approved registration in your scope for this event."
+msgstr "لا يوجد تسجيل معتمد نهائيًا ضمن نطاقك لهذه الفعالية."
+
+#, python-format
+msgid "%(name)s (%(code)s) · event %(event)s"
+msgstr "%(name)s (%(code)s) · الفعالية %(event)s"
+
+msgid "Skipped"
+msgstr "متجاوزة"
+
+msgid "Errors"
+msgstr "الأخطاء"
+
+msgid "Edit setting"
+msgstr "تعديل الإعداد"
+
+msgid "Add setting"
+msgstr "إضافة إعداد"
+
+#, python-format
+msgid "Edit %(code)s"
+msgstr "تعديل %(code)s"
+
+#, python-format
+msgid "Add: %(kind)s"
+msgstr "إضافة: %(kind)s"
+
+msgid "Save changes"
+msgstr "حفظ التغييرات"
+
+msgid "Add"
+msgstr "إضافة"
+
+msgid "Participant roles, badge types, access profiles and access rules of the event. They are assigned to approved participants; they are not staff account roles."
+msgstr "أدوار المشاركين وأنواع الشارات وملفات الوصول وقواعد الوصول الخاصة بالفعالية. تُعيَّن للمشاركين المعتمدين؛ وليست أدوارًا لحسابات الموظفين."
+
+msgid "Choose an event"
+msgstr "اختر فعالية"
+
+msgid "Show"
+msgstr "عرض"
+
+msgid "No event edition is in your scope."
+msgstr "لا توجد دورة فعالية ضمن نطاقك."
+
+#, python-format
+msgid "Event: %(name)s (%(code)s)"
+msgstr "الفعالية: %(name)s (%(code)s)"
+
+#, python-format
+msgid "%(counter)s active"
+msgid_plural "%(counter)s active"
+msgstr[0] "%(counter)s نشط"
+msgstr[1] "واحد نشط (%(counter)s)"
+msgstr[2] "اثنان نشطان (%(counter)s)"
+msgstr[3] "%(counter)s نشطة"
+msgstr[4] "%(counter)s نشطًا"
+msgstr[5] "%(counter)s نشط"
+
+msgid "Current assignments"
+msgstr "التعيينات الحالية"
+
+msgctxt "setting status"
+msgid "Active"
+msgstr "نشط"
+
+msgctxt "setting status"
+msgid "Inactive"
+msgstr "غير نشط"
+
+msgid "Deactivate"
+msgstr "تعطيل"
+
+msgid "None yet. Add the first one; it is active at once and can be assigned."
+msgstr "لا شيء بعد. أضف الأول؛ يصبح نشطًا فورًا ويمكن تعيينه."
+
+msgid "None configured for this event yet."
+msgstr "لم يُضبط أي شيء لهذه الفعالية بعد."
+
+msgid "Approval of a registration needs a current participant role, badge type and access profile. Deactivating a setting stops new assignments of it; existing assignments are unchanged."
+msgstr "يتطلب اعتماد تسجيل دور مشارك ونوع شارة وملف وصول حاليًا. يوقف تعطيل الإعداد التعيينات الجديدة له؛ ولا تتغير التعيينات الموجودة."
+
+msgid "Message from the registration team"
+msgstr "رسالة من فريق التسجيل"
+
+msgid "Closed registrations"
+msgstr "التسجيلات المغلقة"
+
+msgid "Status tabs count the cases of active registrations only. Cases of withdrawn, cancelled or not-approved registrations are kept as history under Closed registrations; identity counts are not application or approval counts."
+msgstr "لا تحسب علامات تبويب الحالة إلا ملفات التسجيلات النشطة. تُحفظ ملفات التسجيلات المسحوبة أو الملغاة أو غير المعتمدة ضمن التسجيلات المغلقة؛ وأعداد الهوية ليست أعداد طلبات أو اعتمادات."
+
+msgid "This registration was cancelled by the team."
+msgstr "ألغى الفريق هذا التسجيل."
+
+msgid "The participant withdrew this registration."
+msgstr "سحب المشارك هذا التسجيل."
+
+msgid "Identity verification processing has stopped: no check runs, no action is available and nothing moves to participation review. The verification information below is kept as history. A new registration by the participant is a separate request."
+msgstr "توقفت معالجة التحقق من الهوية: لا يجري أي فحص، ولا يتاح أي إجراء، ولا ينتقل شيء إلى مراجعة المشاركة. تُحفظ معلومات التحقق أدناه في السجل. أي تسجيل جديد للمشارك طلب مستقل."
+
+msgid "Save corrections and verify identity"
+msgstr "حفظ التصحيحات والتحقق من الهوية"
+
+msgid "Save these corrections and verify the identity?"
+msgstr "حفظ هذه التصحيحات والتحقق من الهوية؟"
+
+msgid "The corrected values replace the submitted ones, and the identity is verified without returning the request to the participant. Participation is still decided separately."
+msgstr "تحل القيم المصححة محل القيم المقدمة، ويُتحقق من الهوية دون إعادة الطلب إلى المشارك. يبقى قرار المشاركة منفصلًا."
+
+msgid "Save and verify"
+msgstr "حفظ وتحقق"
+
+msgid "Compare the participant's values, the Ministry values above and the evidence. Correct only what the evidence confirms."
+msgstr "قارن قيم المشارك وقيم الوزارة أعلاه والوثائق. لا تصحح إلا ما تؤكده الوثائق."
+
+msgid "A changed NIN is checked with the Ministry service first. A verifying answer records an API verification; otherwise your manual verification from the evidence is recorded, together with the lookup result."
+msgstr "يُفحص رقم التعريف الوطني المعدّل أولًا لدى خدمة الوزارة. تُسجَّل الإجابة المطابقة تحققًا عبر الواجهة البرمجية؛ وإلا يُسجَّل تحققك اليدوي من الوثائق مع نتيجة الاستعلام."
+
+msgid "The Ministry service is not available here: a changed NIN is recorded with your manual verification from the evidence."
+msgstr "خدمة الوزارة غير متاحة هنا: يُسجَّل رقم التعريف الوطني المعدّل مع تحققك اليدوي من الوثائق."
+
+msgid "You may not change the NIN: it stays as it is."
+msgstr "لا يمكنك تغيير رقم التعريف الوطني: يبقى كما هو."
+
+msgid "No reviewable evidence of the required kind yet. Return the case to ask for it."
+msgstr "لا توجد بعد وثيقة قابلة للمراجعة من النوع المطلوب. أعد الملف لطلبها."
+
+msgid "Submission language:"
+msgstr "لغة الإرسال:"
+
+msgid "Recorded when the participant submitted the registration."
+msgstr "سُجّلت عندما قدّم المشارك التسجيل."
+
+msgid "Taken from the language of the legal notices the participant accepted at submission (older registration)."
+msgstr "مأخوذة من لغة الإشعارات القانونية التي قبلها المشارك عند الإرسال (تسجيل سابق)."
+
+msgid "The e-mail is sent in this language. Write the note in it."
+msgstr "يُرسل البريد الإلكتروني بهذه اللغة. اكتب الملاحظة بها."
+
+msgid "not recorded for this older registration"
+msgstr "غير مسجلة لهذا التسجيل السابق"
+
+#, python-format
+msgid "Choose the language to write in below. Proposed: %(language)s, the registration's preferred language."
+msgstr "اختر أدناه لغة الكتابة. المقترحة: %(language)s، اللغة المفضلة للتسجيل."
+
+msgid "The participant sees the selected requests and your note, never the reason or a service result."
+msgstr "يرى المشارك الطلبات المحددة وملاحظتك، ولا يرى أبدًا السبب أو نتيجة الخدمة."
+
+msgid "Corrections and notes to the participant"
+msgstr "التصحيحات والملاحظات الموجهة للمشارك"
+
+msgid "Changed:"
+msgstr "ما تغيّر:"
+
+msgid "Note to participant"
+msgstr "ملاحظة للمشارك"
+
+msgid "View registrations"
+msgstr "عرض التسجيلات"
+
+msgid "Export"
+msgstr "تصدير"
+
+msgid "Copied"
+msgstr "تم النسخ"
+
+msgid "Copy link"
+msgstr "نسخ الرابط"
+
+msgid "Places used"
+msgstr "الأماكن المستخدمة"
+
+#, python-format
+msgid "%(used)s of %(capacity)s (%(remaining)s left)"
+msgstr "%(used)s من %(capacity)s (يتبقى %(remaining)s)"
+
+msgid "A submitted registration keeps its place, even when withdrawn or cancelled later."
+msgstr "يحتفظ التسجيل المقدم بمكانه حتى لو سُحب أو أُلغي لاحقًا."
+
+msgid "Registration links"
+msgstr "روابط التسجيل"
+
+#, python-format
+msgid "%(counter)s link"
+msgid_plural "%(counter)s links"
+msgstr[0] "%(counter)s رابط"
+msgstr[1] "رابط واحد (%(counter)s)"
+msgstr[2] "رابطان (%(counter)s)"
+msgstr[3] "%(counter)s روابط"
+msgstr[4] "%(counter)s رابطًا"
+msgstr[5] "%(counter)s رابط"
+
+msgid "Started"
+msgstr "بدأت"
+
+#, python-format
+msgid "Until %(until)s"
+msgstr "حتى %(until)s"
+
+msgid "As long as the campaign is open and valid"
+msgstr "ما دامت الحملة مفتوحة وصالحة"
+
+#, python-format
+msgid "Disabled %(when)s"
+msgstr "عُطّل في %(when)s"
+
+msgid "No longer usable"
+msgstr "لم يعد قابلًا للاستخدام"
+
+msgid "A replaced or disabled link no longer starts registrations; the registrations it started keep this campaign and organization."
+msgstr "لم يعد الرابط المستبدل أو المعطل يبدأ تسجيلات؛ وتحتفظ التسجيلات التي بدأها بهذه الحملة وهذه الهيئة."
+
+msgid "No link was issued yet. Open the campaign, then issue its link."
+msgstr "لم يصدر أي رابط بعد. افتح الحملة ثم أصدر رابطها."
+
+msgid "Disable the invitation link?"
+msgstr "تعطيل رابط الدعوة؟"
+
+msgid "The link stops working immediately and no new link is issued. Registrations already started keep their campaign."
+msgstr "يتوقف الرابط عن العمل فورًا ولا يصدر رابط جديد. تحتفظ التسجيلات التي بدأت بحملتها."
+
+msgid "Disable link"
+msgstr "تعطيل الرابط"
+
+msgid "Edit campaign"
+msgstr "تعديل الحملة"
+
+msgid "The organization, the event, the links and the registrations already started stay as they are."
+msgstr "تبقى الهيئة والفعالية والروابط والتسجيلات التي بدأت كما هي."
+
+msgid "Registration limit: every submitted registration keeps its place, including one withdrawn or cancelled later; drafts never use a place."
+msgstr "حد التسجيلات: يحتفظ كل تسجيل مقدم بمكانه، حتى لو سُحب أو أُلغي لاحقًا؛ ولا تستخدم المسودات أي مكان."
+
+msgid "View the resulting registrations"
+msgstr "عرض التسجيلات الناتجة"
+
+#, python-format
+msgid "%(counter)s organization. Open one to manage its campaigns, registration links, delegation lists and registrations."
+msgid_plural "%(counter)s organizations. Open one to manage its campaigns, registration links, delegation lists and registrations."
+msgstr[0] "%(counter)s هيئة. افتح واحدة لإدارة حملاتها وروابط التسجيل وقوائم الوفود والتسجيلات."
+msgstr[1] "هيئة واحدة (%(counter)s). افتحها لإدارة حملاتها وروابط التسجيل وقوائم الوفود والتسجيلات."
+msgstr[2] "هيئتان (%(counter)s). افتح واحدة لإدارة حملاتها وروابط التسجيل وقوائم الوفود والتسجيلات."
+msgstr[3] "%(counter)s هيئات. افتح واحدة لإدارة حملاتها وروابط التسجيل وقوائم الوفود والتسجيلات."
+msgstr[4] "%(counter)s هيئة. افتح واحدة لإدارة حملاتها وروابط التسجيل وقوائم الوفود والتسجيلات."
+msgstr[5] "%(counter)s هيئة. افتح واحدة لإدارة حملاتها وروابط التسجيل وقوائم الوفود والتسجيلات."
+
+msgid "No event edition is open for registration: campaigns and delegation lists can be prepared once one is open."
+msgstr "لا توجد دورة مفتوحة للتسجيل: يمكن إعداد الحملات وقوائم الوفود بمجرد فتح إحداها."
+
+msgid "Manage organizations"
+msgstr "إدارة الهيئات"
+
+msgid "Create organization"
+msgstr "إنشاء هيئة"
+
+msgid "Open an organization under Manage organizations (or create one), then create its first invitation campaign there."
+msgstr "افتح هيئة ضمن إدارة الهيئات (أو أنشئ واحدة)، ثم أنشئ فيها أول حملة دعوة لها."
+
+msgid "This organization is inactive: no new campaign, delegation list or on-behalf registration can be started for it. Its existing campaigns, links and registrations are unchanged; close a campaign to stop its link."
+msgstr "هذه الهيئة غير نشطة: لا يمكن بدء حملة أو قائمة وفد أو تسجيل نيابة عن الغير جديد لها. لا تتغير حملاتها وروابطها وتسجيلاتها الموجودة؛ أغلق الحملة لإيقاف رابطها."
+
+msgid "No event edition is open for registration, so new campaigns, delegation lists and on-behalf registrations cannot be started now."
+msgstr "لا توجد دورة مفتوحة للتسجيل، لذا لا يمكن الآن بدء حملات أو قوائم وفود أو تسجيلات نيابة عن الغير جديدة."
+
+msgid "Registrations of this organization"
+msgstr "تسجيلات هذه الهيئة"
+
+msgid "All registrations"
+msgstr "كل التسجيلات"
+
+msgid "Campaign"
+msgstr "الحملة"
+
+msgid "Link"
+msgstr "الرابط"
+
+msgid "No active link"
+msgstr "لا يوجد رابط نشط"
+
+#, python-format
+msgid "%(used)s of %(capacity)s"
+msgstr "%(used)s من %(capacity)s"
+
+msgid "no limit"
+msgstr "دون حد"
+
+msgid "No invitation campaign yet."
+msgstr "لا توجد حملة دعوة بعد."
+
+msgid "Create a campaign, open it, then issue its registration link and send it to the organization."
+msgstr "أنشئ حملة وافتحها، ثم أصدر رابط التسجيل الخاص بها وأرسله إلى الهيئة."
+
+msgid "A campaign can be created by an invitation manager of this organization while an event is open."
+msgstr "يمكن لمدير الدعوات في هذه الهيئة إنشاء حملة ما دامت هناك فعالية مفتوحة."
+
+msgid "Delegation lists"
+msgstr "قوائم الوفود"
+
+msgid "Upload a delegation list"
+msgstr "رفع قائمة وفد"
+
+msgid "Preview and results"
+msgstr "المعاينة والنتائج"
+
+msgid "No delegation list uploaded yet."
+msgstr "لم تُرفع أي قائمة وفد بعد."
+
+msgid "Organization actions"
+msgstr "إجراءات الهيئة"
+
+msgid "Register on behalf"
+msgstr "التسجيل نيابة عن الغير"
+
+#, python-format
+msgid "Start a registration for this organization in %(event)s; the participant claims it with their own e-mail and completes it."
+msgstr "ابدأ تسجيلًا لهذه الهيئة في %(event)s؛ يطالب به المشارك ببريده الإلكتروني ويكمله."
+
+msgid "Register a participant"
+msgstr "تسجيل مشارك"
+
+msgid "Activation"
+msgstr "التفعيل"
+
+msgid "Deactivate this organization?"
+msgstr "تعطيل هذه الهيئة؟"
+
+msgid "No new campaign, delegation list or on-behalf registration can be started. Existing campaigns, links and registrations stay as they are."
+msgstr "لا يمكن بدء حملة أو قائمة وفد أو تسجيل نيابة عن الغير جديد. تبقى الحملات والروابط والتسجيلات الموجودة كما هي."
+
+msgid "Edit organization"
+msgstr "تعديل الهيئة"
+
+msgid "Registrations keep the organization name their participants submitted; only the master record changes."
+msgstr "تحتفظ التسجيلات باسم الهيئة الذي قدمه مشاركوها؛ ولا يتغير إلا السجل المرجعي."
+
+msgid "Possible duplicates:"
+msgstr "تكرارات محتملة:"
+
+msgid "Create, edit, activate or deactivate organizations, then manage their campaigns, links, delegation lists and registrations from each organization's page."
+msgstr "أنشئ الهيئات أو عدّلها أو فعّلها أو عطّلها، ثم أدر حملاتها وروابطها وقوائم وفودها وتسجيلاتها من صفحة كل هيئة."
+
+msgid "Find organizations"
+msgstr "البحث عن الهيئات"
+
+msgid "Name contains"
+msgstr "يحتوي الاسم على"
+
+#, python-format
+msgid "%(total)s in total"
+msgstr "%(total)s في المجموع"
+
+msgid "Campaigns"
+msgstr "الحملات"
+
+msgid "Organization pages"
+msgstr "صفحات الهيئات"
+
+msgid "No organization matches these filters."
+msgstr "لا توجد هيئة تطابق هذه المرشحات."
+
+msgid "No organization exists yet."
+msgstr "لا توجد أي هيئة بعد."
+
+msgid "Create the first organization, then open it to create an invitation campaign and issue its registration link."
+msgstr "أنشئ أول هيئة، ثم افتحها لإنشاء حملة دعوة وإصدار رابط التسجيل الخاص بها."
+
+msgid "Organizations appear here once they exist in your scope."
+msgstr "تظهر الهيئات هنا بمجرد وجودها ضمن نطاقك."
+
+msgid "Identity returned by the Ministry service"
+msgstr "الهوية التي أعادتها خدمة الوزارة"
+
+msgid "For checking only. This lookup changes no registration and verifies nobody; corrections are made in the identity review. Nothing below is stored."
+msgstr "للتحقق فقط. لا يغيّر هذا الاستعلام أي تسجيل ولا يتحقق من أي شخص؛ وتُجرى التصحيحات في مراجعة الهوية. لا يُحفظ أي شيء مما يلي."
+
+msgid "The service answered for a different number than the one entered. Do not use these details for that number."
+msgstr "أجابت الخدمة عن رقم مختلف عن الرقم المدخل. لا تستخدم هذه البيانات لذلك الرقم."
+
+msgid "Last name (Latin)"
+msgstr "اللقب (بالأحرف اللاتينية)"
+
+msgid "Not supplied"
+msgstr "غير مقدم"
+
+msgid "First name(s) (Latin)"
+msgstr "الاسم الشخصي (بالأحرف اللاتينية)"
+
+msgid "Last name (Arabic)"
+msgstr "اللقب (بالعربية)"
+
+msgid "First name(s) (Arabic)"
+msgstr "الاسم الشخصي (بالعربية)"
+
+msgid "(incomplete: only the parts shown are known; nothing is completed)"
+msgstr "(ناقص: الأجزاء المعروضة فقط معروفة؛ ولا يُكمَّل أي شيء)"
+
+msgid "(format not recognized; shown exactly as received)"
+msgstr "(صيغة غير معروفة؛ معروض كما ورد تمامًا)"
+
+msgid "Presumed date"
+msgstr "تاريخ مفترض"
+
+msgid "Not recognized"
+msgstr "غير معروف"
+
+msgid "The Ministry marks this birth date as presumed: the day or the month may not be known, so the date may not be the real one. It never replaces a date a participant or a reviewer entered, and it is never completed."
+msgstr "تشير الوزارة إلى أن تاريخ الميلاد هذا مفترض: قد يكون اليوم أو الشهر غير معروف، فقد لا يكون التاريخ الحقيقي. لا يحل أبدًا محل تاريخ أدخله مشارك أو مراجع، ولا يُكمَّل أبدًا."
+
+msgid "The Ministry date is incomplete. No day or month is invented."
+msgstr "تاريخ الوزارة ناقص. لا يُخترع أي يوم أو شهر."
+
+msgid "Looks up one identity number you are authorized to look up. A returned identity is shown with its names, birth date and presumed-date flag. It creates no registration, changes no identity and verifies nobody. The number and the details are not stored, shown again or logged."
+msgstr "يستعلم عن رقم هوية واحد مصرح لك بالاستعلام عنه. تُعرض الهوية المعادة بأسمائها وتاريخ ميلادها ومؤشر التاريخ المفترض. لا يُنشأ أي تسجيل ولا تتغير أي هوية ولا يُتحقق من أي شخص. لا يُحفظ الرقم ولا البيانات ولا تُعرض مجددًا ولا تُسجَّل."
+
+msgid "Every registration in your authorized scope, including drafts, withdrawn, cancelled and earlier registrations, newest first."
+msgstr "كل التسجيلات ضمن نطاقك المصرح به، بما فيها المسودات والتسجيلات المسحوبة والملغاة والسابقة، الأحدث أولًا."
+
+#, python-format
+msgid "%(counter)s registration in your scope"
+msgid_plural "%(counter)s registrations in your scope"
+msgstr[0] "%(counter)s تسجيل ضمن نطاقك"
+msgstr[1] "تسجيل واحد (%(counter)s) ضمن نطاقك"
+msgstr[2] "تسجيلان (%(counter)s) ضمن نطاقك"
+msgstr[3] "%(counter)s تسجيلات ضمن نطاقك"
+msgstr[4] "%(counter)s تسجيلًا ضمن نطاقك"
+msgstr[5] "%(counter)s تسجيل ضمن نطاقك"
+
+#, python-format
+msgid "%(counter)s matches the current filters"
+msgid_plural "%(counter)s match the current filters"
+msgstr[0] "%(counter)s يطابق المرشحات الحالية"
+msgstr[1] "واحد (%(counter)s) يطابق المرشحات الحالية"
+msgstr[2] "اثنان (%(counter)s) يطابقان المرشحات الحالية"
+msgstr[3] "%(counter)s تطابق المرشحات الحالية"
+msgstr[4] "%(counter)s تطابق المرشحات الحالية"
+msgstr[5] "%(counter)s تطابق المرشحات الحالية"
+
+msgid "Population:"
+msgstr "الفئة:"
+
+msgid "Registrations started through one invitation link."
+msgstr "تسجيلات بدأت عبر رابط دعوة واحد."
+
+msgid "Registrations created from one delegation list."
+msgstr "تسجيلات أُنشئت من قائمة وفد واحدة."
+
+msgid "Further filters from the statistics are applied."
+msgstr "تُطبَّق مرشحات إضافية من الإحصاءات."
+
+msgid "The full reference or its beginning; searched across every page."
+msgstr "المرجع كاملًا أو بدايته؛ يُبحث عنه في كل الصفحات."
+
+msgid "Search by name or e-mail"
+msgstr "البحث بالاسم أو البريد الإلكتروني"
+
+msgid "The beginning of a given or family name, or a full e-mail address. Sent privately; never shown in the address."
+msgstr "بداية الاسم الشخصي أو اللقب، أو عنوان بريد إلكتروني كامل. يُرسل بشكل خاص؛ ولا يظهر أبدًا في العنوان."
+
+#, python-format
+msgid "Search applied: %(counter)s matching registration."
+msgid_plural "Search applied: %(counter)s matching registrations."
+msgstr[0] "تم تطبيق البحث: %(counter)s تسجيل مطابق."
+msgstr[1] "تم تطبيق البحث: تسجيل واحد (%(counter)s) مطابق."
+msgstr[2] "تم تطبيق البحث: تسجيلان (%(counter)s) مطابقان."
+msgstr[3] "تم تطبيق البحث: %(counter)s تسجيلات مطابقة."
+msgstr[4] "تم تطبيق البحث: %(counter)s تسجيلًا مطابقًا."
+msgstr[5] "تم تطبيق البحث: %(counter)s تسجيل مطابق."
+
+msgid "This search is no longer available. Search again."
+msgstr "لم يعد هذا البحث متاحًا. ابحث مجددًا."
+
+msgid "Filter registrations"
+msgstr "تصفية التسجيلات"
+
+msgid "Dates are calendar days in the selected event's time zone (UTC when no event is selected), both included."
+msgstr "التواريخ أيام تقويمية بالمنطقة الزمنية للفعالية المحددة (التوقيت العالمي إذا لم تُحدد فعالية)، مع احتساب الطرفين."
+
+msgid "Clear all"
+msgstr "مسح الكل"
+
+msgid "Registration list pages"
+msgstr "صفحات قائمة التسجيلات"
+
+msgid "No registration matches these filters."
+msgstr "لا يوجد تسجيل يطابق هذه المرشحات."
+
+#, python-format
+msgid "Your scope holds %(counter)s registration. Change or clear the filters to see it."
+msgid_plural "Your scope holds %(counter)s registrations. Change or clear the filters to see them."
+msgstr[0] "يحتوي نطاقك على %(counter)s تسجيل. غيّر المرشحات أو امسحها لرؤيته."
+msgstr[1] "يحتوي نطاقك على تسجيل واحد (%(counter)s). غيّر المرشحات أو امسحها لرؤيته."
+msgstr[2] "يحتوي نطاقك على تسجيلين (%(counter)s). غيّر المرشحات أو امسحها لرؤيتهما."
+msgstr[3] "يحتوي نطاقك على %(counter)s تسجيلات. غيّر المرشحات أو امسحها لرؤيتها."
+msgstr[4] "يحتوي نطاقك على %(counter)s تسجيلًا. غيّر المرشحات أو امسحها لرؤيتها."
+msgstr[5] "يحتوي نطاقك على %(counter)s تسجيل. غيّر المرشحات أو امسحها لرؤيتها."
+
+msgid "Registrations appear here once they exist in an event or organization you are authorized for. If you expected some, ask an account administrator to check your role's scope."
+msgstr "تظهر التسجيلات هنا بمجرد وجودها في فعالية أو هيئة مصرح لك بها. إذا كنت تتوقع وجود بعضها، فاطلب من مسؤول الحسابات التحقق من نطاق دورك."
+
+msgid "Registration statistics"
+msgstr "إحصاءات التسجيلات"
+
+msgid "Where registrations stand, how processing progresses and who is approved to attend, for your authorized scope."
+msgstr "أين وصلت التسجيلات، وكيف تتقدم المعالجة، ومن المعتمد للحضور، ضمن نطاقك المصرح به."
+
+#, python-format
+msgid "Computed at %(when)s from the current data."
+msgstr "حُسبت في %(when)s من البيانات الحالية."
+
+#, python-format
+msgid "%(counter)s registration in your scope."
+msgid_plural "%(counter)s registrations in your scope."
+msgstr[0] "%(counter)s تسجيل ضمن نطاقك."
+msgstr[1] "تسجيل واحد (%(counter)s) ضمن نطاقك."
+msgstr[2] "تسجيلان (%(counter)s) ضمن نطاقك."
+msgstr[3] "%(counter)s تسجيلات ضمن نطاقك."
+msgstr[4] "%(counter)s تسجيلًا ضمن نطاقك."
+msgstr[5] "%(counter)s تسجيل ضمن نطاقك."
+
+msgid "Statistics filters"
+msgstr "مرشحات الإحصاءات"
+
+msgid "All events in your scope"
+msgstr "كل الفعاليات ضمن نطاقك"
+
+msgid "From (submission or event date)"
+msgstr "من (تاريخ الإرسال أو الحدث)"
+
+msgid "Until"
+msgstr "حتى"
+
+msgid "Chart period"
+msgstr "فترة الرسوم البيانية"
+
+msgid "Automatic"
+msgstr "تلقائي"
+
+msgid "Week"
+msgstr "أسبوع"
+
+msgid "Active filters:"
+msgstr "المرشحات النشطة:"
+
+msgid "Ready-to-export reports"
+msgstr "تقارير جاهزة للتصدير"
+
+msgid "Each report covers every registration matching these filters (not only what this page shows), with the event, the generation time and the definitions. PDF opens a print-ready report: choose Save as PDF in the print dialog."
+msgstr "يغطي كل تقرير جميع التسجيلات المطابقة لهذه المرشحات (وليس ما تعرضه هذه الصفحة فقط)، مع الفعالية ووقت الإنشاء والتعريفات. يفتح PDF تقريرًا جاهزًا للطباعة: اختر الحفظ بصيغة PDF في نافذة الطباعة."
+
+msgid "The final-approved report includes the attendee list only for holders of the export permission in this scope."
+msgstr "لا يتضمن تقرير المعتمدين نهائيًا قائمة الحاضرين إلا لحاملي صلاحية التصدير في هذا النطاق."
+
+msgid "Share"
+msgstr "الحصة"
+
+msgid "None in this population."
+msgstr "لا شيء ضمن هذه الفئة."
+
+msgid "Metric definitions"
+msgstr "تعريفات المؤشرات"
+
+msgid "Date range: the counts concern registrations first submitted within the range (all dates when it is empty), in their current state; the progress charts count events dated within the range. Dates are calendar days in the selected event's time zone (UTC when no event is selected)."
+msgstr "الفترة: تخص الأعداد التسجيلات المقدمة لأول مرة خلال الفترة (كل التواريخ إذا كانت فارغة)، بحالتها الحالية؛ وتحسب رسوم التطور الأحداث المؤرخة خلال الفترة. التواريخ أيام تقويمية بالمنطقة الزمنية للفعالية المحددة (التوقيت العالمي إذا لم تُحدد فعالية)."
+
+msgid "2. Final-approved attendees"
+msgstr "2. المشاركون المعتمدون نهائيًا"
+
+msgid "final-approved registrations"
+msgstr "تسجيلات معتمدة نهائيًا"
+
+msgid "Current decision Approved, and the registration is approved, current, not withdrawn and not cancelled."
+msgstr "القرار الحالي «معتمد»، والتسجيل معتمد وحالي وغير مسحوب وغير ملغى."
+
+msgid "Open the searchable list of accepted registrations"
+msgstr "فتح القائمة القابلة للبحث للتسجيلات المقبولة"
+
+#, python-format
+msgid "Day %(day)s: %(counter)s registration"
+msgid_plural "Day %(day)s: %(counter)s registrations"
+msgstr[0] "اليوم %(day)s: %(counter)s تسجيل"
+msgstr[1] "اليوم %(day)s: تسجيل واحد (%(counter)s)"
+msgstr[2] "اليوم %(day)s: تسجيلان (%(counter)s)"
+msgstr[3] "اليوم %(day)s: %(counter)s تسجيلات"
+msgstr[4] "اليوم %(day)s: %(counter)s تسجيلًا"
+msgstr[5] "اليوم %(day)s: %(counter)s تسجيل"
+
+msgid "Days overlap: a registration approved for all three days counts on each of them, so the day figures do not add up to the total."
+msgstr "الأيام متداخلة: يُحسب التسجيل المعتمد للأيام الثلاثة في كل يوم منها، لذا لا تساوي أرقام الأيام المجموع."
+
+msgid "Participation categories (participant roles)"
+msgstr "فئات المشاركة (أدوار المشاركين)"
+
+msgid "Organizations of the final-approved"
+msgstr "هيئات المعتمدين نهائيًا"
+
+msgid "1. Current overview"
+msgstr "1. النظرة العامة الحالية"
+
+msgid "Current overview"
+msgstr "النظرة العامة الحالية"
+
+#, python-format
+msgid "%(percent)s %% of applications"
+msgstr "%(percent)s %% من الطلبات"
+
+msgid "Drafts (not submitted, not counted as applications)"
+msgstr "المسودات (غير المقدمة، ولا تُحسب طلبات)"
+
+msgid "Applications include every submitted registration, withdrawn and replaced ones too; a person who registered again is one unique participant and at most one approved person. The identity review queue counts are not application or approval counts."
+msgstr "تشمل الطلبات كل تسجيل مقدم، بما في ذلك المسحوب والمستبدل؛ والشخص الذي سجّل من جديد مشارك فريد واحد وشخص معتمد واحد على الأكثر. أعداد قائمة مراجعة الهوية ليست أعداد طلبات أو اعتمادات."
+
+msgid "6. Registration sources"
+msgstr "6. مصادر التسجيلات"
+
+msgid "Source of the registration"
+msgstr "مصدر التسجيل"
+
+msgid "Registration sources"
+msgstr "مصادر التسجيلات"
+
+msgid "Registrations by organization"
+msgstr "التسجيلات حسب الهيئة"
+
+msgid "7. Participant composition"
+msgstr "7. تركيبة المشاركين"
+
+msgid "Stored categories only; missing values are shown as Not provided. Nationality is one dimension among others."
+msgstr "الفئات المسجلة فقط؛ تظهر القيم الناقصة بعبارة «غير مقدم». الجنسية بُعد من بين أبعاد أخرى."
+
+msgid "5. Progress over time"
+msgstr "5. التطور عبر الزمن"
+
+#, python-format
+msgid "Events dated from %(start)s to %(end)s, whatever the submission date of their registration."
+msgstr "الأحداث المؤرخة من %(start)s إلى %(end)s، أيًا كان تاريخ إرسال تسجيلها."
+
+msgid "One bar per week (from Monday)."
+msgstr "شريط واحد لكل أسبوع (ابتداءً من الاثنين)."
+
+msgid "One bar per day."
+msgstr "شريط واحد لكل يوم."
+
+#, python-format
+msgid "(highest: %(peak)s)"
+msgstr "(الأعلى: %(peak)s)"
+
+msgid "New applications per period; the table below gives every value."
+msgstr "الطلبات الجديدة لكل فترة؛ يقدم الجدول أدناه كل القيم."
+
+#, python-format
+msgid "(scale: %(peak)s)"
+msgstr "(المقياس: %(peak)s)"
+
+msgid "Approval decisions per period; the table below gives every value."
+msgstr "قرارات الاعتماد لكل فترة؛ يقدم الجدول أدناه كل القيم."
+
+msgid "Table of values"
+msgstr "جدول القيم"
+
+#, python-format
+msgid "Cumulative columns start from what was recorded before the range: %(applications)s applications and %(approvals)s approval decisions. Decisions are recorded events, a superseded decision included; they are not the current approved count."
+msgstr "تبدأ الأعمدة التراكمية مما سُجّل قبل الفترة: %(applications)s طلبًا و%(approvals)s قرار اعتماد. القرارات أحداث مسجلة، بما في ذلك القرار المستبدل؛ وليست العدد الحالي للمعتمدين."
+
+msgid "3. Processing workload"
+msgstr "3. عبء المعالجة"
+
+msgid "Processing workload"
+msgstr "عبء المعالجة"
+
+msgid "Not recorded for this stage"
+msgstr "غير مسجل لهذه المرحلة"
+
+msgid "4. Operational exceptions"
+msgstr "4. الاستثناءات التشغيلية"
+
+msgid "Reasons for identity manual review"
+msgstr "أسباب المراجعة اليدوية للهوية"
+
+msgid "No case waits for manual review."
+msgstr "لا يوجد ملف ينتظر المراجعة اليدوية."
+
+msgid "Repeated correction requests"
+msgstr "طلبات التصحيح المتكررة"
+
+msgid "Identity corrections requested twice or more"
+msgstr "تصحيحات هوية طُلبت مرتين أو أكثر"
+
+msgid "Information requests sent twice or more"
+msgstr "طلبات معلومات أُرسلت مرتين أو أكثر"
+
+msgid "Requests per registration"
+msgstr "الطلبات لكل تسجيل"
+
+msgid "Identity corrections"
+msgstr "تصحيحات الهوية"
+
+msgid "Information requests"
+msgstr "طلبات المعلومات"
+
+msgid "These registrations would never reach a decision. The deployment team's review-queue backfill (dry run first) repairs eligible ones."
+msgstr "لن تصل هذه التسجيلات أبدًا إلى قرار. يصلح استدراك قائمة المراجعة الذي ينفذه فريق النشر (بتجربة أولًا) المؤهل منها."
+
+msgid "Every registration in the authorized scope that matches the filters, not one page."
+msgstr "كل التسجيلات ضمن النطاق المصرح به المطابقة للمرشحات، وليس صفحة واحدة."
+
+msgid "Print or save as PDF"
+msgstr "طباعة أو حفظ بصيغة PDF"
+
+msgid "Attendee list"
+msgstr "قائمة الحاضرين"
+
+msgid "The attendee list covers only the registrations inside your export scope: %(withheld)s of %(total)s final-approved registrations are not listed."
+msgstr "لا تشمل قائمة الحاضرين إلا التسجيلات الواقعة ضمن نطاق التصدير المسموح لك: %(withheld)s من أصل %(total)s تسجيلًا معتمدًا نهائيًا غير مدرجة."
+
+msgid "Other (%(groups)s more)"
+msgstr "أخرى (%(groups)s إضافية)"
+
+msgid "Long lists show their %(limit)s largest groups; the remaining groups are added up in “Other”, so every list still sums to its total. The XLSX and PDF reports list every group."
+msgstr "تعرض القوائم الطويلة أكبر %(limit)s مجموعة فيها؛ وتُجمع المجموعات المتبقية في «أخرى»، فيبقى مجموع كل قائمة مساويًا لإجماليها. وتسرد تقارير XLSX وPDF كل المجموعات."
+
+msgid "One bar per week, labelled with its Monday; the first and last bars count only the dates inside the range."
+msgstr "عمود واحد لكل أسبوع، يُعرَّف بيوم الاثنين منه؛ ولا يحتسب العمودان الأول والأخير إلا التواريخ الواقعة ضمن الفترة."
+
+msgid "Figures, campaigns and delegation lists cover the events and organizations of your authorized scope."
+msgstr "تشمل الأرقام والحملات وقوائم الوفود الفعاليات والمنظمات الواقعة ضمن نطاقك المصرح به."

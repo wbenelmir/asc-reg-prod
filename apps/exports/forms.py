@@ -17,7 +17,7 @@ from apps.core.forms import ScopedModelChoiceField
 
 from .models import ALLOWED_EXPORT_PURPOSE_CODES
 
-SCOPE_FIELDS = ("event_edition_id", "organization_id")
+SCOPE_FIELDS = ("event_edition_id", "organization_id", "campaign_id")
 
 
 class OrganizationChoiceField(ScopedModelChoiceField):
@@ -50,6 +50,14 @@ class ExportRequestForm(forms.Form):
         empty_label=_("Every organization in your scope"),
         error_messages={"invalid_choice": _("Select an organization from the list.")},
     )
+    # UPD-06: optionally, one invitation campaign's results.
+    campaign_id = ScopedModelChoiceField(
+        queryset=None,
+        required=False,
+        label=_("Invitation campaign"),
+        empty_label=_("Every campaign"),
+        error_messages={"invalid_choice": _("Select a campaign from the list.")},
+    )
     purpose_code = forms.ChoiceField(
         label=_("Purpose"),
         error_messages={
@@ -63,7 +71,7 @@ class ExportRequestForm(forms.Form):
         error_messages={"required": _("A reason is required to request an export.")},
     )
 
-    def __init__(self, *args, events=None, organizations=None, **kwargs):
+    def __init__(self, *args, events=None, organizations=None, campaigns=None, **kwargs):
         super().__init__(*args, **kwargs)
         from apps.events.models import EventEdition
         from apps.organizations.models import Organization
@@ -74,10 +82,36 @@ class ExportRequestForm(forms.Form):
         self.fields["organization_id"].queryset = (
             organizations if organizations is not None else Organization.objects.none()
         )
+        from apps.invitations.models import InvitationCampaign
+
+        self.fields["campaign_id"].queryset = (
+            campaigns if campaigns is not None else InvitationCampaign.objects.none()
+        )
+        self.fields["campaign_id"].label_from_instance = lambda campaign: (
+            f"{campaign.name} ({campaign.public_reference})"
+        )
         self.fields["purpose_code"].choices = [
             ("", _("Select a purpose")),
             *code_choices("export_purpose", sorted(ALLOWED_EXPORT_PURPOSE_CODES)),
         ]
+
+    def clean(self):
+        cleaned = super().clean()
+        campaign = cleaned.get("campaign_id")
+        event = cleaned.get("event_edition_id")
+        organization = cleaned.get("organization_id")
+        if campaign is not None and (
+            (event is not None and campaign.event_edition_id != event.pk)
+            or (organization is not None and campaign.organization_id != organization.pk)
+        ):
+            self.add_error(
+                "campaign_id",
+                forms.ValidationError(
+                    _("This campaign belongs to another event or organization."),
+                    code="mismatch",
+                ),
+            )
+        return cleaned
 
     def has_scope_violation(self) -> bool:
         """A submitted event or organization outside the caller's scope, or

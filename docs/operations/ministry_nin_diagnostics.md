@@ -28,7 +28,7 @@ as they need it, with an end of validity when possible.
 | --- | --- | --- |
 | **1. Configuration** | Shown when the page opens. Reads this server's settings; sends nothing. Lists the NAMES of missing or invalid settings (never a value, host or path), and whether this web process holds a cached token. | Only that the settings are present and well formed. A cached token is not proof that authentication works now; each web and worker process keeps its own. |
 | **2. Authentication** ("Test authentication") | One new authentication request with the configured credentials, never the cached token. The token received is discarded (not shown, not cached). Shows the outcome, HTTP status, duration, time and the token lifetime in seconds. | That the authentication endpoint accepted the credentials just now. Not that lookups work. |
-| **3. Lookup** ("Test lookup") | One lookup of an identity number you are authorized to use for testing, through the same adapter as registrations (validation, transport, token, parsing). Creates no registration, changes no identity, verifies nobody, sends no notification. The number is not stored, shown again or logged; identity data in the answer is discarded. | That the lookup endpoint answers for that number. |
+| **3. Lookup** ("Test lookup") | One lookup of an identity number you are authorized to use for testing, through the same adapter as registrations (validation, transport, token, parsing). Creates no registration, changes no identity, verifies nobody, sends no notification. The number is not stored, shown again or logged. A returned identity is shown once, in that response (see below), and is never stored, logged or audited. | That the lookup endpoint answers for that number, and what it holds for it. |
 
 Nothing runs when the page is opened or reloaded; each network check is a
 separate button (POST with CSRF). Results are shown once, in that response,
@@ -42,7 +42,7 @@ and never kept in the session or the URL.
 | Configuration incomplete | Required settings missing or invalid. Nothing sent. | Complete the settings named under Configuration. |
 | Authentication succeeded | Fresh authentication accepted. | Test a lookup. |
 | Authentication failed | Credentials refused (401/403, `credentials_rejected`), an unexpected status (for example HTTP 400, `auth_unexpected_status`), or an answer that does not match the configured token or expiry mapping (`auth_contract_mismatch`, `auth_expiry_mismatch`). | Deployment team checks the credentials and the authentication request/response contract with the provider. Do not retry in a loop. |
-| Lookup answered: identity found | The lookup endpoint returned an identity. Nothing recorded. | None. |
+| Lookup answered: identity found | The lookup endpoint returned an identity; its details are shown below the result. Nothing recorded. | Compare with the registration in the identity review if needed; this page changes nothing. |
 | Lookup answered: no identity found | HTTP 200 with `identite: null`: the service works and holds no identity for that number. Not an authentication failure and not a decision about anyone. | Use a number known to exist if a positive check is needed. |
 | Service unavailable or too slow | Timeout, connection or TLS failure, or a provider server error (5xx). | Retry later; if persistent, check network routing, TLS and the provider's status. |
 | Redirect refused | The service answered with a redirect (for example HTTP 301, `redirect_refused`). Redirects are never followed, so credentials and numbers never go to another address. | Deployment team confirms the canonical address and corrects `MINISTRY_NIN_API_BASE_URL`, `MINISTRY_NIN_API_AUTH_PATH` or `MINISTRY_NIN_API_LOOKUP_PATH_TEMPLATE` (including any trailing slash), or the proxy routing. Never enable redirect following or disable TLS checks. |
@@ -51,6 +51,28 @@ and never kept in the session or the URL.
 | Too many checks | The platform's own limit: `NIN_DIAGNOSTICS_MAX_PER_OPERATOR` (default 5) per operator and `NIN_DIAGNOSTICS_MAX_PER_ENVIRONMENT` (default 20) for the environment in each `NIN_DIAGNOSTICS_WINDOW_SECONDS` (default 600) window, counted on the shared counter (Redis in staging and production). Nothing sent. | Wait for the window to pass. |
 | Another check is running | Only one check runs at a time across every process. Nothing sent. | Try again in a moment. |
 | Check the test number | Not 18 digits. Nothing sent. | Enter the 18 digits. |
+
+### Identity details shown for a found identity
+
+When the service returns an identity, the page shows, for that response only:
+
+* the last name and first name(s) in Latin and in Arabic characters (Arabic
+  shown right to left);
+* the birth date exactly as known: a complete date; an incomplete date with
+  only the known parts (for example the year alone), marked as incomplete; or
+  a value in an unrecognized format, shown as received. The page never
+  completes a missing day or month and never invents a date;
+* the presumed-date flag ("Yes", "No" or "Not supplied"). "Yes" comes with an
+  explanation: the Ministry marks the birth date as presumed, so the day or
+  month may not be the real one;
+* a warning if the service answered for a different number than the one
+  entered.
+
+`identite: null` is shown as "no identity found", distinct from an error or an
+authentication failure. The details are never written to the database, the
+audit trail, the logs or the session, and no registration or identity record
+is changed. Corrections are made in the identity review ("Save corrections and
+verify identity").
 
 ## 4. Records and retention
 

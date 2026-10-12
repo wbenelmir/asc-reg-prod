@@ -128,6 +128,22 @@ _STATUS_TONES: dict[str, dict[str, tuple[str, str]]] = {
         "VALID": ("success", "check"),
         "INVALID": ("danger", "x-circle"),
     },
+    # UPD-05: a withdrawn registration closed by the team (the stored public
+    # status stays WITHDRAWN; `cancelled_at` tells the two apart).
+    "registration_closure": {
+        "CANCELLED_BY_TEAM": ("neutral", "lock"),
+    },
+    # UPD-06: organizations (apps.organizations.models.OrganizationStatus).
+    "organization": {
+        "ACTIVE": ("success", "check-circle"),
+        "INACTIVE": ("neutral", "ban"),
+        "MERGED": ("neutral", "layers"),
+    },
+    # UPD-07: accreditation settings (active or not).
+    "setting": {
+        "ACTIVE": ("success", "check-circle"),
+        "INACTIVE": ("neutral", "ban"),
+    },
 }
 
 _DEFAULT_TONE = ("neutral", "info")

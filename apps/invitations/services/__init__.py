@@ -138,6 +138,83 @@ def create_campaign(
     return campaign
 
 
+class CampaignNotEditableError(Exception):
+    """A closed campaign keeps its settings as history."""
+
+
+def update_campaign(
+    campaign: InvitationCampaign,
+    *,
+    actor,
+    expected_version: int,
+    name: str,
+    valid_from=None,
+    valid_until=None,
+    capacity: int | None = None,
+    language: str = "en",
+    audit_recorder: AuditRecorder | None = None,
+    correlation_id: str = "",
+) -> InvitationCampaign:
+    """UPD-06: edit a campaign's name, validity window, optional capacity
+    and default language (a versioned, audited change).
+
+    Never changes its organization, event, links or registrations. A
+    capacity lower than the places already used is accepted: it only stops
+    new submissions (places used by submitted registrations, withdrawn and
+    cancelled ones included, are never given back). A closed campaign is
+    history and is not edited."""
+    audit_recorder = audit_recorder or PersistentAuditRecorder()
+    with transaction.atomic():
+        locked = InvitationCampaign.objects.select_for_update().get(pk=campaign.pk)
+        if locked.version != expected_version:
+            from apps.reviews.services import StaleVersionError
+
+            raise StaleVersionError("The campaign changed since it was loaded.")
+        if locked.status == InvitationCampaignStatus.CLOSED:
+            raise CampaignNotEditableError("A closed campaign is not edited.")
+        values = {
+            "name": name.strip()[:200],
+            "valid_from": valid_from,
+            "valid_until": valid_until,
+            "capacity": capacity,
+            "language": language,
+        }
+        changed = [field for field, value in values.items() if getattr(locked, field) != value]
+        if changed:
+            for field in changed:
+                setattr(locked, field, values[field])
+            locked.version += 1
+            locked.save(update_fields=[*changed, "version", "updated_at"])
+            audit_recorder.record(
+                AuditRecord(
+                    actor_type="OPERATIONAL_USER",
+                    actor_user_id=getattr(actor, "pk", None),
+                    action_code=action_codes.CAMPAIGN_UPDATED,
+                    target_type="InvitationCampaign",
+                    target_uuid=locked.pk,
+                    event_edition_id=locked.event_edition_id,
+                    result="SUCCESS",
+                    after_summary={"changed": changed, "capacity": locked.capacity},
+                    correlation_id=correlation_id,
+                )
+            )
+    return locked
+
+
+def campaign_usage(campaign: InvitationCampaign) -> dict:
+    """Places used against the capacity (UPD-06). A submitted registration
+    keeps its place, even after a withdrawal or a cancellation: the
+    `SUBMITTED` use is append-only evidence and is never released."""
+    submitted = InvitationUse.objects.filter(
+        campaign=campaign, use_kind=InvitationUseKind.SUBMITTED
+    ).count()
+    started = InvitationUse.objects.filter(
+        campaign=campaign, use_kind=InvitationUseKind.DRAFT_CREATED
+    ).count()
+    remaining = None if campaign.capacity is None else max(campaign.capacity - submitted, 0)
+    return {"submitted": submitted, "started": started, "remaining": remaining}
+
+
 _LEGAL_CAMPAIGN_TRANSITIONS: dict[str, frozenset[str]] = {
     InvitationCampaignStatus.DRAFT: frozenset({InvitationCampaignStatus.ACTIVE}),
     InvitationCampaignStatus.ACTIVE: frozenset(
@@ -185,6 +262,7 @@ def change_campaign_status(
             )
         old_status = locked.status
         locked.status = new_status
+        locked.version += 1  # UPD-06: a status change is visible to a stale edit form
         if new_status == InvitationCampaignStatus.CLOSED:
             locked.closed_at = timezone.now()
             locked.save(update_fields=["status", "closed_at", "version"])

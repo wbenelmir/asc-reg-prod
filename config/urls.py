@@ -31,6 +31,7 @@ urlpatterns = [
     path("", include("apps.registrations.urls")),
     path("", include("apps.documents.urls")),
     path("", include("apps.invitations.urls")),
+    path("", include("apps.organizations.urls")),
     path("", include("apps.reviews.urls")),
     path("", include("apps.people.urls")),
     path("", include("apps.accreditation.urls")),

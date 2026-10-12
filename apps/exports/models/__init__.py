@@ -70,6 +70,14 @@ class ExportRequest(UUIDPrimaryKeyModel, TimestampedModel):
         on_delete=models.PROTECT,
         related_name="export_requests",
     )
+    # UPD-06 (exports.0002): an export of one invitation campaign's results.
+    invitation_campaign = models.ForeignKey(
+        "invitations.InvitationCampaign",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="export_requests",
+    )
     purpose_code = models.CharField(max_length=64)
     reason = models.CharField(max_length=500)
     requested_by = models.ForeignKey(

@@ -1,0 +1,13 @@
+{% load i18n %}
+<details class="asc-card asc-stats-definitions" data-stats-section="definitions"{% if print_mode %} open{% endif %}>
+  <summary class="asc-card-title">{% include "components/icon.html" with name="info" %}{% trans "Metric definitions" %}</summary>
+  <div class="asc-table-wrap">
+    <table class="asc-table asc-stats-table" aria-label="{% trans 'Metric definitions' %}">
+      <thead><tr><th scope="col">{% trans "Metric" %}</th><th scope="col">{% trans "Population" %}</th><th scope="col">{% trans "Source" %}</th><th scope="col">{% trans "Denominator" %}</th><th scope="col">{% trans "Time basis" %}</th></tr></thead>
+      <tbody>
+        {% for row in definitions %}<tr data-definition="{{ row.key }}"><th scope="row">{{ row.label }}</th><td>{{ row.population }}</td><td>{{ row.source }}</td><td>{{ row.denominator }}</td><td>{{ row.time_basis }}</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="form-text mb-0">{% trans "Date range: the counts concern registrations first submitted within the range (all dates when it is empty), in their current state; the progress charts count events dated within the range. Dates are calendar days in the selected event's time zone (UTC when no event is selected)." %}</p>
+</details>

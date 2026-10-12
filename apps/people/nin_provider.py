@@ -44,9 +44,11 @@ from urllib.parse import urlsplit
 
 from apps.people.identity_contract import (
     NIN_PATTERN,
+    DiagnosticIdentity,
     LookupKind,
     OfficialIdentityFacts,
     classify_lookup_body,
+    diagnostic_identity_from_body,
 )
 
 
@@ -74,6 +76,10 @@ class LookupOutcome:
     http_status: int | None = None
     retryable: bool = False
     request_reference: str = ""
+    #: UPD-04: the display details of a returned identity, filled only when
+    #: the staff lookup tool asks (`include_diagnostic=True`); never by the
+    #: verification worker, and never stored.
+    diagnostic: DiagnosticIdentity | None = None
 
 
 @dataclass(frozen=True)
@@ -792,7 +798,7 @@ class MinistryNinProvider:
                 return LookupOutcome(LookupKind.INVALID_RESPONSE, detail="response_too_large")
             return LookupOutcome(LookupKind.UNAVAILABLE, detail=exc.code, retryable=True)
 
-    def lookup(self, nin: str) -> LookupOutcome:
+    def lookup(self, nin: str, *, include_diagnostic: bool = False) -> LookupOutcome:
         if NIN_PATTERN.fullmatch(nin or "") is None:
             # Never build a request path from anything but 18 ASCII digits.
             return LookupOutcome(LookupKind.INVALID_RESPONSE, detail="nin_not_requestable")
@@ -812,9 +818,15 @@ class MinistryNinProvider:
                 self._tokens.invalidate(token.generation)
                 reauthenticated = True
                 continue
-            return self._interpret_lookup(response, reauthenticated=reauthenticated)
+            return self._interpret_lookup(
+                response,
+                reauthenticated=reauthenticated,
+                requested_nin=nin if include_diagnostic else None,
+            )
 
-    def _interpret_lookup(self, response: HttpResponse, *, reauthenticated: bool) -> LookupOutcome:
+    def _interpret_lookup(
+        self, response: HttpResponse, *, reauthenticated: bool, requested_nin: str | None = None
+    ) -> LookupOutcome:
         status = response.status
         if status == 200:
             decoded_ok, document = decode_json_strictly(response.body)
@@ -828,6 +840,11 @@ class MinistryNinProvider:
                 facts=classification.facts,
                 detail=classification.detail,
                 http_status=status,
+                diagnostic=(
+                    diagnostic_identity_from_body(document, requested_nin=requested_nin)
+                    if requested_nin is not None
+                    else None
+                ),
             )
         if status == 401:
             return LookupOutcome(

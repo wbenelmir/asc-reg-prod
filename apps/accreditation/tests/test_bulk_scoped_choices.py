@@ -19,7 +19,12 @@ from django.urls import reverse
 
 from apps.accreditation.models import BulkAssignmentOperation, ParticipantRole
 
-from .conftest import make_operational_user_with_membership, make_registration, sign_in_operational
+from .conftest import (
+    make_operational_user_with_membership,
+    make_registration,
+    record_final_approval,
+    sign_in_operational,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -66,8 +71,9 @@ def test_choices_are_limited_to_assignable_objects(coordinator, role, other_even
 
 def test_an_assignable_object_previews(coordinator, role, event, organization):
     approved = make_registration(event=event, organization=organization, public_reference="F8-OK-1")
-    approved.public_status = "APPROVED"
-    approved.save(update_fields=["public_status"])
+    # UPD-07: the bulk population is final-approved registrations (current
+    # approval decision), not merely an APPROVED status.
+    record_final_approval(approved)
     response = _preview(_client(coordinator), "PARTICIPANT_ROLE", str(role.pk))
     assert response.status_code == 200
     operation = response.context["operation"]

@@ -525,14 +525,61 @@ def preview_bulk_assignment(
     return operation
 
 
+#: UPD-07: execution outcomes that skip a row (nothing is wrong with the
+#: operation itself); any other failure reason counts as an error.
+BULK_SKIP_REASONS = frozenset(
+    {"ALREADY_CURRENT", "STALE_REGISTRATION", "NO_LONGER_ELIGIBLE", "NOT_AUTHORIZED"}
+)
+
+
+def bulk_result_counts(rows) -> dict:
+    """`{"applied", "skipped", "errors"}` of an operation's execution rows."""
+    applied = sum(1 for row in rows if row.get("success"))
+    skipped = sum(
+        1 for row in rows if not row.get("success") and row.get("reason") in BULK_SKIP_REASONS
+    )
+    return {"applied": applied, "skipped": skipped, "errors": len(rows) - applied - skipped}
+
+
+def _is_final_approved_now(registration: Registration) -> bool:
+    """The locked registration is still final-approved and live: approved,
+    current context, neither withdrawn nor cancelled, and its CURRENT
+    decision is an approval (`apps.registrations.reporting.final_approved_q`)."""
+    from apps.reviews.models import RegistrationDecision
+
+    return (
+        registration.public_status == RegistrationPublicStatus.APPROVED
+        and registration.is_current_context
+        and registration.withdrawn_at is None
+        and registration.cancelled_at is None
+        and RegistrationDecision.objects.filter(
+            registration_id=registration.pk, is_current=True, outcome="APPROVED"
+        ).exists()
+    )
+
+
 def execute_bulk_assignment(
-    *, operation: BulkAssignmentOperation, actor, audit_recorder: AuditRecorder | None = None
+    *,
+    operation: BulkAssignmentOperation,
+    actor,
+    authorized_registration_ids=None,
+    require_final_approved: bool = False,
+    audit_recorder: AuditRecorder | None = None,
 ) -> BulkAssignmentOperation:
     """Step 5-8 of the bulk workflow: execute EXACTLY the previewed scope,
     re-validating each row's current state at execution time (Phase 2
     Prompt 4 §5 "must not silently expand beyond the previewed scope").
     Idempotent: re-executing an already-EXECUTED operation returns it
-    unchanged."""
+    unchanged.
+
+    UPD-07: each row is checked again under its lock: still live (not
+    withdrawn, cancelled or not approved, current context) and, with
+    `require_final_approved` (the operations page), still final-approved
+    (`NO_LONGER_ELIGIBLE` otherwise, e.g. cancelled or decided differently
+    after the preview); still in the executor's authorized scope when
+    `authorized_registration_ids` is given (`NOT_AUTHORIZED`); and unchanged
+    since the preview (`STALE_REGISTRATION`). Only rows of the preview are
+    ever considered."""
     audit_recorder = audit_recorder or PersistentAuditRecorder()
     with transaction.atomic():
         locked_operation = BulkAssignmentOperation.objects.select_for_update().get(pk=operation.pk)
@@ -552,6 +599,36 @@ def execute_bulk_assignment(
         for reg_id in locked_operation.target_registration_ids:
             try:
                 registration = Registration.objects.select_for_update().get(pk=reg_id)
+                if authorized_registration_ids is not None and str(reg_id) not in {
+                    str(value) for value in authorized_registration_ids
+                }:
+                    execution_results.append(
+                        {
+                            "registration_id": str(reg_id),
+                            "success": False,
+                            "reason": "NOT_AUTHORIZED",
+                        }
+                    )
+                    continue
+                live = (
+                    registration.public_status
+                    not in (
+                        RegistrationPublicStatus.WITHDRAWN,
+                        RegistrationPublicStatus.NOT_APPROVED,
+                    )
+                    and registration.is_current_context
+                )
+                if not live or (
+                    require_final_approved and not _is_final_approved_now(registration)
+                ):
+                    execution_results.append(
+                        {
+                            "registration_id": str(reg_id),
+                            "success": False,
+                            "reason": "NO_LONGER_ELIGIBLE",
+                        }
+                    )
+                    continue
                 if preview_versions.get(str(reg_id)) != registration.version:
                     execution_results.append(
                         {
@@ -615,6 +692,10 @@ def execute_bulk_assignment(
                 after_summary={
                     "success_count": sum(1 for r in execution_results if r["success"]),
                     "failure_count": sum(1 for r in execution_results if not r["success"]),
+                    **{
+                        f"{key}_count": value
+                        for key, value in bulk_result_counts(execution_results).items()
+                    },
                 },
             )
         )

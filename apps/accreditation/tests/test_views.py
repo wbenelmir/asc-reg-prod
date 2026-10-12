@@ -337,13 +337,15 @@ def test_bulk_preview_only_targets_the_callers_own_scope(
     in_scope = make_registration(
         event=event, organization=organization, public_reference="ACC-INSCOPE-01"
     )
-    in_scope.public_status = "APPROVED"
-    in_scope.save(update_fields=["public_status"])
     out_of_scope = make_registration(
         event=event, organization=other_organization, public_reference="ACC-OOS-01"
     )
-    out_of_scope.public_status = "APPROVED"
-    out_of_scope.save(update_fields=["public_status"])
+    # UPD-07: the bulk population is final-approved: approved with its current
+    # approval decision.
+    from apps.accreditation.tests.conftest import record_final_approval
+
+    record_final_approval(in_scope)
+    record_final_approval(out_of_scope)
 
     coordinator = make_operational_user_with_membership(
         email="bulk-scope@example.com",

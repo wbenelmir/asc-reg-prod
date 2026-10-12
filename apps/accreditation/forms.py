@@ -162,3 +162,115 @@ class AttendanceDeactivationForm(forms.Form):
     reason = forms.CharField(
         min_length=3, max_length=300, label=_("Reason"), help_text=_REASON_HELP
     )
+
+
+# ---------------------------------------------------------------------------
+# UPD-07: participant accreditation settings (apps.accreditation.settings_admin)
+# ---------------------------------------------------------------------------
+
+
+def _datetime_field(label):
+    return forms.DateTimeField(
+        label=label,
+        required=False,
+        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"),
+    )
+
+
+class AccreditationSettingForm(forms.Form):
+    """One participant role, badge type, access profile or access rule. The
+    fields follow the kind; the code is asked only at creation."""
+
+    code = forms.CharField(
+        label=_("Code"),
+        max_length=64,
+        help_text=_(
+            "Capital letters, digits, - and _ (for example SPEAKER). It cannot be changed later."
+        ),
+        widget=forms.TextInput(attrs={"dir": "ltr", "autocomplete": "off", "spellcheck": "false"}),
+    )
+    name = forms.CharField(label=_("Name (English)"), max_length=200)
+    name_fr = forms.CharField(label=_("Name (French)"), max_length=200, required=False)
+    name_ar = forms.CharField(
+        label=_("Name (Arabic)"),
+        max_length=200,
+        required=False,
+        widget=forms.TextInput(attrs={"dir": "rtl", "lang": "ar"}),
+    )
+    participant_visible = forms.BooleanField(
+        label=_("Show this badge type to the participant"), required=False
+    )
+    reentry_policy = forms.ChoiceField(label=_("Re-entry"), required=False)
+    access_profile = forms.ModelChoiceField(
+        label=_("Access profile (optional)"), queryset=None, required=False
+    )
+    zone = forms.ModelChoiceField(label=_("Zone (optional)"), queryset=None, required=False)
+    gate = forms.ModelChoiceField(label=_("Gate (optional)"), queryset=None, required=False)
+    event_type = forms.ChoiceField(label=_("Applies to"), required=False)
+    effect = forms.ChoiceField(label=_("Effect"), required=False)
+    valid_from = _datetime_field(_("Valid from (optional)"))
+    valid_until = _datetime_field(_("Valid until (optional)"))
+
+    _BY_KIND = {
+        "role": ("name", "name_fr", "name_ar"),
+        "badge-type": ("name", "name_fr", "name_ar", "participant_visible"),
+        "access-profile": (
+            "name",
+            "name_fr",
+            "name_ar",
+            "reentry_policy",
+            "valid_from",
+            "valid_until",
+        ),
+        "access-rule": (
+            "name",
+            "name_fr",
+            "name_ar",
+            "access_profile",
+            "zone",
+            "gate",
+            "event_type",
+            "effect",
+            "valid_from",
+            "valid_until",
+        ),
+    }
+
+    def __init__(self, *args, kind_slug: str, event_edition, creating: bool, **kwargs):
+        super().__init__(*args, **kwargs)
+        from apps.accreditation.models import (
+            AccessProfile,
+            AccessRuleEffect,
+            AccessRuleEventType,
+            ReentryPolicy,
+        )
+        from apps.events.models import Gate, Zone
+
+        self.kind_slug = kind_slug
+        keep = set(self._BY_KIND[kind_slug]) | ({"code"} if creating else set())
+        for name in list(self.fields):
+            if name not in keep:
+                del self.fields[name]
+        if "reentry_policy" in self.fields:
+            self.fields["reentry_policy"].choices = ReentryPolicy.choices
+            self.fields["reentry_policy"].required = True
+        if "event_type" in self.fields:
+            self.fields["event_type"].choices = AccessRuleEventType.choices
+            self.fields["event_type"].required = True
+            self.fields["effect"].choices = AccessRuleEffect.choices
+            self.fields["effect"].required = True
+            self.fields["access_profile"].queryset = AccessProfile.objects.filter(
+                event_edition=event_edition
+            ).order_by("code")
+            self.fields["zone"].queryset = Zone.objects.filter(
+                venue__event_edition=event_edition
+            ).order_by("code")
+            self.fields["gate"].queryset = Gate.objects.filter(
+                venue__event_edition=event_edition
+            ).order_by("code")
+            for name in ("access_profile", "zone", "gate"):
+                self.fields[name].label_from_instance = lambda obj: f"{obj.code} · {obj.name}"
+
+    def values(self) -> dict:
+        """The model values of a valid form (everything except the code)."""
+        return {name: self.cleaned_data.get(name) for name in self._BY_KIND[self.kind_slug]}

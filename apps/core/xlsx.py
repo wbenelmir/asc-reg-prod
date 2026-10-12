@@ -4,9 +4,10 @@ The project has no spreadsheet dependency, and the decision workbook
 (`apps.reviews.workbook`) needs only plain text cells, so this module writes
 and reads exactly that instead of adding a new runtime dependency.
 
-Writer: inline-string cells only (a cell is a formula only when it carries an
+Writer: inline-string cells (a cell is a formula only when it carries an
 `<f>` element, which is never written, so every value is literal text; display
-columns additionally carry `quotePrefix`), a frozen header row, an auto
+columns additionally carry `quotePrefix`) and, for Python `int` and `float`
+values only, plain numeric cells (UPD-08 statistics), a frozen header row, an auto
 filter, column widths, list validations (drop-downs) and an optional sheet
 protection WITHOUT password. Protection is an editing convenience, never a
 security boundary: the server re-verifies everything it reads back.
@@ -75,6 +76,7 @@ STYLE_EDITABLE = 3  # unlocked, text format, highlighted
 STYLE_TECHNICAL = 4  # locked, grey
 STYLE_WRAP = 5  # instructions text, wrapped
 STYLE_TITLE = 6  # instructions title, bold
+STYLE_NUMBER = 7  # a numeric value (int or float), general format
 
 
 @dataclass(frozen=True)
@@ -97,9 +99,17 @@ class Sheet:
     protect: bool = False
     #: Per-row style override for instructions-like sheets (column index -> style).
     row_styles: dict[int, int] = field(default_factory=dict)
+    #: UPD-08: an Arabic report sheet reads right to left.
+    right_to_left: bool = False
 
 
 def _cell_xml(ref: str, value: str, style: int) -> str:
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        # A number is written as a number, never as text that could be a
+        # formula; non-finite values are written as empty text.
+        if value == value and value not in (float("inf"), float("-inf")):
+            return f'<c r="{ref}" s="{STYLE_NUMBER}"><v>{value!r}</v></c>'
+        value = ""
     text = _clean(value)
     space = ' xml:space="preserve"' if text != text.strip() or "\n" in text else ""
     return f'<c r="{ref}" t="inlineStr" s="{style}"><is><t{space}>{escape(text)}</t></is></c>'
@@ -113,7 +123,8 @@ def _sheet_xml(sheet: Sheet) -> str:
     parts = [
         f'<worksheet xmlns="{MAIN_NS}" xmlns:r="{REL_NS}">',
         f'<dimension ref="A1:{last_col}{max(last_row, 1)}"/>',
-        '<sheetViews><sheetView workbookViewId="0">',
+        f"<sheetViews><sheetView{' rightToLeft="1"' if sheet.right_to_left else ''}"
+        ' workbookViewId="0">',
     ]
     if sheet.header and sheet.freeze_header:
         parts.append(
@@ -195,7 +206,7 @@ def _styles_xml() -> str:
         '<cellStyleXfs count="1">'
         '<xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>'
         "</cellStyleXfs>"
-        '<cellXfs count="7">'
+        '<cellXfs count="8">'
         '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
         '<xf numFmtId="49" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1"'
         ' applyFill="1" applyNumberFormat="1"/>'
@@ -209,6 +220,7 @@ def _styles_xml() -> str:
         ' applyNumberFormat="1" applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf>'
         '<xf numFmtId="49" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"'
         ' quotePrefix="1" applyNumberFormat="1"/>'
+        '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>'
         "</cellXfs>"
         '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>'
         "</styleSheet>"

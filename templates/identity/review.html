@@ -53,6 +53,15 @@
       {% include "components/icon.html" with name="lock" %}
       <div><p class="mb-0">{% trans "Finally rejected. The registration is not approved; the participant was told that it was rejected and how to register again from the same account." %}</p></div>
     </div>
+  {% elif registration_closed and registration.public_status == "WITHDRAWN" %}
+    {# UPD-01: withdrawn or cancelled. Processing stopped; history is kept. #}
+    <div class="asc-notice asc-notice-warning mb-3" role="status" data-idv-registration-closed data-idv-registration-cancelled>
+      {% include "components/icon.html" with name="lock" %}
+      <div>
+        <p class="mb-1"><strong>{% if registration.cancelled_at %}{% trans "This registration was cancelled by the team." %}{% else %}{% trans "The participant withdrew this registration." %}{% endif %}</strong></p>
+        <p class="mb-0">{% trans "Identity verification processing has stopped: no check runs, no action is available and nothing moves to participation review. The verification information below is kept as history. A new registration by the participant is a separate request." %}</p>
+      </div>
+    </div>
   {% elif registration_closed %}
     <div class="asc-notice asc-notice-neutral mb-3" data-idv-registration-closed>
       {% include "components/icon.html" with name="lock" %}
@@ -170,6 +179,43 @@
             </details>
           {% endif %}
 
+          {% if actionable and "verify_identity_manually" in granted %}
+            <details class="asc-idv-action" data-idv-action="correct-verify"{% if forms.correct_verify.errors %} open{% endif %}>
+              <summary>{% trans "Save corrections and verify identity" %}</summary>
+              {% with form=forms.correct_verify %}
+                <form method="post" action="{% url 'identity:correct-and-verify' pk=case.pk %}" data-idv-form="correct-verify"
+                      data-confirm-title="{% trans 'Save these corrections and verify the identity?' %}"
+                      data-confirm="{% trans 'The corrected values replace the submitted ones, and the identity is verified without returning the request to the participant. Participation is still decided separately.' %}"
+                      data-confirm-action="{% trans 'Save and verify' %}" data-confirm-tone="primary">
+                  {% csrf_token %}{% include "identity/_queue_context.html" %}
+                  <p class="form-text">{% trans "Compare the participant's values, the Ministry values above and the evidence. Correct only what the evidence confirms." %}</p>
+                  {% if form.fields.evidence_document.choices %}
+                    {% include "components/field.html" with field=form.given_names control="ltr" %}
+                    {% include "components/field.html" with field=form.family_name control="ltr" %}
+                    {% include "components/field.html" with field=form.date_of_birth %}
+                    {% if form.nin %}
+                      {% if "correct_identity_nin" in granted and show_full_identifier %}
+                        {% include "components/field.html" with field=form.nin control="ltr" %}
+                        <p class="form-text" data-idv-recheck-note>{% if ministry_recheck_possible %}{% trans "A changed NIN is checked with the Ministry service first. A verifying answer records an API verification; otherwise your manual verification from the evidence is recorded, together with the lookup result." %}{% else %}{% trans "The Ministry service is not available here: a changed NIN is recorded with your manual verification from the evidence." %}{% endif %}</p>
+                      {% else %}
+                        <input type="hidden" name="nin" value="{{ identifier.value_encrypted }}">
+                        <p class="form-text">{% trans "You may not change the NIN: it stays as it is." %}</p>
+                      {% endif %}
+                    {% endif %}
+                    {% include "components/field.html" with field=form.evidence_document %}
+                    {% include "components/field.html" with field=form.reason_code %}
+                    {% include "components/field.html" with field=form.note %}
+                    <div class="asc-stack-actions">
+                      <button type="submit" class="btn btn-success" name="advance" value="stay"{% if conflicts.exists %} disabled{% endif %}>{% include "components/icon.html" with name="check-circle" %}<span>{% trans "Save corrections and verify identity" %}</span></button>
+                    </div>
+                  {% else %}
+                    <p class="mb-0 asc-muted" data-idv-no-evidence>{% trans "No reviewable evidence of the required kind yet. Return the case to ask for it." %}</p>
+                  {% endif %}
+                </form>
+              {% endwith %}
+            </details>
+          {% endif %}
+
           {% if actionable and "return_identity_for_correction" in granted %}
             <details class="asc-idv-action" data-idv-action="return"{% if forms.return.errors %} open{% endif %}>
               <summary>{% trans "Return for correction" %}</summary>
@@ -177,8 +223,22 @@
                 <form method="post" action="{% url 'identity:return' pk=case.pk %}" data-idv-form="return">
                   {% csrf_token %}{% include "identity/_queue_context.html" %}
                   {% include "components/field.html" with field=form.items %}
+                  <div class="asc-notice asc-notice-neutral mb-2" data-idv-submission-language="{{ submission_language.code|default:'unknown' }}" data-idv-language-basis="{{ submission_language.basis }}">
+                    {% include "components/icon.html" with name="globe" %}
+                    <div>
+                      {% if submission_language.known %}
+                        <p class="mb-0"><strong>{% trans "Submission language:" %}</strong> <bdi>{{ submission_language_label }}</bdi></p>
+                        <p class="mb-0 form-text">{% if submission_language.basis == "RECORDED" %}{% trans "Recorded when the participant submitted the registration." %}{% else %}{% trans "Taken from the language of the legal notices the participant accepted at submission (older registration)." %}{% endif %} {% trans "The e-mail is sent in this language. Write the note in it." %}</p>
+                      {% else %}
+                        <p class="mb-0"><strong>{% trans "Submission language:" %}</strong> {% trans "not recorded for this older registration" %}</p>
+                        <p class="mb-0 form-text">{% blocktrans with language=proposed_language_label %}Choose the language to write in below. Proposed: {{ language }}, the registration's preferred language.{% endblocktrans %}</p>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% if form.notification_language %}{% include "components/field.html" with field=form.notification_language %}{% endif %}
+                  {% include "components/field.html" with field=form.participant_note %}
                   {% include "components/field.html" with field=form.note %}
-                  <p class="form-text">{% trans "The participant sees only the selected requests, never the reason or a service result." %}</p>
+                  <p class="form-text">{% trans "The participant sees the selected requests and your note, never the reason or a service result." %}</p>
                   <div class="asc-stack-actions">
                     <button type="submit" class="btn btn-outline-primary" name="advance" value="stay"><span>{% trans "Return for correction" %}</span></button>
                     <button type="submit" class="btn btn-outline-primary" name="advance" value="next"><span>{% trans "Return and open the next case" %}</span></button>
@@ -268,6 +328,22 @@
             <li class="asc-timeline-empty">{% trans "No decision yet." %}</li>
           {% endfor %}
         </ul>
+        {% if correction_history %}
+          <h3 class="h6 mt-3">{% trans "Corrections and notes to the participant" %}</h3>
+          <ul class="asc-timeline" data-idv-correction-history>
+            {% for entry in correction_history %}
+              <li data-idv-history-action="{{ entry.decision.action }}">
+                <p class="mb-1">{{ entry.decision.get_action_display }}</p>
+                {% for change in entry.changes %}
+                  <p class="mb-1 small"><span class="asc-code">{{ change.field }}</span>{% trans ":" context "label separator" %} <bdi dir="ltr">{{ change.before|default:"—" }}</bdi> → <bdi dir="ltr">{{ change.after|default:"—" }}</bdi></p>
+                {% endfor %}
+                {% if entry.decision.requested_items and not entry.changes and entry.decision.action == "CORRECT_AND_VERIFY" %}<p class="mb-1 asc-muted small">{% trans "Changed:" %} {% for item in entry.decision.requested_items %}<span class="asc-code">{{ item }}</span>{% if not forloop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+                {% if entry.note %}<div class="asc-idv-participant-note" data-idv-participant-note><p class="mb-1"><strong>{% trans "Note to participant" %}</strong>{% if entry.language %} · <bdi>{{ entry.language }}</bdi>{% endif %}</p><p class="mb-1 asc-preline" dir="auto">{{ entry.note }}</p></div>{% endif %}
+                <p class="asc-timeline-meta">{% if entry.decision.actor_user %}<bdi>{{ entry.decision.actor_user.display_name|default:entry.decision.actor_user.email_normalized }}</bdi>{% endif %} · <time datetime="{{ entry.decision.created_at|date:'c' }}">{{ entry.decision.created_at }}</time></p>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
         <h3 class="h6 mt-3">{% trans "Identity revisions" %}</h3>
         <ul class="asc-timeline">
           {% for revision in revisions %}

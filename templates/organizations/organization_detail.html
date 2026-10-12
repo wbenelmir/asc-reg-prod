@@ -1,0 +1,142 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% block title %}{{ organization.official_name }}{% endblock %}
+{% block breadcrumbs %}{% url 'organizations:list' as parent_url %}{% trans "Organizations" as parent_label %}{% include "components/breadcrumb_trail.html" with parent_label=parent_label parent_url=parent_url current=organization.official_name %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Organization" %} · {{ organization.get_organization_type_display }}{% if organization.country_code %} · {{ organization.country_code.localized_name }}{% endif %}</p>
+      <h1><bdi>{{ organization.official_name }}</bdi></h1>
+      <ul class="asc-chip-list mt-2" aria-label="{% trans 'Current status' %}">
+        <li data-organization-status="{{ organization.status }}">{% status_chip "organization" organization.status organization.status|code_label:"organization_status" %}</li>
+      </ul>
+    </div>
+    <div class="asc-actions-row mt-0">
+      {% if can_change %}<a class="btn btn-outline-primary" href="{% url 'organizations:edit' pk=organization.pk %}">{% include "components/icon.html" with name="edit" %}<span>{% trans "Edit" %}</span></a>{% endif %}
+      {% if can_view_registrations %}<a class="btn btn-outline-secondary" href="{% url 'registrations:ops-intake-list' %}?organization={{ organization.pk }}" data-organization-registrations>{% include "components/icon.html" with name="list" %}<span>{% trans "View registrations" %}</span></a>{% endif %}
+      {% if can_export %}<a class="btn btn-outline-secondary" href="{% url 'exports:workspace' %}?event={{ event.pk }}&amp;organization={{ organization.pk }}" data-organization-export>{% include "components/icon.html" with name="download" %}<span>{% trans "Export" %}</span></a>{% endif %}
+    </div>
+  </div>
+
+  {% if not active %}
+    <div class="asc-notice asc-notice-warning mb-3" role="status" data-organization-inactive>
+      {% include "components/icon.html" with name="ban" %}
+      <div><p class="mb-0">{% trans "This organization is inactive: no new campaign, delegation list or on-behalf registration can be started for it. Its existing campaigns, links and registrations are unchanged; close a campaign to stop its link." %}</p></div>
+    </div>
+  {% endif %}
+  {% if event is None %}
+    <div class="asc-notice asc-notice-neutral mb-3" role="status">{% include "components/icon.html" with name="info" %}<div><p class="mb-0">{% trans "No event edition is open for registration, so new campaigns, delegation lists and on-behalf registrations cannot be started now." %}</p></div></div>
+  {% endif %}
+
+  <div class="asc-kpis mb-3" role="group" aria-label="{% trans 'Registrations of this organization' %}" data-organization-counts>
+    <div class="asc-kpi"><span class="asc-kpi-label">{% trans "All registrations" %}</span><span class="asc-kpi-value" data-count="total">{{ counts.total }}</span></div>
+    <div class="asc-kpi asc-kpi-info"><span class="asc-kpi-label">{% trans "Active applications" %}</span><span class="asc-kpi-value" data-count="active">{{ counts.active }}</span></div>
+    <div class="asc-kpi asc-kpi-success"><span class="asc-kpi-label">{% trans "Final-approved" %}</span><span class="asc-kpi-value" data-count="final_approved">{{ counts.final_approved }}</span></div>
+    <div class="asc-kpi"><span class="asc-kpi-label">{% trans "Withdrawn or cancelled" %}</span><span class="asc-kpi-value" data-count="withdrawn">{{ counts.withdrawn }}</span></div>
+  </div>
+  <p class="form-text mb-3" data-organization-scope-note>{% trans "Figures, campaigns and delegation lists cover the events and organizations of your authorized scope." %}</p>
+
+  <div class="asc-detail-layout">
+    <div class="asc-detail-main">
+      <section class="asc-card asc-card-flush" aria-labelledby="org-campaigns-heading">
+        <div class="asc-card-toolbar">
+          <h2 class="asc-card-toolbar-title" id="org-campaigns-heading">{% trans "Invitation campaigns" %}</h2>
+          {% if can_create_campaign %}<a class="btn btn-sm btn-primary" href="{% url 'invitations:campaign-create' organization_id=organization.pk %}" data-organization-create-campaign>{% trans "Create campaign" %}</a>{% endif %}
+        </div>
+        {% if campaigns %}
+          <div class="asc-table-wrap">
+            <table class="asc-table" aria-labelledby="org-campaigns-heading">
+              <thead>
+                <tr>
+                  <th scope="col">{% trans "Campaign" %}</th>
+                  <th scope="col">{% trans "Status" %}</th>
+                  <th scope="col">{% trans "Link" %}</th>
+                  <th scope="col" class="asc-num">{% trans "Places used" %}</th>
+                  <th scope="col" class="asc-num">{% trans "Registrations" %}</th>
+                  <th scope="col"><span class="visually-hidden">{% trans "Actions" %}</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for campaign in campaigns %}
+                  <tr data-campaign-row="{{ campaign.public_reference }}">
+                    <th scope="row"><bdi>{{ campaign.name }}</bdi><div class="asc-muted small"><bdi dir="ltr" class="asc-code">{{ campaign.public_reference }}</bdi> · <bdi dir="ltr">{{ campaign.event_edition.code }}</bdi></div></th>
+                    <td>{% status_chip "campaign" campaign.status campaign.get_status_display %}</td>
+                    <td>{% if campaign.active_link %}{% status_chip "invitation_link" campaign.active_link.status campaign.active_link.get_status_display %}{% else %}<span class="asc-muted">{% trans "No active link" %}</span>{% endif %}</td>
+                    <td class="asc-num">{% if campaign.capacity is not None %}{% blocktrans with used=campaign.usage.submitted capacity=campaign.capacity %}{{ used }} of {{ capacity }}{% endblocktrans %}{% else %}{{ campaign.usage.submitted }} · {% trans "no limit" %}{% endif %}</td>
+                    <td class="asc-num">{{ campaign.registration_count }}</td>
+                    <td class="asc-cell-action"><a class="btn btn-sm btn-outline-primary" href="{% url 'invitations:campaign-detail' pk=campaign.pk %}">{% trans "Manage" %}<span class="visually-hidden"> <bdi>{{ campaign.name }}</bdi></span></a></td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="asc-empty" data-organization-campaigns-empty>
+            <span class="asc-tile">{% include "components/icon.html" with name="mail" %}</span>
+            <h3>{% trans "No invitation campaign yet." %}</h3>
+            <p>{% if can_create_campaign %}{% trans "Create a campaign, open it, then issue its registration link and send it to the organization." %}{% else %}{% trans "A campaign can be created by an invitation manager of this organization while an event is open." %}{% endif %}</p>
+          </div>
+        {% endif %}
+      </section>
+
+      <section class="asc-card asc-card-flush" aria-labelledby="org-batches-heading">
+        <div class="asc-card-toolbar">
+          <h2 class="asc-card-toolbar-title" id="org-batches-heading">{% trans "Delegation lists" %}</h2>
+          {% if can_upload_delegation %}<a class="btn btn-sm btn-primary" href="{% url 'invitations:delegation-upload' organization_id=organization.pk %}" data-organization-upload>{% trans "Upload a delegation list" %}</a>{% endif %}
+        </div>
+        {% if batches %}
+          <ul class="asc-records">
+            {% for batch in batches %}
+              <li class="asc-record" data-batch-row="{{ batch.pk }}">
+                <div class="asc-record-head">
+                  <h3 class="asc-record-title">{% status_chip "delegation_batch" batch.status batch.get_status_display %}</h3>
+                  <p class="asc-record-meta"><time datetime="{{ batch.created_at|date:'c' }}">{{ batch.created_at }}</time></p>
+                </div>
+                <dl class="asc-record-fields">
+                  <div><dt>{% trans "Valid rows" %}</dt><dd>{% blocktrans with valid=batch.valid_row_count total=batch.row_count %}{{ valid }} of {{ total }}{% endblocktrans %}</dd></div>
+                  <div><dt>{% trans "Applied" %}</dt><dd>{{ batch.applied_row_count }}</dd></div>
+                </dl>
+                <div class="asc-record-actions"><a class="btn btn-outline-primary" href="{% url 'invitations:delegation-detail' pk=batch.pk %}" data-record-action>{% trans "Preview and results" %}</a></div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="asc-card-note">{% trans "No delegation list uploaded yet." %}</p>
+        {% endif %}
+      </section>
+    </div>
+
+    <aside class="asc-detail-aside" aria-label="{% trans 'Organization actions' %}">
+      {% if can_register_on_behalf %}
+        <section class="asc-card" aria-labelledby="org-onbehalf-heading">
+          <h2 class="asc-card-title" id="org-onbehalf-heading">{% include "components/icon.html" with name="user" %}{% trans "Register on behalf" %}</h2>
+          <p class="asc-section-lead">{% blocktrans with event=event.code %}Start a registration for this organization in {{ event }}; the participant claims it with their own e-mail and completes it.{% endblocktrans %}</p>
+          <a class="btn btn-outline-primary" href="{% url 'invitations:on-behalf-create' organization_id=organization.pk %}">{% trans "Register a participant" %}</a>
+        </section>
+      {% endif %}
+      {% if can_change %}
+        <section class="asc-card" aria-labelledby="org-status-heading">
+          <h2 class="asc-card-title" id="org-status-heading">{% include "components/icon.html" with name="refresh" %}{% trans "Activation" %}</h2>
+          {% if organization.status == "MERGED" %}
+            <p class="mb-0 asc-muted">{% trans "A merged organization cannot change status." %}</p>
+          {% elif active %}
+            <form method="post" action="{% url 'organizations:status' pk=organization.pk %}"
+                  data-confirm-title="{% trans 'Deactivate this organization?' %}"
+                  data-confirm="{% trans 'No new campaign, delegation list or on-behalf registration can be started. Existing campaigns, links and registrations stay as they are.' %}"
+                  data-confirm-action="{% trans 'Deactivate' %}">
+              {% csrf_token %}
+              <input type="hidden" name="status" value="INACTIVE">
+              <button type="submit" class="btn btn-outline-danger" data-organization-deactivate><span>{% trans "Deactivate" %}</span></button>
+            </form>
+          {% else %}
+            <form method="post" action="{% url 'organizations:status' pk=organization.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="status" value="ACTIVE">
+              <button type="submit" class="btn btn-outline-primary" data-organization-activate><span>{% trans "Activate" %}</span></button>
+            </form>
+          {% endif %}
+        </section>
+      {% endif %}
+    </aside>
+  </div>
+{% endblock %}

@@ -27,6 +27,7 @@ from apps.accounts.policies import operational_permission_required
 from apps.audit import action_codes
 from apps.core.middleware.correlation import get_correlation_id
 from apps.people.forms.identity import (
+    CorrectAndVerifyForm,
     CorrectNinForm,
     ExceptionVerifyForm,
     GrantNinExemptionForm,
@@ -55,6 +56,7 @@ from apps.people.search_context import (
 )
 from apps.people.selectors.identity import (
     ALL_STATUSES,
+    CLOSED_REGISTRATIONS,
     QUEUE_FILTER_KEYS,
     case_history,
     clean_queue_filters,
@@ -141,6 +143,8 @@ def identity_queue(request):
         request.GET.get("page", 1)
     )
     counts = status_counts(request.user, filters, search=search)
+    for case in page.object_list:
+        case.registration_closed = case.registration.public_status not in ACTIVE_PUBLIC_STATUSES
     choices = filter_choices(request.user)
     from apps.core.models import Country
 
@@ -162,7 +166,11 @@ def identity_queue(request):
                 "status_tabs": [
                     (value, label, counts.get(value, 0)) for value, label in IdentityStatus.choices
                 ],
-                "total_count": sum(counts.values()),
+                # UPD-01: the status tabs count active registrations only;
+                # closed registrations' cases are history in their own tab.
+                "closed_count": counts[CLOSED_REGISTRATIONS],
+                "closed_registrations": CLOSED_REGISTRATIONS,
+                "total_count": counts[ALL_STATUSES],
                 "all_statuses": ALL_STATUSES,
                 "reasons": IdentityReasonCode.choices,
                 "routes": IdentityRoute.choices,
@@ -294,6 +302,20 @@ def _render_case(request, case, *, forms_by_action=None, status=200):
     }
     nin_types = identity_review.manual_evidence_types(case)
     forms_by_action = forms_by_action or {}
+    # UPD-03: the participant's submission language, independent of the staff
+    # interface language, with how sure it is.
+    from apps.registrations import language as registration_language
+
+    submission_language = registration_language.submission_language_for(case.registration)
+    profile = case.registration.profile
+    correct_initial = {
+        **initial,
+        "given_names": profile.submitted_given_names,
+        "family_name": profile.submitted_family_name,
+        "date_of_birth": profile.date_of_birth,
+    }
+    if case.route == IdentityRoute.NIN and identifier is not None and can_view_evidence:
+        correct_initial["nin"] = identifier.value_encrypted
     context_forms = {
         "verify": forms_by_action.get("verify")
         or VerifyIdentityForm(initial=initial, evidence_choices=_evidence_choices(rows, nin_types)),
@@ -305,7 +327,22 @@ def _render_case(request, case, *, forms_by_action=None, status=200):
             ),
         ),
         "return": forms_by_action.get("return")
-        or ReturnForCorrectionForm(initial=initial, route=case.route),
+        or ReturnForCorrectionForm(
+            initial={
+                **initial,
+                "notification_language": registration_language.explicit_fallback_language(
+                    case.registration
+                ),
+            },
+            route=case.route,
+            language_known=submission_language.known,
+        ),
+        "correct_verify": forms_by_action.get("correct_verify")
+        or CorrectAndVerifyForm(
+            initial=correct_initial,
+            route=case.route,
+            evidence_choices=_evidence_choices(rows, nin_types),
+        ),
         "correct": forms_by_action.get("correct")
         or CorrectNinForm(
             initial=initial,
@@ -381,10 +418,55 @@ def _render_case(request, case, *, forms_by_action=None, status=200):
                     (row["preview_url"] for row in rows if row["preview_url"]), ""
                 ),
                 "return_items": identity_review.RETURN_ITEMS[case.route],
+                "submission_language": submission_language,
+                "submission_language_label": registration_language.language_display(
+                    submission_language.code
+                ),
+                "proposed_language_label": registration_language.language_display(
+                    registration_language.explicit_fallback_language(case.registration)
+                ),
+                # UPD-02: whether a changed NIN would be checked with the
+                # Ministry before saving (never for a foreign participant).
+                "ministry_recheck_possible": case.route == IdentityRoute.NIN
+                and identity_review.ministry_recheck_possible(),
+                "correction_history": _correction_history(decisions, can_view_evidence),
             },
             status=status,
         )
     )
+
+
+def _correction_history(decisions, can_view_evidence: bool) -> list[dict]:
+    """UPD-02/03: the staff corrections (values only for readers of evidence)
+    and the notes sent to the participant, newest first, as recorded."""
+    import json
+
+    from apps.registrations.language import language_display
+
+    history = []
+    for decision in decisions:
+        if not (decision.changes_encrypted or decision.participant_note_encrypted):
+            continue
+        entry = {"decision": decision, "changes": [], "note": "", "language": ""}
+        if decision.changes_encrypted and can_view_evidence:
+            try:
+                changes = json.loads(decision.changes_encrypted)
+            except ValueError:
+                changes = {}
+            entry["changes"] = [
+                {
+                    "field": field,
+                    "before": values.get("before", ""),
+                    "after": values.get("after", ""),
+                }
+                for field, values in sorted(changes.items())
+                if isinstance(values, dict)
+            ]
+        entry["note"] = decision.participant_note_encrypted or ""
+        if decision.notification_language:
+            entry["language"] = language_display(decision.notification_language)
+        history.append(entry)
+    return history
 
 
 @operational_permission_required("people.view_identityverification", login_url=LOGIN)
@@ -402,6 +484,29 @@ def _conflict(request, case, message: str) -> HttpResponse:
             {"message": message, "case_url": f"{url}?{querystring}" if querystring else url},
             status=409,
         )
+    )
+
+
+def _closed_registration_conflict(request, case) -> HttpResponse | None:
+    """UPD-01: when a refused action met a registration that is now closed
+    (withdrawn or cancelled, possibly after the page was opened), say so
+    plainly. Reads the stored status, not the copy loaded with the page."""
+    from apps.registrations.models import Registration
+
+    current_status = (
+        Registration.objects.filter(pk=case.registration_id)
+        .values_list("public_status", flat=True)
+        .first()
+    )
+    if current_status in ACTIVE_PUBLIC_STATUSES:
+        return None
+    return _conflict(
+        request,
+        case,
+        _(
+            "This registration was withdrawn or cancelled, so its identity processing has "
+            "stopped. Nothing was saved. Its history stays available under Closed registrations."
+        ),
     )
 
 
@@ -446,6 +551,9 @@ def _run_action(request, pk, *, form_key, form, command, success_message):
         )
         raise
     except identity_review.StaleIdentityVersion:
+        closed = _closed_registration_conflict(request, case)
+        if closed is not None:
+            return closed
         return _conflict(
             request,
             case,
@@ -472,6 +580,15 @@ def _run_action(request, pk, *, form_key, form, command, success_message):
         return _render_case(request, case, forms_by_action={form_key: form}, status=400)
     except identity_review.InvalidIdentityInput as error:
         message = {
+            "names": _("Use Latin letters for the names, exactly as on the identity document."),
+            "birth_date": _("Enter a date of birth that meets the event's age rule."),
+            "participant_note_too_long": _("The note to the participant is too long."),
+            "participant_note_invalid": _(
+                "The note to the participant contains characters that are not allowed."
+            ),
+            "nin_not_applicable": _(
+                "A NIN applies only to Algerian participants on the NIN route."
+            ),
             "explanation_required": _("Write an explanation of at least 10 characters."),
             "confirmation_required": _("Confirm this action deliberately to continue."),
             "nin_format": _("Enter exactly 18 digits."),
@@ -481,6 +598,9 @@ def _run_action(request, pk, *, form_key, form, command, success_message):
         form.add_error(None, message)
         return _render_case(request, case, forms_by_action={form_key: form}, status=400)
     except identity_review.IdentityStateError:
+        closed = _closed_registration_conflict(request, case)
+        if closed is not None:
+            return closed
         return _conflict(
             request,
             case,
@@ -555,7 +675,13 @@ def identity_exception(request, pk):
 @require_POST
 def identity_return(request, pk):
     case = _case_or_404(request, pk)
-    form = ReturnForCorrectionForm(request.POST, route=case.route)
+    from apps.registrations.language import submission_language_for
+
+    form = ReturnForCorrectionForm(
+        request.POST,
+        route=case.route,
+        language_known=submission_language_for(case.registration).known,
+    )
     return _run_action(
         request,
         pk,
@@ -567,9 +693,48 @@ def identity_return(request, pk):
             expected_version=data["expected_version"],
             items=data["items"],
             note=data.get("note", ""),
+            participant_note=data.get("participant_note", ""),
+            notification_language=data.get("notification_language", ""),
             correlation_id=get_correlation_id() or "",
         ),
         success_message=_("Returned to the participant for correction."),
+    )
+
+
+@operational_permission_required("people.verify_identity_manually", login_url=LOGIN)
+@require_POST
+def identity_correct_and_verify(request, pk):
+    """UPD-02: save validated corrections and verify the identity in one
+    action. The service re-checks permissions, scope, state and version, and
+    looks a changed NIN up with the Ministry before anything is written."""
+    case = _case_or_404(request, pk)
+    form = CorrectAndVerifyForm(
+        request.POST,
+        route=case.route,
+        evidence_choices=_evidence_form_choices(case, identity_review.manual_evidence_types(case)),
+    )
+    return _run_action(
+        request,
+        pk,
+        form_key="correct_verify",
+        form=form,
+        command=lambda c, data: identity_review.correct_and_verify_identity(
+            c.pk,
+            actor=request.user,
+            expected_version=data["expected_version"],
+            given_names=data["given_names"],
+            family_name=data["family_name"],
+            date_of_birth=data["date_of_birth"],
+            nin=data.get("nin", ""),
+            evidence_document_id=data["evidence_document"],
+            reason_code=data["reason_code"],
+            note=data.get("note", ""),
+            correlation_id=get_correlation_id() or "",
+        ),
+        success_message=_(
+            "Corrections saved and identity verified. The registration now waits for its "
+            "participation decision, which is taken separately."
+        ),
     )
 
 
@@ -899,6 +1064,7 @@ def identity_correction(request, pk):
                 "registration": registration,
                 "form": form,
                 "requested_labels": correction.labels,
+                "participant_note": correction.participant_note,
                 "show_passport_page": case.route == IdentityRoute.PASSPORT
                 or "ALGERIAN_PASSPORT_PAGE" in correction.items,
                 "exemption_route": case.route == IdentityRoute.NIN_EXEMPTION,

@@ -320,6 +320,23 @@ def stage3_world(db):
             nationality_code_id="DZ",
         )
         registrations.append(registration)
+        if public == "APPROVED":
+            # UPD-07: an approval is final only with its current decision row.
+            from django.utils import timezone
+
+            from apps.reviews.models import RegistrationDecision
+
+            RegistrationDecision.objects.create(
+                registration=registration,
+                sequence=1,
+                outcome="APPROVED",
+                internal_reason_code="ELIGIBLE",
+                is_current=True,
+                decided_by=operator,
+                decided_at=timezone.now(),
+                event_edition=event,
+                organization=organization,
+            )
         cases.append(
             open_review_case(
                 registration=registration,

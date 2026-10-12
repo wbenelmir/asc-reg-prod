@@ -1,0 +1,58 @@
+{% load i18n %}
+{# UPD-08: processing workload (current state) and operational exceptions. #}
+<section class="asc-card" aria-labelledby="stats-workload-heading" data-stats-section="workload">
+  <h2 class="asc-card-title" id="stats-workload-heading">{% include "components/icon.html" with name="clock" %}{% trans "3. Processing workload" %}</h2>
+  <div class="asc-table-wrap">
+    <table class="asc-table asc-stats-table" aria-label="{% trans 'Processing workload' %}">
+      <thead><tr><th scope="col">{% trans "Stage" %}</th><th scope="col" class="asc-num">{% trans "Count" %}</th><th scope="col">{% trans "Oldest waiting since" %}</th><th scope="col" class="asc-num">{% trans "Average wait (days)" %}</th><th scope="col">{% trans "Oldest items" %}</th></tr></thead>
+      <tbody>
+        {% for stage in report.workload %}
+          <tr data-stage="{{ stage.key }}">
+            <th scope="row"><a href="{{ stage.url }}">{{ stage.label }}</a><div class="asc-muted small">{{ stage.basis }}</div></th>
+            <td class="asc-num" data-count="{{ stage.count }}">{{ stage.count }}</td>
+            <td>{% if stage.oldest %}<time datetime="{{ stage.oldest|date:'c' }}">{{ stage.oldest }}</time>{% else %}—{% endif %}</td>
+            <td class="asc-num">{% if stage.average_days is not None %}{{ stage.average_days }}{% else %}<span class="asc-muted" title="{% trans 'Not recorded for this stage' %}">—</span>{% endif %}</td>
+            <td>{% for reference, since in stage.oldest_items %}<bdi dir="ltr" class="asc-code">{{ reference }}</bdi>{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="asc-card" aria-labelledby="stats-exceptions-heading" data-stats-section="exceptions">
+  <h2 class="asc-card-title" id="stats-exceptions-heading">{% include "components/icon.html" with name="alert-triangle" %}{% trans "4. Operational exceptions" %}</h2>
+  <div class="asc-stats-grid">
+    <div>
+      <h3 class="h6">{% trans "Reasons for identity manual review" %}</h3>
+      <div class="asc-table-wrap">
+        <table class="asc-table asc-stats-table" aria-label="{% trans 'Reasons for identity manual review' %}">
+          <thead><tr><th scope="col">{% trans "Reason" %}</th><th scope="col" class="asc-num">{% trans "Count" %}</th></tr></thead>
+          <tbody>
+            {% for row in report.exceptions.manual_review_reasons %}<tr data-reason="{{ row.code }}"><th scope="row">{{ row.label }}</th><td class="asc-num">{{ row.count }}</td></tr>{% empty %}<tr><td colspan="2" class="asc-table-empty">{% trans "No case waits for manual review." %}</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <h3 class="h6">{% trans "Repeated correction requests" %}</h3>
+      <dl class="asc-dl asc-dl-compact" data-stats-repeated>
+        <dt>{% trans "Identity corrections requested twice or more" %}</dt><dd data-count="{{ report.exceptions.repeated_identity_corrections }}">{{ report.exceptions.repeated_identity_corrections }}</dd>
+        <dt>{% trans "Information requests sent twice or more" %}</dt><dd data-count="{{ report.exceptions.repeated_information_requests }}">{{ report.exceptions.repeated_information_requests }}</dd>
+      </dl>
+      <div class="asc-table-wrap">
+        <table class="asc-table asc-stats-table" aria-label="{% trans 'Requests per registration' %}">
+          <thead><tr><th scope="col">{% trans "Requests per registration" %}</th><th scope="col" class="asc-num">{% trans "Identity corrections" %}</th><th scope="col" class="asc-num">{% trans "Information requests" %}</th></tr></thead>
+          <tbody>
+            {% for bucket, identity_count, request_count in report.exceptions.bucket_rows %}<tr><th scope="row"><bdi dir="ltr">{{ bucket }}</bdi></th><td class="asc-num">{{ identity_count }}</td><td class="asc-num">{{ request_count }}</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <h3 class="h6">{% trans "Identity verified, no participation-review work" %}</h3>
+      <p class="asc-stats-hero"><span class="asc-stats-hero-value" data-verified-without-review="{{ report.exceptions.verified_without_review_work }}">{{ report.exceptions.verified_without_review_work }}</span></p>
+      <p class="form-text mb-0">{% trans "These registrations would never reach a decision. The deployment team's review-queue backfill (dry run first) repairs eligible ones." %} <a href="{{ verified_without_review_url }}" class="d-print-none">{% trans "Show them" %}</a></p>
+    </div>
+  </div>
+</section>

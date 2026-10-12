@@ -159,9 +159,15 @@ def _no_overflow(page):
     return page.evaluate("() => document.documentElement.scrollWidth <= window.innerWidth")
 
 
-def _never_shown(page):
+def _never_shown(page, *, identity_shown: bool = False):
+    """The number, the token values and the service address are never in the
+    page. UPD-04: a found identity's requested fields (names, birth date,
+    presume) are shown in the lookup result, and only in that page."""
     html = page.content()
-    for secret in (TEST_NIN, ISSUED, CONFIGURED_B, "ministry.example.test", "DIAGNOSTIQUE"):
+    secrets = [TEST_NIN, ISSUED, CONFIGURED_B, "ministry.example.test"]
+    if not identity_shown:
+        secrets.append("DIAGNOSTIQUE")
+    for secret in secrets:
         assert secret not in html, secret
 
 
@@ -204,7 +210,11 @@ def test_each_check_has_its_own_action_and_result(live_server, page, scripted):
     result = _result(page, "IDENTITY_FOUND")
     expect(result).to_contain_text("identity found")
     expect(page.get_by_label("Authorized test identity number (NIN)")).to_have_value("")
-    _never_shown(page)
+    expect(page.locator("[data-identity-field='family_name_latin']")).to_contain_text(
+        "DIAGNOSTIQUE"
+    )
+    expect(page.locator("[data-identity-field='given_names_latin']")).to_contain_text("NAVIGATEUR")
+    _never_shown(page, identity_shown=True)
     _shot(page, "en-desktop-3-lookup-found")
 
     scripted.lookup = [_json(301, {"location": "elsewhere"})]

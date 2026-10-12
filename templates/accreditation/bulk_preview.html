@@ -11,9 +11,22 @@
     <div class="asc-page-head">
       <p class="asc-kicker">{% trans "Bulk accreditation" %}</p>
       <h1>{% trans "Bulk accreditation assignment" %}</h1>
-      <p>{% trans "Assign one role, badge type, access profile or access rule to every approved registration in your scope. Nothing changes until you execute the preview." %}</p>
+      <p>{% trans "Assign one role, badge type, access profile or access rule to every final-approved registration in your scope. Nothing changes until you execute the preview." %}</p>
     </div>
+    {% if prerequisites.can_view_settings %}
+      <div class="asc-actions-row mt-0">
+        <a class="btn btn-outline-secondary" href="{% url 'accreditation:settings' %}" data-bulk-settings-link>{% include "components/icon.html" with name="list" %}<span>{% trans "Accreditation settings" %}</span></a>
+      </div>
+    {% endif %}
   </div>
+
+  {% if prerequisites.populations %}
+    <div class="asc-stat-strip mb-3" data-bulk-population>
+      {% for row in prerequisites.populations %}
+        <p class="mb-0">{% blocktrans count counter=row.count with event=row.event.code %}{{ event }}: {{ counter }} final-approved registration in your scope{% plural %}{{ event }}: {{ counter }} final-approved registrations in your scope{% endblocktrans %}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
 
   <section class="asc-card" aria-labelledby="bulk-form-heading">
     <h2 class="asc-card-title" id="bulk-form-heading">{% include "components/icon.html" with name="layers" %}{% trans "What to assign" %}</h2>
@@ -33,10 +46,21 @@
         </div>
       </form>
     {% else %}
-      <div class="asc-empty">
+      <div class="asc-empty" data-bulk-empty="{% if not prerequisites.events %}no-event{% elif not prerequisites.configured %}not-configured{% else %}all-inactive{% endif %}">
         <span class="asc-tile">{% include "components/icon.html" with name="layers" %}</span>
         <h3>{% trans "There is nothing you can assign in bulk." %}</h3>
-        <p>{% trans "Active roles, badge types, access profiles and access rules appear here for the events where you may bulk-assign them." %}</p>
+        {% if not prerequisites.events %}
+          <p>{% trans "Missing prerequisite: your roles do not let you assign accreditation in any event edition." %}</p>
+        {% elif not prerequisites.configured %}
+          <p>{% trans "Missing prerequisite: no participant role, badge type, access profile or access rule is configured for your events yet." %}</p>
+        {% else %}
+          <p>{% trans "Missing prerequisite: every participant role, badge type, access profile and access rule of your events is inactive." %}</p>
+        {% endif %}
+        {% if prerequisites.can_manage_settings and prerequisites.events %}
+          <p class="mb-0"><a class="btn btn-primary" href="{% url 'accreditation:settings' %}" data-bulk-manage-settings>{% trans "Configure accreditation settings" %}</a></p>
+        {% elif prerequisites.events %}
+          <p class="mb-0">{% trans "Ask the superadmin to configure them." %}</p>
+        {% endif %}
       </div>
     {% endif %}
   </section>
@@ -48,11 +72,14 @@
         <span class="asc-count">{% blocktrans count counter=eligible_count %}{{ counter }} registration will be affected{% plural %}{{ counter }} registrations will be affected{% endblocktrans %}</span>
       </div>
       <div class="asc-card-form">
-        <dl class="asc-dl">
+        <dl class="asc-dl" data-bulk-preview-summary>
+          <dt>{% trans "Event edition" %}</dt><dd><bdi>{{ reference_obj.event_edition.name }}</bdi> (<bdi dir="ltr">{{ reference_obj.event_edition.code }}</bdi>)</dd>
+          <dt>{% trans "Population" %}</dt><dd>{% trans "Final-approved registrations in your scope: current decision Approved, not withdrawn or cancelled." %} {% blocktrans count counter=population_count %}{{ counter }} registration.{% plural %}{{ counter }} registrations.{% endblocktrans %}</dd>
           <dt>{% trans "Assignment type" %}</dt><dd>{{ kind_label }}</dd>
-          <dt>{% trans "Assign" %}</dt><dd><bdi>{{ reference_obj.localized_name }}</bdi></dd>
-          <dt>{% trans "Event edition" %}</dt><dd><bdi>{{ reference_obj.event_edition.name }}</bdi></dd>
+          <dt>{% trans "Assign" %}</dt><dd><bdi>{{ reference_obj.localized_name }}</bdi> <bdi dir="ltr" class="asc-code">{{ reference_obj.code }}</bdi></dd>
+          <dt>{% trans "Will be assigned" %}</dt><dd data-bulk-eligible="{{ eligible_count }}"><strong>{{ eligible_count }}</strong>{% if already_count %} · {% blocktrans count counter=already_count %}{{ counter }} already has it (unchanged){% plural %}{{ counter }} already have it (unchanged){% endblocktrans %}{% endif %}</dd>
         </dl>
+        <p class="form-text mb-0">{% trans "Nothing is changed by this preview. At execution, each registration is checked again: one withdrawn, cancelled, decided differently or no longer in your scope is skipped." %}</p>
       </div>
       {% if operation.preview_results %}
         <div class="asc-table-wrap asc-wide-only">
@@ -87,7 +114,7 @@
       {% else %}
         <div class="asc-empty">
           <span class="asc-tile">{% include "components/icon.html" with name="inbox" %}</span>
-          <h3>{% trans "No approved registrations in your scope for this event." %}</h3>
+          <h3>{% trans "No final-approved registration in your scope for this event." %}</h3>
         </div>
       {% endif %}
       {% if eligible_count %}

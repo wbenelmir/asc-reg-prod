@@ -1,0 +1,34 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% if organization %}{% trans "Edit organization" %}{% else %}{% trans "Create organization" %}{% endif %}{% endblock %}
+{% block breadcrumbs %}{% url 'organizations:list' as parent_url %}{% trans "Organizations" as parent_label %}{% if organization %}{% trans "Edit organization" as current %}{% else %}{% trans "Create organization" as current %}{% endif %}{% include "components/breadcrumb_trail.html" with parent_label=parent_label parent_url=parent_url current=current %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Organizations" %}</p>
+      <h1>{% if organization %}{% trans "Edit organization" %}{% else %}{% trans "Create organization" %}{% endif %}</h1>
+      {% if organization %}<p>{% trans "Registrations keep the organization name their participants submitted; only the master record changes." %}</p>{% endif %}
+    </div>
+  </div>
+  {% include "components/error_summary.html" %}
+  {% if duplicates %}
+    <div class="asc-notice asc-notice-warning mb-3" role="alert" data-organization-duplicates>
+      {% include "components/icon.html" with name="layers" %}
+      <div>
+        <p class="mb-1"><strong>{% trans "Possible duplicates:" %}</strong></p>
+        <ul class="mb-0">{% for duplicate in duplicates %}<li><a href="{% url 'organizations:detail' pk=duplicate.pk %}"><bdi>{{ duplicate.official_name }}</bdi></a> · {{ duplicate.get_organization_type_display }}</li>{% endfor %}</ul>
+      </div>
+    </div>
+  {% endif %}
+  <form method="post" class="asc-card asc-form-narrow" novalidate>
+    {% csrf_token %}
+    {% include "components/field.html" with field=form.official_name %}
+    {% include "components/field.html" with field=form.organization_type %}
+    {% include "components/field.html" with field=form.country_code %}
+    {% if duplicates %}{% include "components/field.html" with field=form.confirm_duplicate %}{% endif %}
+    <div class="asc-form-actions">
+      <button type="submit" class="btn btn-primary"><span>{% if organization %}{% trans "Save changes" %}{% else %}{% trans "Create organization" %}{% endif %}</span></button>
+      <a class="btn btn-outline-secondary" href="{% if organization %}{% url 'organizations:detail' pk=organization.pk %}{% else %}{% url 'organizations:list' %}{% endif %}">{% trans "Cancel" %}</a>
+    </div>
+  </form>
+{% endblock %}

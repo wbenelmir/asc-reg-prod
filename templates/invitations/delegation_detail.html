@@ -28,6 +28,10 @@
     </div>
   </div>
 
+  {% if can_view_registrations and batch.applied_row_count %}
+    <p class="mb-3"><a class="btn btn-outline-secondary" href="{% url 'registrations:ops-intake-list' %}?batch={{ batch.pk }}" data-batch-registrations>{% include "components/icon.html" with name="list" %}<span>{% trans "View the resulting registrations" %}</span></a></p>
+  {% endif %}
+
   {% if batch.status == "VALIDATED" and can_apply %}
     <section class="asc-card" aria-labelledby="apply-heading">
       <h2 class="asc-card-title" id="apply-heading">{% include "components/icon.html" with name="send" %}{% trans "Apply the valid rows" %}</h2>

@@ -15,7 +15,7 @@ from django.views.decorators.http import require_http_methods
 
 from apps.accounts import participant_auth
 from apps.accounts.policies import has_scoped_permission, operational_permission_required
-from apps.registrations.models import Registration
+from apps.registrations.models import Registration, RegistrationPublicStatus
 
 from .forms import (
     ApprovedDecisionForm,
@@ -45,6 +45,7 @@ from .selectors import (
     review_cases_visible_to,
 )
 from .services import (
+    REOPENABLE_PUBLIC_STATUSES,
     ActiveInformationRequestExistsError,
     ApprovalRequiresAssignmentsError,
     ApprovalRequiresVerifiedIdentityError,
@@ -316,8 +317,12 @@ def case_detail(request, pk):
         "can_decide": has_scoped_permission(
             request.user, "reviews.add_registrationdecision", **scope
         ),
-        "can_reopen": has_scoped_permission(request.user, "reviews.reopen_reviewcase", **scope),
-        "can_cancel": has_scoped_permission(request.user, "reviews.cancel_registration", **scope),
+        # UPD-01: a withdrawn or cancelled registration is history; it is
+        # neither reopened nor cancelled again (the services refuse both).
+        "can_reopen": registration.public_status in REOPENABLE_PUBLIC_STATUSES
+        and has_scoped_permission(request.user, "reviews.reopen_reviewcase", **scope),
+        "can_cancel": registration.public_status != RegistrationPublicStatus.WITHDRAWN
+        and has_scoped_permission(request.user, "reviews.cancel_registration", **scope),
         "duplicate_outcomes": DuplicateOutcome.choices,
     }
     # IDV-3 (IDV-10): the identity status is shown beside the participation

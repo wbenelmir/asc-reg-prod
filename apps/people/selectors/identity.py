@@ -31,15 +31,26 @@ from apps.people.policies import identity_verifications_visible_to
 QUEUE_FILTER_KEYS = ("status", "reason", "route", "nationality", "source", "event", "ctx")
 DEFAULT_STATUS_FILTER = IdentityStatus.MANUAL_REVIEW
 ALL_STATUSES = "ALL"
+#: UPD-01: the cases of withdrawn, cancelled or not-approved registrations.
+#: They are history, never actionable work: every identity-status tab (and
+#: its count) shows active registrations only, and this tab shows the closed
+#: ones, whatever their last identity status.
+CLOSED_REGISTRATIONS = "CLOSED"
 #: The most case ids one search keeps.
 SEARCH_RESULT_LIMIT = 500
+
+
+def _active_registration_q() -> Q:
+    from apps.people.services.identity_verification import ACTIVE_PUBLIC_STATUSES
+
+    return Q(registration__public_status__in=ACTIVE_PUBLIC_STATUSES)
 
 
 def clean_queue_filters(query) -> dict[str, str]:
     """Bounded, validated filters from a query dict; unknown values are dropped."""
     filters: dict[str, str] = {}
     status = (query.get("status") or DEFAULT_STATUS_FILTER).strip()
-    if status == ALL_STATUSES or status in IdentityStatus.values:
+    if status in (ALL_STATUSES, CLOSED_REGISTRATIONS) or status in IdentityStatus.values:
         filters["status"] = status
     else:
         filters["status"] = DEFAULT_STATUS_FILTER
@@ -125,7 +136,10 @@ def resolve_queue_search(user, text: str) -> tuple[str, list[str], bool]:
 def queue_queryset(user, filters: dict[str, str], *, search=None, apply_status: bool = True):
     """The filtered queue. `search` (a `SearchContext`) narrows it to the case
     ids of a resolved search; scope -- and, for a NIN search, the evidence
-    permission -- is applied again here on every use."""
+    permission -- is applied again here on every use.
+
+    UPD-01: an identity-status filter lists the cases of ACTIVE registrations
+    only; `CLOSED` lists those of closed registrations; `ALL` lists both."""
     queryset = identity_verifications_visible_to(user).select_related(
         "registration",
         "registration__profile",
@@ -133,8 +147,11 @@ def queue_queryset(user, filters: dict[str, str], *, search=None, apply_status: 
         "event_edition",
         "current_revision__identifier",
     )
-    if apply_status and filters.get("status") not in (None, ALL_STATUSES):
-        queryset = queryset.filter(status=filters["status"])
+    status = filters.get("status")
+    if apply_status and status == CLOSED_REGISTRATIONS:
+        queryset = queryset.exclude(_active_registration_q())
+    elif apply_status and status not in (None, ALL_STATUSES):
+        queryset = queryset.filter(_active_registration_q(), status=status)
     if filters.get("reason"):
         queryset = queryset.filter(reason_code=filters["reason"])
     if filters.get("route"):
@@ -157,16 +174,24 @@ def queue_queryset(user, filters: dict[str, str], *, search=None, apply_status: 
 
 
 def status_counts(user, filters: dict[str, str], *, search=None) -> dict[str, int]:
-    """Counts per status under every filter except the status itself."""
+    """Counts per identity status of ACTIVE registrations, plus `CLOSED` (the
+    closed registrations' cases) and `ALL` (both), under every filter except
+    the status itself. One aggregate query (UPD-01)."""
+    active = _active_registration_q()
     rows = (
         queue_queryset(user, filters, search=search, apply_status=False)
         .order_by()
         .values("status")
-        .annotate(total=Count("pk"))
+        .annotate(active=Count("pk", filter=active), closed=Count("pk", filter=~active))
     )
     counts = {status: 0 for status in IdentityStatus.values}
+    counts[CLOSED_REGISTRATIONS] = 0
     for row in rows:
-        counts[row["status"]] = row["total"]
+        counts[row["status"]] = row["active"]
+        counts[CLOSED_REGISTRATIONS] += row["closed"]
+    counts[ALL_STATUSES] = (
+        sum(counts[status] for status in IdentityStatus.values) + counts[CLOSED_REGISTRATIONS]
+    )
     return counts
 
 

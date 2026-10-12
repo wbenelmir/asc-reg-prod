@@ -184,7 +184,7 @@ def _approve(registration, manager, version):
 
 
 def test_an_approval_racing_the_identity_verification(versions, manager, reviewer) -> None:
-    from apps.reviews.services import ApprovalRequiresVerifiedIdentityError
+    from apps.reviews.services import ApprovalRequiresVerifiedIdentityError, StaleVersionError
 
     registration = _manual_case("IDVQCA", versions)
     assign_approval_prerequisites(registration, manager)
@@ -199,7 +199,14 @@ def test_an_approval_racing_the_identity_verification(versions, manager, reviewe
     )
 
     _no_deadlock(errors)
-    assert all(isinstance(error, ApprovalRequiresVerifiedIdentityError) for error in errors)
+    # Approval first: refused, the identity is not verified yet. Verification
+    # first: it moves the registration to participation review (a version
+    # bump), so the approval sent with the earlier version is a visible
+    # conflict. Either way nothing is approved on an unverified identity.
+    assert all(
+        isinstance(error, (ApprovalRequiresVerifiedIdentityError, StaleVersionError))
+        for error in errors
+    )
     registration.refresh_from_db()
     case = case_for(registration)
     assert case.status == IdentityStatus.MANUALLY_VERIFIED  # the verification always lands

@@ -135,6 +135,11 @@ class Registration(UUIDPrimaryKeyModel, TimestampedModel, VersionedModel):
     )
     is_current_context = models.BooleanField(default=True)
     preferred_language = models.CharField(max_length=8, default="en")
+    # UPD-03 (registrations.0011): the interface language active when the
+    # participant made the final submission. Empty for registrations
+    # submitted before it was recorded; `apps.registrations.language`
+    # derives those from the submission evidence or reports them unknown.
+    submission_language = models.CharField(max_length=8, blank=True, default="", db_default="")
     current_step = models.CharField(max_length=100, blank=True, default="")
     submitted_at = models.DateTimeField(null=True, blank=True)
     withdrawn_at = models.DateTimeField(null=True, blank=True)

@@ -28,11 +28,13 @@ from .selectors import (
     organization_workspace_registrations,
 )
 from .services import (
+    CampaignNotEditableError,
     ClaimUnavailable,
     IllegalCampaignTransitionError,
     InvitationLinkUnavailable,
     NoActiveLinkError,
     apply_delegation_batch,
+    campaign_usage,
     change_campaign_status,
     claim_on_behalf_registration_by_hash,
     create_campaign,
@@ -40,7 +42,9 @@ from .services import (
     hash_claim_token,
     issue_initial_link,
     resolve_invitation_link,
+    revoke_link,
     rotate_link,
+    update_campaign,
     upload_delegation_batch,
 )
 
@@ -95,6 +99,20 @@ def _get_scoped_organization_or_404(
         )
         raise Http404("No Organization matches the given query.")
     return organization
+
+
+def _refuse_inactive_organization(request, organization):
+    """UPD-06: a deactivated organization starts nothing new (campaign,
+    delegation list, on-behalf registration). Returns a redirect, or None."""
+    from apps.organizations.models import OrganizationStatus
+
+    if organization.status == OrganizationStatus.ACTIVE:
+        return None
+    messages.error(
+        request,
+        _("This organization is inactive. Activate it before starting anything new for it."),
+    )
+    return redirect("invitations:workspace-dashboard")
 
 
 def _record_workspace_detail_view(user, *, target_type: str, target_uuid) -> None:
@@ -247,10 +265,35 @@ def workspace_dashboard(request):
         :50
     ]
     batches = delegation_batches_visible_to(request.user).select_related("organization")[:50]
+    # UPD-06: organization management is discoverable from here for those
+    # who hold it (the superadmin by default).
+    can_manage_organizations = has_scoped_permission(
+        request.user, "organizations.view_organization"
+    )
+    organization_count = (
+        organizations_visible_to(
+            request.user, app_label="organizations", codename="view_organization"
+        ).count()
+        if can_manage_organizations
+        else None
+    )
+    try:
+        current_event = current_event_edition()
+    except NoOpenEventEdition:
+        current_event = None
     return render(
         request,
         "invitations/workspace_dashboard.html",
-        {"campaigns": campaigns, "batches": batches},
+        {
+            "campaigns": campaigns,
+            "batches": batches,
+            "can_manage_organizations": can_manage_organizations,
+            "can_create_organization": has_scoped_permission(
+                request.user, "organizations.add_organization"
+            ),
+            "organization_count": organization_count,
+            "current_event": current_event,
+        },
     )
 
 
@@ -358,6 +401,9 @@ def campaign_create(request, organization_id):
         codename="add_invitationcampaign",
         event_edition_id=event_edition.pk,
     )
+    refused = _refuse_inactive_organization(request, organization)
+    if refused is not None:
+        return refused
 
     form = CampaignForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
@@ -409,12 +455,36 @@ def campaign_detail(request, pk):
         "event_edition_id": campaign.event_edition_id,
         "organization_id": campaign.organization_id,
     }
+    # UPD-06: every link of the campaign (active, replaced, disabled), with
+    # the registrations each started and submitted. Counts only.
+    from django.db.models import Count, Q
+
+    links = list(
+        campaign.links.annotate(
+            started=Count("uses", filter=Q(uses__use_kind="DRAFT_CREATED")),
+            submitted=Count("uses", filter=Q(uses__use_kind="SUBMITTED")),
+        ).order_by("-created_at")
+    )
     return render(
         request,
         "invitations/campaign_detail.html",
         {
             "campaign": campaign,
             "active_link": active_link,
+            "links": links,
+            "usage": campaign_usage(campaign),
+            "registration_count": campaign.registrations.count(),
+            "can_edit": campaign.status != "CLOSED"
+            and has_scoped_permission(
+                request.user, "invitations.change_invitationcampaign", **scope
+            ),
+            "can_revoke_link": has_scoped_permission(
+                request.user, "invitations.change_invitationlink", **scope
+            ),
+            "can_view_registrations": has_scoped_permission(
+                request.user, "registrations.view_registration", **scope
+            ),
+            "can_export": has_scoped_permission(request.user, "exports.add_exportrequest", **scope),
             "issued_url": issued_url,
             # Authorization-aware UI (Phase 2 Prompt 2 correction pass): the
             # server-side decorator on each POST endpoint remains the real
@@ -444,6 +514,75 @@ def campaign_change_status(request, pk):
         change_campaign_status(campaign, new_status, actor=request.user)
     except IllegalCampaignTransitionError:
         messages.error(request, _("That status change is not allowed from the current status."))
+    return redirect("invitations:campaign-detail", pk=campaign.pk)
+
+
+@operational_permission_required(
+    "invitations.change_invitationcampaign", login_url="accounts:operational-sign-in"
+)
+def campaign_edit(request, pk):
+    """UPD-06: edit the name, validity dates, optional capacity and default
+    language of a campaign (versioned and audited by `update_campaign`)."""
+    campaign = _get_visible_campaign_or_404(request, pk, codename="change_invitationcampaign")
+    from django.utils import timezone
+
+    initial = {
+        "name": campaign.name,
+        "valid_from": timezone.localtime(campaign.valid_from) if campaign.valid_from else None,
+        "valid_until": timezone.localtime(campaign.valid_until) if campaign.valid_until else None,
+        "capacity": campaign.capacity,
+        "language": campaign.language,
+    }
+    form = CampaignForm(request.POST or None, initial=initial)
+    if request.method == "POST" and form.is_valid():
+        from apps.reviews.services import StaleVersionError
+
+        try:
+            updated = update_campaign(
+                campaign,
+                actor=request.user,
+                expected_version=int(request.POST.get("expected_version", campaign.version)),
+                name=form.cleaned_data["name"],
+                valid_from=form.cleaned_data.get("valid_from"),
+                valid_until=form.cleaned_data.get("valid_until"),
+                capacity=form.cleaned_data.get("capacity"),
+                language=form.cleaned_data["language"],
+            )
+        except StaleVersionError:
+            messages.error(
+                request, _("The campaign changed since you opened this page. Nothing was saved.")
+            )
+        except CampaignNotEditableError:
+            messages.error(request, _("A closed campaign cannot be edited."))
+        else:
+            usage = campaign_usage(updated)
+            if updated.capacity is not None and usage["submitted"] > updated.capacity:
+                messages.warning(
+                    request,
+                    _(
+                        "The new limit is lower than the places already used. No registration is "
+                        "removed; the link accepts no new submission."
+                    ),
+                )
+            messages.success(request, _("Campaign updated."))
+        return redirect("invitations:campaign-detail", pk=campaign.pk)
+    return render(request, "invitations/campaign_edit.html", {"form": form, "campaign": campaign})
+
+
+@operational_permission_required(
+    "invitations.change_invitationlink", login_url="accounts:operational-sign-in"
+)
+@require_http_methods(["POST"])
+def campaign_revoke_link(request, pk):
+    """UPD-06: disable the campaign's active link without replacing it. The
+    registrations it started keep their campaign and link."""
+    campaign = _get_visible_campaign_or_404(request, pk, codename="change_invitationlink")
+    try:
+        revoke_link(campaign, actor=request.user)
+    except NoActiveLinkError:
+        messages.error(request, _("This campaign has no active link to disable."))
+    else:
+        messages.success(request, _("The link is disabled. Earlier registrations are unchanged."))
     return redirect("invitations:campaign-detail", pk=campaign.pk)
 
 
@@ -494,6 +633,9 @@ def delegation_upload(request, organization_id):
         codename="add_delegationbatch",
         event_edition_id=event_edition.pk,
     )
+    refused = _refuse_inactive_organization(request, organization)
+    if refused is not None:
+        return refused
 
     # A server-issued, session-bound, per-(organization, event) form token
     # (Phase 2 Prompt 2 correction pass "make delegation upload genuinely
@@ -574,7 +716,18 @@ def delegation_detail(request, pk):
     return render(
         request,
         "invitations/delegation_detail.html",
-        {"batch": batch, "rows": rows, "can_apply": can_apply},
+        {
+            "batch": batch,
+            "rows": rows,
+            "can_apply": can_apply,
+            # UPD-06: the registrations created from this list, in the list.
+            "can_view_registrations": has_scoped_permission(
+                request.user,
+                "registrations.view_registration",
+                event_edition_id=batch.event_edition_id,
+                organization_id=batch.organization_id,
+            ),
+        },
     )
 
 
@@ -620,6 +773,9 @@ def on_behalf_create(request, organization_id):
         codename="register_on_behalf",
         event_edition_id=event_edition.pk,
     )
+    refused = _refuse_inactive_organization(request, organization)
+    if refused is not None:
+        return refused
 
     form = OnBehalfDraftForm(request.POST or None)
     claim_url = None

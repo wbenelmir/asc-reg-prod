@@ -260,28 +260,29 @@ def test_staff_identity_actions_refuse_a_not_approved_registration(
     assert registration.public_status == RegistrationPublicStatus.NOT_APPROVED
 
 
-def test_an_authorized_reopening_restores_the_correction_path(
-    idv_event, legal_versions, reviewer, manager
+@pytest.mark.parametrize("how", ["withdraw", "cancel"])
+def test_a_withdrawn_or_cancelled_correction_is_never_reopened_by_staff(
+    idv_event, legal_versions, reviewer, manager, how
 ) -> None:
+    """UPD-01 (2026-10-12): a withdrawn or cancelled registration is never
+    reactivated by a staff action. Its identity case stays as history and the
+    participant registers again from the same account instead."""
     from apps.reviews.services import reopen_registration
 
     registration = _returned(idv_event, legal_versions, reviewer)
-    _close("withdraw", registration, manager)
+    _close(how, registration, manager)
     registration.refresh_from_db()
-    reopen_registration(
-        registration=registration,
-        expected_version=registration.version,
-        reason="synthetic authorized reopening",
-        actor=manager,
-    )
+    before = _footprint(registration)
+    with pytest.raises(ValueError, match="cannot be reopened"):
+        reopen_registration(
+            registration=registration,
+            expected_version=registration.version,
+            reason="synthetic reopening attempt",
+            actor=manager,
+        )
     registration.refresh_from_db()
-    assert registration.public_status == RegistrationPublicStatus.UNDER_REVIEW
+    assert registration.public_status == RegistrationPublicStatus.WITHDRAWN
+    assert _footprint(registration) == before
     case = case_for(registration)
-    assert case.status == IdentityStatus.MANUAL_REVIEW  # waiting for staff, not for the participant
-    review.return_identity_for_correction(
-        case.pk, actor=reviewer, expected_version=case.version, items=["NIN_NUMBER"]
-    )
-    _resubmit(registration, case_for(registration).version)
-    registration.refresh_from_db()
-    assert registration.public_status == RegistrationPublicStatus.SUBMITTED
-    assert case_for(registration).status == IdentityStatus.PENDING  # the changed NIN is checked
+    assert case.status == IdentityStatus.MANUAL_REVIEW
+    assert case.reason_code == IdentityReasonCode.REGISTRATION_CLOSED

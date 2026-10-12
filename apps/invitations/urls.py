@@ -38,6 +38,17 @@ urlpatterns = [
         views.campaign_change_status,
         name="campaign-change-status",
     ),
+    # UPD-06: edit a campaign; disable its link without replacing it.
+    path(
+        "organizations/workspace/campaigns/<uuid:pk>/edit/",
+        views.campaign_edit,
+        name="campaign-edit",
+    ),
+    path(
+        "organizations/workspace/campaigns/<uuid:pk>/revoke-link/",
+        views.campaign_revoke_link,
+        name="campaign-revoke-link",
+    ),
     path(
         "organizations/workspace/campaigns/<uuid:pk>/issue-link/",
         views.campaign_issue_link,

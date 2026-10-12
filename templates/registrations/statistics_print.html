@@ -1,0 +1,49 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% block title %}{{ report_title }}{% endblock %}
+{% block body_attrs %} class="asc-ui asc-operations asc-stats-print" data-entry-busy-text="{% trans 'Working…' %}"{% endblock %}
+{% block content %}
+  {% comment %}
+    UPD-08: the printable report (PDF through the browser's print dialog, with
+    the platform fonts and right-to-left layout). The whole filtered scope,
+    computed once; the page opens the print dialog by itself.
+  {% endcomment %}
+  <div class="asc-stats-report-head" data-auto-print data-stats-report="{{ report_kind }}">
+    <p class="asc-kicker">{% trans "ASC 2026 Registration Platform" %}</p>
+    <h1>{{ report_title }}</h1>
+    <dl class="asc-dl asc-dl-compact">
+      <dt>{% trans "Generated at" %}</dt><dd data-stats-generated><bdi dir="ltr">{{ generated_label }}</bdi></dd>
+      <dt>{% trans "Dataset" %}</dt><dd>{% trans "Every registration in the authorized scope that matches the filters, not one page." %}</dd>
+      <dt>{% trans "Filters" %}</dt><dd>{% for label, value in filter_summary %}{{ label }}: <bdi>{{ value }}</bdi>{% if not forloop.last %} · {% endif %}{% empty %}{% trans "none" %}{% endfor %}</dd>
+    </dl>
+    <p class="d-print-none mb-3"><button type="button" class="btn btn-primary" data-print-report>{% include "components/icon.html" with name="download" %}<span>{% trans "Print or save as PDF" %}</span></button></p>
+  </div>
+  {% with print_mode=True %}
+    {% if report_kind == "situation" %}
+      {% include "registrations/statistics/_overview.html" %}
+      {% include "registrations/statistics/_trends.html" %}
+      {% include "registrations/statistics/_sources.html" %}
+    {% elif report_kind == "approved" %}
+      {% include "registrations/statistics/_final_approved.html" %}
+      {% if attendees is not None %}
+        <section class="asc-card asc-card-flush" aria-labelledby="stats-attendees-heading" data-stats-attendees="{{ attendees|length }}">
+          <div class="asc-card-toolbar"><h2 class="asc-card-toolbar-title" id="stats-attendees-heading">{% trans "Attendee list" %}</h2><span class="asc-count">{{ attendees|length }}</span></div>
+          {% if attendee_access.withheld %}<p class="form-text px-3" data-attendee-scope="partial">{% blocktrans trimmed with withheld=attendee_access.withheld total=attendee_access.total %}The attendee list covers only the registrations inside your export scope: {{ withheld }} of {{ total }} final-approved registrations are not listed.{% endblocktrans %}</p>{% endif %}
+          <div class="asc-table-wrap">
+            <table class="asc-table asc-stats-table" aria-labelledby="stats-attendees-heading">
+              <thead><tr><th scope="col">{% trans "Reference" %}</th><th scope="col">{% trans "Name" %}</th><th scope="col">{% trans "Nationality" %}</th><th scope="col">{% trans "Organization" %}</th><th scope="col">{% trans "Participant role" %}</th><th scope="col">{% trans "Badge type" %}</th><th scope="col">{% trans "Attendance days" %}</th><th scope="col">{% trans "Approved on" %}</th></tr></thead>
+              <tbody>
+                {% for row in attendees %}<tr><th scope="row"><bdi dir="ltr" class="asc-code">{{ row.0 }}</bdi></th><td><bdi>{{ row.1 }} {{ row.2 }}</bdi></td><td>{{ row.3 }}</td><td><bdi>{{ row.4 }}</bdi></td><td>{{ row.5 }}</td><td>{{ row.6 }}</td><td>{{ row.7 }}</td><td><bdi dir="ltr">{{ row.8 }}</bdi></td></tr>{% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      {% elif attendees_withheld %}
+        <p class="form-text">{% trans "The attendee list is included only for holders of the export permission in this scope." %}</p>
+      {% endif %}
+    {% else %}
+      {% include "registrations/statistics/_workload.html" %}
+    {% endif %}
+    {% include "registrations/statistics/_definitions.html" %}
+  {% endwith %}
+{% endblock %}

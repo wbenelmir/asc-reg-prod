@@ -104,6 +104,7 @@ def request_export(
     *,
     event_edition,
     organization=None,
+    campaign=None,
     dataset_kind: str = ExportDatasetKind.REGISTRATIONS_SUMMARY,
     purpose_code: str,
     reason: str,
@@ -134,6 +135,7 @@ def request_export(
             existing.requested_by_id == requested_by.pk
             and existing.event_edition_id == event_edition.pk
             and existing.organization_id == getattr(organization, "pk", None)
+            and existing.invitation_campaign_id == getattr(campaign, "pk", None)
             and existing.dataset_kind == dataset_kind
             and existing.purpose_code == purpose_code
             and existing.reason == reason[:500]
@@ -158,6 +160,10 @@ def request_export(
     )
     if organization is not None:
         scoped_registrations = scoped_registrations.filter(source_organization=organization)
+    if campaign is not None:
+        # UPD-06: one campaign's results (its registrations keep the campaign
+        # whatever happened to the links they started from).
+        scoped_registrations = scoped_registrations.filter(invitation_campaign=campaign)
     scoped_registrations = list(scoped_registrations.order_by("public_reference"))
 
     content_bytes, row_count = _generate_csv_bytes(
@@ -174,6 +180,7 @@ def request_export(
                 schema_version=EXPORT_SCHEMA_VERSION,
                 event_edition=event_edition,
                 organization=organization,
+                invitation_campaign=campaign,
                 purpose_code=purpose_code,
                 reason=reason[:500],
                 requested_by=requested_by,

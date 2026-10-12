@@ -22,6 +22,13 @@
     <ul class="mb-0">
       {% for label in requested_labels %}<li><bdi>{{ label }}</bdi></li>{% endfor %}
     </ul>
+    {% if participant_note %}
+      {# UPD-03: the team's note for this request, escaped, line breaks kept. #}
+      <div class="asc-participant-note mt-3" data-idv-participant-note>
+        <h3 class="asc-participant-note-title">{% trans "Message from the registration team" %}</h3>
+        <p class="asc-preline mb-0" dir="auto">{{ participant_note }}</p>
+      </div>
+    {% endif %}
   </section>
 
   {% include "components/error_summary.html" %}

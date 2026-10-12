@@ -158,7 +158,8 @@ also filters by the actor's scoped memberships.
 | Exports (CSV) | Private storage, minimized columns | The requester in scope; retrieval audited | Counted | — | Expiry job (idempotent) |
 | Communications | Destination and body encrypted | `view_communicationmessage`, scoped | Outbox payload carries ids only (sweep: TEST) | — | OD-007 |
 | Logs | Redaction filter (`apps/core/redaction.py`) for credentials, tokens, NIN and passport values, and document URLs | Operators of the host | — | — | Deployment policy |
-| Error reporting, telemetry, analytics | **None integrated** (no SDK or tracker found; STATIC) | — | — | — | — |
+| Error reporting, telemetry | **None integrated** (no SDK or tracker found; STATIC) | — | — | — | — |
+| Web analytics (GA4, production only, since 2026-10) | Opt-in consent; public start and legal pages only; fixed path and English title, referrer origin only, no form values, signals and ad personalisation off; sealed before htmx navigation (`docs/operations/google_analytics.md`; TEST) | Google Analytics property owner | No server-side logging of analytics | Consent choice in `localStorage`; `_ga` cookies after consent, deleted on withdrawal | GA4 property retention setting |
 
 ## 5. External dependencies and outage behaviour
 

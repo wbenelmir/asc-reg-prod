@@ -1,0 +1,50 @@
+{% load i18n %}
+{# UPD-08: the final-approved population and its readiness (prominent dedicated view). #}
+{% with population=report.final_approved %}
+<section class="asc-card asc-stats-approved" aria-labelledby="stats-approved-heading" data-stats-section="final-approved">
+  <div class="asc-stats-approved-head">
+    <h2 class="asc-card-title" id="stats-approved-heading">{% include "components/icon.html" with name="check-circle" %}{% trans "2. Final-approved attendees" %}</h2>
+    <p class="asc-stats-hero" data-final-approved="{{ population.total }}"><span class="asc-stats-hero-value">{{ population.total }}</span> <span>{% trans "final-approved registrations" %}</span></p>
+    <p class="form-text mb-2">{% trans "Current decision Approved, and the registration is approved, current, not withdrawn and not cancelled." %}</p>
+    {% if final_approved_url %}<p class="mb-0 d-print-none"><a class="btn btn-primary" href="{{ final_approved_url }}" data-stats-approved-list>{% include "components/icon.html" with name="list" %}<span>{% trans "Open the searchable list of accepted registrations" %}</span></a></p>{% endif %}
+  </div>
+
+  <div class="asc-stats-grid">
+    <div>
+      <h3 class="h6">{% trans "Readiness" %}</h3>
+      <div class="asc-table-wrap">
+        <table class="asc-table asc-stats-table" aria-label="{% trans 'Readiness' %}">
+          <thead><tr><th scope="col">{% trans "Item" %}</th><th scope="col" class="asc-num">{% trans "Count" %}</th><th scope="col" class="asc-num">%</th></tr></thead>
+          <tbody>
+            {% for row in population.readiness %}<tr data-readiness="{{ row.key }}"><th scope="row">{{ row.label }}</th><td class="asc-num">{{ row.count }}</td><td class="asc-num">{% if row.percent is not None %}{{ row.percent }}{% else %}—{% endif %}</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <h3 class="h6">{% trans "Approved attendance days" %}</h3>
+      {% trans "Approved attendance days" as caption %}{% trans "Attendance" as column %}
+      {% include "registrations/statistics/_breakdown.html" with rows=population.attendance.categories caption=caption column=column %}
+      <ul class="asc-plain-list mt-2" data-stats-days>
+        {% for row in population.attendance.days %}<li>{% if row.url %}<a href="{{ row.url }}">{% endif %}{% blocktrans with day=row.day count counter=row.count %}Day {{ day }}: {{ counter }} registration{% plural %}Day {{ day }}: {{ counter }} registrations{% endblocktrans %}{% if row.url %}</a>{% endif %}</li>{% endfor %}
+      </ul>
+      <p class="form-text mb-0">{% trans "Days overlap: a registration approved for all three days counts on each of them, so the day figures do not add up to the total." %}</p>
+    </div>
+    <div>
+      <h3 class="h6">{% trans "Participation categories (participant roles)" %}</h3>
+      {% trans "Participation categories" as caption %}{% trans "Participant role" as column %}
+      {% include "registrations/statistics/_breakdown.html" with rows=population.roles caption=caption column=column %}
+    </div>
+    <div>
+      <h3 class="h6">{% trans "Badge types" %}</h3>
+      {% trans "Badge types" as caption %}{% trans "Badge type" as column %}
+      {% include "registrations/statistics/_breakdown.html" with rows=population.badge_types caption=caption column=column %}
+    </div>
+    <div class="asc-stats-grid-wide">
+      <h3 class="h6">{% trans "Organizations" %}</h3>
+      {% trans "Organizations of the final-approved" as caption %}{% trans "Organization" as column %}
+      {% include "registrations/statistics/_breakdown.html" with rows=population.organizations caption=caption column=column %}
+    </div>
+  </div>
+</section>
+{% endwith %}

@@ -4612,3 +4612,225 @@ body.asc-ui :lang(ar) {
     flex: 1 1 100%;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Consolidated update 2026-10-12 (UPD-01 to UPD-08)                   */
+/* ------------------------------------------------------------------ */
+
+/* Text written by staff for a participant: escaped, line breaks kept. */
+.asc-ui .asc-preline {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.asc-ui .asc-participant-note {
+  padding: 0.75rem 1rem;
+  border-inline-start: 4px solid var(--asc-info-edge);
+  border-radius: var(--asc-radius-sm);
+  background: var(--asc-info-bg);
+  color: var(--asc-text);
+}
+
+.asc-ui .asc-participant-note-title {
+  margin: 0 0 0.375rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-idv-participant-note {
+  margin-block: 0.25rem;
+  padding-inline-start: 0.75rem;
+  border-inline-start: 3px solid var(--asc-border-strong);
+}
+
+/* UPD-05: counts strip, the two search forms side by side, collapsible filters. */
+.asc-ui .asc-stat-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--asc-border);
+  border-radius: var(--asc-radius);
+  background: var(--asc-surface);
+}
+
+.asc-ui .asc-search-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: 1rem;
+}
+
+.asc-ui .asc-search-pair > .asc-card {
+  margin-bottom: 0;
+}
+
+.asc-ui .asc-filters-disclosure > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--asc-target);
+  margin: 0;
+  cursor: pointer;
+}
+
+.asc-ui .asc-filters-disclosure[open] > summary {
+  margin-bottom: 0.75rem;
+}
+
+/* UPD-08: statistics. One hue for single-series bars; exact tables beside every chart. */
+.asc-ui .asc-stats-kpis .asc-stats-kpi {
+  color: inherit;
+  text-decoration: none;
+}
+
+.asc-ui .asc-stats-kpis .asc-stats-kpi:hover,
+.asc-ui .asc-stats-kpis .asc-stats-kpi:focus-visible {
+  border-color: var(--asc-blue);
+  text-decoration: none;
+}
+
+.asc-ui .asc-kpi-note {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--asc-text-muted);
+}
+
+.asc-ui .asc-stats-kpi-strong .asc-kpi-value {
+  color: var(--asc-success-fg);
+}
+
+.asc-ui .asc-stats-approved {
+  border-inline-start: 4px solid var(--asc-success-edge);
+}
+
+.asc-ui .asc-stats-hero {
+  margin: 0.25rem 0;
+}
+
+.asc-ui .asc-stats-hero-value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--asc-heading);
+}
+
+.asc-ui .asc-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: 1rem 1.5rem;
+  margin-top: 1rem;
+}
+
+.asc-ui .asc-stats-grid-wide {
+  grid-column: 1 / -1;
+}
+
+.asc-ui .asc-stats-table th[scope="row"] {
+  font-weight: 500;
+}
+
+.asc-ui .asc-stats-missing th,
+.asc-ui .asc-stats-missing td {
+  color: var(--asc-text-muted);
+  font-style: italic;
+}
+
+.asc-ui .asc-stats-bar-col {
+  width: 28%;
+  min-width: 6rem;
+}
+
+.asc-ui .asc-hbar {
+  display: block;
+  width: 100%;
+  height: 0.5rem;
+}
+
+.asc-ui .asc-hbar-track {
+  fill: var(--asc-surface-sunken);
+}
+
+.asc-ui .asc-hbar-fill,
+.asc-ui .asc-chart-bar {
+  fill: var(--asc-blue);
+}
+
+.asc-ui .asc-chart-bar-success {
+  fill: var(--asc-success-solid);
+}
+
+.asc-ui .asc-chart-baseline {
+  stroke: var(--asc-border-strong);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.asc-ui .asc-stats-chart {
+  margin: 0;
+}
+
+.asc-ui .asc-stats-chart svg {
+  display: block;
+  width: 100%;
+  height: 10rem;
+  border-bottom: 0;
+}
+
+.asc-ui .asc-chart-axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  color: var(--asc-text-muted);
+}
+
+/* Right to left: time and shares grow from the inline start. */
+[dir="rtl"] .asc-ui .asc-stats-chart svg,
+[dir="rtl"] .asc-ui .asc-hbar {
+  transform: scaleX(-1);
+}
+
+.asc-ui .asc-stats-export-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.asc-ui .asc-stats-export {
+  padding: 0.75rem;
+  border: 1px solid var(--asc-border);
+  border-radius: var(--asc-radius);
+}
+
+.asc-ui .asc-stats-table-details > summary,
+.asc-ui .asc-stats-definitions > summary {
+  min-height: var(--asc-target);
+  cursor: pointer;
+}
+
+@media print {
+  .asc-ui .asc-sectionnav,
+  .asc-ui .breadcrumb,
+  .asc-ui .asc-flash,
+  .asc-ui .d-print-none,
+  .asc-ui [data-stats-filters],
+  .asc-ui [data-stats-exports] {
+    display: none !important;
+  }
+
+  .asc-ui .asc-card {
+    break-inside: avoid-page;
+    box-shadow: none;
+  }
+
+  .asc-ui .asc-stats-print .asc-table-wrap {
+    overflow: visible;
+  }
+
+  .asc-ui .asc-hbar-fill,
+  .asc-ui .asc-chart-bar {
+    fill: #1f3d63;
+  }
+}

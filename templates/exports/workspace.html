@@ -20,6 +20,7 @@
         <div class="asc-form-grid asc-form-grid-top">
           {% include "components/field.html" with field=form.event_edition_id %}
           {% include "components/picker.html" with field=form.organization_id %}
+          {% include "components/field.html" with field=form.campaign_id mark_optional=True %}
           {% include "components/field.html" with field=form.purpose_code %}
         </div>
         {% include "components/field.html" with field=form.reason %}

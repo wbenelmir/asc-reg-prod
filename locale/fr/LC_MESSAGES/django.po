@@ -10423,3 +10423,1315 @@ msgstr "Importer le fichier Excel et prévisualiser"
 msgctxt "decision workbook"
 msgid "Rejection reason"
 msgstr "Motif de refus"
+
+msgid "Capital letters, digits, - and _ (for example SPEAKER). It cannot be changed later."
+msgstr "Lettres majuscules, chiffres, - et _ (par exemple SPEAKER). Il ne pourra plus être modifié."
+
+msgid "Show this badge type to the participant"
+msgstr "Afficher ce type de badge au participant"
+
+msgid "Re-entry"
+msgstr "Réentrée"
+
+msgid "Access profile (optional)"
+msgstr "Profil d'accès (facultatif)"
+
+msgid "Zone (optional)"
+msgstr "Zone (facultatif)"
+
+msgid "Gate (optional)"
+msgstr "Porte (facultatif)"
+
+msgid "Applies to"
+msgstr "S'applique à"
+
+msgid "Effect"
+msgstr "Effet"
+
+msgid "Valid from (optional)"
+msgstr "Valide à partir du (facultatif)"
+
+msgid "Valid until (optional)"
+msgstr "Valide jusqu'au (facultatif)"
+
+msgid "Badge types"
+msgstr "Types de badge"
+
+msgid "Use 2 to 64 capital letters, digits, - or _ for the code."
+msgstr "Utilisez de 2 à 64 lettres majuscules, chiffres, - ou _ pour le code."
+
+msgid "This code is already used in this event."
+msgstr "Ce code est déjà utilisé pour cet événement."
+
+msgid "The profile, zone and gate must belong to the same event."
+msgstr "Le profil, la zone et la porte doivent appartenir au même événement."
+
+msgid "Choose the zone of the gate."
+msgstr "Choisissez la zone de la porte."
+
+msgid "The end of the validity must be after its start."
+msgstr "La fin de validité doit être postérieure à son début."
+
+msgid "Check the values entered."
+msgstr "Vérifiez les valeurs saisies."
+
+msgid "Setting created and active."
+msgstr "Paramètre créé et actif."
+
+msgid "Setting updated."
+msgstr "Paramètre mis à jour."
+
+msgid "Setting activated."
+msgstr "Paramètre activé."
+
+msgid "Setting deactivated. Existing assignments are unchanged."
+msgstr "Paramètre désactivé. Les attributions existantes ne changent pas."
+
+msgid "Identity correction request"
+msgstr "Demande de correction d'identité"
+
+msgctxt "organization status"
+msgid "Active"
+msgstr "Active"
+
+msgctxt "organization status"
+msgid "Inactive"
+msgstr "Inactive"
+
+msgctxt "organization status"
+msgid "Merged"
+msgstr "Fusionnée"
+
+msgid "No longer final-approved (withdrawn, cancelled or decided)"
+msgstr "N'est plus approuvé définitivement (retiré, annulé ou décidé autrement)"
+
+msgid "No longer in your authorized scope"
+msgstr "N'est plus dans votre périmètre autorisé"
+
+msgid "Statistics"
+msgstr "Statistiques"
+
+msgid "Accreditation settings"
+msgstr "Paramètres d'accréditation"
+
+msgid "Every campaign"
+msgstr "Toutes les campagnes"
+
+msgid "Select a campaign from the list."
+msgstr "Sélectionnez une campagne dans la liste."
+
+msgid "This campaign belongs to another event or organization."
+msgstr "Cette campagne appartient à un autre événement ou à une autre organisation."
+
+msgid "This organization is inactive. Activate it before starting anything new for it."
+msgstr "Cette organisation est inactive. Activez-la avant de lancer quoi que ce soit de nouveau pour elle."
+
+msgid "The campaign changed since you opened this page. Nothing was saved."
+msgstr "La campagne a changé depuis l'ouverture de cette page. Rien n'a été enregistré."
+
+msgid "A closed campaign cannot be edited."
+msgstr "Une campagne clôturée ne peut pas être modifiée."
+
+msgid "The new limit is lower than the places already used. No registration is removed; the link accepts no new submission."
+msgstr "La nouvelle limite est inférieure aux places déjà utilisées. Aucune inscription n'est supprimée ; le lien n'accepte plus de nouvelle soumission."
+
+msgid "Campaign updated."
+msgstr "Campagne mise à jour."
+
+msgid "This campaign has no active link to disable."
+msgstr "Cette campagne n'a aucun lien actif à désactiver."
+
+msgid "The link is disabled. Earlier registrations are unchanged."
+msgstr "Le lien est désactivé. Les inscriptions antérieures ne changent pas."
+
+msgid "Official name"
+msgstr "Nom officiel"
+
+msgid "Country"
+msgstr "Pays"
+
+msgid "Create it anyway: this is a different organization."
+msgstr "La créer quand même : il s'agit d'une autre organisation."
+
+msgid "Enter the organization's official name."
+msgstr "Saisissez le nom officiel de l'organisation."
+
+msgid "An organization with the same name exists. Open it instead, or confirm that this is a different organization."
+msgstr "Une organisation portant le même nom existe. Ouvrez-la plutôt, ou confirmez qu'il s'agit d'une autre organisation."
+
+msgid "Organization created."
+msgstr "Organisation créée."
+
+msgid "Organization updated."
+msgstr "Organisation mise à jour."
+
+msgid "A merged organization cannot change status."
+msgstr "Une organisation fusionnée ne peut pas changer de statut."
+
+msgid "Organization activated."
+msgstr "Organisation activée."
+
+msgid "Organization deactivated."
+msgstr "Organisation désactivée."
+
+msgid "Note to participant (optional)"
+msgstr "Note au participant (facultatif)"
+
+msgid "Shown to the participant with this request and included in the e-mail. Write it in the submission language shown above; it is not translated."
+msgstr "Affichée au participant avec cette demande et incluse dans l'e-mail. Rédigez-la dans la langue de soumission indiquée ci-dessus ; elle n'est pas traduite."
+
+msgid "Language of the e-mail and note"
+msgstr "Langue de l'e-mail et de la note"
+
+msgid "The submission language of this registration is not recorded. Choose the language the participant should be written to; nothing is inferred from nationality or from the staff interface."
+msgstr "La langue de soumission de cette inscription n'est pas enregistrée. Choisissez la langue dans laquelle écrire au participant ; rien n'est déduit de la nationalité ni de l'interface du personnel."
+
+msgid "First name(s)"
+msgstr "Prénom(s)"
+
+msgid "Last name"
+msgstr "Nom"
+
+msgid "NIN (18 digits)"
+msgstr "NIN (18 chiffres)"
+
+msgid "A changed NIN is checked again with the Ministry service before saving."
+msgstr "Un NIN modifié est vérifié de nouveau auprès du service du ministère avant l'enregistrement."
+
+msgid "Staff correction from evidence"
+msgstr "Correction par le personnel d'après les justificatifs"
+
+msgid "Corrected and verified by staff"
+msgstr "Corrigée et vérifiée par le personnel"
+
+msgid "Message from the registration team:"
+msgstr "Message de l'équipe d'inscription :"
+
+msgid "The submitted data was corrected from the identity document, which confirms the identity"
+msgstr "Les données soumises ont été corrigées d'après la pièce d'identité, qui confirme l'identité"
+
+msgid "A typing error was corrected; the document confirms the identity"
+msgstr "Une erreur de saisie a été corrigée ; le document confirme l'identité"
+
+msgid "This registration was withdrawn or cancelled, so its identity processing has stopped. Nothing was saved. Its history stays available under Closed registrations."
+msgstr "Cette inscription a été retirée ou annulée : le traitement de son identité est arrêté. Rien n'a été enregistré. Son historique reste disponible sous Inscriptions clôturées."
+
+msgid "Use Latin letters for the names, exactly as on the identity document."
+msgstr "Utilisez des lettres latines pour les noms, exactement comme sur la pièce d'identité."
+
+msgid "Enter a date of birth that meets the event's age rule."
+msgstr "Saisissez une date de naissance conforme à la règle d'âge de l'événement."
+
+msgid "The note to the participant is too long."
+msgstr "La note au participant est trop longue."
+
+msgid "The note to the participant contains characters that are not allowed."
+msgstr "La note au participant contient des caractères non autorisés."
+
+msgid "A NIN applies only to Algerian participants on the NIN route."
+msgstr "Un NIN ne concerne que les participants algériens du parcours NIN."
+
+msgid "Corrections saved and identity verified. The registration now waits for its participation decision, which is taken separately."
+msgstr "Corrections enregistrées et identité vérifiée. L'inscription attend maintenant sa décision de participation, prise séparément."
+
+msgid "All applications (submitted)"
+msgstr "Toutes les candidatures (soumises)"
+
+msgid "Active applications"
+msgstr "Candidatures actives"
+
+msgid "Final-approved"
+msgstr "Approuvées définitivement"
+
+msgid "In processing"
+msgstr "En cours de traitement"
+
+msgid "Withdrawn or cancelled"
+msgstr "Retirées ou annulées"
+
+msgid "Cancelled by the team"
+msgstr "Annulée par l'équipe"
+
+msgid "Withdrawn by the participant"
+msgstr "Retirée par le participant"
+
+msgid "Identity check pending"
+msgstr "Vérification d'identité en attente"
+
+msgid "Identity manual review"
+msgstr "Examen manuel de l'identité"
+
+msgid "Waiting for the participant"
+msgstr "En attente du participant"
+
+msgid "Waiting for the participation decision"
+msgstr "En attente de la décision de participation"
+
+msgid "Identity verified, no participation-review work"
+msgstr "Identité vérifiée, sans examen de participation"
+
+msgctxt "registration segment"
+msgid "Drafts (not submitted)"
+msgstr "Brouillons (non soumis)"
+
+msgid "Total applications"
+msgstr "Total des candidatures"
+
+msgid "Every submitted registration, including withdrawn, cancelled and replaced ones."
+msgstr "Toutes les inscriptions soumises, y compris retirées, annulées et remplacées."
+
+msgid "Registration: first submission time"
+msgstr "Inscription : date de première soumission"
+
+msgid "Registration cohort"
+msgstr "Cohorte d'inscriptions"
+
+msgid "Submitted and not withdrawn, cancelled or not approved."
+msgstr "Soumises et ni retirées, ni annulées, ni refusées."
+
+msgid "Registration status"
+msgstr "Statut de l'inscription"
+
+msgid "Registration cohort, current state"
+msgstr "Cohorte d'inscriptions, état actuel"
+
+msgid "Current decision Approved, registration approved, current, not withdrawn or cancelled. A person who registered again is counted once."
+msgstr "Décision actuelle Approuvée, inscription approuvée, actuelle, ni retirée ni annulée. Une personne qui s'est réinscrite est comptée une seule fois."
+
+msgid "Current participation decision and registration status"
+msgstr "Décision de participation actuelle et statut de l'inscription"
+
+msgid "Submitted, under review or waiting for the participant; no final outcome."
+msgstr "Soumises, en examen ou en attente du participant ; pas de résultat final."
+
+msgid "Current decision Not approved (an identity rejection included)."
+msgstr "Décision actuelle Non approuvée (y compris un rejet d'identité)."
+
+msgid "Current participation decision"
+msgstr "Décision de participation actuelle"
+
+msgid "Withdrawn by the participant or cancelled by the team; kept as history."
+msgstr "Retirées par le participant ou annulées par l'équipe ; conservées dans l'historique."
+
+msgid "Registration status and withdrawal or cancellation time"
+msgstr "Statut de l'inscription et date de retrait ou d'annulation"
+
+msgid "Unique participants"
+msgstr "Participants uniques"
+
+msgid "Distinct persons among the applications (several applications, one person)."
+msgstr "Personnes distinctes parmi les candidatures (plusieurs candidatures, une personne)."
+
+msgid "Registration person"
+msgstr "Personne de l'inscription"
+
+msgid "Approved persons"
+msgstr "Personnes approuvées"
+
+msgid "Distinct persons with a final-approved registration."
+msgstr "Personnes distinctes ayant une inscription approuvée définitivement."
+
+msgid "Active registrations whose Ministry check is queued or running."
+msgstr "Inscriptions actives dont la vérification ministérielle est en file ou en cours."
+
+msgid "Identity verification status"
+msgstr "Statut de la vérification d'identité"
+
+msgid "Current state; waiting since the last identity status change"
+msgstr "État actuel ; en attente depuis le dernier changement de statut d'identité"
+
+msgid "Active registrations whose identity waits for a reviewer."
+msgstr "Inscriptions actives dont l'identité attend un examinateur."
+
+msgid "An identity correction or an information request is open."
+msgstr "Une correction d'identité ou une demande d'informations est ouverte."
+
+msgid "Current state; waiting since the request was sent"
+msgstr "État actuel ; en attente depuis l'envoi de la demande"
+
+msgid "Identity verified, no current decision yet."
+msgstr "Identité vérifiée, aucune décision actuelle."
+
+msgid "Identity status and decision history"
+msgstr "Statut d'identité et historique des décisions"
+
+msgid "Current state; waiting since the review case opened"
+msgstr "État actuel ; en attente depuis l'ouverture du dossier d'examen"
+
+msgid "Verified without review work"
+msgstr "Vérifiées sans examen"
+
+msgid "Identity verified and undecided, but no open participation-review case."
+msgstr "Identité vérifiée et sans décision, mais aucun dossier d'examen de participation ouvert."
+
+msgid "Identity status, review cases and decisions"
+msgstr "Statut d'identité, dossiers d'examen et décisions"
+
+msgid "since the identity status changed"
+msgstr "depuis le changement de statut d'identité"
+
+msgid "since the correction or information request was sent"
+msgstr "depuis l'envoi de la demande de correction ou d'informations"
+
+msgid "since the participation-review case opened"
+msgstr "depuis l'ouverture du dossier d'examen de participation"
+
+msgid "No reason recorded"
+msgstr "Aucun motif enregistré"
+
+msgid "No current role"
+msgstr "Aucun rôle actuel"
+
+msgid "No current badge type"
+msgstr "Aucun type de badge actuel"
+
+msgid "No organization"
+msgstr "Aucune organisation"
+
+msgid "Not classified yet"
+msgstr "Pas encore classée"
+
+msgid "Current access profile"
+msgstr "Profil d'accès actuel"
+
+msgid "Digital entry pass active"
+msgstr "Titre d'accès numérique actif"
+
+msgid "Pass generated, not active"
+msgstr "Titre généré, non actif"
+
+msgid "No digital entry pass yet"
+msgstr "Pas encore de titre d'accès numérique"
+
+msgid "Physical badge handed over"
+msgstr "Badge physique remis"
+
+msgid "No campaign"
+msgstr "Aucune campagne"
+
+msgid "Not provided"
+msgstr "Non renseigné"
+
+msgid "General registration situation"
+msgstr "Situation générale des inscriptions"
+
+msgid "Final-approved attendees"
+msgstr "Participants approuvés définitivement"
+
+msgid "Processing workload and exceptions"
+msgstr "Charge de traitement et exceptions"
+
+msgid "None (not provided)"
+msgstr "Aucun (non renseigné)"
+
+msgid "Submitted from"
+msgstr "Soumises à partir du"
+
+msgid "Submitted until"
+msgstr "Soumises jusqu'au"
+
+msgid "Population"
+msgstr "Population"
+
+msgid "Participation category"
+msgstr "Catégorie de participation"
+
+msgid "Approved attendance days"
+msgstr "Jours de présence approuvés"
+
+msgid "Conference day"
+msgstr "Jour de conférence"
+
+#, python-format
+msgid "Day %(day)s"
+msgstr "Jour %(day)s"
+
+msgid "Generated at"
+msgstr "Généré le"
+
+msgid "Dataset"
+msgstr "Données"
+
+msgid "every registration in the authorized scope that matches the filters below"
+msgstr "toutes les inscriptions du périmètre autorisé correspondant aux filtres ci-dessous"
+
+msgid "Date basis"
+msgstr "Base des dates"
+
+msgid "counts are registrations first submitted within the date range, in their current state; trends count events dated within the range"
+msgstr "les comptes portent sur les inscriptions soumises pour la première fois dans la période, dans leur état actuel ; les tendances comptent les événements datés dans la période"
+
+msgid "Filters"
+msgstr "Filtres"
+
+msgid "none"
+msgstr "aucun"
+
+msgid "Report"
+msgstr "Rapport"
+
+msgid "Definitions"
+msgstr "Définitions"
+
+msgid "Metric"
+msgstr "Indicateur"
+
+msgid "Denominator"
+msgstr "Dénominateur"
+
+msgid "Time basis"
+msgstr "Base temporelle"
+
+msgid "Delegation list"
+msgstr "Liste de délégation"
+
+msgid "Percentage of applications"
+msgstr "Pourcentage des candidatures"
+
+msgid "Processing stages"
+msgstr "Étapes de traitement"
+
+msgid "Stage"
+msgstr "Étape"
+
+msgid "Progress over time"
+msgstr "Évolution dans le temps"
+
+msgid "Period start"
+msgstr "Début de période"
+
+msgid "New applications"
+msgstr "Nouvelles candidatures"
+
+msgid "Approval decisions"
+msgstr "Décisions d'approbation"
+
+msgid "Not-approved decisions"
+msgstr "Décisions de non-approbation"
+
+msgid "Withdrawals and cancellations"
+msgstr "Retraits et annulations"
+
+msgid "Cumulative applications"
+msgstr "Candidatures cumulées"
+
+msgid "Cumulative approval decisions"
+msgstr "Décisions d'approbation cumulées"
+
+msgid "Sources"
+msgstr "Sources"
+
+msgid "Dimension"
+msgstr "Dimension"
+
+msgid "Value"
+msgstr "Valeur"
+
+msgid "Applications"
+msgstr "Candidatures"
+
+msgid "Composition"
+msgstr "Composition"
+
+msgid "Generated, not active"
+msgstr "Généré, non actif"
+
+msgid "Final-approved registrations"
+msgstr "Inscriptions approuvées définitivement"
+
+#, python-format
+msgid "Day %(day)s (overlapping)"
+msgstr "Jour %(day)s (chevauchement)"
+
+msgid "The attendee list is included only for holders of the export permission in this scope."
+msgstr "La liste des participants n'est incluse que pour les titulaires de l'autorisation d'export dans ce périmètre."
+
+msgid "Summary"
+msgstr "Synthèse"
+
+msgid "Attendance"
+msgstr "Présence"
+
+msgid "Participation categories"
+msgstr "Catégories de participation"
+
+msgid "Attendees"
+msgstr "Participants"
+
+msgid "Approved on"
+msgstr "Approuvé le"
+
+msgid "Digital entry pass"
+msgstr "Titre d'accès numérique"
+
+msgid "Identity manual review reason"
+msgstr "Motif d'examen manuel de l'identité"
+
+msgid "Identity correction requests per registration"
+msgstr "Demandes de correction d'identité par inscription"
+
+msgid "Information requests per registration"
+msgstr "Demandes d'informations par inscription"
+
+msgid "Workload"
+msgstr "Charge"
+
+msgid "Oldest waiting since"
+msgstr "Plus ancienne attente depuis"
+
+msgid "Average wait (days)"
+msgstr "Attente moyenne (jours)"
+
+msgid "Waiting time basis"
+msgstr "Base du temps d'attente"
+
+msgid "Oldest items"
+msgstr "Éléments les plus anciens"
+
+msgid "Waiting since"
+msgstr "En attente depuis"
+
+msgid "Exceptions"
+msgstr "Exceptions"
+
+msgid "Exception"
+msgstr "Exception"
+
+msgid "Enter at least 2 characters to search."
+msgstr "Saisissez au moins 2 caractères pour rechercher."
+
+msgid "Assign one role, badge type, access profile or access rule to every final-approved registration in your scope. Nothing changes until you execute the preview."
+msgstr "Attribuez un rôle, un type de badge, un profil d'accès ou une règle d'accès à chaque inscription approuvée définitivement de votre périmètre. Rien ne change tant que vous n'exécutez pas l'aperçu."
+
+#, python-format
+msgid "%(event)s: %(counter)s final-approved registration in your scope"
+msgid_plural "%(event)s: %(counter)s final-approved registrations in your scope"
+msgstr[0] "%(event)s : %(counter)s inscription approuvée définitivement dans votre périmètre"
+msgstr[1] "%(event)s : %(counter)s inscriptions approuvées définitivement dans votre périmètre"
+
+msgid "Missing prerequisite: your roles do not let you assign accreditation in any event edition."
+msgstr "Prérequis manquant : vos rôles ne vous permettent d'attribuer d'accréditation dans aucune édition."
+
+msgid "Missing prerequisite: no participant role, badge type, access profile or access rule is configured for your events yet."
+msgstr "Prérequis manquant : aucun rôle de participant, type de badge, profil d'accès ou règle d'accès n'est encore configuré pour vos événements."
+
+msgid "Missing prerequisite: every participant role, badge type, access profile and access rule of your events is inactive."
+msgstr "Prérequis manquant : tous les rôles de participant, types de badge, profils d'accès et règles d'accès de vos événements sont inactifs."
+
+msgid "Configure accreditation settings"
+msgstr "Configurer les paramètres d'accréditation"
+
+msgid "Ask the superadmin to configure them."
+msgstr "Demandez au super-administrateur de les configurer."
+
+msgid "Final-approved registrations in your scope: current decision Approved, not withdrawn or cancelled."
+msgstr "Inscriptions approuvées définitivement de votre périmètre : décision actuelle Approuvée, ni retirées ni annulées."
+
+#, python-format
+msgid "%(counter)s registration."
+msgid_plural "%(counter)s registrations."
+msgstr[0] "%(counter)s inscription."
+msgstr[1] "%(counter)s inscriptions."
+
+msgid "Will be assigned"
+msgstr "Sera attribué"
+
+#, python-format
+msgid "%(counter)s already has it (unchanged)"
+msgid_plural "%(counter)s already have it (unchanged)"
+msgstr[0] "%(counter)s l'a déjà (inchangé)"
+msgstr[1] "%(counter)s l'ont déjà (inchangés)"
+
+msgid "Nothing is changed by this preview. At execution, each registration is checked again: one withdrawn, cancelled, decided differently or no longer in your scope is skipped."
+msgstr "Cet aperçu ne modifie rien. À l'exécution, chaque inscription est revérifiée : celle qui a été retirée, annulée, décidée autrement ou qui n'est plus dans votre périmètre est ignorée."
+
+msgid "No final-approved registration in your scope for this event."
+msgstr "Aucune inscription approuvée définitivement dans votre périmètre pour cet événement."
+
+#, python-format
+msgid "%(name)s (%(code)s) · event %(event)s"
+msgstr "%(name)s (%(code)s) · événement %(event)s"
+
+msgid "Skipped"
+msgstr "Ignorées"
+
+msgid "Errors"
+msgstr "Erreurs"
+
+msgid "Edit setting"
+msgstr "Modifier le paramètre"
+
+msgid "Add setting"
+msgstr "Ajouter un paramètre"
+
+#, python-format
+msgid "Edit %(code)s"
+msgstr "Modifier %(code)s"
+
+#, python-format
+msgid "Add: %(kind)s"
+msgstr "Ajouter : %(kind)s"
+
+msgid "Save changes"
+msgstr "Enregistrer les modifications"
+
+msgid "Add"
+msgstr "Ajouter"
+
+msgid "Participant roles, badge types, access profiles and access rules of the event. They are assigned to approved participants; they are not staff account roles."
+msgstr "Rôles de participant, types de badge, profils d'accès et règles d'accès de l'événement. Ils sont attribués aux participants approuvés ; ce ne sont pas des rôles de comptes du personnel."
+
+msgid "Choose an event"
+msgstr "Choisir un événement"
+
+msgid "Show"
+msgstr "Afficher"
+
+msgid "No event edition is in your scope."
+msgstr "Aucune édition d'événement n'est dans votre périmètre."
+
+#, python-format
+msgid "Event: %(name)s (%(code)s)"
+msgstr "Événement : %(name)s (%(code)s)"
+
+#, python-format
+msgid "%(counter)s active"
+msgid_plural "%(counter)s active"
+msgstr[0] "%(counter)s actif"
+msgstr[1] "%(counter)s actifs"
+
+msgid "Current assignments"
+msgstr "Attributions actuelles"
+
+msgctxt "setting status"
+msgid "Active"
+msgstr "Actif"
+
+msgctxt "setting status"
+msgid "Inactive"
+msgstr "Inactif"
+
+msgid "Deactivate"
+msgstr "Désactiver"
+
+msgid "None yet. Add the first one; it is active at once and can be assigned."
+msgstr "Aucun pour l'instant. Ajoutez le premier ; il est aussitôt actif et peut être attribué."
+
+msgid "None configured for this event yet."
+msgstr "Aucun n'est encore configuré pour cet événement."
+
+msgid "Approval of a registration needs a current participant role, badge type and access profile. Deactivating a setting stops new assignments of it; existing assignments are unchanged."
+msgstr "L'approbation d'une inscription exige un rôle de participant, un type de badge et un profil d'accès actuels. Désactiver un paramètre empêche de nouvelles attributions ; les attributions existantes ne changent pas."
+
+msgid "Message from the registration team"
+msgstr "Message de l'équipe d'inscription"
+
+msgid "Closed registrations"
+msgstr "Inscriptions clôturées"
+
+msgid "Status tabs count the cases of active registrations only. Cases of withdrawn, cancelled or not-approved registrations are kept as history under Closed registrations; identity counts are not application or approval counts."
+msgstr "Les onglets de statut ne comptent que les dossiers des inscriptions actives. Les dossiers des inscriptions retirées, annulées ou non approuvées sont conservés sous Inscriptions clôturées ; les comptes d'identité ne sont ni des comptes de candidatures ni des comptes d'approbations."
+
+msgid "This registration was cancelled by the team."
+msgstr "Cette inscription a été annulée par l'équipe."
+
+msgid "The participant withdrew this registration."
+msgstr "Le participant a retiré cette inscription."
+
+msgid "Identity verification processing has stopped: no check runs, no action is available and nothing moves to participation review. The verification information below is kept as history. A new registration by the participant is a separate request."
+msgstr "Le traitement de la vérification d'identité est arrêté : aucune vérification ne s'exécute, aucune action n'est disponible et rien ne passe à l'examen de participation. Les informations de vérification ci-dessous sont conservées dans l'historique. Une nouvelle inscription du participant est une demande distincte."
+
+msgid "Save corrections and verify identity"
+msgstr "Enregistrer les corrections et vérifier l'identité"
+
+msgid "Save these corrections and verify the identity?"
+msgstr "Enregistrer ces corrections et vérifier l'identité ?"
+
+msgid "The corrected values replace the submitted ones, and the identity is verified without returning the request to the participant. Participation is still decided separately."
+msgstr "Les valeurs corrigées remplacent les valeurs soumises et l'identité est vérifiée sans renvoyer la demande au participant. La participation reste décidée séparément."
+
+msgid "Save and verify"
+msgstr "Enregistrer et vérifier"
+
+msgid "Compare the participant's values, the Ministry values above and the evidence. Correct only what the evidence confirms."
+msgstr "Comparez les valeurs du participant, les valeurs du ministère ci-dessus et les justificatifs. Ne corrigez que ce que les justificatifs confirment."
+
+msgid "A changed NIN is checked with the Ministry service first. A verifying answer records an API verification; otherwise your manual verification from the evidence is recorded, together with the lookup result."
+msgstr "Un NIN modifié est d'abord vérifié auprès du service du ministère. Une réponse concordante enregistre une vérification par API ; sinon, votre vérification manuelle d'après les justificatifs est enregistrée, avec le résultat de la consultation."
+
+msgid "The Ministry service is not available here: a changed NIN is recorded with your manual verification from the evidence."
+msgstr "Le service du ministère n'est pas disponible ici : un NIN modifié est enregistré avec votre vérification manuelle d'après les justificatifs."
+
+msgid "You may not change the NIN: it stays as it is."
+msgstr "Vous ne pouvez pas modifier le NIN : il reste inchangé."
+
+msgid "No reviewable evidence of the required kind yet. Return the case to ask for it."
+msgstr "Aucun justificatif examinable du type requis pour l'instant. Renvoyez le dossier pour le demander."
+
+msgid "Submission language:"
+msgstr "Langue de soumission :"
+
+msgid "Recorded when the participant submitted the registration."
+msgstr "Enregistrée lorsque le participant a soumis l'inscription."
+
+msgid "Taken from the language of the legal notices the participant accepted at submission (older registration)."
+msgstr "Déduite de la langue des mentions légales acceptées par le participant à la soumission (inscription antérieure)."
+
+msgid "The e-mail is sent in this language. Write the note in it."
+msgstr "L'e-mail est envoyé dans cette langue. Rédigez la note dans celle-ci."
+
+msgid "not recorded for this older registration"
+msgstr "non enregistrée pour cette inscription antérieure"
+
+#, python-format
+msgid "Choose the language to write in below. Proposed: %(language)s, the registration's preferred language."
+msgstr "Choisissez ci-dessous la langue de rédaction. Proposée : %(language)s, la langue préférée de l'inscription."
+
+msgid "The participant sees the selected requests and your note, never the reason or a service result."
+msgstr "Le participant voit les demandes sélectionnées et votre note, jamais le motif ni un résultat du service."
+
+msgid "Corrections and notes to the participant"
+msgstr "Corrections et notes au participant"
+
+msgid "Changed:"
+msgstr "Modifié :"
+
+msgid "Note to participant"
+msgstr "Note au participant"
+
+msgid "View registrations"
+msgstr "Voir les inscriptions"
+
+msgid "Export"
+msgstr "Exporter"
+
+msgid "Copied"
+msgstr "Copié"
+
+msgid "Copy link"
+msgstr "Copier le lien"
+
+msgid "Places used"
+msgstr "Places utilisées"
+
+#, python-format
+msgid "%(used)s of %(capacity)s (%(remaining)s left)"
+msgstr "%(used)s sur %(capacity)s (%(remaining)s restantes)"
+
+msgid "A submitted registration keeps its place, even when withdrawn or cancelled later."
+msgstr "Une inscription soumise conserve sa place, même si elle est retirée ou annulée ensuite."
+
+msgid "Registration links"
+msgstr "Liens d'inscription"
+
+#, python-format
+msgid "%(counter)s link"
+msgid_plural "%(counter)s links"
+msgstr[0] "%(counter)s lien"
+msgstr[1] "%(counter)s liens"
+
+msgid "Started"
+msgstr "Commencées"
+
+#, python-format
+msgid "Until %(until)s"
+msgstr "Jusqu'au %(until)s"
+
+msgid "As long as the campaign is open and valid"
+msgstr "Tant que la campagne est ouverte et valide"
+
+#, python-format
+msgid "Disabled %(when)s"
+msgstr "Désactivé le %(when)s"
+
+msgid "No longer usable"
+msgstr "N'est plus utilisable"
+
+msgid "A replaced or disabled link no longer starts registrations; the registrations it started keep this campaign and organization."
+msgstr "Un lien remplacé ou désactivé ne démarre plus d'inscription ; les inscriptions qu'il a démarrées conservent cette campagne et cette organisation."
+
+msgid "No link was issued yet. Open the campaign, then issue its link."
+msgstr "Aucun lien n'a encore été émis. Ouvrez la campagne, puis émettez son lien."
+
+msgid "Disable the invitation link?"
+msgstr "Désactiver le lien d'invitation ?"
+
+msgid "The link stops working immediately and no new link is issued. Registrations already started keep their campaign."
+msgstr "Le lien cesse de fonctionner immédiatement et aucun nouveau lien n'est émis. Les inscriptions déjà commencées conservent leur campagne."
+
+msgid "Disable link"
+msgstr "Désactiver le lien"
+
+msgid "Edit campaign"
+msgstr "Modifier la campagne"
+
+msgid "The organization, the event, the links and the registrations already started stay as they are."
+msgstr "L'organisation, l'événement, les liens et les inscriptions déjà commencées restent inchangés."
+
+msgid "Registration limit: every submitted registration keeps its place, including one withdrawn or cancelled later; drafts never use a place."
+msgstr "Limite d'inscriptions : chaque inscription soumise conserve sa place, y compris si elle est retirée ou annulée ensuite ; les brouillons n'utilisent jamais de place."
+
+msgid "View the resulting registrations"
+msgstr "Voir les inscriptions qui en résultent"
+
+#, python-format
+msgid "%(counter)s organization. Open one to manage its campaigns, registration links, delegation lists and registrations."
+msgid_plural "%(counter)s organizations. Open one to manage its campaigns, registration links, delegation lists and registrations."
+msgstr[0] "%(counter)s organisation. Ouvrez-en une pour gérer ses campagnes, liens d'inscription, listes de délégation et inscriptions."
+msgstr[1] "%(counter)s organisations. Ouvrez-en une pour gérer ses campagnes, liens d'inscription, listes de délégation et inscriptions."
+
+msgid "No event edition is open for registration: campaigns and delegation lists can be prepared once one is open."
+msgstr "Aucune édition n'est ouverte aux inscriptions : les campagnes et listes de délégation pourront être préparées dès qu'une le sera."
+
+msgid "Manage organizations"
+msgstr "Gérer les organisations"
+
+msgid "Create organization"
+msgstr "Créer une organisation"
+
+msgid "Open an organization under Manage organizations (or create one), then create its first invitation campaign there."
+msgstr "Ouvrez une organisation sous Gérer les organisations (ou créez-en une), puis créez-y sa première campagne d'invitation."
+
+msgid "This organization is inactive: no new campaign, delegation list or on-behalf registration can be started for it. Its existing campaigns, links and registrations are unchanged; close a campaign to stop its link."
+msgstr "Cette organisation est inactive : aucune nouvelle campagne, liste de délégation ou inscription pour le compte d'autrui ne peut être lancée pour elle. Ses campagnes, liens et inscriptions existants ne changent pas ; clôturez une campagne pour arrêter son lien."
+
+msgid "No event edition is open for registration, so new campaigns, delegation lists and on-behalf registrations cannot be started now."
+msgstr "Aucune édition n'est ouverte aux inscriptions : de nouvelles campagnes, listes de délégation et inscriptions pour le compte d'autrui ne peuvent pas être lancées maintenant."
+
+msgid "Registrations of this organization"
+msgstr "Inscriptions de cette organisation"
+
+msgid "All registrations"
+msgstr "Toutes les inscriptions"
+
+msgid "Campaign"
+msgstr "Campagne"
+
+msgid "Link"
+msgstr "Lien"
+
+msgid "No active link"
+msgstr "Aucun lien actif"
+
+#, python-format
+msgid "%(used)s of %(capacity)s"
+msgstr "%(used)s sur %(capacity)s"
+
+msgid "no limit"
+msgstr "sans limite"
+
+msgid "No invitation campaign yet."
+msgstr "Aucune campagne d'invitation pour l'instant."
+
+msgid "Create a campaign, open it, then issue its registration link and send it to the organization."
+msgstr "Créez une campagne, ouvrez-la, puis émettez son lien d'inscription et envoyez-le à l'organisation."
+
+msgid "A campaign can be created by an invitation manager of this organization while an event is open."
+msgstr "Une campagne peut être créée par un gestionnaire d'invitations de cette organisation tant qu'un événement est ouvert."
+
+msgid "Delegation lists"
+msgstr "Listes de délégation"
+
+msgid "Upload a delegation list"
+msgstr "Téléverser une liste de délégation"
+
+msgid "Preview and results"
+msgstr "Aperçu et résultats"
+
+msgid "No delegation list uploaded yet."
+msgstr "Aucune liste de délégation téléversée pour l'instant."
+
+msgid "Organization actions"
+msgstr "Actions de l'organisation"
+
+msgid "Register on behalf"
+msgstr "Inscrire pour le compte d'autrui"
+
+#, python-format
+msgid "Start a registration for this organization in %(event)s; the participant claims it with their own e-mail and completes it."
+msgstr "Démarrez une inscription pour cette organisation dans %(event)s ; le participant la réclame avec sa propre adresse e-mail et la complète."
+
+msgid "Register a participant"
+msgstr "Inscrire un participant"
+
+msgid "Activation"
+msgstr "Activation"
+
+msgid "Deactivate this organization?"
+msgstr "Désactiver cette organisation ?"
+
+msgid "No new campaign, delegation list or on-behalf registration can be started. Existing campaigns, links and registrations stay as they are."
+msgstr "Aucune nouvelle campagne, liste de délégation ou inscription pour le compte d'autrui ne pourra être lancée. Les campagnes, liens et inscriptions existants restent inchangés."
+
+msgid "Edit organization"
+msgstr "Modifier l'organisation"
+
+msgid "Registrations keep the organization name their participants submitted; only the master record changes."
+msgstr "Les inscriptions conservent le nom d'organisation soumis par leurs participants ; seule la fiche de référence change."
+
+msgid "Possible duplicates:"
+msgstr "Doublons possibles :"
+
+msgid "Create, edit, activate or deactivate organizations, then manage their campaigns, links, delegation lists and registrations from each organization's page."
+msgstr "Créez, modifiez, activez ou désactivez des organisations, puis gérez leurs campagnes, liens, listes de délégation et inscriptions depuis la page de chaque organisation."
+
+msgid "Find organizations"
+msgstr "Rechercher des organisations"
+
+msgid "Name contains"
+msgstr "Le nom contient"
+
+#, python-format
+msgid "%(total)s in total"
+msgstr "%(total)s au total"
+
+msgid "Campaigns"
+msgstr "Campagnes"
+
+msgid "Organization pages"
+msgstr "Pages des organisations"
+
+msgid "No organization matches these filters."
+msgstr "Aucune organisation ne correspond à ces filtres."
+
+msgid "No organization exists yet."
+msgstr "Aucune organisation n'existe encore."
+
+msgid "Create the first organization, then open it to create an invitation campaign and issue its registration link."
+msgstr "Créez la première organisation, puis ouvrez-la pour créer une campagne d'invitation et émettre son lien d'inscription."
+
+msgid "Organizations appear here once they exist in your scope."
+msgstr "Les organisations apparaissent ici dès qu'elles existent dans votre périmètre."
+
+msgid "Identity returned by the Ministry service"
+msgstr "Identité renvoyée par le service du ministère"
+
+msgid "For checking only. This lookup changes no registration and verifies nobody; corrections are made in the identity review. Nothing below is stored."
+msgstr "Pour contrôle uniquement. Cette consultation ne modifie aucune inscription et ne vérifie personne ; les corrections se font dans l'examen d'identité. Rien de ce qui suit n'est conservé."
+
+msgid "The service answered for a different number than the one entered. Do not use these details for that number."
+msgstr "Le service a répondu pour un autre numéro que celui saisi. N'utilisez pas ces informations pour ce numéro."
+
+msgid "Last name (Latin)"
+msgstr "Nom (latin)"
+
+msgid "Not supplied"
+msgstr "Non fourni"
+
+msgid "First name(s) (Latin)"
+msgstr "Prénom(s) (latin)"
+
+msgid "Last name (Arabic)"
+msgstr "Nom (arabe)"
+
+msgid "First name(s) (Arabic)"
+msgstr "Prénom(s) (arabe)"
+
+msgid "(incomplete: only the parts shown are known; nothing is completed)"
+msgstr "(incomplète : seules les parties affichées sont connues ; rien n'est complété)"
+
+msgid "(format not recognized; shown exactly as received)"
+msgstr "(format non reconnu ; affichée telle que reçue)"
+
+msgid "Presumed date"
+msgstr "Date présumée"
+
+msgid "Not recognized"
+msgstr "Non reconnu"
+
+msgid "The Ministry marks this birth date as presumed: the day or the month may not be known, so the date may not be the real one. It never replaces a date a participant or a reviewer entered, and it is never completed."
+msgstr "Le ministère indique que cette date de naissance est présumée : le jour ou le mois peuvent être inconnus, la date peut donc ne pas être la vraie. Elle ne remplace jamais une date saisie par un participant ou un examinateur et n'est jamais complétée."
+
+msgid "The Ministry date is incomplete. No day or month is invented."
+msgstr "La date du ministère est incomplète. Aucun jour ni mois n'est inventé."
+
+msgid "Looks up one identity number you are authorized to look up. A returned identity is shown with its names, birth date and presumed-date flag. It creates no registration, changes no identity and verifies nobody. The number and the details are not stored, shown again or logged."
+msgstr "Consulte un numéro d'identité que vous êtes autorisé à consulter. Une identité renvoyée est affichée avec ses noms, sa date de naissance et l'indicateur de date présumée. Aucune inscription n'est créée, aucune identité modifiée, personne n'est vérifié. Le numéro et les informations ne sont ni conservés, ni réaffichés, ni journalisés."
+
+msgid "Every registration in your authorized scope, including drafts, withdrawn, cancelled and earlier registrations, newest first."
+msgstr "Toutes les inscriptions de votre périmètre autorisé, y compris brouillons, inscriptions retirées, annulées et antérieures, les plus récentes d'abord."
+
+#, python-format
+msgid "%(counter)s registration in your scope"
+msgid_plural "%(counter)s registrations in your scope"
+msgstr[0] "%(counter)s inscription dans votre périmètre"
+msgstr[1] "%(counter)s inscriptions dans votre périmètre"
+
+#, python-format
+msgid "%(counter)s matches the current filters"
+msgid_plural "%(counter)s match the current filters"
+msgstr[0] "%(counter)s correspond aux filtres actuels"
+msgstr[1] "%(counter)s correspondent aux filtres actuels"
+
+msgid "Population:"
+msgstr "Population :"
+
+msgid "Registrations started through one invitation link."
+msgstr "Inscriptions commencées par un lien d'invitation."
+
+msgid "Registrations created from one delegation list."
+msgstr "Inscriptions créées à partir d'une liste de délégation."
+
+msgid "Further filters from the statistics are applied."
+msgstr "D'autres filtres issus des statistiques sont appliqués."
+
+msgid "The full reference or its beginning; searched across every page."
+msgstr "La référence complète ou son début ; recherchée sur toutes les pages."
+
+msgid "Search by name or e-mail"
+msgstr "Rechercher par nom ou e-mail"
+
+msgid "The beginning of a given or family name, or a full e-mail address. Sent privately; never shown in the address."
+msgstr "Le début d'un prénom ou d'un nom, ou une adresse e-mail complète. Envoyé de façon privée ; jamais affiché dans l'adresse."
+
+#, python-format
+msgid "Search applied: %(counter)s matching registration."
+msgid_plural "Search applied: %(counter)s matching registrations."
+msgstr[0] "Recherche appliquée : %(counter)s inscription correspondante."
+msgstr[1] "Recherche appliquée : %(counter)s inscriptions correspondantes."
+
+msgid "This search is no longer available. Search again."
+msgstr "Cette recherche n'est plus disponible. Relancez-la."
+
+msgid "Filter registrations"
+msgstr "Filtrer les inscriptions"
+
+msgid "Dates are calendar days in the selected event's time zone (UTC when no event is selected), both included."
+msgstr "Les dates sont des jours calendaires dans le fuseau horaire de l'événement sélectionné (UTC si aucun événement n'est sélectionné), bornes incluses."
+
+msgid "Clear all"
+msgstr "Tout effacer"
+
+msgid "Registration list pages"
+msgstr "Pages de la liste des inscriptions"
+
+msgid "No registration matches these filters."
+msgstr "Aucune inscription ne correspond à ces filtres."
+
+#, python-format
+msgid "Your scope holds %(counter)s registration. Change or clear the filters to see it."
+msgid_plural "Your scope holds %(counter)s registrations. Change or clear the filters to see them."
+msgstr[0] "Votre périmètre contient %(counter)s inscription. Modifiez ou effacez les filtres pour la voir."
+msgstr[1] "Votre périmètre contient %(counter)s inscriptions. Modifiez ou effacez les filtres pour les voir."
+
+msgid "Registrations appear here once they exist in an event or organization you are authorized for. If you expected some, ask an account administrator to check your role's scope."
+msgstr "Les inscriptions apparaissent ici dès qu'elles existent dans un événement ou une organisation pour lesquels vous êtes autorisé. Si vous en attendiez, demandez à un administrateur de comptes de vérifier le périmètre de votre rôle."
+
+msgid "Registration statistics"
+msgstr "Statistiques des inscriptions"
+
+msgid "Where registrations stand, how processing progresses and who is approved to attend, for your authorized scope."
+msgstr "Où en sont les inscriptions, comment avance le traitement et qui est approuvé pour participer, dans votre périmètre autorisé."
+
+#, python-format
+msgid "Computed at %(when)s from the current data."
+msgstr "Calculé le %(when)s à partir des données actuelles."
+
+#, python-format
+msgid "%(counter)s registration in your scope."
+msgid_plural "%(counter)s registrations in your scope."
+msgstr[0] "%(counter)s inscription dans votre périmètre."
+msgstr[1] "%(counter)s inscriptions dans votre périmètre."
+
+msgid "Statistics filters"
+msgstr "Filtres des statistiques"
+
+msgid "All events in your scope"
+msgstr "Tous les événements de votre périmètre"
+
+msgid "From (submission or event date)"
+msgstr "Du (date de soumission ou d'événement)"
+
+msgid "Until"
+msgstr "Au"
+
+msgid "Chart period"
+msgstr "Période des graphiques"
+
+msgid "Automatic"
+msgstr "Automatique"
+
+msgid "Week"
+msgstr "Semaine"
+
+msgid "Active filters:"
+msgstr "Filtres actifs :"
+
+msgid "Ready-to-export reports"
+msgstr "Rapports prêts à exporter"
+
+msgid "Each report covers every registration matching these filters (not only what this page shows), with the event, the generation time and the definitions. PDF opens a print-ready report: choose Save as PDF in the print dialog."
+msgstr "Chaque rapport couvre toutes les inscriptions correspondant à ces filtres (pas seulement ce qu'affiche cette page), avec l'événement, l'heure de génération et les définitions. PDF ouvre un rapport prêt à imprimer : choisissez Enregistrer au format PDF dans la boîte de dialogue d'impression."
+
+msgid "The final-approved report includes the attendee list only for holders of the export permission in this scope."
+msgstr "Le rapport des approuvés définitifs n'inclut la liste des participants que pour les titulaires de l'autorisation d'export dans ce périmètre."
+
+msgid "Share"
+msgstr "Part"
+
+msgid "None in this population."
+msgstr "Aucun dans cette population."
+
+msgid "Metric definitions"
+msgstr "Définitions des indicateurs"
+
+msgid "Date range: the counts concern registrations first submitted within the range (all dates when it is empty), in their current state; the progress charts count events dated within the range. Dates are calendar days in the selected event's time zone (UTC when no event is selected)."
+msgstr "Période : les comptes concernent les inscriptions soumises pour la première fois dans la période (toutes les dates si elle est vide), dans leur état actuel ; les graphiques d'évolution comptent les événements datés dans la période. Les dates sont des jours calendaires dans le fuseau horaire de l'événement sélectionné (UTC si aucun événement n'est sélectionné)."
+
+msgid "2. Final-approved attendees"
+msgstr "2. Participants approuvés définitivement"
+
+msgid "final-approved registrations"
+msgstr "inscriptions approuvées définitivement"
+
+msgid "Current decision Approved, and the registration is approved, current, not withdrawn and not cancelled."
+msgstr "Décision actuelle Approuvée, et l'inscription est approuvée, actuelle, ni retirée ni annulée."
+
+msgid "Open the searchable list of accepted registrations"
+msgstr "Ouvrir la liste consultable des inscriptions acceptées"
+
+#, python-format
+msgid "Day %(day)s: %(counter)s registration"
+msgid_plural "Day %(day)s: %(counter)s registrations"
+msgstr[0] "Jour %(day)s : %(counter)s inscription"
+msgstr[1] "Jour %(day)s : %(counter)s inscriptions"
+
+msgid "Days overlap: a registration approved for all three days counts on each of them, so the day figures do not add up to the total."
+msgstr "Les jours se chevauchent : une inscription approuvée pour les trois jours compte pour chacun d'eux ; les chiffres par jour ne s'additionnent donc pas jusqu'au total."
+
+msgid "Participation categories (participant roles)"
+msgstr "Catégories de participation (rôles de participant)"
+
+msgid "Organizations of the final-approved"
+msgstr "Organisations des approuvés définitifs"
+
+msgid "1. Current overview"
+msgstr "1. Vue d'ensemble actuelle"
+
+msgid "Current overview"
+msgstr "Vue d'ensemble actuelle"
+
+#, python-format
+msgid "%(percent)s %% of applications"
+msgstr "%(percent)s %% des candidatures"
+
+msgid "Drafts (not submitted, not counted as applications)"
+msgstr "Brouillons (non soumis, non comptés comme candidatures)"
+
+msgid "Applications include every submitted registration, withdrawn and replaced ones too; a person who registered again is one unique participant and at most one approved person. The identity review queue counts are not application or approval counts."
+msgstr "Les candidatures incluent toutes les inscriptions soumises, y compris retirées et remplacées ; une personne réinscrite est un seul participant unique et au plus une personne approuvée. Les comptes de la file d'examen d'identité ne sont ni des comptes de candidatures ni des comptes d'approbations."
+
+msgid "6. Registration sources"
+msgstr "6. Sources des inscriptions"
+
+msgid "Source of the registration"
+msgstr "Source de l'inscription"
+
+msgid "Registration sources"
+msgstr "Sources des inscriptions"
+
+msgid "Registrations by organization"
+msgstr "Inscriptions par organisation"
+
+msgid "7. Participant composition"
+msgstr "7. Composition des participants"
+
+msgid "Stored categories only; missing values are shown as Not provided. Nationality is one dimension among others."
+msgstr "Catégories enregistrées uniquement ; les valeurs manquantes apparaissent comme Non renseigné. La nationalité est une dimension parmi d'autres."
+
+msgid "5. Progress over time"
+msgstr "5. Évolution dans le temps"
+
+#, python-format
+msgid "Events dated from %(start)s to %(end)s, whatever the submission date of their registration."
+msgstr "Événements datés du %(start)s au %(end)s, quelle que soit la date de soumission de leur inscription."
+
+msgid "One bar per week (from Monday)."
+msgstr "Une barre par semaine (à partir du lundi)."
+
+msgid "One bar per day."
+msgstr "Une barre par jour."
+
+#, python-format
+msgid "(highest: %(peak)s)"
+msgstr "(maximum : %(peak)s)"
+
+msgid "New applications per period; the table below gives every value."
+msgstr "Nouvelles candidatures par période ; le tableau ci-dessous donne chaque valeur."
+
+#, python-format
+msgid "(scale: %(peak)s)"
+msgstr "(échelle : %(peak)s)"
+
+msgid "Approval decisions per period; the table below gives every value."
+msgstr "Décisions d'approbation par période ; le tableau ci-dessous donne chaque valeur."
+
+msgid "Table of values"
+msgstr "Tableau des valeurs"
+
+#, python-format
+msgid "Cumulative columns start from what was recorded before the range: %(applications)s applications and %(approvals)s approval decisions. Decisions are recorded events, a superseded decision included; they are not the current approved count."
+msgstr "Les colonnes cumulées partent de ce qui était enregistré avant la période : %(applications)s candidatures et %(approvals)s décisions d'approbation. Les décisions sont des événements enregistrés, y compris une décision remplacée ; ce n'est pas le nombre actuel d'approuvés."
+
+msgid "3. Processing workload"
+msgstr "3. Charge de traitement"
+
+msgid "Processing workload"
+msgstr "Charge de traitement"
+
+msgid "Not recorded for this stage"
+msgstr "Non enregistré pour cette étape"
+
+msgid "4. Operational exceptions"
+msgstr "4. Exceptions opérationnelles"
+
+msgid "Reasons for identity manual review"
+msgstr "Motifs d'examen manuel de l'identité"
+
+msgid "No case waits for manual review."
+msgstr "Aucun dossier n'attend d'examen manuel."
+
+msgid "Repeated correction requests"
+msgstr "Demandes de correction répétées"
+
+msgid "Identity corrections requested twice or more"
+msgstr "Corrections d'identité demandées au moins deux fois"
+
+msgid "Information requests sent twice or more"
+msgstr "Demandes d'informations envoyées au moins deux fois"
+
+msgid "Requests per registration"
+msgstr "Demandes par inscription"
+
+msgid "Identity corrections"
+msgstr "Corrections d'identité"
+
+msgid "Information requests"
+msgstr "Demandes d'informations"
+
+msgid "These registrations would never reach a decision. The deployment team's review-queue backfill (dry run first) repairs eligible ones."
+msgstr "Ces inscriptions n'atteindraient jamais de décision. Le rattrapage de la file d'examen par l'équipe de déploiement (d'abord à blanc) répare celles qui sont éligibles."
+
+msgid "Every registration in the authorized scope that matches the filters, not one page."
+msgstr "Toutes les inscriptions du périmètre autorisé correspondant aux filtres, pas une seule page."
+
+msgid "Print or save as PDF"
+msgstr "Imprimer ou enregistrer en PDF"
+
+msgid "Attendee list"
+msgstr "Liste des participants"
+
+msgid "The attendee list covers only the registrations inside your export scope: %(withheld)s of %(total)s final-approved registrations are not listed."
+msgstr "La liste des participants ne couvre que les inscriptions de votre périmètre d’export : %(withheld)s inscriptions approuvées définitivement sur %(total)s n’y figurent pas."
+
+msgid "Other (%(groups)s more)"
+msgstr "Autres (%(groups)s de plus)"
+
+msgid "Long lists show their %(limit)s largest groups; the remaining groups are added up in “Other”, so every list still sums to its total. The XLSX and PDF reports list every group."
+msgstr "Les listes longues affichent leurs %(limit)s groupes les plus importants ; les autres groupes sont additionnés dans « Autres », de sorte que chaque liste correspond toujours à son total. Les rapports XLSX et PDF listent tous les groupes."
+
+msgid "One bar per week, labelled with its Monday; the first and last bars count only the dates inside the range."
+msgstr "Une barre par semaine, identifiée par son lundi ; la première et la dernière barre ne comptent que les dates comprises dans la période."
+
+msgid "Figures, campaigns and delegation lists cover the events and organizations of your authorized scope."
+msgstr "Les chiffres, les campagnes et les listes de délégation couvrent les éditions et les organisations de votre périmètre autorisé."

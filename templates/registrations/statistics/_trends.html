@@ -1,0 +1,46 @@
+{% load i18n %}
+{# UPD-08: events dated within the range. Single-series bar charts (one hue) with native tooltips; the exact table follows. #}
+{% with trend=report.trends %}
+<section class="asc-card" aria-labelledby="stats-trends-heading" data-stats-section="trends">
+  <h2 class="asc-card-title" id="stats-trends-heading">{% include "components/icon.html" with name="refresh" %}{% trans "5. Progress over time" %}</h2>
+  <p class="form-text">{% blocktrans with start=trend.range.start|date:"Y-m-d" end=trend.range.end|date:"Y-m-d" %}Events dated from {{ start }} to {{ end }}, whatever the submission date of their registration.{% endblocktrans %} {% if trend.range.period == "week" %}{% trans "One bar per week, labelled with its Monday; the first and last bars count only the dates inside the range." %}{% else %}{% trans "One bar per day." %}{% endif %}</p>
+  <div class="asc-stats-grid">
+    <figure class="asc-stats-chart" data-stats-chart="applications">
+      <figcaption class="h6">{% trans "New applications" %} <span class="asc-muted small">{% blocktrans with peak=peak %}(highest: {{ peak }}){% endblocktrans %}</span></figcaption>
+      <svg viewBox="0 0 {{ chart_width }} 102" preserveAspectRatio="none" role="img" aria-label="{% trans 'New applications per period; the table below gives every value.' %}" focusable="false">
+        <line class="asc-chart-baseline" x1="0" y1="100.5" x2="{{ chart_width }}" y2="100.5"></line>
+        {% for row in trend.rows %}{% if row.applications %}<rect class="asc-chart-bar" x="{{ row.x }}" y="{{ row.y|stringformat:'.2f' }}" width="8" height="{{ row.height|stringformat:'.2f' }}" rx="1.5"><title>{{ row.bucket|date:"Y-m-d" }}: {{ row.applications }}</title></rect>{% endif %}{% endfor %}
+      </svg>
+      <div class="asc-chart-axis"><span>{{ trend.range.start|date:"Y-m-d" }}</span><span>{{ trend.range.end|date:"Y-m-d" }}</span></div>
+    </figure>
+    <figure class="asc-stats-chart" data-stats-chart="approvals">
+      <figcaption class="h6">{% trans "Approval decisions" %} <span class="asc-muted small">{% blocktrans with peak=peak_decisions %}(scale: {{ peak }}){% endblocktrans %}</span></figcaption>
+      <svg viewBox="0 0 {{ chart_width }} 102" preserveAspectRatio="none" role="img" aria-label="{% trans 'Approval decisions per period; the table below gives every value.' %}" focusable="false">
+        <line class="asc-chart-baseline" x1="0" y1="100.5" x2="{{ chart_width }}" y2="100.5"></line>
+        {% for row in trend.rows %}{% if row.approved %}<rect class="asc-chart-bar asc-chart-bar-success" x="{{ row.x }}" y="{{ row.decision_y|stringformat:'.2f' }}" width="8" height="{{ row.decision_height|stringformat:'.2f' }}" rx="1.5"><title>{{ row.bucket|date:"Y-m-d" }}: {{ row.approved }}</title></rect>{% endif %}{% endfor %}
+      </svg>
+      <div class="asc-chart-axis"><span>{{ trend.range.start|date:"Y-m-d" }}</span><span>{{ trend.range.end|date:"Y-m-d" }}</span></div>
+    </figure>
+  </div>
+  <details class="asc-stats-table-details mt-2"{% if print_mode %} open{% endif %}>
+    <summary>{% trans "Table of values" %}</summary>
+    <div class="asc-table-wrap">
+      <table class="asc-table asc-stats-table" aria-label="{% trans 'Progress over time' %}" data-stats-trend-table>
+        <thead><tr>
+          <th scope="col">{% trans "Period start" %}</th>
+          <th scope="col" class="asc-num">{% trans "New applications" %}</th>
+          <th scope="col" class="asc-num">{% trans "Approval decisions" %}</th>
+          <th scope="col" class="asc-num">{% trans "Not-approved decisions" %}</th>
+          <th scope="col" class="asc-num">{% trans "Withdrawals and cancellations" %}</th>
+          <th scope="col" class="asc-num">{% trans "Cumulative applications" %}</th>
+          <th scope="col" class="asc-num">{% trans "Cumulative approval decisions" %}</th>
+        </tr></thead>
+        <tbody>
+          {% for row in trend.rows %}<tr><th scope="row"><bdi dir="ltr">{{ row.bucket|date:"Y-m-d" }}</bdi></th><td class="asc-num">{{ row.applications }}</td><td class="asc-num">{{ row.approved }}</td><td class="asc-num">{{ row.not_approved }}</td><td class="asc-num">{{ row.withdrawn }}</td><td class="asc-num">{{ row.cumulative_applications }}</td><td class="asc-num">{{ row.cumulative_approval_decisions }}</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="form-text mb-0">{% blocktrans with applications=trend.baseline_applications approvals=trend.baseline_approvals %}Cumulative columns start from what was recorded before the range: {{ applications }} applications and {{ approvals }} approval decisions. Decisions are recorded events, a superseded decision included; they are not the current approved count.{% endblocktrans %}</p>
+  </details>
+</section>
+{% endwith %}

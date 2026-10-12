@@ -77,3 +77,120 @@ def create_organization(
         organization_type=organization_type,
         country_code_id=country_code_id,
     )
+
+
+# ---------------------------------------------------------------------------
+# UPD-06: authorized organization management (create, edit, activate,
+# deactivate), audited. Never a merge and never a delete: registrations,
+# campaigns and batches keep pointing at the same organization row.
+# ---------------------------------------------------------------------------
+
+
+class OrganizationStatusError(Exception):
+    """The requested status change is not allowed (a merged organization)."""
+
+
+def _audit_organization(actor, action_code: str, organization, *, before=None, after=None):
+    from apps.audit.contracts import AuditRecord
+    from apps.audit.services import PersistentAuditRecorder
+
+    PersistentAuditRecorder().record(
+        AuditRecord(
+            actor_type="OPERATIONAL_USER",
+            actor_user_id=getattr(actor, "pk", None),
+            action_code=action_code,
+            target_type="Organization",
+            target_uuid=organization.pk,
+            result="SUCCESS",
+            before_summary=before,
+            after_summary=after,
+        )
+    )
+
+
+def create_organization_audited(
+    *, actor, official_name: str, organization_type: str, country_code_id: str | None = None
+) -> Organization:
+    """`create_organization`, plus the audit event of who created it."""
+    from django.db import transaction
+
+    from apps.audit import action_codes
+
+    with transaction.atomic():
+        organization = create_organization(
+            official_name=official_name,
+            organization_type=organization_type,
+            country_code_id=country_code_id,
+        )
+        _audit_organization(
+            actor,
+            action_codes.ORGANIZATION_CREATED,
+            organization,
+            after={"organization_type": organization_type, "country": country_code_id or ""},
+        )
+    return organization
+
+
+def update_organization(
+    organization: Organization,
+    *,
+    actor,
+    official_name: str,
+    organization_type: str,
+    country_code_id: str | None = None,
+) -> Organization:
+    """Edit the master record. The submitted snapshots of registrations
+    (`ProfessionalAffiliation.submitted_organization_name`) never change."""
+    from django.db import transaction
+
+    from apps.audit import action_codes
+
+    with transaction.atomic():
+        locked = Organization.objects.select_for_update().get(pk=organization.pk)
+        changed = []
+        name = official_name.strip()
+        if locked.official_name != name:
+            locked.official_name = name
+            locked.normalized_name = normalize_organization_name(name)
+            changed.append("official_name")
+        if locked.organization_type != organization_type:
+            locked.organization_type = organization_type
+            changed.append("organization_type")
+        if (locked.country_code_id or None) != (country_code_id or None):
+            locked.country_code_id = country_code_id or None
+            changed.append("country_code")
+        if changed:
+            locked.save()
+            _audit_organization(
+                actor, action_codes.ORGANIZATION_UPDATED, locked, after={"changed": changed}
+            )
+    return locked
+
+
+def set_organization_status(organization: Organization, *, actor, active: bool) -> Organization:
+    """Activate or deactivate. A deactivated organization cannot be used for a
+    new campaign, delegation list or on-behalf registration; its existing
+    campaigns, links and registrations are untouched (close a campaign
+    explicitly to stop its link). A merged organization is never changed."""
+    from django.db import transaction
+
+    from apps.audit import action_codes
+    from apps.organizations.models import OrganizationStatus
+
+    target = OrganizationStatus.ACTIVE if active else OrganizationStatus.INACTIVE
+    with transaction.atomic():
+        locked = Organization.objects.select_for_update().get(pk=organization.pk)
+        if locked.status == OrganizationStatus.MERGED:
+            raise OrganizationStatusError("A merged organization cannot change status.")
+        if locked.status != target:
+            before = locked.status
+            locked.status = target
+            locked.save(update_fields=["status", "updated_at"])
+            _audit_organization(
+                actor,
+                action_codes.ORGANIZATION_STATUS_CHANGED,
+                locked,
+                before={"status": before},
+                after={"status": target},
+            )
+    return locked

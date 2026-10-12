@@ -1,0 +1,17 @@
+{% load i18n %}{# Applications and final-approved side by side for one dimension. `rows`, `caption`, `column`. #}
+<div class="asc-table-wrap">
+  <table class="asc-table asc-stats-table" aria-label="{{ caption }}">
+    <thead><tr><th scope="col">{{ column }}</th><th scope="col" class="asc-num">{% trans "Applications" %}</th><th scope="col" class="asc-num">{% trans "Final-approved" %}</th></tr></thead>
+    <tbody>
+      {% for row in rows %}
+        <tr{% if row.missing %} class="asc-stats-missing"{% endif %}>
+          <th scope="row"><bdi>{{ row.label }}</bdi></th>
+          <td class="asc-num">{% if row.url %}<a href="{{ row.url }}">{{ row.applications }}</a>{% else %}{{ row.applications }}{% endif %}</td>
+          <td class="asc-num">{% if row.approved_url %}<a href="{{ row.approved_url }}">{{ row.approved }}</a>{% else %}{{ row.approved }}{% endif %}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="3" class="asc-table-empty">{% trans "None in this population." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

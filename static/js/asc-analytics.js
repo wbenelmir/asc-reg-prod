@@ -18,11 +18,20 @@
  * script with the page's FIXED path and title from the marker (never
  * location.href, the query string, the real title or form values); the
  * referrer is reduced to its origin; Google signals and ad personalisation
- * are off. GA4 "Enhanced measurement" must be switched off in the GA admin
- * (see the deployment notes), since it would collect the real URL.
+ * are off. The sanitised values are set before the tag is configured, so
+ * every hit of the page uses them.
  *
- * htmx re-runs body scripts after a boosted swap: listeners are bound once,
- * and the per-page step runs again (a page view only on a marked page).
+ * Navigation: htmx boosted navigation keeps this page's JavaScript (and so
+ * the loaded tag) alive and calls history.pushState before the new content
+ * is swapped in. GA4 "Enhanced measurement" sends its own page views (the
+ * real URL and title) on such history changes, even with send_page_view
+ * off. So once the tag is loaded, measurement is SEALED for the rest of the
+ * page's lifetime (window["ga-disable-<ID>"] = true, Google's documented
+ * opt-out) as soon as an htmx request starts, a history entry is restored,
+ * or the swapped-in page carries no marker. A boosted GET navigation is
+ * turned into a normal page load instead, so a public page reached that way
+ * starts its own tag and is counted exactly once, and every other page
+ * starts without Google at all.
  */
 (function () {
   "use strict";
@@ -66,10 +75,46 @@
     window.dataLayer.push(arguments);
   }
 
-  function loadTag(id) {
-    window["ga-disable-" + id] = false;
-    if (window.ascAnalyticsLoaded) return;
+  function referrerOrigin() {
+    try {
+      return document.referrer ? new URL(document.referrer).origin + "/" : "";
+    } catch (error) {
+      return "";
+    }
+  }
+
+  // The only page values Google receives: the marker's fixed path and title.
+  function pageValues(node) {
+    var path = node.getAttribute("data-page-path") || "";
+    if (path.charAt(0) !== "/" || /[?#]/.test(path)) return null;
+    return {
+      page_location: window.location.origin + path,
+      page_path: path,
+      page_title: node.getAttribute("data-page-title") || "ASC 2026",
+      page_referrer: referrerOrigin(),
+    };
+  }
+
+  // Stops every later hit of this page lifetime, including Enhanced
+  // measurement events Google's script would send on its own.
+  function seal() {
+    if (!window.ascAnalyticsLoaded) return;
+    window.ascAnalyticsSealed = true;
+    window["ga-disable-" + window.ascAnalyticsId] = true;
+  }
+
+  function loadTag(id, page) {
+    if (window.ascAnalyticsSealed) return false;
+    if (window.ascAnalyticsLoaded) {
+      if (window.ascAnalyticsId !== id) return false;
+      // Accepted again after declining on this page.
+      window["ga-disable-" + id] = false;
+      gtag("consent", "update", { analytics_storage: "granted" });
+      return true;
+    }
     window.ascAnalyticsLoaded = true;
+    window.ascAnalyticsId = id;
+    window["ga-disable-" + id] = false;
     window.dataLayer = window.dataLayer || [];
     window.gtag = gtag;
     gtag("consent", "default", {
@@ -79,6 +124,7 @@
       ad_personalization: "denied",
     });
     gtag("js", new Date());
+    gtag("set", page);
     gtag("config", id, {
       send_page_view: false,
       allow_google_signals: false,
@@ -88,32 +134,20 @@
     script.async = true;
     script.src = TAG_ORIGIN + "/gtag/js?id=" + encodeURIComponent(id);
     document.head.appendChild(script);
+    return true;
   }
 
-  function referrerOrigin() {
-    try {
-      return document.referrer ? new URL(document.referrer).origin + "/" : "";
-    } catch (error) {
-      return "";
-    }
-  }
-
-  function sendPageView(node) {
-    // One view per rendered page: a boosted swap both re-runs this script
-    // and fires htmx:after:swap.
+  function sendPageView(node, page) {
+    // One view per rendered page and page lifetime.
     if (node.hasAttribute("data-asc-analytics-sent")) return;
     node.setAttribute("data-asc-analytics-sent", "");
-    var path = node.getAttribute("data-page-path") || "/";
-    if (path.charAt(0) !== "/" || /[?#]/.test(path)) return;
-    var page = {
-      page_location: window.location.origin + path,
-      page_path: path,
-      page_title: node.getAttribute("data-page-title") || "ASC 2026",
-      page_referrer: referrerOrigin(),
-    };
-    // Every later hit of this page uses the same sanitised values.
-    gtag("set", page);
     gtag("event", "page_view", page);
+  }
+
+  function start(node, id) {
+    var page = pageValues(node);
+    if (!page) return;
+    if (loadTag(id, page)) sendPageView(node, page);
   }
 
   function removeGoogleCookies() {
@@ -145,12 +179,25 @@
     Array.prototype.forEach.call(document.querySelectorAll("[data-asc-analytics-open]"), function (button) {
       button.hidden = !id;
     });
-    if (!id) return;
+    if (!id) {
+      seal();
+      return;
+    }
     var choice = consent();
     setBanner(choice === null);
-    if (choice === "granted") {
-      loadTag(id);
-      sendPageView(node);
+    if (choice === "granted") start(node, id);
+  }
+
+  function isBoostedGet(event) {
+    var ctx = event.detail && event.detail.ctx;
+    var request = ctx && ctx.request;
+    if (!request || String(request.method || "GET").toUpperCase() !== "GET") return null;
+    if (!request.headers || request.headers["HX-Request-Type"] !== "full") return null;
+    try {
+      var url = new URL(request.action, window.location.href);
+      return url.origin === window.location.origin ? url.href : null;
+    } catch (error) {
+      return null;
     }
   }
 
@@ -175,8 +222,7 @@
       writeConsent(value);
       setBanner(false);
       if (value === "granted" && before !== "granted") {
-        loadTag(id);
-        sendPageView(node);
+        start(node, id);
       } else if (value === "denied") {
         window["ga-disable-" + id] = true;
         if (window.ascAnalyticsLoaded) gtag("consent", "update", { analytics_storage: "denied" });
@@ -184,8 +230,26 @@
       }
     });
 
+    // Before htmx fetches anything (and so before it pushes a history entry).
+    document.addEventListener("htmx:before:request", function (event) {
+      if (!window.ascAnalyticsLoaded) return;
+      seal();
+      var href = isBoostedGet(event);
+      if (href) {
+        event.preventDefault();
+        window.location.assign(href);
+      }
+    });
+    document.addEventListener("htmx:before:history:restore", seal);
+    window.addEventListener("popstate", seal);
+
     document.addEventListener("htmx:after:swap", setUp);
   }
 
-  setUp();
+  // The footer control follows this script in the page: wait for it.
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setUp, { once: true });
+  } else {
+    setUp();
+  }
 })();

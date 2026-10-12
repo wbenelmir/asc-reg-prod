@@ -1,0 +1,54 @@
+{% load i18n %}
+<section class="asc-card" aria-labelledby="stats-sources-heading" data-stats-section="sources">
+  <h2 class="asc-card-title" id="stats-sources-heading">{% include "components/icon.html" with name="building" %}{% trans "6. Registration sources" %}</h2>
+  {% if breakdowns_compacted %}<p class="form-text" data-stats-compacted>{% blocktrans trimmed with limit=breakdown_limit %}Long lists show their {{ limit }} largest groups; the remaining groups are added up in “Other”, so every list still sums to its total. The XLSX and PDF reports list every group.{% endblocktrans %}</p>{% endif %}
+  <div class="asc-stats-grid">
+    <div>
+      <h3 class="h6">{% trans "Source of the registration" %}</h3>
+      {% trans "Registration sources" as caption %}{% trans "Source" as column %}
+      {% include "registrations/statistics/_paired.html" with rows=report.sources.kinds caption=caption column=column %}
+    </div>
+    <div>
+      <h3 class="h6">{% trans "Invitation campaigns" %}</h3>
+      {% trans "Invitation campaigns" as caption %}{% trans "Campaign" as column %}
+      {% include "registrations/statistics/_paired.html" with rows=report.sources.campaigns caption=caption column=column %}
+    </div>
+    <div>
+      <h3 class="h6">{% trans "Organizations" %}</h3>
+      {% trans "Registrations by organization" as caption %}{% trans "Organization" as column %}
+      {% include "registrations/statistics/_paired.html" with rows=report.sources.organizations caption=caption column=column %}
+    </div>
+    <div>
+      <h3 class="h6">{% trans "Delegation lists" %}</h3>
+      {% trans "Delegation lists" as caption %}{% trans "Delegation list" as column %}
+      {% include "registrations/statistics/_paired.html" with rows=report.sources.batches caption=caption column=column %}
+    </div>
+  </div>
+</section>
+
+<section class="asc-card" aria-labelledby="stats-composition-heading" data-stats-section="composition">
+  <h2 class="asc-card-title" id="stats-composition-heading">{% include "components/icon.html" with name="globe" %}{% trans "7. Participant composition" %}</h2>
+  <p class="form-text">{% trans "Stored categories only; missing values are shown as Not provided. Nationality is one dimension among others." %}</p>
+  <div class="asc-stats-grid">
+    <div>
+      <h3 class="h6">{% trans "Organization type" %}</h3>
+      {% trans "Organization type" as caption %}{% trans "Organization type" as column %}
+      {% include "registrations/statistics/_paired.html" with rows=report.composition.organization_type caption=caption column=column %}
+    </div>
+    <div>
+      <h3 class="h6">{% trans "Sector" %}</h3>
+      {% trans "Sector" as caption %}{% trans "Sector" as column %}
+      {% include "registrations/statistics/_paired.html" with rows=report.composition.sector caption=caption column=column %}
+    </div>
+    <div>
+      <h3 class="h6">{% trans "Nationality" %}</h3>
+      {% trans "Nationality" as caption %}{% trans "Nationality" as column %}
+      {% include "registrations/statistics/_paired.html" with rows=report.composition.nationality caption=caption column=column %}
+    </div>
+    <div>
+      <h3 class="h6">{% trans "Country of residence" %}</h3>
+      {% trans "Country of residence" as caption %}{% trans "Country of residence" as column %}
+      {% include "registrations/statistics/_paired.html" with rows=report.composition.residence caption=caption column=column %}
+    </div>
+  </div>
+</section>

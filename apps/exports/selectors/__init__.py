@@ -60,3 +60,20 @@ def export_scope_choices(user):
         )
     ).order_by("official_name")
     return events, organizations
+
+
+def export_campaign_choices(user):
+    """UPD-06: the invitation campaigns whose registrations `user` may
+    export (the same rule as `export_scope_choices`)."""
+    from apps.invitations.models import InvitationCampaign
+
+    scoped = registrations_visible_for_export(user)
+    return (
+        InvitationCampaign.objects.filter(
+            pk__in=scoped.exclude(invitation_campaign_id__isnull=True).values_list(
+                "invitation_campaign_id", flat=True
+            )
+        )
+        .select_related("organization")
+        .order_by("name")
+    )

@@ -33,6 +33,12 @@ urlpatterns = [
         "ops/identity/cases/<uuid:pk>/correct-nin/", views.identity_correct_nin, name="correct-nin"
     ),
     path("ops/identity/cases/<uuid:pk>/reject/", views.identity_reject, name="reject"),
+    # UPD-02: save corrections and verify identity, in one action.
+    path(
+        "ops/identity/cases/<uuid:pk>/correct-and-verify/",
+        views.identity_correct_and_verify,
+        name="correct-and-verify",
+    ),
     path(
         "ops/identity/cases/<uuid:pk>/evidence/<uuid:document_id>/",
         views.identity_evidence,

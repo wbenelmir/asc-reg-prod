@@ -1,0 +1,91 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n asc_ui %}
+{% block title %}{% trans "Accreditation settings" %}{% endblock %}
+{% block content %}
+  {% comment %}
+    UPD-07: participant accreditation settings of one event edition. They are
+    what accreditation assignments choose from (one by one or in bulk); they
+    are not staff account roles. Controls appear only to holders of the
+    add/change permission for this event; the views check it again.
+  {% endcomment %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker">{% trans "Accreditation" %}</p>
+      <h1>{% trans "Accreditation settings" %}</h1>
+      <p>{% trans "Participant roles, badge types, access profiles and access rules of the event. They are assigned to approved participants; they are not staff account roles." %}</p>
+    </div>
+    <div class="asc-actions-row mt-0">
+      <a class="btn btn-outline-secondary" href="{% url 'accreditation:bulk-preview' %}">{% include "components/icon.html" with name="layers" %}<span>{% trans "Bulk accreditation" %}</span></a>
+    </div>
+  </div>
+
+  {% if events|length > 1 %}
+    <form method="get" class="asc-card asc-card-form mb-3" aria-label="{% trans 'Choose an event' %}">
+      <label for="id_settings_event" class="form-label">{% trans "Event" %}</label>
+      <div class="asc-actions-row">
+        <select id="id_settings_event" name="event" class="form-select">
+          {% for option in events %}<option value="{{ option.pk }}"{% if option.pk == event.pk %} selected{% endif %}>{{ option.code }} · {{ option.name }}</option>{% endfor %}
+        </select>
+        <button type="submit" class="btn btn-outline-primary">{% trans "Show" %}</button>
+      </div>
+    </form>
+  {% endif %}
+
+  {% if event is None %}
+    <div class="asc-empty">
+      <span class="asc-tile">{% include "components/icon.html" with name="layers" %}</span>
+      <h3>{% trans "No event edition is in your scope." %}</h3>
+    </div>
+  {% else %}
+    <p class="asc-section-lead" data-settings-event="{{ event.code }}">{% blocktrans with name=event.name code=event.code %}Event: {{ name }} ({{ code }}){% endblocktrans %}</p>
+    {% for section in sections %}
+      <section class="asc-card asc-card-flush" aria-labelledby="settings-{{ section.kind.slug }}" data-settings-kind="{{ section.kind.slug }}">
+        <div class="asc-card-toolbar">
+          <h2 class="asc-card-toolbar-title" id="settings-{{ section.kind.slug }}">{{ section.kind.plural }}</h2>
+          <span class="asc-count">{% blocktrans count counter=section.active_count %}{{ counter }} active{% plural %}{{ counter }} active{% endblocktrans %}</span>
+          {% if section.can_add %}<a class="btn btn-sm btn-primary" href="{% url 'accreditation:setting-create' kind_slug=section.kind.slug %}?event={{ event.pk }}" data-setting-create="{{ section.kind.slug }}">{% trans "Add" %}<span class="visually-hidden"> {{ section.kind.label }}</span></a>{% endif %}
+        </div>
+        {% if section.items %}
+          <div class="asc-table-wrap">
+            <table class="asc-table" aria-labelledby="settings-{{ section.kind.slug }}">
+              <thead>
+                <tr>
+                  <th scope="col">{% trans "Code" %}</th>
+                  <th scope="col">{% trans "Name" %}</th>
+                  <th scope="col">{% trans "Status" %}</th>
+                  <th scope="col" class="asc-num">{% trans "Current assignments" %}</th>
+                  <th scope="col"><span class="visually-hidden">{% trans "Actions" %}</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in section.items %}
+                  <tr data-setting-row="{{ item.code }}">
+                    <th scope="row"><bdi dir="ltr" class="asc-code">{{ item.code }}</bdi></th>
+                    <td><bdi>{{ item.localized_name }}</bdi></td>
+                    <td>{% if item.is_active %}{% trans "Active" context "setting status" as label %}{% status_chip "setting" "ACTIVE" label %}{% else %}{% trans "Inactive" context "setting status" as label %}{% status_chip "setting" "INACTIVE" label %}{% endif %}</td>
+                    <td class="asc-num">{{ item.current_assignments }}</td>
+                    <td class="asc-cell-action">
+                      {% if section.can_change %}
+                        <div class="asc-actions-row">
+                          <a class="btn btn-sm btn-outline-primary" href="{% url 'accreditation:setting-edit' kind_slug=section.kind.slug pk=item.pk %}">{% trans "Edit" %}<span class="visually-hidden"> <bdi dir="ltr">{{ item.code }}</bdi></span></a>
+                          <form method="post" action="{% url 'accreditation:setting-status' kind_slug=section.kind.slug pk=item.pk %}" class="m-0">
+                            {% csrf_token %}
+                            <input type="hidden" name="active" value="{% if item.is_active %}0{% else %}1{% endif %}">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary" data-setting-toggle="{{ item.code }}">{% if item.is_active %}{% trans "Deactivate" %}{% else %}{% trans "Activate" %}{% endif %}<span class="visually-hidden"> <bdi dir="ltr">{{ item.code }}</bdi></span></button>
+                          </form>
+                        </div>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="asc-card-note" data-settings-empty="{{ section.kind.slug }}">{% if section.can_add %}{% trans "None yet. Add the first one; it is active at once and can be assigned." %}{% else %}{% trans "None configured for this event yet." %}{% endif %}</p>
+        {% endif %}
+      </section>
+    {% endfor %}
+    <p class="form-text">{% trans "Approval of a registration needs a current participant role, badge type and access profile. Deactivating a setting stops new assignments of it; existing assignments are unchanged." %}</p>
+  {% endif %}
+{% endblock %}

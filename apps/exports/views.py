@@ -21,6 +21,7 @@ from apps.accounts.policies import has_scoped_permission, operational_permission
 
 from .forms import ExportRequestForm
 from .selectors import (
+    export_campaign_choices,
     export_requests_visible_to,
     export_scope_choices,
     registrations_visible_for_export,
@@ -51,10 +52,23 @@ def export_workspace(request):
     forged one, is answered exactly like a denied scope (409), so the
     response never tells whether that event or organization exists."""
     events, organizations = export_scope_choices(request.user)
+    campaigns = export_campaign_choices(request.user)
+    # UPD-06: "Export" from an organization or a campaign preselects them.
+    initial = {
+        field: request.GET.get(key)
+        for key, field in (
+            ("event", "event_edition_id"),
+            ("organization", "organization_id"),
+            ("campaign", "campaign_id"),
+        )
+        if request.GET.get(key)
+    }
     form = ExportRequestForm(
         request.POST if request.method == "POST" else None,
+        initial=initial,
         events=events,
         organizations=organizations,
+        campaigns=campaigns,
     )
     context = {
         "exports": export_requests_visible_to(request.user)
@@ -75,6 +89,7 @@ def export_workspace(request):
 
     event_edition = form.cleaned_data["event_edition_id"]
     organization = form.cleaned_data.get("organization_id")
+    campaign = form.cleaned_data.get("campaign_id")
     if not has_scoped_permission(
         request.user,
         "exports.add_exportrequest",
@@ -89,12 +104,15 @@ def export_workspace(request):
     )
     if organization is not None:
         scoped_registrations = scoped_registrations.filter(source_organization=organization)
+    if campaign is not None:
+        scoped_registrations = scoped_registrations.filter(invitation_campaign=campaign)
     registration_ids = list(scoped_registrations.values_list("pk", flat=True))
 
     try:
         request_export(
             event_edition=event_edition,
             organization=organization,
+            campaign=campaign,
             purpose_code=form.cleaned_data["purpose_code"],
             reason=form.cleaned_data["reason"],
             requested_by=request.user,

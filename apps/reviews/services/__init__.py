@@ -1649,10 +1649,13 @@ def record_identity_rejection_outcome(
 # Reopening, withdrawal, operational cancellation
 # ---------------------------------------------------------------------------
 
+#: UPD-01 (2026-10-12): a withdrawn or cancelled registration is never
+#: reactivated by a staff action; the participant registers again from the
+#: same account instead (a new request), and the withdrawn one keeps its
+#: history. Approved and not-approved registrations may still be reopened.
 REOPENABLE_PUBLIC_STATUSES = (
     RegistrationPublicStatus.APPROVED,
     RegistrationPublicStatus.NOT_APPROVED,
-    RegistrationPublicStatus.WITHDRAWN,
 )
 
 
@@ -1672,6 +1675,11 @@ def reopen_registration(
         locked = _lock_versioned(
             Registration, pk=registration.pk, expected_version=expected_version
         )
+        if locked.public_status == RegistrationPublicStatus.WITHDRAWN:
+            raise ValueError(
+                "A withdrawn or cancelled registration cannot be reopened. The participant can "
+                "register again from the same account; this registration keeps its history."
+            )
         if locked.public_status not in REOPENABLE_PUBLIC_STATUSES:
             raise ValueError(f"A {locked.public_status} registration cannot be reopened.")
         from apps.people.models import IdentityStatus, IdentityVerification
@@ -1792,6 +1800,10 @@ def cancel_registration_operationally(
         locked = _lock_versioned(
             Registration, pk=registration.pk, expected_version=expected_version
         )
+        if locked.public_status == RegistrationPublicStatus.WITHDRAWN:
+            # UPD-01: already withdrawn or cancelled; nothing changes (its
+            # withdrawal or cancellation time is history).
+            return locked
         locked.public_status = RegistrationPublicStatus.WITHDRAWN
         locked.internal_status = RegistrationInternalStatus.CLOSED
         locked.cancelled_at = timezone.now()

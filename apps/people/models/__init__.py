@@ -601,6 +601,11 @@ class IdentityRevisionSource(models.TextChoices):
         "OFFICIAL_NAME_NORMALIZATION",
         _("Official name form applied (case or spacing only)"),
     )
+    # UPD-02: names, birth date or NIN corrected by a reviewer from evidence.
+    STAFF_IDENTITY_CORRECTION = (
+        "STAFF_IDENTITY_CORRECTION",
+        _("Staff correction from evidence"),
+    )
 
 
 class IdentityRevision(UUIDPrimaryKeyModel):
@@ -705,6 +710,8 @@ class IdentityDecisionAction(models.TextChoices):
     )
     OFFICIAL_NAME_APPLIED = "OFFICIAL_NAME_APPLIED", _("Official name form applied")
     REGISTRATION_CLOSED = "REGISTRATION_CLOSED", _("Registration closed")
+    # UPD-02: corrections saved and the identity verified in one action.
+    CORRECT_AND_VERIFY = "CORRECT_AND_VERIFY", _("Corrected and verified by staff")
 
 
 class IdentityDecision(UUIDPrimaryKeyModel):
@@ -715,6 +722,17 @@ class IdentityDecision(UUIDPrimaryKeyModel):
     note, never shown to the participant. `requested_items` lists the preset
     correction items of a return. `evidence_document` is the reviewed document
     for a manual verification or a NIN correction.
+
+    UPD-03: a return for correction may carry `participant_note_encrypted`, a
+    note written for the participant (shown in the platform and in the
+    correction e-mail), and records the language the participant was written
+    to (`notification_language`) and why that language was chosen
+    (`notification_language_basis`). Each note belongs to its own return, so
+    the sequence of requests and notes is the decision history itself.
+
+    UPD-02: `changes_encrypted` holds the previous and corrected values of a
+    staff correction (encrypted JSON), shown only to readers of identity
+    evidence; the audit event names the changed fields only.
     """
 
     verification = models.ForeignKey(
@@ -739,6 +757,13 @@ class IdentityDecision(UUIDPrimaryKeyModel):
         Person, null=True, blank=True, on_delete=models.PROTECT, related_name="+"
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    # --- UPD-02 / UPD-03 (people.0007) ---
+    participant_note_encrypted = EncryptedTextField(blank=True, default="", db_default="")
+    notification_language = models.CharField(max_length=8, blank=True, default="", db_default="")
+    notification_language_basis = models.CharField(
+        max_length=24, blank=True, default="", db_default=""
+    )
+    changes_encrypted = EncryptedTextField(blank=True, default="", db_default="")
 
     class Meta:
         db_table = "people_identity_decision"

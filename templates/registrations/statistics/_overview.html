@@ -1,0 +1,22 @@
+{% load i18n %}
+{# UPD-08 overview: current-state counts of the registration cohort; each opens its list. #}
+<section class="asc-card" aria-labelledby="stats-overview-heading" data-stats-section="overview">
+  <h2 class="asc-card-title" id="stats-overview-heading">{% include "components/icon.html" with name="layers" %}{% trans "1. Current overview" %}</h2>
+  <div class="asc-kpis asc-stats-kpis" role="group" aria-label="{% trans 'Current overview' %}">
+    {% for card in cards %}
+      <a class="asc-kpi asc-stats-kpi{% if card.key == 'final_approved' %} asc-kpi-success asc-stats-kpi-strong{% elif card.key == 'rejected' %} asc-kpi-danger{% elif card.key == 'processing' %} asc-kpi-info{% endif %}" href="{{ card.url }}" data-stats-card="{{ card.key }}" data-count="{{ card.count }}">
+        <span class="asc-kpi-label">{{ card.label }}</span>
+        <span class="asc-kpi-value">{{ card.count }}</span>
+        {% if card.percent is not None %}<span class="asc-kpi-note">{% blocktrans with percent=card.percent %}{{ percent }} % of applications{% endblocktrans %}</span>{% endif %}
+      </a>
+    {% endfor %}
+  </div>
+  <dl class="asc-dl asc-dl-compact mt-3" data-stats-persons>
+    <dt>{% trans "Unique participants" %}</dt><dd data-count="{{ report.overview.unique_participants }}">{{ report.overview.unique_participants }}</dd>
+    <dt>{% trans "Approved persons" %}</dt><dd data-count="{{ report.overview.approved_persons }}">{{ report.overview.approved_persons }}</dd>
+    <dt>{% trans "Withdrawn by the participant" %}</dt><dd>{{ report.overview.withdrawn_by_participant }}</dd>
+    <dt>{% trans "Cancelled by the team" %}</dt><dd>{{ report.overview.cancelled_by_team }}</dd>
+    <dt>{% trans "Drafts (not submitted, not counted as applications)" %}</dt><dd>{{ report.overview.drafts }}</dd>
+  </dl>
+  <p class="form-text mb-0">{% trans "Applications include every submitted registration, withdrawn and replaced ones too; a person who registered again is one unique participant and at most one approved person. The identity review queue counts are not application or approval counts." %}</p>
+</section>

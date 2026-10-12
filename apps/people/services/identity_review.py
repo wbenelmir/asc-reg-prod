@@ -277,6 +277,7 @@ def _decision(
     note="",
     items=(),
     evidence=None,
+    **extra_fields,
 ) -> IdentityDecision:  # noqa: E501
     return IdentityDecision.objects.create(
         verification=verification,
@@ -290,6 +291,7 @@ def _decision(
         evidence_document=evidence,
         actor_user=actor_user,
         actor_person=actor_person,
+        **extra_fields,
     )
 
 
@@ -324,9 +326,20 @@ def _set_registration_status(registration, *, public_status, internal_status) ->
         registration.save(update_fields=[*fields, "version", "updated_at"])
 
 
-def _notify(registration, *, purpose_code: str, idempotency_key: str) -> None:
+def _notify(
+    registration,
+    *,
+    purpose_code: str,
+    idempotency_key: str,
+    language: str = "",
+    extra_context: dict | None = None,
+) -> None:
     """Best effort, safe, existing templates only: the message names the
-    registration reference and the event, never a reason or a result."""
+    registration reference and the event, never a reason or a result.
+
+    `language` overrides the registration's preferred language (UPD-03: the
+    correction request is written in the participant's submission language);
+    `extra_context` adds values the template version explicitly allows."""
     from apps.communications.services import queue_communication
     from apps.people.models import ContactPointStatus, ContactPointType
 
@@ -340,19 +353,75 @@ def _notify(registration, *, purpose_code: str, idempotency_key: str) -> None:
     ).first()
     if contact is None:
         return
+    language = language or registration.preferred_language or "en"
     queue_communication(
         purpose_code=purpose_code,
         event_edition=registration.event_edition,
         person=registration.person,
         registration=registration,
-        language=registration.preferred_language or "en",
+        language=language,
         destination=contact.value_encrypted,
         context={
             "public_reference": registration.public_reference,
-            "event_name": registration.event_edition.display_name(registration.preferred_language),
+            "event_name": registration.event_edition.display_name(language),
+            **(extra_context or {}),
         },
         idempotency_key=idempotency_key,
     )
+
+
+# ---------------------------------------------------------------------------
+# UPD-03: the note to the participant on a correction request
+# ---------------------------------------------------------------------------
+
+#: The longest note to the participant (code points, after normalization).
+MAX_PARTICIPANT_NOTE_LENGTH = 2000
+
+
+def clean_participant_note(note: str) -> str:
+    """Normalize a note written for the participant: line breaks kept (CR LF
+    and CR become LF), NFC, trimmed. Control characters other than line
+    breaks and tabs are refused, never silently removed."""
+    from apps.registrations.services import normalize_long_text
+
+    text = normalize_long_text(note or "")
+    if len(text) > MAX_PARTICIPANT_NOTE_LENGTH:
+        raise InvalidIdentityInput("participant_note_too_long")
+    if any(ord(char) < 32 and char not in "\n\t" for char in text):
+        raise InvalidIdentityInput("participant_note_invalid")
+    return text
+
+
+def correction_notification_language(registration, requested: str = "") -> tuple[str, str]:
+    """`(language, basis)` for a correction request (UPD-03).
+
+    The registration's submission language when it is known (recorded, or
+    derived from the accepted notice); otherwise the language staff chose
+    explicitly (`STAFF_SELECTED`). Without a choice, the registration's
+    preferred language is used and recorded as such (`PREFERRED_FALLBACK`),
+    never a language inferred from nationality or the staff interface."""
+    from apps.registrations import language as registration_language
+
+    submission = registration_language.submission_language_for(registration)
+    if submission.known:
+        return submission.code, submission.basis
+    chosen = registration_language.clean_language(requested)
+    if chosen:
+        return chosen, registration_language.STAFF_SELECTED
+    return registration_language.explicit_fallback_language(registration), "PREFERRED_FALLBACK"
+
+
+def participant_note_section(note: str, language: str) -> str:
+    """The note block of the correction e-mail, in `language`, or "" when
+    there is no note. Plain text: the e-mail is sent as text, so the note's
+    line breaks are kept as they are."""
+    from django.utils import translation
+
+    if not note:
+        return ""
+    with translation.override(language):
+        heading = str(_("Message from the registration team:"))
+    return f"\n\n{heading}\n{note}\n"
 
 
 # ---------------------------------------------------------------------------
@@ -500,11 +569,22 @@ def return_identity_for_correction(
     expected_version: int,
     items: list[str],
     note: str = "",
+    participant_note: str = "",
+    notification_language: str = "",
     correlation_id: str = "",
 ) -> IdentityVerification:
     """Ask the participant to correct and resubmit on the SAME account and
     registration (IDV-09). The participant sees Additional Information
-    Required and the preset items, never the reason or a provider result."""
+    Required and the preset items, never the reason or a provider result.
+
+    UPD-03: `participant_note` is an optional note written FOR the
+    participant, in the participant's submission language (no automatic
+    translation). It belongs to this return (its own decision row), is shown
+    in the participant's workspace and correction page, and is included in
+    the correction e-mail, sent once per return in that language
+    (`correction_notification_language`; `notification_language` is the
+    staff choice used only when the submission language is unknown). `note`
+    stays the internal note, never shown to the participant."""
     from apps.registrations.models import RegistrationInternalStatus, RegistrationPublicStatus
     from apps.reviews.models import InformationRequest, InformationRequestStatus
 
@@ -515,6 +595,7 @@ def return_identity_for_correction(
     if not items or any(item not in catalogue for item in items):
         raise InvalidIdentityInput("items")
     note = _clean_note(note)
+    participant_note = clean_participant_note(participant_note)
 
     with transaction.atomic():
         registration, locked = _lock_case(verification_id, expected_version)
@@ -538,6 +619,9 @@ def return_identity_for_correction(
             public_status=RegistrationPublicStatus.ADDITIONAL_INFORMATION_REQUIRED,
             internal_status=RegistrationInternalStatus.AWAITING_APPLICANT,
         )
+        language, language_basis = correction_notification_language(
+            registration, notification_language
+        )
         decision = _decision(
             locked,
             action=IdentityDecisionAction.RETURN_FOR_CORRECTION,
@@ -545,20 +629,36 @@ def return_identity_for_correction(
             actor_user=actor,
             note=note,
             items=items,
+            participant_note_encrypted=participant_note,
+            notification_language=language,
+            notification_language_basis=language_basis,
         )
         _audit(
             action_codes.IDENTITY_RETURNED_FOR_CORRECTION,
             verification=locked,
             actor_user=actor,
-            after={"status": locked.status, "items": items},
+            after={
+                "status": locked.status,
+                "items": items,
+                # Whether a note was written, and the language used; never the note.
+                "participant_note": bool(participant_note),
+                "notification_language": language,
+                "notification_language_basis": language_basis,
+            },
             correlation_id=correlation_id,
         )
         from apps.communications.purposes import CommunicationPurpose
 
+        # One message per return: the key is the decision, so a retried
+        # delivery or a repeated call never sends a second one.
         _notify(
             registration,
-            purpose_code=CommunicationPurpose.INFORMATION_REQUEST,
+            purpose_code=CommunicationPurpose.IDENTITY_CORRECTION_REQUEST,
             idempotency_key=f"identity-correction-request:{decision.pk}",
+            language=language,
+            extra_context={
+                "participant_note_section": participant_note_section(participant_note, language)
+            },
         )
     return locked
 
@@ -683,6 +783,444 @@ def correct_nin_and_recheck(
             actor_user=actor,
             reason_code=reason_code,
             after={"status": locked.status, "revision": revision.number, "nin_changed": changed},
+            correlation_id=correlation_id,
+        )
+    return locked
+
+
+# ---------------------------------------------------------------------------
+# UPD-02: save corrections and verify identity, in one reviewer action
+# ---------------------------------------------------------------------------
+
+#: Preset reasons of a correction-and-verification.
+CORRECTION_VERIFY_REASONS = {
+    "DATA_CORRECTED_FROM_DOCUMENT": _(
+        "The submitted data was corrected from the identity document, which confirms the identity"
+    ),
+    "TYPING_ERROR_CORRECTED": _("A typing error was corrected; the document confirms the identity"),
+    "NAME_VARIANT_CONFIRMED": _("A name variant is confirmed on the document"),
+}
+
+#: The fields a reviewer may correct, in display order.
+CORRECTABLE_FIELDS = ("given_names", "family_name", "date_of_birth", "nin")
+
+
+@dataclass(frozen=True)
+class MinistryRecheck:
+    """One lookup of a corrected NIN, made before the correction is saved and
+    outside any database transaction. `outcome` is None when no lookup was
+    possible (`skipped` says why: no official service, or no free slot)."""
+
+    outcome: object = None
+    provider: object = None
+    duration_ms: int = 0
+    skipped: str = ""
+
+
+def ministry_recheck_possible(provider=None) -> bool:
+    """Whether a corrected NIN can be checked with the Ministry service here:
+    the official adapter, configured (or a development simulation where the
+    settings allow one, as for the worker)."""
+    from django.conf import settings
+
+    from apps.people.nin_provider import get_nin_provider
+
+    try:
+        provider = provider or get_nin_provider()
+    except Exception:  # noqa: BLE001 - an unloadable backend means no recheck
+        return False
+    official = bool(getattr(provider, "IS_OFFICIAL", False))
+    if not official and not getattr(settings, "IDENTITY_ALLOW_SIMULATED_PROVIDER", False):
+        return False
+    try:
+        return not provider.configuration_problems()
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def _recheck_corrected_nin(nin: str, provider=None) -> MinistryRecheck:
+    """Look the corrected NIN up through the existing adapter, inside a
+    provider concurrency slot, never inside a transaction (A13-14)."""
+    import time
+
+    from apps.people.nin_provider import get_nin_provider
+    from apps.people.services.identity_verification import (
+        _require_no_open_transaction,
+        _safe_lookup,
+        provider_slot,
+    )
+
+    provider = provider or get_nin_provider()
+    if not ministry_recheck_possible(provider):
+        return MinistryRecheck(skipped="not_configured")
+    _require_no_open_transaction()
+    with provider_slot() as acquired:
+        if not acquired:
+            return MinistryRecheck(provider=provider, skipped="busy")
+        started = time.monotonic()
+        outcome = _safe_lookup(provider, nin)
+        duration_ms = int((time.monotonic() - started) * 1000)
+    return MinistryRecheck(outcome=outcome, provider=provider, duration_ms=duration_ms)
+
+
+def _changes_payload(before: dict, after: dict, changed: list[str]) -> str:
+    """Encrypted-at-rest JSON of the previous and corrected values of the
+    changed fields only (protected; never logged, never in an audit summary)."""
+    import json
+
+    return json.dumps(
+        {field: {"before": before[field], "after": after[field]} for field in changed},
+        ensure_ascii=False,
+        sort_keys=True,
+    )
+
+
+def correct_and_verify_identity(
+    verification_id,
+    *,
+    actor,
+    expected_version: int,
+    given_names: str,
+    family_name: str,
+    date_of_birth,
+    nin: str = "",
+    evidence_document_id,
+    reason_code: str,
+    note: str = "",
+    provider=None,
+    correlation_id: str = "",
+) -> IdentityVerification:
+    """Save validated corrections and verify the identity in one action
+    (UPD-02), without returning the request to the participant and without a
+    new upload: the reviewer compares the submitted values, the retained
+    Ministry facts and the existing evidence, corrects the first name, last
+    name, date of birth and (NIN route) the NIN, and confirms.
+
+    * Permissions: `people.verify_identity_manually` in the case's scope, plus
+      `people.correct_identity_nin` when the NIN changes. Validation (Latin
+      names, the event's age rule, the 18-digit NIN, an allowed reason, a
+      reviewable document of the route's kind) happens before any write; a
+      refusal leaves no partial edit and no approval.
+    * A changed NIN of an Algerian participant is looked up again through the
+      existing adapter FIRST, outside any transaction (no lock is held during
+      the call). A verifying answer for the corrected values makes the case
+      API_VERIFIED (truthful provenance). Not found, unavailable, a conflicting
+      record or no service: the reviewer's manual resolution from the
+      evidence applies and the case is MANUALLY_VERIFIED. The lookup attempt
+      is retained either way; a conflicting record is never called API
+      verified. Foreign participants and the NIN exemption route are never
+      looked up.
+    * The Ministry date never replaces the reviewer's date (with `presume`
+      true it is not even compared); no official value is written over a
+      reviewer's value.
+    * Everything is written in ONE transaction under the identity lock order,
+      after the version check: a case changed meanwhile (another reviewer,
+      the participant, the worker, a withdrawal) is a conflict and nothing is
+      saved. Pending checks are discarded and the new revision makes any
+      late result stale, so an older API result can never overwrite this
+      decision.
+    * The verified, active, eligible registration enters participation
+      review exactly once (`enqueue_for_participation_review`, idempotent).
+      Identity verification never approves participation.
+    """
+    from apps.core.text_rules import TextRuleError, normalize_latin_name, normalize_nin
+    from apps.people.identity_contract import LookupKind, evaluate_identity_match
+    from apps.people.services import create_identity_identifier
+    from apps.people.services.identity_verification import (
+        _REASON_FOR_KIND,
+        _RESULT_FOR_REASON,
+    )
+    from apps.registrations.models import Registration, RegistrationProfile
+    from apps.registrations.services import age_problem
+
+    verification = _load(verification_id)
+    require_identity_permission(actor, "verify_identity_manually", verification)
+    _require_reason(reason_code, CORRECTION_VERIFY_REASONS)
+    note = _clean_note(note)
+    try:
+        given_names = normalize_latin_name(given_names)
+        family_name = normalize_latin_name(family_name)
+    except TextRuleError:
+        raise InvalidIdentityInput("names") from None
+    registration = Registration.objects.select_related("event_edition").get(
+        pk=verification.registration_id
+    )
+    if date_of_birth is None or age_problem(date_of_birth, registration.event_edition):
+        raise InvalidIdentityInput("birth_date")
+    route = verification.route
+    current = verification.current_revision.identifier
+    new_nin = ""
+    if route == IdentityRoute.NIN:
+        try:
+            new_nin = normalize_nin(nin)
+        except TextRuleError:
+            raise InvalidIdentityInput("nin_format") from None
+    elif (nin or "").strip():
+        raise InvalidIdentityInput("nin_not_applicable")
+    nin_changed = bool(new_nin) and new_nin != current.value_encrypted
+    if nin_changed:
+        require_identity_permission(actor, "correct_identity_nin", verification)
+
+    # Read-only pre-checks, so the Ministry is never asked about a case that
+    # cannot be decided. All of them are repeated under the locks below.
+    if registration.public_status not in ACTIVE_PUBLIC_STATUSES:
+        raise IdentityStateError("registration_not_active")
+    if verification.status != IdentityStatus.MANUAL_REVIEW:
+        raise IdentityStateError("not_in_manual_review")
+    if verification.version != expected_version:
+        raise StaleIdentityVersion("version")
+    _reviewable_document(registration, evidence_document_id, manual_evidence_types(verification))
+    if (
+        nin_changed
+        and find_cross_person_conflicts(
+            identifier_type=IdentifierType.NIN,
+            country_code_id=ALGERIA_COUNTRY_CODE,
+            raw_value=new_nin,
+            person_id=verification.person_id,
+        ).exists
+    ):
+        raise DuplicateIdentityConflict("duplicate")
+
+    recheck = MinistryRecheck(skipped="not_applicable")
+    if nin_changed and route == IdentityRoute.NIN:
+        recheck = _recheck_corrected_nin(new_nin, provider)
+
+    with transaction.atomic():
+        registration, locked = _lock_case(verification_id, expected_version)
+        _require_active(registration)
+        if locked.status != IdentityStatus.MANUAL_REVIEW:
+            raise IdentityStateError("not_in_manual_review")
+        document = _reviewable_document(
+            registration, evidence_document_id, manual_evidence_types(locked)
+        )
+        profile = RegistrationProfile.objects.get(registration=registration)
+        current = locked.current_revision.identifier
+        before = {
+            "given_names": profile.submitted_given_names,
+            "family_name": profile.submitted_family_name,
+            "date_of_birth": profile.date_of_birth.isoformat() if profile.date_of_birth else "",
+            "nin": current.value_encrypted if route == IdentityRoute.NIN else "",
+        }
+        after = {
+            "given_names": given_names,
+            "family_name": family_name,
+            "date_of_birth": date_of_birth.isoformat(),
+            "nin": new_nin if route == IdentityRoute.NIN else "",
+        }
+        changed = [field for field in CORRECTABLE_FIELDS if before[field] != after[field]]
+        identifier = current
+        if "nin" in changed:
+            siblings = lock_cases_sharing_identifier(current.pk, exclude_verification_id=locked.pk)
+            lock_identifier_values(
+                IdentifierType.NIN, ALGERIA_COUNTRY_CODE, [current.value_encrypted, new_nin]
+            )
+            if find_cross_person_conflicts(
+                identifier_type=IdentifierType.NIN,
+                country_code_id=ALGERIA_COUNTRY_CODE,
+                raw_value=new_nin,
+                person_id=locked.person_id,
+            ).exists:
+                raise DuplicateIdentityConflict("duplicate")
+            current.status = IdentifierStatus.REPLACED
+            current.save(update_fields=["status", "updated_at"])
+            identifier = create_identity_identifier(
+                person=locked.person,
+                identifier_type=IdentifierType.NIN,
+                country_code_id=ALGERIA_COUNTRY_CODE,
+                raw_value=new_nin,
+                status=IdentifierStatus.DECLARED,
+            )
+            rebind_cases_after_replacement(
+                siblings,
+                replacement=identifier,
+                changed_field="nin",
+                origin=locked,
+                actor_user=actor,
+                correlation_id=correlation_id,
+            )
+        elif current.status not in VERIFIABLE_IDENTIFIER_STATUSES:
+            raise IdentityStateError("identity_changed")
+        profile_fields = [field for field in changed if field != "nin"]
+        if profile_fields:
+            profile.submitted_given_names = given_names
+            profile.submitted_family_name = family_name
+            profile.submitted_full_name = f"{given_names} {family_name}".strip()
+            profile.date_of_birth = date_of_birth
+            profile.save(
+                update_fields=[
+                    "submitted_given_names",
+                    "submitted_family_name",
+                    "submitted_full_name",
+                    "date_of_birth",
+                    "updated_at",
+                ]
+            )
+        revision = locked.current_revision
+        if changed:
+            revision = create_revision(
+                verification=locked,
+                identifier=identifier,
+                profile=profile,
+                source=IdentityRevisionSource.STAFF_IDENTITY_CORRECTION,
+                changed_fields=changed,
+                created_by_user=actor,
+            )
+            locked.current_revision = revision
+        discard_open_jobs(locked)
+
+        # Provenance: the API path only for a verifying answer about exactly
+        # these corrected values; otherwise the reviewer's manual resolution.
+        outcome = recheck.outcome
+        evaluation = None
+        attempt_reason = ""
+        api_source = ""
+        if outcome is not None:
+            if outcome.kind == LookupKind.FOUND and outcome.facts is not None:
+                evaluation = evaluate_identity_match(
+                    requested_nin=new_nin,
+                    submitted_given_names=given_names,
+                    submitted_family_name=family_name,
+                    submitted_birth_date=date_of_birth,
+                    facts=outcome.facts,
+                )
+                attempt_reason = evaluation.reason_code
+                if evaluation.verified:
+                    api_source = (
+                        VerificationSource.MINISTRY_API
+                        if getattr(recheck.provider, "IS_OFFICIAL", False)
+                        else VerificationSource.SIMULATED_API
+                    )
+            elif outcome.kind == LookupKind.FOUND:
+                attempt_reason = IdentityReasonCode.INVALID_RESPONSE
+            else:
+                attempt_reason = _REASON_FOR_KIND.get(
+                    outcome.kind, IdentityReasonCode.INVALID_RESPONSE
+                )
+
+        supersede_same_person_declarations(
+            locked, identifier, actor_user=actor, correlation_id=correlation_id
+        )
+        final = verify_identifier_or_conflict(
+            locked, identifier, revision=revision, profile=profile
+        )
+        if final == IdentityReasonCode.IDENTITY_DATA_CHANGED:
+            raise IdentityStateError("identity_changed")
+        if final:
+            raise DuplicateIdentityConflict("duplicate")
+
+        now = timezone.now()
+        if api_source:
+            status, source = IdentityStatus.API_VERIFIED, api_source
+        elif route == IdentityRoute.NIN:
+            status, source = (
+                IdentityStatus.MANUALLY_VERIFIED,
+                (VerificationSource.MANUAL_NATIONAL_ID_CARD),
+            )
+        elif route == IdentityRoute.NIN_EXEMPTION:
+            status, source = (
+                IdentityStatus.MANUALLY_VERIFIED,
+                (VerificationSource.MANUAL_NIN_EXEMPTION),
+            )
+        else:
+            status, source = IdentityStatus.MANUALLY_VERIFIED, VerificationSource.MANUAL_PASSPORT
+        from_status = _transition(
+            locked, status=status, reason_code="", source=source, actor=actor, now=now
+        )
+        if outcome is not None:
+            # The lookup attempt is retained either way, on the revision it
+            # checked. Official facts are kept only for the requested NIN.
+            retain = evaluation is not None and bool(evaluation.retained_family_name_latin)
+            IdentityVerificationAttempt.objects.create(
+                identity_identifier=identifier,
+                registration=registration,
+                method=IdentityVerificationMethod.EXTERNAL_SERVICE,
+                provider_code=getattr(recheck.provider, "PROVIDER_CODE", "UNKNOWN")[:64],
+                request_reference=(outcome.request_reference or "")[:64],
+                result=_RESULT_FOR_REASON.get(
+                    attempt_reason, IdentityVerificationResult.INCONCLUSIVE
+                ),
+                attempted_at=now,
+                performed_by_user=actor,
+                revision=revision,
+                attempt_number=1,
+                outcome=outcome.kind,
+                reason_code=attempt_reason,
+                detail_code=(outcome.detail or "")[:40],
+                is_official_provider=bool(getattr(recheck.provider, "IS_OFFICIAL", False)),
+                applied=True,
+                http_status=outcome.http_status if isinstance(outcome.http_status, int) else None,
+                duration_ms=recheck.duration_ms,
+                comparison=dict(evaluation.comparison) if evaluation is not None else {},
+                presume_flag=evaluation.presume if evaluation is not None else "",
+                policy_basis=evaluation.policy_basis if evaluation is not None else "",
+                official_family_name_latin=(
+                    evaluation.retained_family_name_latin if retain else ""
+                ),
+                official_given_names_latin=(
+                    evaluation.retained_given_names_latin if retain else ""
+                ),
+                official_birth_date=(
+                    evaluation.retained_birth_date.isoformat()
+                    if retain and evaluation.retained_birth_date
+                    else ""
+                ),
+                official_birth_date_text=evaluation.retained_birth_date_text if retain else "",
+            )
+        if not api_source:
+            IdentityVerificationAttempt.objects.create(
+                identity_identifier=identifier,
+                registration=registration,
+                method=IdentityVerificationMethod.MANUAL_DOCUMENT,
+                provider_code="STAFF",
+                result=IdentityVerificationResult.MATCH,
+                attempted_at=now,
+                performed_by_user=actor,
+                revision=revision,
+                outcome="MANUAL",
+                evidence_document=document,
+                applied=True,
+            )
+        type(document).objects.filter(pk=document.pk).update(
+            verified_at=now, verified_by_user=actor
+        )
+        _decision(
+            locked,
+            action=IdentityDecisionAction.CORRECT_AND_VERIFY,
+            from_status=from_status,
+            actor_user=actor,
+            reason_code=reason_code,
+            note=note,
+            items=changed,
+            evidence=document,
+            changes_encrypted=_changes_payload(before, after, changed) if changed else "",
+        )
+        recheck_label = outcome.kind if outcome is not None else recheck.skipped
+        _audit(
+            action_codes.IDENTITY_CORRECTED_AND_VERIFIED,
+            verification=locked,
+            actor_user=actor,
+            reason_code=reason_code,
+            after={
+                "status": locked.status,
+                "source": source,
+                # Field names only; the values stay in the encrypted decision.
+                "changed": changed,
+                "revision": revision.number,
+                "ministry_recheck": recheck_label,
+                "ministry_reason": attempt_reason,
+            },
+            correlation_id=correlation_id,
+        )
+        from apps.reviews.intake import EntryTrigger, enqueue_for_participation_review
+
+        enqueue_for_participation_review(
+            registration.pk,
+            trigger=(
+                EntryTrigger.IDENTITY_API_VERIFIED
+                if api_source
+                else EntryTrigger.IDENTITY_MANUALLY_VERIFIED
+            ),
+            actor=actor,
             correlation_id=correlation_id,
         )
     return locked
@@ -838,11 +1376,13 @@ def _save_exemption_image(registration, person, identifier, uploaded_file) -> No
 
 @dataclass(frozen=True)
 class CorrectionRequest:
-    """The open correction request a participant answers."""
+    """The open correction request a participant answers. `participant_note`
+    is the team's note written for this request (UPD-03), "" when none."""
 
     verification: IdentityVerification
     items: tuple[str, ...]
     labels: tuple[str, ...]
+    participant_note: str = ""
 
 
 def open_correction_request(registration) -> CorrectionRequest | None:
@@ -869,6 +1409,7 @@ def open_correction_request(registration) -> CorrectionRequest | None:
         verification=verification,
         items=items,
         labels=tuple(str(catalogue[item]) for item in items if item in catalogue),
+        participant_note=decision.participant_note_encrypted if decision is not None else "",
     )
 
 

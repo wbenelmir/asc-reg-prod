@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from django.urls import path
 
-from . import attendance_views, views
+from . import attendance_views, settings_views, views
 
 app_name = "accreditation"
 
@@ -28,6 +28,23 @@ urlpatterns = [
         name="assignment-change",
     ),
     path("ops/accreditation/bulk/preview/", views.bulk_preview, name="bulk-preview"),
+    # UPD-07: participant accreditation settings (roles, badge types, profiles, rules).
+    path("ops/accreditation/settings/", settings_views.settings_overview, name="settings"),
+    path(
+        "ops/accreditation/settings/<str:kind_slug>/new/",
+        settings_views.setting_create,
+        name="setting-create",
+    ),
+    path(
+        "ops/accreditation/settings/<str:kind_slug>/<uuid:pk>/edit/",
+        settings_views.setting_edit,
+        name="setting-edit",
+    ),
+    path(
+        "ops/accreditation/settings/<str:kind_slug>/<uuid:pk>/status/",
+        settings_views.setting_status,
+        name="setting-status",
+    ),
     path("ops/accreditation/bulk/<uuid:pk>/execute/", views.bulk_execute, name="bulk-execute"),
     # Attendance entitlements (apps.accreditation.attendance).
     path("ops/attendance/", attendance_views.attendance_overview, name="attendance-overview"),

@@ -11,14 +11,19 @@
     </div>
   </div>
 
+  {% if reference_obj %}<p class="asc-section-lead" data-bulk-result-setting>{% blocktrans with name=reference_obj.localized_name code=reference_obj.code event=reference_obj.event_edition.code %}{{ name }} ({{ code }}) · event {{ event }}{% endblocktrans %}</p>{% endif %}
   <div class="asc-kpis mb-3" role="group" aria-label="{% trans 'Execution summary' %}">
     <div class="asc-kpi asc-kpi-success">
-      <span class="asc-kpi-label">{% include "components/icon.html" with name="check-circle" size="sm" %}{% trans "Assigned" %}</span>
-      <span class="asc-kpi-value">{{ success_count }}</span>
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="check-circle" size="sm" %}{% trans "Applied" %}</span>
+      <span class="asc-kpi-value" data-bulk-applied="{{ applied_count }}">{{ applied_count }}</span>
     </div>
-    <div class="asc-kpi{% if failure_count %} asc-kpi-danger{% endif %}">
-      <span class="asc-kpi-label">{% include "components/icon.html" with name="x-circle" size="sm" %}{% trans "Not assigned" %}</span>
-      <span class="asc-kpi-value">{{ failure_count }}</span>
+    <div class="asc-kpi{% if skipped_count %} asc-kpi-warning{% endif %}">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="alert-triangle" size="sm" %}{% trans "Skipped" %}</span>
+      <span class="asc-kpi-value" data-bulk-skipped="{{ skipped_count }}">{{ skipped_count }}</span>
+    </div>
+    <div class="asc-kpi{% if error_count %} asc-kpi-danger{% endif %}">
+      <span class="asc-kpi-label">{% include "components/icon.html" with name="x-circle" size="sm" %}{% trans "Errors" %}</span>
+      <span class="asc-kpi-value" data-bulk-errors="{{ error_count }}">{{ error_count }}</span>
     </div>
   </div>
 

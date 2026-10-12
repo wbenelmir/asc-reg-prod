@@ -1,0 +1,35 @@
+{% extends "layouts/base_operations.html" %}
+{% load i18n %}
+{% block title %}{% trans "Edit campaign" %}{% endblock %}
+{% block breadcrumbs %}{% url 'invitations:campaign-detail' pk=campaign.pk as parent_url %}{% trans "Invitation campaign" as parent_label %}{% trans "Edit campaign" as current %}{% include "components/breadcrumb_trail.html" with parent_label=parent_label parent_url=parent_url current=current %}{% endblock %}
+{% block content %}
+  <div class="asc-page-head-row">
+    <div class="asc-page-head">
+      <p class="asc-kicker"><bdi>{{ campaign.organization.official_name }}</bdi> · <bdi dir="ltr" class="asc-code">{{ campaign.public_reference }}</bdi></p>
+      <h1>{% trans "Edit campaign" %}</h1>
+      <p>{% trans "The organization, the event, the links and the registrations already started stay as they are." %}</p>
+    </div>
+  </div>
+  <section class="asc-card asc-form-narrow" aria-labelledby="campaign-edit-heading">
+    <h2 class="asc-card-title" id="campaign-edit-heading">{% include "components/icon.html" with name="edit" %}{% trans "Campaign details" %}</h2>
+    {% include "components/error_summary.html" %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="expected_version" value="{{ campaign.version }}">
+      {% include "components/field.html" with field=form.name %}
+      <div class="asc-form-grid asc-form-grid-top">
+        {% include "components/field.html" with field=form.valid_from control="ltr" mark_optional=True %}
+        {% include "components/field.html" with field=form.valid_until control="ltr" mark_optional=True %}
+      </div>
+      <div class="asc-form-grid asc-form-grid-top">
+        {% include "components/field.html" with field=form.capacity control="ltr" mark_optional=True %}
+        {% include "components/field.html" with field=form.language %}
+      </div>
+      <p class="form-text">{% trans "Registration limit: every submitted registration keeps its place, including one withdrawn or cancelled later; drafts never use a place." %}</p>
+      <div class="asc-actions-row">
+        <button type="submit" class="btn btn-primary"><span>{% trans "Save changes" %}</span></button>
+        <a class="btn btn-outline-secondary" href="{% url 'invitations:campaign-detail' pk=campaign.pk %}">{% trans "Cancel" %}</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

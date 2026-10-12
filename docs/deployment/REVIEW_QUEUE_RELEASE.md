@@ -47,11 +47,25 @@ or changes a registration. The backfill is a separate, explicit step (§4).
    from apps.documents.models import Document
    from apps.reviews.models import ReviewCase, RegistrationDecision
    from django.db.models import Count
-   print(Registration.objects.count(), RegistrationSubmission.objects.count(),
-         IdentityVerification.objects.count(), Document.objects.count(),
-         ReviewCase.objects.count(), RegistrationDecision.objects.count())
-   print(list(Registration.objects.values("public_status").annotate(n=Count("pk")).order_by("public_status")))
-   print(list(IdentityVerification.objects.values("status").annotate(n=Count("pk")).order_by("status")))
+
+   print(
+       Registration.objects.count(),
+       RegistrationSubmission.objects.count(),
+       IdentityVerification.objects.count(),
+       Document.objects.count(),
+       ReviewCase.objects.count(),
+       RegistrationDecision.objects.count(),
+   )
+   print(
+       list(
+           Registration.objects.values("public_status")
+           .annotate(n=Count("pk"))
+           .order_by("public_status")
+       )
+   )
+   print(
+       list(IdentityVerification.objects.values("status").annotate(n=Count("pk")).order_by("status"))
+   )
    ```
 
 Never replace the production database with a local or test database.

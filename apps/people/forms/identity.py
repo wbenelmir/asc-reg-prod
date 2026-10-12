@@ -14,9 +14,11 @@ from apps.core.forms import LocalizedOrderModelChoiceField
 from apps.core.models import selectable_countries
 from apps.core.widgets import DayMonthYearWidget, SearchableSelect
 from apps.people.services.identity_review import (
+    CORRECTION_VERIFY_REASONS,
     EXCEPTION_REASONS,
     MANUAL_VERIFY_REASONS,
     MAX_NOTE_LENGTH,
+    MAX_PARTICIPANT_NOTE_LENGTH,
     MIN_EXPLANATION_LENGTH,
     NIN_CORRECTION_REASONS,
     RECHECK_REASONS,
@@ -88,11 +90,96 @@ class ReturnForCorrectionForm(_CaseForm):
     items = forms.MultipleChoiceField(
         label=_("Ask the participant to"), widget=forms.CheckboxSelectMultiple
     )
+    # UPD-03: shown to the participant in the platform and in the e-mail.
+    participant_note = forms.CharField(
+        label=_("Note to participant (optional)"),
+        required=False,
+        max_length=MAX_PARTICIPANT_NOTE_LENGTH,
+        help_text=_(
+            "Shown to the participant with this request and included in the e-mail. Write it "
+            "in the submission language shown above; it is not translated."
+        ),
+        widget=forms.Textarea(attrs={"rows": 4, "dir": "auto"}),
+    )
+    # UPD-03: asked only when the submission language is unknown.
+    notification_language = forms.ChoiceField(
+        label=_("Language of the e-mail and note"),
+        required=False,
+        help_text=_(
+            "The submission language of this registration is not recorded. Choose the language "
+            "the participant should be written to; nothing is inferred from nationality or "
+            "from the staff interface."
+        ),
+    )
     note = _note_field(required=False, label=_("Internal note (optional, never shown)"))
 
-    def __init__(self, *args, route: str, **kwargs):
+    def __init__(self, *args, route: str, language_known: bool = True, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["items"].choices = _choices(RETURN_ITEMS[route])
+        if language_known:
+            del self.fields["notification_language"]
+        else:
+            from apps.registrations.language import language_display, supported_language_codes
+
+            self.fields["notification_language"].required = True
+            self.fields["notification_language"].choices = [
+                (code, language_display(code)) for code in supported_language_codes()
+            ]
+
+
+class CorrectAndVerifyForm(_CaseForm):
+    """UPD-02: corrected values, the evidence reviewed and a reason. The NIN
+    field exists on the NIN route only (never for a foreign participant)."""
+
+    given_names = forms.CharField(
+        label=_("First name(s)"),
+        max_length=200,
+        widget=forms.TextInput(attrs={"dir": "ltr", "autocomplete": "off", "spellcheck": "false"}),
+    )
+    family_name = forms.CharField(
+        label=_("Last name"),
+        max_length=200,
+        widget=forms.TextInput(attrs={"dir": "ltr", "autocomplete": "off", "spellcheck": "false"}),
+    )
+    date_of_birth = forms.DateField(
+        label=_("Date of birth"),
+        input_formats=["%Y-%m-%d"],
+        widget=DayMonthYearWidget(),
+        error_messages={"invalid": _("Enter a real date.")},
+    )
+    nin = forms.CharField(
+        label=_("NIN (18 digits)"),
+        max_length=40,
+        widget=forms.TextInput(
+            attrs={"inputmode": "numeric", "autocomplete": "off", "spellcheck": "false"}
+        ),
+        help_text=_("A changed NIN is checked again with the Ministry service before saving."),
+    )
+    evidence_document = forms.ChoiceField(label=_("Evidence reviewed"), widget=forms.RadioSelect)
+    reason_code = forms.ChoiceField(label=_("Reason"), choices=_choices(CORRECTION_VERIFY_REASONS))
+    note = _note_field(required=False, label=_("Internal note (optional)"))
+
+    def __init__(self, *args, route: str, evidence_choices=(), **kwargs):
+        super().__init__(*args, **kwargs)
+        if route != "NIN":
+            del self.fields["nin"]
+        self.fields["evidence_document"].choices = list(evidence_choices)
+        if len(self.fields["evidence_document"].choices) == 1:
+            self.fields["evidence_document"].initial = self.fields["evidence_document"].choices[0][
+                0
+            ]
+
+    def clean_given_names(self):
+        return _latin_name(self.cleaned_data["given_names"])
+
+    def clean_family_name(self):
+        return _latin_name(self.cleaned_data["family_name"])
+
+    def clean_date_of_birth(self):
+        value = self.cleaned_data["date_of_birth"]
+        if value >= timezone.now().date():
+            raise forms.ValidationError(_("Enter a date of birth in the past."))
+        return value
 
 
 class CorrectNinForm(_CaseForm):

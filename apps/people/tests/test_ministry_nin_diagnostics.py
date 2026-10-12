@@ -248,16 +248,27 @@ def test_authentication_failures_are_named_and_sanitized(
 # ---------------------------------------------------------------------------
 
 
-def test_a_found_identity_is_reported_without_identity_data(operator, fake_transport, caplog):
+def test_a_found_identity_shows_only_the_requested_details(operator, fake_transport, caplog):
+    """UPD-04 (2026-10-12): the requested identity details are shown to the
+    operator in the response page; the number, the token, unrelated response
+    fields and the configuration never are, and logs keep none of it."""
+    from apps.audit.models import AuditEvent
+
     fake_transport.lookup = [_json(200, FOUND_BODY)]
     with caplog.at_level(logging.DEBUG):
         response = _client(operator).post(LOOKUP_URL, {"nin": TEST_NIN})
     assert _outcome(response) == diagnostics.IDENTITY_FOUND
     assert ("GET", f"/api/get/{TEST_NIN}") in fake_transport.calls
     html = response.content.decode()
-    _no_secret_in(html)
+    assert "DIAGNOSTIQUE" in html and "SYNTHETIQUE" in html
+    for secret in (ISSUED_BEARER, TEST_NIN, RAW_MARKER, CONFIGURED_B, "ministry.example.test"):
+        assert secret not in html, secret
     assert 'value="' + TEST_NIN not in html
     _no_secret_in(caplog.text)
+    summary = str(
+        AuditEvent.objects.filter(action_code="IDV_NIN_DIAGNOSTIC_RUN").last().after_summary
+    )
+    _no_secret_in(summary)
 
 
 def test_identite_null_is_a_successful_lookup_without_identity(operator, fake_transport):

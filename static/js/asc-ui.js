@@ -42,6 +42,32 @@
     var sync = function (event) { menu.open = !event.matches; };
     if (narrow.addEventListener) narrow.addEventListener("change", sync);
   });
+  // UPD-06: copy a value shown once (an invitation link) to the clipboard.
+  // Without JavaScript or clipboard access the value stays selectable.
+  document.addEventListener("click", function (event) {
+    var button = event.target.closest ? event.target.closest("[data-copy-target]") : null;
+    if (!button) return;
+    var source = document.getElementById(button.getAttribute("data-copy-target"));
+    if (!source || !navigator.clipboard) return;
+    navigator.clipboard.writeText(source.textContent.trim()).then(function () {
+      var label = button.querySelector("span");
+      var done = button.getAttribute("data-copy-done");
+      if (label && done) label.textContent = done;
+    });
+  });
+  // UPD-08: the printable report. A "Print or save as PDF" button opens the
+  // browser's print dialog; a report opened from a PDF link opens it once.
+  document.addEventListener("click", function (event) {
+    var button = event.target.closest ? event.target.closest("[data-print-report]") : null;
+    if (!button) return;
+    event.preventDefault();
+    window.print();
+  });
+  if (document.querySelector("[data-auto-print]")) {
+    window.addEventListener("load", function () {
+      setTimeout(function () { window.print(); }, 250);
+    });
+  }
   // A page restored from the back/forward cache must be usable again.
   window.addEventListener("pageshow", function (event) {
     if (!event.persisted) return;

@@ -82,6 +82,12 @@ OPS_IN_VIEW_POLICY = {
     "ops/integrations/ministry-nin/",
     "ops/integrations/ministry-nin/authentication/",
     "ops/integrations/ministry-nin/lookup/",
+    # UPD-07 accreditation settings: the permission depends on the setting
+    # kind in the URL (`accreditation.add_<kind>` / `change_<kind>`), checked
+    # in the view before any lookup and again for the setting's own event.
+    "ops/accreditation/settings/<str:kind_slug>/new/",
+    "ops/accreditation/settings/<str:kind_slug>/<uuid:pk>/edit/",
+    "ops/accreditation/settings/<str:kind_slug>/<uuid:pk>/status/",
 }
 #: Checkpoint (gate) routes: `checkpoint_required` = operational sign-in plus
 #: an enrolled device cookie plus an open checkpoint session.

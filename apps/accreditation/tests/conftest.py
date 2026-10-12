@@ -114,6 +114,41 @@ def make_registration(*, event, organization=None, person=None, public_reference
     )
 
 
+def record_final_approval(registration, *, decided_by=None):
+    """UPD-07: make `registration` final-approved for tests: APPROVED with a
+    current APPROVED decision row (synthetic; no service checks run)."""
+    import uuid
+
+    from apps.accounts.models import OperationalUser, OperationalUserStatus
+    from apps.reviews.models import RegistrationDecision
+
+    if decided_by is None:
+        decided_by = OperationalUser.objects.create_user(
+            email=f"decider-{uuid.uuid4().hex[:12]}@example.test",
+            password=TEST_OPERATIONAL_PASSWORD,
+            status=OperationalUserStatus.ACTIVE,
+        )
+    Registration.objects.filter(pk=registration.pk).update(
+        public_status=RegistrationPublicStatus.APPROVED
+    )
+    RegistrationDecision.objects.filter(registration=registration, is_current=True).update(
+        is_current=False
+    )
+    RegistrationDecision.objects.create(
+        registration=registration,
+        sequence=RegistrationDecision.objects.filter(registration=registration).count() + 1,
+        outcome="APPROVED",
+        internal_reason_code="ELIGIBLE",
+        is_current=True,
+        decided_by=decided_by,
+        decided_at=timezone.now(),
+        event_edition_id=registration.event_edition_id,
+        organization_id=registration.source_organization_id,
+    )
+    registration.refresh_from_db()
+    return registration
+
+
 @pytest.fixture
 def registration(event, organization):
     return make_registration(event=event, organization=organization)

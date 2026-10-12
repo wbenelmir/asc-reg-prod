@@ -1,27 +1,154 @@
 {% extends "layouts/base_operations.html" %}
 {% load i18n asc_ui %}
-{% block title %}{% trans "Registration intake" %}{% endblock %}
+{% block title %}{% trans "Registrations" %}{% endblock %}
 {% block content %}
+  {% comment %}
+    UPD-05: the complete registrations list. Scope, filters, search and
+    pagination are computed on the server (apps.registrations.ops_list):
+    every filter applies to the whole authorized set before pagination.
+    The reference search is the only search text that may appear in the
+    address; names and e-mail addresses are searched by a CSRF-protected
+    POST and represented here only by the opaque `ctx` reference.
+  {% endcomment %}
   <div class="asc-page-head-row">
     <div class="asc-page-head">
-      <h1>{% trans "Registration intake" %}</h1>
-      <p>{% trans "The most recent registrations in your authorized scope, newest first." %}</p>
+      <h1>{% trans "Registrations" %}</h1>
+      <p>{% trans "Every registration in your authorized scope, including drafts, withdrawn, cancelled and earlier registrations, newest first." %}</p>
     </div>
   </div>
 
-  <form method="get" class="asc-card asc-card-form mb-3" role="search" data-intake-reference-search>
-    <label for="id_intake_reference" class="form-label">{% trans "Find by registration reference" %}</label>
-    <div class="asc-actions-row">
-      <input type="text" id="id_intake_reference" name="reference" value="{{ reference }}" maxlength="32" class="form-control" dir="ltr" autocomplete="off" spellcheck="false">
-      <button type="submit" class="btn btn-outline-primary">{% trans "Find" %}</button>
-      {% if reference %}<a class="btn btn-outline-secondary" href="{% url 'registrations:ops-intake-list' %}">{% trans "Show all" %}</a>{% endif %}
+  <div class="asc-stat-strip mb-3" data-registration-counts>
+    <p class="mb-0"><strong data-scope-total="{{ scope_total }}">{% blocktrans count counter=scope_total %}{{ counter }} registration in your scope{% plural %}{{ counter }} registrations in your scope{% endblocktrans %}</strong>{% if filtered %} · <span data-matching-total="{{ matching_total }}">{% blocktrans count counter=matching_total %}{{ counter }} matches the current filters{% plural %}{{ counter }} match the current filters{% endblocktrans %}</span>{% endif %}</p>
+    {% if segment_label %}<p class="mb-0 form-text" data-segment-filter>{% trans "Population:" %} {{ segment_label }}</p>{% endif %}
+    {% if filters.link %}<p class="mb-0 form-text" data-link-filter>{% trans "Registrations started through one invitation link." %}</p>{% endif %}
+    {% if filters.batch %}<p class="mb-0 form-text" data-batch-filter>{% trans "Registrations created from one delegation list." %}</p>{% endif %}
+    {% if filters.role or filters.attendance or filters.residence %}<p class="mb-0 form-text" data-extra-filter>{% trans "Further filters from the statistics are applied." %}</p>{% endif %}
+  </div>
+
+  <div class="asc-search-pair mb-3">
+    <form method="get" class="asc-card asc-card-form" role="search" aria-label="{% trans 'Find by registration reference' %}" data-intake-reference-search>
+      {% for key, value in filters.items %}{% if key != "reference" and key != "ctx" %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}{% endfor %}
+      {% if filters.ctx %}<input type="hidden" name="ctx" value="{{ filters.ctx }}">{% endif %}
+      <label for="id_intake_reference" class="form-label">{% trans "Find by registration reference" %}</label>
+      <div class="asc-actions-row">
+        <input type="text" id="id_intake_reference" name="reference" value="{{ filters.reference|default:'' }}" maxlength="32" class="form-control" dir="ltr" autocomplete="off" spellcheck="false">
+        <button type="submit" class="btn btn-outline-primary">{% trans "Find" %}</button>
+      </div>
+      <p class="form-text mb-0">{% trans "The full reference or its beginning; searched across every page." %}</p>
+    </form>
+    <form method="post" action="{% url 'registrations:ops-search' %}" class="asc-card asc-card-form" role="search" aria-label="{% trans 'Search by name or e-mail' %}" data-intake-private-search>
+      {% csrf_token %}
+      {% for key, value in filters.items %}{% if key != "ctx" %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}{% endfor %}
+      <label for="id_intake_q" class="form-label">{% trans "Search by name or e-mail" %}</label>
+      <div class="asc-actions-row">
+        <input type="search" id="id_intake_q" name="q" value="" maxlength="100" class="form-control" dir="auto" autocomplete="off" spellcheck="false">
+        <button type="submit" class="btn btn-outline-primary">{% include "components/icon.html" with name="search" %}<span>{% trans "Search" %}</span></button>
+      </div>
+      <p class="form-text mb-0">{% trans "The beginning of a given or family name, or a full e-mail address. Sent privately; never shown in the address." %}</p>
+    </form>
+  </div>
+
+  {% if search %}
+    <div class="asc-notice asc-notice-neutral mb-3" data-intake-search-active>
+      {% include "components/icon.html" with name="search" %}
+      <div class="asc-idv-search-note">
+        <p class="mb-0">{% blocktrans count counter=search.case_ids|length %}Search applied: {{ counter }} matching registration.{% plural %}Search applied: {{ counter }} matching registrations.{% endblocktrans %}{% if search.truncated %} {% trans "Only the first matches are kept; refine the search." %}{% endif %}</p>
+        <form method="post" action="{% url 'registrations:ops-search' %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="clear">
+          {% for key, value in filters.items %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endfor %}
+          <button type="submit" class="btn btn-outline-secondary btn-sm">{% trans "Clear search" %}</button>
+        </form>
+      </div>
     </div>
-  </form>
+  {% elif search_expired %}
+    <div class="asc-notice asc-notice-warning mb-3" data-intake-search-expired>
+      {% include "components/icon.html" with name="clock" %}
+      <div><p class="mb-0">{% trans "This search is no longer available. Search again." %}</p></div>
+    </div>
+  {% endif %}
+
+  <details class="asc-card asc-filters-disclosure mb-3"{% if filtered %} open{% endif %} data-intake-filters>
+    <summary class="asc-card-title">{% include "components/icon.html" with name="filter" %}{% trans "Filters" %}</summary>
+    <form method="get" class="asc-filters" aria-label="{% trans 'Filter registrations' %}">
+      {% if filters.reference %}<input type="hidden" name="reference" value="{{ filters.reference }}">{% endif %}
+      {% if filters.ctx %}<input type="hidden" name="ctx" value="{{ filters.ctx }}">{% endif %}
+      {% for key in hidden_filter_keys %}{% for name, value in filters.items %}{% if name == key %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endif %}{% endfor %}{% endfor %}
+      <div class="asc-filters-grid">
+        <div>
+          <label for="id_status" class="form-label">{% trans "Applicant status" %}</label>
+          <select id="id_status" name="status" class="form-select">
+            <option value="">{% trans "Any" %}</option>
+            {% for value, label in status_choices %}<option value="{{ value }}"{% if filters.status == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="id_segment" class="form-label">{% trans "Population" %}</label>
+          <select id="id_segment" name="segment" class="form-select">
+            <option value="">{% trans "Any" %}</option>
+            {% for value, label in segment_choices %}<option value="{{ value }}"{% if filters.segment == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        {% if choices.events|length > 1 %}
+          <div>
+            <label for="id_event" class="form-label">{% trans "Event" %}</label>
+            <select id="id_event" name="event" class="form-select">
+              <option value="">{% trans "Any" %}</option>
+              {% for event in choices.events %}<option value="{{ event.pk }}"{% if filters.event == event.pk|stringformat:'s' %} selected{% endif %}>{{ event.code }}</option>{% endfor %}
+            </select>
+          </div>
+        {% endif %}
+        <div>
+          <label for="id_source" class="form-label">{% trans "Source" %}</label>
+          <select id="id_source" name="source" class="form-select">
+            <option value="">{% trans "Any" %}</option>
+            {% for value, label in source_choices %}<option value="{{ value }}"{% if filters.source == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="id_organization" class="form-label">{% trans "Organization" %}</label>
+          <select id="id_organization" name="organization" class="form-select">
+            <option value="">{% trans "Any" %}</option>
+            <option value="{{ missing }}"{% if filters.organization == missing %} selected{% endif %}>{% trans "No organization" %}</option>
+            {% for organization in choices.organizations %}<option value="{{ organization.pk }}"{% if filters.organization == organization.pk|stringformat:'s' %} selected{% endif %}>{{ organization.official_name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="id_campaign" class="form-label">{% trans "Invitation campaign" %}</label>
+          <select id="id_campaign" name="campaign" class="form-select">
+            <option value="">{% trans "Any" %}</option>
+            <option value="{{ missing }}"{% if filters.campaign == missing %} selected{% endif %}>{% trans "No campaign" %}</option>
+            {% for campaign in choices.campaigns %}<option value="{{ campaign.pk }}"{% if filters.campaign == campaign.pk|stringformat:'s' %} selected{% endif %}>{{ campaign.name }} ({{ campaign.public_reference }})</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="id_nationality" class="form-label">{% trans "Nationality" %}</label>
+          <select id="id_nationality" name="nationality" class="form-select">
+            <option value="">{% trans "Any" %}</option>
+            {% for country in choices.nationalities %}<option value="{{ country.pk }}"{% if filters.nationality == country.pk %} selected{% endif %}>{{ country.localized_name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="id_submitted_from" class="form-label">{% trans "Submitted from" %}</label>
+          <input type="date" id="id_submitted_from" name="submitted_from" value="{{ filters.submitted_from|default:'' }}" class="form-control" dir="ltr">
+        </div>
+        <div>
+          <label for="id_submitted_to" class="form-label">{% trans "Submitted until" %}</label>
+          <input type="date" id="id_submitted_to" name="submitted_to" value="{{ filters.submitted_to|default:'' }}" class="form-control" dir="ltr">
+        </div>
+      </div>
+      <p class="form-text">{% trans "Dates are calendar days in the selected event's time zone (UTC when no event is selected), both included." %}</p>
+      <div class="asc-filters-actions">
+        <button type="submit" class="btn btn-primary">{% include "components/icon.html" with name="filter" %}<span>{% trans "Apply filters" %}</span></button>
+        <a class="btn btn-outline-secondary" href="{% url 'registrations:ops-intake-list' %}">{% trans "Clear all" %}</a>
+      </div>
+    </form>
+  </details>
 
   <section class="asc-card asc-card-flush" aria-labelledby="intake-table-caption">
     <div class="asc-card-toolbar">
       <h2 class="asc-card-toolbar-title" id="intake-table-caption">{% trans "Registrations you are authorized to view" %}</h2>
-      <span class="asc-count">{% blocktrans count counter=registrations|length %}{{ counter }} registration{% plural %}{{ counter }} registrations{% endblocktrans %}</span>
+      <span class="asc-count" data-result-count>{% blocktrans count counter=matching_total %}{{ counter }} registration{% plural %}{{ counter }} registrations{% endblocktrans %}</span>
     </div>
     {% if registrations %}
       {# Wide screens: a real table. Phones: the same rows as stacked records (UI checkpoint 1 correction); only one is displayed. #}
@@ -30,7 +157,9 @@
           <thead>
             <tr>
               <th scope="col">{% trans "Registration Reference" %}</th>
+              <th scope="col">{% trans "Name" %}</th>
               <th scope="col">{% trans "Event edition" %}</th>
+              <th scope="col">{% trans "Source" %}</th>
               <th scope="col">{% trans "Applicant status" %}</th>
               <th scope="col">{% trans "Processing state" %}</th>
               <th scope="col">{% trans "Submitted at" %}</th>
@@ -39,10 +168,12 @@
           </thead>
           <tbody>
             {% for registration in registrations %}
-              <tr>
+              <tr data-registration-row="{{ registration.public_reference }}">
                 <th scope="row"><bdi dir="ltr" class="asc-code">{{ registration.public_reference }}</bdi></th>
+                <td>{% if registration.profile.submitted_full_name %}<bdi>{{ registration.profile.submitted_full_name }}</bdi>{% else %}<span class="asc-muted">{% trans "Not provided" %}</span>{% endif %}</td>
                 <td><bdi dir="ltr" class="asc-code">{{ registration.event_edition.code }}</bdi></td>
-                <td>{% status_chip "registration" registration.public_status registration.get_public_status_display %}</td>
+                <td>{{ registration.get_source_kind_display }}{% if registration.source_organization %}<div class="asc-muted small"><bdi>{{ registration.source_organization.official_name }}</bdi></div>{% endif %}</td>
+                <td>{% include "registrations/_registration_status_chip.html" %}</td>
                 <td>{% status_chip "processing" registration.internal_status registration.get_internal_status_display %}</td>
                 <td>{% if registration.submitted_at %}<time datetime="{{ registration.submitted_at|date:'c' }}">{{ registration.submitted_at }}</time>{% else %}<span class="asc-muted">{% trans "Not submitted" %}</span>{% endif %}</td>
                 <td class="asc-cell-action">
@@ -58,11 +189,12 @@
           <li class="asc-record" data-record>
             <div class="asc-record-head">
               <h3 class="asc-record-title"><bdi dir="ltr" class="asc-code">{{ registration.public_reference }}</bdi></h3>
-              <p class="asc-record-meta">{% trans "Event edition" %}{% trans ":" context "label separator" %} <bdi dir="ltr" class="asc-code">{{ registration.event_edition.code }}</bdi></p>
+              <p class="asc-record-meta">{% if registration.profile.submitted_full_name %}<bdi>{{ registration.profile.submitted_full_name }}</bdi> · {% endif %}<bdi dir="ltr" class="asc-code">{{ registration.event_edition.code }}</bdi></p>
             </div>
             <dl class="asc-record-fields">
-              <div><dt>{% trans "Applicant status" %}</dt><dd>{% status_chip "registration" registration.public_status registration.get_public_status_display %}</dd></div>
+              <div><dt>{% trans "Applicant status" %}</dt><dd>{% include "registrations/_registration_status_chip.html" %}</dd></div>
               <div><dt>{% trans "Processing state" %}</dt><dd>{% status_chip "processing" registration.internal_status registration.get_internal_status_display %}</dd></div>
+              <div><dt>{% trans "Source" %}</dt><dd>{{ registration.get_source_kind_display }}</dd></div>
               <div class="asc-record-wide"><dt>{% trans "Submitted at" %}</dt><dd>{% if registration.submitted_at %}<time datetime="{{ registration.submitted_at|date:'c' }}">{{ registration.submitted_at }}</time>{% else %}<span class="asc-muted">{% trans "Not submitted" %}</span>{% endif %}</dd></div>
             </dl>
             <div class="asc-record-actions">
@@ -71,14 +203,22 @@
           </li>
         {% endfor %}
       </ul>
-      {% if registrations|length >= 200 %}
-        <p class="asc-card-foot">{% include "components/icon.html" with name="info" size="sm" %} {% trans "Only the 200 most recent registrations are listed." %}</p>
-      {% endif %}
+      <div class="asc-card-foot">
+        {% trans "Registration list pages" as pages_label %}
+        {% include "components/pagination.html" with label=pages_label %}
+      </div>
+    {% elif scope_total %}
+      <div class="asc-empty" data-intake-empty="no-match">
+        <span class="asc-tile">{% include "components/icon.html" with name="search" %}</span>
+        <h3>{% trans "No registration matches these filters." %}</h3>
+        <p>{% blocktrans count counter=scope_total %}Your scope holds {{ counter }} registration. Change or clear the filters to see it.{% plural %}Your scope holds {{ counter }} registrations. Change or clear the filters to see them.{% endblocktrans %}</p>
+        <p class="mb-0"><a class="btn btn-outline-secondary" href="{% url 'registrations:ops-intake-list' %}">{% trans "Clear all" %}</a></p>
+      </div>
     {% else %}
-      <div class="asc-empty">
+      <div class="asc-empty" data-intake-empty="empty-scope">
         <span class="asc-tile">{% include "components/icon.html" with name="list" %}</span>
         <h3>{% trans "No registrations are currently visible to you." %}</h3>
-        <p>{% trans "Registrations appear here once they exist in an event or organization you are authorized for." %}</p>
+        <p>{% trans "Registrations appear here once they exist in an event or organization you are authorized for. If you expected some, ask an account administrator to check your role's scope." %}</p>
       </div>
     {% endif %}
   </section>

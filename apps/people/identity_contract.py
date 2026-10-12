@@ -249,6 +249,115 @@ def classify_lookup_body(body: object) -> LookupClassification:
     )
 
 
+# ---------------------------------------------------------------------------
+# UPD-04: identity details for the staff lookup tool (display only)
+# ---------------------------------------------------------------------------
+
+#: How the official birth date reads, for display.
+DATE_COMPLETE = "complete"  # DD/MM/YYYY and a real date
+DATE_PARTIAL = "partial"  # some parts unknown (00, XX or missing): never completed
+DATE_UNREADABLE = "unreadable"  # another format, or an impossible date
+DATE_ABSENT = "absent"
+
+_PARTIAL_DMY = re.compile(r"([0-9X]{2}|\?\?|)[/.-]([0-9X]{2}|\?\?|)[/.-]([0-9]{4})", re.IGNORECASE)
+_YEAR_ONLY = re.compile(r"[0-9]{4}")
+
+
+@dataclass(frozen=True)
+class DiagnosticBirthDate:
+    kind: str
+    text: str = ""  # exactly as returned (bounded, printable), "" when absent
+    value: datetime.date | None = None  # only for a complete, real date
+    day: int | None = None
+    month: int | None = None
+    year: int | None = None
+
+
+@dataclass(frozen=True)
+class DiagnosticIdentity:
+    """The identity details the lookup tool shows to an authorized operator
+    (UPD-04). Built from a decoded body, in memory, for one response; never
+    stored, logged or audited. Only the requested display fields are read:
+    the Latin and Arabic names, the birth date and the presume flag. The
+    returned number itself is not kept, only whether it equals the number
+    looked up. A field the service did not supply (or supplied in an
+    unusable form) is None."""
+
+    nin_matches_request: bool
+    family_name_latin: str | None
+    given_names_latin: str | None
+    family_name_arabic: str | None
+    given_names_arabic: str | None
+    birth_date: DiagnosticBirthDate
+    presume: str
+
+
+def describe_official_birth_date(raw: object) -> DiagnosticBirthDate:
+    """Describe an official birth date for display, without inventing any
+    part of it. A complete DD/MM/YYYY real date is `complete`. A date whose
+    day or month is unknown (00, XX, ?? or empty) or a year alone is
+    `partial`, with only the known parts. Anything else is `unreadable` and
+    is shown exactly as received."""
+    if raw is None or raw == "":
+        return DiagnosticBirthDate(DATE_ABSENT)
+    if not isinstance(raw, str):
+        return DiagnosticBirthDate(DATE_UNREADABLE)
+    text = raw.strip()
+    if len(text) > MAX_OFFICIAL_DATE_TEXT_LENGTH or not text.isprintable():
+        return DiagnosticBirthDate(DATE_UNREADABLE)
+    parsed = parse_official_birth_date(text)
+    if parsed.outcome == "parsed":
+        value = parsed.value
+        return DiagnosticBirthDate(
+            DATE_COMPLETE, text, value, day=value.day, month=value.month, year=value.year
+        )
+    if _YEAR_ONLY.fullmatch(text):
+        return DiagnosticBirthDate(DATE_PARTIAL, text, year=int(text))
+    match = _PARTIAL_DMY.fullmatch(text)
+    if match is not None:
+        day_text, month_text, year_text = match.groups()
+        parts = []
+        for value, upper in ((day_text, 31), (month_text, 12)):
+            if value.upper() in ("", "00", "XX", "??"):
+                parts.append(None)  # explicitly unknown
+            elif value.isdigit() and 1 <= int(value) <= upper:
+                parts.append(int(value))
+            else:
+                return DiagnosticBirthDate(DATE_UNREADABLE, text)
+        day, month = parts
+        if day is None or month is None:
+            return DiagnosticBirthDate(
+                DATE_PARTIAL, text, day=day, month=month, year=int(year_text)
+            )
+    return DiagnosticBirthDate(DATE_UNREADABLE, text)
+
+
+def _display_name(value: object) -> str | None:
+    """A bounded, printable official name, or None."""
+    return _official_name(value)
+
+
+def diagnostic_identity_from_body(body: object, *, requested_nin: str) -> DiagnosticIdentity | None:
+    """The display details of a lookup body whose `identite` is an object,
+    else None (no identity, or not an object). Works on bodies the matching
+    contract refuses too, so an operator sees which fields are missing."""
+    if not isinstance(body, dict):
+        return None
+    identity = body.get("identite")
+    if not isinstance(identity, dict):
+        return None
+    returned = identity.get("nin")
+    return DiagnosticIdentity(
+        nin_matches_request=isinstance(returned, str) and returned == requested_nin,
+        family_name_latin=_display_name(identity.get("nom_f")),
+        given_names_latin=_display_name(identity.get("pren_f")),
+        family_name_arabic=_display_name(identity.get("nom_a")),
+        given_names_arabic=_display_name(identity.get("pren_a")),
+        birth_date=describe_official_birth_date(identity.get("d_nais")),
+        presume=parse_presume(identity.get("presume"), present="presume" in identity),
+    )
+
+
 @dataclass(frozen=True)
 class MatchEvaluation:
     """The outcome of comparing official facts with the submitted identity.
