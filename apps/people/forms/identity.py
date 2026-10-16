@@ -24,6 +24,7 @@ from apps.people.services.identity_review import (
     RECHECK_REASONS,
     REJECT_REASONS,
     RETURN_ITEMS,
+    WITHOUT_DOCUMENT_REASONS,
 )
 
 
@@ -61,18 +62,65 @@ def _note_field(*, required: bool, label, help_text=""):
     )
 
 
+#: IDV-FIRST: the explicit "no document" choice of the evidence field. Choosing
+#: it is deliberate (the field stays required) and needs a justification.
+NO_DOCUMENT_CHOICE = "none"
+
+
+def _set_evidence_choices(form, evidence_choices, *, without_document: bool) -> None:
+    """The reviewable documents, plus (IDV-FIRST) the "no document" choice where
+    the case allows a verification without one. A single document is
+    preselected, as before; without any, "no document" and its reason are."""
+    documents = list(evidence_choices)
+    field = form.fields["evidence_document"]
+    field.choices = documents
+    if len(documents) == 1:
+        field.initial = documents[0][0]
+    if without_document:
+        field.choices = [
+            *documents,
+            (NO_DOCUMENT_CHOICE, _("No identity document: manual reviewer decision")),
+        ]
+        if not documents:
+            field.initial = NO_DOCUMENT_CHOICE
+            form.fields["reason_code"].initial = next(
+                code
+                for code, _label in form.fields["reason_code"].choices
+                if code in WITHOUT_DOCUMENT_REASONS
+            )
+        form.fields["note"].label = _("Internal note or justification")
+        form.fields["note"].help_text = _(
+            "Required without a document: explain how you confirmed the identity "
+            "(at least %(count)s characters). Never shown to the participant."
+        ) % {"count": MIN_EXPLANATION_LENGTH}
+
+
+def _clean_evidence_basis(form, cleaned_data):
+    """IDV-FIRST: "no document" becomes an empty document id, and requires the
+    justification. The service checks the same rules again."""
+    if cleaned_data.get("evidence_document") != NO_DOCUMENT_CHOICE:
+        return cleaned_data
+    cleaned_data["evidence_document"] = ""
+    if len((cleaned_data.get("note") or "").strip()) < MIN_EXPLANATION_LENGTH:
+        form.add_error(
+            "note",
+            _("Without a document, write the justification (at least %(count)s characters).")
+            % {"count": MIN_EXPLANATION_LENGTH},
+        )
+    return cleaned_data
+
+
 class VerifyIdentityForm(_CaseForm):
     evidence_document = forms.ChoiceField(label=_("Evidence reviewed"), widget=forms.RadioSelect)
     reason_code = forms.ChoiceField(label=_("Reason"), choices=_choices(MANUAL_VERIFY_REASONS))
     note = _note_field(required=False, label=_("Internal note (optional)"))
 
-    def __init__(self, *args, evidence_choices=(), **kwargs):
+    def __init__(self, *args, evidence_choices=(), without_document=False, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["evidence_document"].choices = list(evidence_choices)
-        if len(self.fields["evidence_document"].choices) == 1:
-            self.fields["evidence_document"].initial = self.fields["evidence_document"].choices[0][
-                0
-            ]
+        _set_evidence_choices(self, evidence_choices, without_document=without_document)
+
+    def clean(self):
+        return _clean_evidence_basis(self, super().clean())
 
 
 class ExceptionVerifyForm(VerifyIdentityForm):
@@ -129,7 +177,9 @@ class ReturnForCorrectionForm(_CaseForm):
 
 class CorrectAndVerifyForm(_CaseForm):
     """UPD-02: corrected values, the evidence reviewed and a reason. The NIN
-    field exists on the NIN route only (never for a foreign participant)."""
+    field exists on the NIN route only (never for a foreign participant), and
+    only for a reviewer who may see and change it (`nin_editable`); otherwise
+    the full NIN is never rendered and the stored NIN is kept on the server."""
 
     given_names = forms.CharField(
         label=_("First name(s)"),
@@ -159,15 +209,22 @@ class CorrectAndVerifyForm(_CaseForm):
     reason_code = forms.ChoiceField(label=_("Reason"), choices=_choices(CORRECTION_VERIFY_REASONS))
     note = _note_field(required=False, label=_("Internal note (optional)"))
 
-    def __init__(self, *args, route: str, evidence_choices=(), **kwargs):
+    def __init__(
+        self,
+        *args,
+        route: str,
+        evidence_choices=(),
+        without_document=False,
+        nin_editable=False,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
-        if route != "NIN":
+        if route != "NIN" or not nin_editable:
             del self.fields["nin"]
-        self.fields["evidence_document"].choices = list(evidence_choices)
-        if len(self.fields["evidence_document"].choices) == 1:
-            self.fields["evidence_document"].initial = self.fields["evidence_document"].choices[0][
-                0
-            ]
+        _set_evidence_choices(self, evidence_choices, without_document=without_document)
+
+    def clean(self):
+        return _clean_evidence_basis(self, super().clean())
 
     def clean_given_names(self):
         return _latin_name(self.cleaned_data["given_names"])

@@ -1,0 +1,6 @@
+{# IDV-FIRST: no reviewable document of the route's kind. The verify actions stay available as a manual reviewer decision (recorded as such, never as a document or Ministry verification); returning the case is only for input the participant must give. #}
+{% load i18n %}
+<div class="asc-notice asc-notice-neutral mb-2" data-idv-without-document>
+  {% include "components/icon.html" with name="info" %}
+  <div><p class="mb-0">{% trans "No reviewable document for this case. You can still verify now as a manual reviewer decision: choose no document, the reason for a verification without a document, and write the justification. Return the case only when the participant must provide something." %}</p></div>
+</div>

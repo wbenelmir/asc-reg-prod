@@ -164,6 +164,7 @@
                 <form method="post" action="{% url 'identity:verify' pk=case.pk %}" data-idv-form="verify">
                   {% csrf_token %}{% include "identity/_queue_context.html" %}
                   {% if form.fields.evidence_document.choices %}
+                    {% if not manual_evidence_available %}{% include "identity/_without_document_note.html" %}{% endif %}
                     {% include "components/field.html" with field=form.evidence_document %}
                     {% include "components/field.html" with field=form.reason_code %}
                     {% include "components/field.html" with field=form.note %}
@@ -190,17 +191,16 @@
                   {% csrf_token %}{% include "identity/_queue_context.html" %}
                   <p class="form-text">{% trans "Compare the participant's values, the Ministry values above and the evidence. Correct only what the evidence confirms." %}</p>
                   {% if form.fields.evidence_document.choices %}
+                    {% if not manual_evidence_available %}{% include "identity/_without_document_note.html" %}{% endif %}
                     {% include "components/field.html" with field=form.given_names control="ltr" %}
                     {% include "components/field.html" with field=form.family_name control="ltr" %}
                     {% include "components/field.html" with field=form.date_of_birth %}
-                    {% if form.nin %}
-                      {% if "correct_identity_nin" in granted and show_full_identifier %}
-                        {% include "components/field.html" with field=form.nin control="ltr" %}
-                        <p class="form-text" data-idv-recheck-note>{% if ministry_recheck_possible %}{% trans "A changed NIN is checked with the Ministry service first. A verifying answer records an API verification; otherwise your manual verification from the evidence is recorded, together with the lookup result." %}{% else %}{% trans "The Ministry service is not available here: a changed NIN is recorded with your manual verification from the evidence." %}{% endif %}</p>
-                      {% else %}
-                        <input type="hidden" name="nin" value="{{ identifier.value_encrypted }}">
-                        <p class="form-text">{% trans "You may not change the NIN: it stays as it is." %}</p>
-                      {% endif %}
+                    {% if "nin" in form.fields %}
+                      {% include "components/field.html" with field=form.nin control="ltr" %}
+                      <p class="form-text" data-idv-recheck-note>{% if ministry_recheck_possible %}{% trans "A changed NIN is checked with the Ministry service first. A verifying answer records an API verification; otherwise your manual verification from the evidence is recorded, together with the lookup result." %}{% else %}{% trans "The Ministry service is not available here: a changed NIN is recorded with your manual verification from the evidence." %}{% endif %}</p>
+                    {% elif case.route == "NIN" %}
+                      {# IDV-FIRST: no NIN in the page; the server keeps the stored one. #}
+                      <p class="form-text" data-idv-nin-kept>{% trans "You may not change the NIN: it stays as it is." %}</p>
                     {% endif %}
                     {% include "components/field.html" with field=form.evidence_document %}
                     {% include "components/field.html" with field=form.reason_code %}

@@ -301,6 +301,8 @@ def _render_case(request, case, *, forms_by_action=None, status=200):
         "after_pk": case.pk,
     }
     nin_types = identity_review.manual_evidence_types(case)
+    # IDV-FIRST: the "no document" choice, where the route allows it.
+    without_document = identity_review.verification_without_document_allowed(case)
     forms_by_action = forms_by_action or {}
     # UPD-03: the participant's submission language, independent of the staff
     # interface language, with how sure it is.
@@ -314,11 +316,16 @@ def _render_case(request, case, *, forms_by_action=None, status=200):
         "family_name": profile.submitted_family_name,
         "date_of_birth": profile.date_of_birth,
     }
-    if case.route == IdentityRoute.NIN and identifier is not None and can_view_evidence:
+    nin_editable = _nin_editable(case, granted)
+    if nin_editable and identifier is not None:
         correct_initial["nin"] = identifier.value_encrypted
     context_forms = {
         "verify": forms_by_action.get("verify")
-        or VerifyIdentityForm(initial=initial, evidence_choices=_evidence_choices(rows, nin_types)),
+        or VerifyIdentityForm(
+            initial=initial,
+            evidence_choices=_evidence_choices(rows, nin_types),
+            without_document=without_document,
+        ),
         "exception": forms_by_action.get("exception")
         or ExceptionVerifyForm(
             initial=initial,
@@ -342,6 +349,8 @@ def _render_case(request, case, *, forms_by_action=None, status=200):
             initial=correct_initial,
             route=case.route,
             evidence_choices=_evidence_choices(rows, nin_types),
+            without_document=without_document,
+            nin_editable=nin_editable,
         ),
         "correct": forms_by_action.get("correct")
         or CorrectNinForm(
@@ -430,10 +439,25 @@ def _render_case(request, case, *, forms_by_action=None, status=200):
                 "ministry_recheck_possible": case.route == IdentityRoute.NIN
                 and identity_review.ministry_recheck_possible(),
                 "correction_history": _correction_history(decisions, can_view_evidence),
+                # IDV-FIRST: no reviewable document of the route's kind; the
+                # verify actions then offer only the manual reviewer decision.
+                "manual_evidence_available": bool(_evidence_choices(rows, nin_types)),
             },
             status=status,
         )
     )
+
+
+def _nin_editable(case, granted) -> bool:
+    """IDV-FIRST: whether this reviewer may see and change the NIN in "Save
+    corrections and verify identity" (NIN route, `correct_identity_nin` and
+    `view_identity_evidence` in the case's scope). Otherwise the form has no
+    NIN field, the full NIN is never rendered, and the service keeps the
+    stored NIN (and refuses a submitted different one)."""
+    return case.route == IdentityRoute.NIN and {
+        "correct_identity_nin",
+        "view_identity_evidence",
+    } <= set(granted)
 
 
 def _correction_history(decisions, can_view_evidence: bool) -> list[dict]:
@@ -577,6 +601,17 @@ def _run_action(request, pk, *, form_key, form, command, success_message):
             None,
             _("Select reviewable evidence: a clean, current document of the required kind."),
         )
+        if form_key in ("verify", "correct_verify") and (
+            identity_review.verification_without_document_allowed(case)
+        ):
+            # IDV-FIRST: the other way to decide without a document.
+            form.add_error(
+                None,
+                _(
+                    "Or choose no document, with the reason for a verification without a "
+                    "document and a written justification."
+                ),
+            )
         return _render_case(request, case, forms_by_action={form_key: form}, status=400)
     except identity_review.InvalidIdentityInput as error:
         message = {
@@ -590,6 +625,14 @@ def _run_action(request, pk, *, form_key, form, command, success_message):
                 "A NIN applies only to Algerian participants on the NIN route."
             ),
             "explanation_required": _("Write an explanation of at least 10 characters."),
+            "justification_required": _(
+                "Without a document, write the justification (at least %(count)s characters)."
+            )
+            % {"count": identity_review.MIN_EXPLANATION_LENGTH},
+            "reason_without_document": _(
+                "This reason is for a verification without a document. Choose a document "
+                "reason, or choose no document."
+            ),
             "confirmation_required": _("Confirm this action deliberately to continue."),
             "nin_format": _("Enter exactly 18 digits."),
             "document_details": _("Enter the document number as printed on the document."),
@@ -623,7 +666,11 @@ def _evidence_form_choices(case, types):
 def identity_verify(request, pk):
     case = _case_or_404(request, pk)
     types = identity_review.manual_evidence_types(case)
-    form = VerifyIdentityForm(request.POST, evidence_choices=_evidence_form_choices(case, types))
+    form = VerifyIdentityForm(
+        request.POST,
+        evidence_choices=_evidence_form_choices(case, types),
+        without_document=identity_review.verification_without_document_allowed(case),
+    )
     return _run_action(
         request,
         pk,
@@ -633,7 +680,7 @@ def identity_verify(request, pk):
             c.pk,
             actor=request.user,
             expected_version=data["expected_version"],
-            evidence_document_id=data["evidence_document"],
+            evidence_document_id=data["evidence_document"] or None,
             reason_code=data["reason_code"],
             note=data.get("note", ""),
             correlation_id=get_correlation_id() or "",
@@ -708,11 +755,19 @@ def identity_correct_and_verify(request, pk):
     action. The service re-checks permissions, scope, state and version, and
     looks a changed NIN up with the Ministry before anything is written."""
     case = _case_or_404(request, pk)
+    nin_editable = _nin_editable(case, granted_identity_codenames(request.user, case))
     form = CorrectAndVerifyForm(
         request.POST,
         route=case.route,
         evidence_choices=_evidence_form_choices(case, identity_review.manual_evidence_types(case)),
+        without_document=identity_review.verification_without_document_allowed(case),
+        nin_editable=nin_editable,
     )
+    # IDV-FIRST: without the NIN field the stored NIN is kept on the server
+    # (`nin=None`). A NIN posted anyway is handed to the service, which keeps
+    # it when unchanged (a page rendered before this release) and refuses a
+    # change without the permissions.
+    submitted_nin = None if nin_editable else (request.POST.get("nin") or "").strip() or None
     return _run_action(
         request,
         pk,
@@ -725,8 +780,8 @@ def identity_correct_and_verify(request, pk):
             given_names=data["given_names"],
             family_name=data["family_name"],
             date_of_birth=data["date_of_birth"],
-            nin=data.get("nin", ""),
-            evidence_document_id=data["evidence_document"],
+            nin=data["nin"] if "nin" in data else submitted_nin,
+            evidence_document_id=data["evidence_document"] or None,
             reason_code=data["reason_code"],
             note=data.get("note", ""),
             correlation_id=get_correlation_id() or "",

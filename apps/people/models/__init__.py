@@ -232,6 +232,8 @@ class IdentityVerificationMethod(models.TextChoices):
     EXTERNAL_SERVICE = "EXTERNAL_SERVICE", "External service"
     MANUAL_DOCUMENT = "MANUAL_DOCUMENT", "Manual document"
     SUPERVISED_CORRECTION = "SUPERVISED_CORRECTION", "Supervised correction"
+    # IDV-FIRST: a reviewer's manual decision recorded without an identity document.
+    MANUAL_DECISION = "MANUAL_DECISION", "Manual reviewer decision"
 
 
 class IdentityVerificationResult(models.TextChoices):
@@ -427,6 +429,12 @@ class VerificationSource(models.TextChoices):
     MANUAL_NIN_EXEMPTION = (
         "MANUAL_NIN_EXEMPTION",
         _("Manual documentary review (NIN exemption)"),
+    )
+    # IDV-FIRST: verified by a reviewer from the submitted data, without any
+    # identity document, with a written justification. Never a Ministry result.
+    MANUAL_REVIEWER_DECISION = (
+        "MANUAL_REVIEWER_DECISION",
+        _("Manual reviewer decision (no document)"),
     )
 
 

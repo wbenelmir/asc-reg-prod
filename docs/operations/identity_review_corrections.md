@@ -41,7 +41,14 @@ identity number route, with "correct identity number") the NIN, then press a
 single **Save corrections and verify identity** button. Required: the
 supporting document that justifies the correction and a reason (data
 corrected from the document, typing error corrected, name variant
-confirmed); a note is optional.
+confirmed); a note is optional. Without a document, see "Verifying without
+a document" below.
+
+The NIN field is shown, with the full NIN, only to a reviewer who holds both
+"correct identity number" and "view identity evidence" for the case. Any
+other reviewer gets no NIN in the page at all (not even hidden): the stored
+NIN is kept on the server and cannot be changed, and a NIN posted anyway that
+differs from it is refused (403, audited as a refused action).
 
 What happens:
 
@@ -63,6 +70,31 @@ What happens:
 
 A presumed Ministry birth date is never used to overwrite a date entered by
 the participant or the reviewer, and is never completed.
+
+### Verifying without a document (IDV-FIRST)
+
+From the first manual review, **Verify identity** and **Save corrections and
+verify identity** are available even when no reviewable identity document
+exists, without returning the case or asking for an upload. An existing
+document stays selectable (a single one is preselected, as before).
+
+* Choose **No identity document: manual reviewer decision**, the reason
+  "No identity document: the reviewer confirms (or corrected the data and
+  confirms) ..." and write the internal justification (at least 10
+  characters, never shown to the participant). A document reason without a
+  document, or the no-document reason with a document, is refused.
+* The identity is recorded as **Manual reviewer decision (no document)**
+  (`MANUAL_REVIEWER_DECISION`), never as a document review or a Ministry
+  verification; no document is created or marked as reviewed. The decision
+  history keeps the reviewer, time, reason and justification (encrypted);
+  the audit event records the basis, never the justification.
+* A changed NIN is still looked up first: a confirming Ministry answer is
+  still recorded as a Ministry (or simulation) verification. Foreign
+  participants are never looked up.
+* The NIN exemption route still needs its declared document (owner decision
+  IDV-Q3). The staff-assisted exception still needs its document.
+* No correction request and no correction e-mail is created; **Return for
+  correction** stays available when the participant must provide something.
 
 ## 3. Note to the participant
 

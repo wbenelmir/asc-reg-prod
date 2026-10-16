@@ -1,5 +1,10 @@
 # Release procedure — consolidated update 2026-10-12 (UPD-01 to UPD-09)
 
+> A later update, IDV-FIRST (2026-10-16), builds on this release and needs
+> `people.0007` from it. Its procedure is in
+> [CURRENT_UPDATE.md](CURRENT_UPDATE.md). This document is kept as written for
+> the 2026-10-12 release.
+
 Registration is open in production and real applications exist. This release
 must preserve every registration, account, identity record, document,
 submission, decision, invitation, badge and audit event. Follow the deployment

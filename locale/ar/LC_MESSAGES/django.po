@@ -11891,3 +11891,35 @@ msgstr "عمود واحد لكل أسبوع، يُعرَّف بيوم الاثن
 
 msgid "Figures, campaigns and delegation lists cover the events and organizations of your authorized scope."
 msgstr "تشمل الأرقام والحملات وقوائم الوفود الفعاليات والمنظمات الواقعة ضمن نطاقك المصرح به."
+
+msgid "No identity document: the reviewer confirms the submitted identity (justification required)"
+msgstr "لا توجد وثيقة هوية: يؤكد المراجع الهوية المصرّح بها (التبرير مطلوب)"
+
+msgid "No identity document: the reviewer corrected the data and confirms the identity (justification required)"
+msgstr "لا توجد وثيقة هوية: صحّح المراجع البيانات ويؤكد الهوية (التبرير مطلوب)"
+
+msgid "Manual reviewer decision (no document)"
+msgstr "قرار يدوي من المراجع (دون وثيقة)"
+
+msgid "No identity document: manual reviewer decision"
+msgstr "لا توجد وثيقة هوية: قرار يدوي من المراجع"
+
+msgid "Internal note or justification"
+msgstr "ملاحظة داخلية أو تبرير"
+
+#, python-format
+msgid "Required without a document: explain how you confirmed the identity (at least %(count)s characters). Never shown to the participant."
+msgstr "مطلوب في غياب الوثيقة: اشرح كيف تأكدت من الهوية (%(count)s أحرف على الأقل). لا يُعرض أبدًا على المشارك."
+
+#, python-format
+msgid "Without a document, write the justification (at least %(count)s characters)."
+msgstr "في غياب الوثيقة، اكتب التبرير (%(count)s أحرف على الأقل)."
+
+msgid "This reason is for a verification without a document. Choose a document reason, or choose no document."
+msgstr "هذا السبب خاص بالتحقق دون وثيقة. اختر سببًا مرتبطًا بوثيقة، أو اختر «دون وثيقة»."
+
+msgid "Or choose no document, with the reason for a verification without a document and a written justification."
+msgstr "أو اختر «دون وثيقة» مع سبب التحقق دون وثيقة وتبرير مكتوب."
+
+msgid "No reviewable document for this case. You can still verify now as a manual reviewer decision: choose no document, the reason for a verification without a document, and write the justification. Return the case only when the participant must provide something."
+msgstr "لا توجد وثيقة قابلة للمراجعة لهذا الملف. يمكنك مع ذلك التحقق الآن بقرار يدوي من المراجع: اختر «دون وثيقة» وسبب التحقق دون وثيقة، واكتب التبرير. لا تُعِد الملف إلا إذا كان على المشارك تقديم شيء ما."

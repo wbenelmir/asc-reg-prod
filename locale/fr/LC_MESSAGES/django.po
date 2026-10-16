@@ -11735,3 +11735,35 @@ msgstr "Une barre par semaine, identifiée par son lundi ; la première et la de
 
 msgid "Figures, campaigns and delegation lists cover the events and organizations of your authorized scope."
 msgstr "Les chiffres, les campagnes et les listes de délégation couvrent les éditions et les organisations de votre périmètre autorisé."
+
+msgid "No identity document: the reviewer confirms the submitted identity (justification required)"
+msgstr "Aucun document d'identité : l'examinateur confirme l'identité déclarée (justification requise)"
+
+msgid "No identity document: the reviewer corrected the data and confirms the identity (justification required)"
+msgstr "Aucun document d'identité : l'examinateur a corrigé les données et confirme l'identité (justification requise)"
+
+msgid "Manual reviewer decision (no document)"
+msgstr "Décision manuelle de l'examinateur (sans document)"
+
+msgid "No identity document: manual reviewer decision"
+msgstr "Aucun document d'identité : décision manuelle de l'examinateur"
+
+msgid "Internal note or justification"
+msgstr "Note interne ou justification"
+
+#, python-format
+msgid "Required without a document: explain how you confirmed the identity (at least %(count)s characters). Never shown to the participant."
+msgstr "Obligatoire sans document : expliquez comment vous avez confirmé l'identité (au moins %(count)s caractères). Jamais affichée au participant."
+
+#, python-format
+msgid "Without a document, write the justification (at least %(count)s characters)."
+msgstr "Sans document, rédigez la justification (au moins %(count)s caractères)."
+
+msgid "This reason is for a verification without a document. Choose a document reason, or choose no document."
+msgstr "Ce motif concerne une vérification sans document. Choisissez un motif lié à un document, ou choisissez « aucun document »."
+
+msgid "Or choose no document, with the reason for a verification without a document and a written justification."
+msgstr "Ou choisissez « aucun document », avec le motif d'une vérification sans document et une justification écrite."
+
+msgid "No reviewable document for this case. You can still verify now as a manual reviewer decision: choose no document, the reason for a verification without a document, and write the justification. Return the case only when the participant must provide something."
+msgstr "Aucun document examinable pour ce dossier. Vous pouvez tout de même vérifier maintenant par une décision manuelle de l'examinateur : choisissez « aucun document », le motif d'une vérification sans document, et rédigez la justification. Ne renvoyez le dossier que si le participant doit fournir quelque chose."

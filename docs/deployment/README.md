@@ -1,5 +1,11 @@
 # Deploying the ASC 2026 Registration Platform (staging Beta)
 
+> **Current update: [IDV-FIRST, 2026-10-16](CURRENT_UPDATE.md).** Start there
+> for the release now being deployed: identity verification and correction
+> from the first manual review without a document, and the full-NIN
+> disclosure fix (migration `people.0008_idv_first_manual_decision`). This
+> guide remains the reference for everything it does not repeat.
+
 The single entry point for the operations team. It assumes experience with
 Python web applications, PostgreSQL, Redis, a reverse proxy and a service
 manager; it does not choose those for you. Everything below uses only what
@@ -327,6 +333,7 @@ python manage.py changepassword uat-reviewer@<domain>             # once per acc
 
 ## 12. Related documents
 
+* **[Current update: IDV-FIRST, 2026-10-16](CURRENT_UPDATE.md)**
 * [Attendance days, opening-day capacity and enforcement](../operations/attendance_days.md)
 * [Staff accounts and scoped access](../operations/staff_accounts.md)
 * [Review queue entry and Excel decisions](../operations/review_decision_workbook.md)

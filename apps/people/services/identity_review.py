@@ -116,6 +116,11 @@ MANUAL_VERIFY_REASONS = {
     ),
     "NAME_VARIANT_CONFIRMED": _("A name variant is confirmed on the document"),
     "BIRTH_DATE_CONFIRMED": _("The birth date is confirmed on the document"),
+    # IDV-FIRST: no identity document was reviewed (justification required).
+    "REVIEWER_CONFIRMED_WITHOUT_DOCUMENT": _(
+        "No identity document: the reviewer confirms the submitted identity (justification "
+        "required)"
+    ),
 }
 EXCEPTION_REASONS = {
     "NO_USABLE_MINISTRY_RECORD": _(
@@ -193,6 +198,42 @@ def manual_evidence_types(verification) -> set[str]:
         wanted = evidence_type_for(identifier)
         return {wanted} if wanted else set()
     return {"PASSPORT_IDENTITY_PAGE"}
+
+
+#: IDV-FIRST: the reasons of a verification recorded without any identity
+#: document, as a reviewer's manual decision. Only valid without a document.
+WITHOUT_DOCUMENT_REASONS = frozenset(
+    {"REVIEWER_CONFIRMED_WITHOUT_DOCUMENT", "CORRECTED_WITHOUT_DOCUMENT"}
+)
+
+
+def verification_without_document_allowed(verification) -> bool:
+    """IDV-FIRST: whether a reviewer may verify this case in manual review
+    without an identity document, from the submitted data and a written
+    justification (source `MANUAL_REVIEWER_DECISION`). Not on the NIN
+    exemption route, which is verified from the declared document only
+    (owner decision IDV-Q3)."""
+    return verification.route != IdentityRoute.NIN_EXEMPTION
+
+
+def _without_document(verification, *, evidence_document_id, reason_code: str, note: str) -> bool:
+    """IDV-FIRST: check the basis of a manual verification before any write and
+    return True when no document is used. Without a document the reason must
+    say so and the internal justification is required; a document reason
+    without a document is refused as missing evidence, so a decision never
+    claims a document that was not reviewed. A no-document reason with a
+    document is refused too."""
+    if evidence_document_id:
+        if reason_code in WITHOUT_DOCUMENT_REASONS:
+            raise InvalidIdentityInput("reason_without_document")
+        return False
+    if reason_code not in WITHOUT_DOCUMENT_REASONS or not (
+        verification_without_document_allowed(verification)
+    ):
+        raise EvidenceUnavailable("missing")
+    if len(note) < MIN_EXPLANATION_LENGTH:
+        raise InvalidIdentityInput("justification_required")
+    return True
 
 
 def _clean_note(note: str) -> str:
@@ -450,6 +491,14 @@ def verify_identity_manually(
     `people.apply_identity_exception` and a written explanation. Neither ever
     overrides a cross-person duplicate, and both stay distinguishable from API
     verification (`verification_source`).
+
+    IDV-FIRST: from the first manual review, without returning the case or
+    asking for an upload, a normal manual verification may also be recorded
+    WITHOUT a document (`evidence_document_id` empty) on the NIN and passport
+    routes: the reason `REVIEWER_CONFIRMED_WITHOUT_DOCUMENT` and an internal
+    justification are then required, and the source is
+    `MANUAL_REVIEWER_DECISION`, never a document or Ministry source. The
+    exception always needs its document.
     """
     verification = _load(verification_id)
     codename = "apply_identity_exception" if exception else "verify_identity_manually"
@@ -458,6 +507,9 @@ def verify_identity_manually(
     note = _clean_note(note)
     if exception and len(note) < MIN_EXPLANATION_LENGTH:
         raise InvalidIdentityInput("explanation_required")
+    without_document = not exception and _without_document(
+        verification, evidence_document_id=evidence_document_id, reason_code=reason_code, note=note
+    )
 
     with transaction.atomic():
         registration, locked = _lock_case(verification_id, expected_version)
@@ -470,6 +522,8 @@ def verify_identity_manually(
         if exception:
             allowed = {"NATIONAL_ID_CARD", "PASSPORT_IDENTITY_PAGE"}
             source = VerificationSource.STAFF_EXCEPTION
+        elif without_document:
+            source = VerificationSource.MANUAL_REVIEWER_DECISION
         elif locked.route == IdentityRoute.NIN:
             source = VerificationSource.MANUAL_NATIONAL_ID_CARD
         elif locked.route == IdentityRoute.NIN_EXEMPTION:
@@ -477,7 +531,11 @@ def verify_identity_manually(
             source = VerificationSource.MANUAL_NIN_EXEMPTION
         else:
             source = VerificationSource.MANUAL_PASSPORT
-        document = _reviewable_document(registration, evidence_document_id, allowed)
+        document = (
+            None
+            if without_document
+            else _reviewable_document(registration, evidence_document_id, allowed)
+        )
         identifier = locked.current_revision.identifier
         from apps.registrations.models import RegistrationProfile
 
@@ -511,6 +569,8 @@ def verify_identity_manually(
             method=(
                 IdentityVerificationMethod.SUPERVISED_CORRECTION
                 if exception
+                else IdentityVerificationMethod.MANUAL_DECISION
+                if without_document
                 else IdentityVerificationMethod.MANUAL_DOCUMENT
             ),
             provider_code="STAFF",
@@ -522,9 +582,10 @@ def verify_identity_manually(
             evidence_document=document,
             applied=True,
         )
-        type(document).objects.filter(pk=document.pk).update(
-            verified_at=now, verified_by_user=actor
-        )
+        if document is not None:
+            type(document).objects.filter(pk=document.pk).update(
+                verified_at=now, verified_by_user=actor
+            )
         _decision(
             locked,
             action=(
@@ -545,7 +606,9 @@ def verify_identity_manually(
             verification=locked,
             actor_user=actor,
             reason_code=reason_code,
-            after={"status": locked.status, "source": source},
+            # Whether a document was reviewed; the justification stays in the
+            # encrypted decision note, never in the audit summary.
+            after={"status": locked.status, "source": source, "document": document is not None},
             correlation_id=correlation_id,
         )
         # Every manual route (document, passport, NIN exemption, staff
@@ -799,6 +862,11 @@ CORRECTION_VERIFY_REASONS = {
     ),
     "TYPING_ERROR_CORRECTED": _("A typing error was corrected; the document confirms the identity"),
     "NAME_VARIANT_CONFIRMED": _("A name variant is confirmed on the document"),
+    # IDV-FIRST: no identity document was reviewed (justification required).
+    "CORRECTED_WITHOUT_DOCUMENT": _(
+        "No identity document: the reviewer corrected the data and confirms the identity "
+        "(justification required)"
+    ),
 }
 
 #: The fields a reviewer may correct, in display order.
@@ -883,7 +951,7 @@ def correct_and_verify_identity(
     given_names: str,
     family_name: str,
     date_of_birth,
-    nin: str = "",
+    nin: str | None = None,
     evidence_document_id,
     reason_code: str,
     note: str = "",
@@ -897,7 +965,8 @@ def correct_and_verify_identity(
     name, date of birth and (NIN route) the NIN, and confirms.
 
     * Permissions: `people.verify_identity_manually` in the case's scope, plus
-      `people.correct_identity_nin` when the NIN changes. Validation (Latin
+      `people.correct_identity_nin` and `people.view_identity_evidence` when
+      the NIN changes (`nin=None` keeps the stored NIN). Validation (Latin
       names, the event's age rule, the 18-digit NIN, an allowed reason, a
       reviewable document of the route's kind) happens before any write; a
       refusal leaves no partial edit and no approval.
@@ -922,6 +991,11 @@ def correct_and_verify_identity(
     * The verified, active, eligible registration enters participation
       review exactly once (`enqueue_for_participation_review`, idempotent).
       Identity verification never approves participation.
+    * IDV-FIRST: with no document (`evidence_document_id` empty, NIN and
+      passport routes), the reason `CORRECTED_WITHOUT_DOCUMENT` and an internal
+      justification are required; a manual resolution is then recorded as
+      `MANUAL_REVIEWER_DECISION`. A changed NIN is still looked up first, and
+      a verifying answer still records the API verification.
     """
     from apps.core.text_rules import TextRuleError, normalize_latin_name, normalize_nin
     from apps.people.identity_contract import LookupKind, evaluate_identity_match
@@ -937,6 +1011,9 @@ def correct_and_verify_identity(
     require_identity_permission(actor, "verify_identity_manually", verification)
     _require_reason(reason_code, CORRECTION_VERIFY_REASONS)
     note = _clean_note(note)
+    without_document = _without_document(
+        verification, evidence_document_id=evidence_document_id, reason_code=reason_code, note=note
+    )
     try:
         given_names = normalize_latin_name(given_names)
         family_name = normalize_latin_name(family_name)
@@ -949,17 +1026,23 @@ def correct_and_verify_identity(
         raise InvalidIdentityInput("birth_date")
     route = verification.route
     current = verification.current_revision.identifier
+    # IDV-FIRST: `nin=None` keeps the stored NIN, read on the server (under the
+    # lock below); the browser never has to send it back.
+    keep_nin = nin is None
     new_nin = ""
-    if route == IdentityRoute.NIN:
+    if route == IdentityRoute.NIN and not keep_nin:
         try:
             new_nin = normalize_nin(nin)
         except TextRuleError:
             raise InvalidIdentityInput("nin_format") from None
-    elif (nin or "").strip():
+    elif route != IdentityRoute.NIN and (nin or "").strip():
         raise InvalidIdentityInput("nin_not_applicable")
     nin_changed = bool(new_nin) and new_nin != current.value_encrypted
     if nin_changed:
+        # Changing a NIN needs the correction permission AND the right to see
+        # the full NIN it replaces (the edit field is shown only then).
         require_identity_permission(actor, "correct_identity_nin", verification)
+        require_identity_permission(actor, "view_identity_evidence", verification)
 
     # Read-only pre-checks, so the Ministry is never asked about a case that
     # cannot be decided. All of them are repeated under the locks below.
@@ -969,7 +1052,10 @@ def correct_and_verify_identity(
         raise IdentityStateError("not_in_manual_review")
     if verification.version != expected_version:
         raise StaleIdentityVersion("version")
-    _reviewable_document(registration, evidence_document_id, manual_evidence_types(verification))
+    if not without_document:
+        _reviewable_document(
+            registration, evidence_document_id, manual_evidence_types(verification)
+        )
     if (
         nin_changed
         and find_cross_person_conflicts(
@@ -990,11 +1076,17 @@ def correct_and_verify_identity(
         _require_active(registration)
         if locked.status != IdentityStatus.MANUAL_REVIEW:
             raise IdentityStateError("not_in_manual_review")
-        document = _reviewable_document(
-            registration, evidence_document_id, manual_evidence_types(locked)
+        document = (
+            None
+            if without_document
+            else _reviewable_document(
+                registration, evidence_document_id, manual_evidence_types(locked)
+            )
         )
         profile = RegistrationProfile.objects.get(registration=registration)
         current = locked.current_revision.identifier
+        if route == IdentityRoute.NIN and keep_nin:
+            new_nin = current.value_encrypted
         before = {
             "given_names": profile.submitted_given_names,
             "family_name": profile.submitted_family_name,
@@ -1111,6 +1203,11 @@ def correct_and_verify_identity(
         now = timezone.now()
         if api_source:
             status, source = IdentityStatus.API_VERIFIED, api_source
+        elif without_document:
+            status, source = (
+                IdentityStatus.MANUALLY_VERIFIED,
+                VerificationSource.MANUAL_REVIEWER_DECISION,
+            )
         elif route == IdentityRoute.NIN:
             status, source = (
                 IdentityStatus.MANUALLY_VERIFIED,
@@ -1170,7 +1267,11 @@ def correct_and_verify_identity(
             IdentityVerificationAttempt.objects.create(
                 identity_identifier=identifier,
                 registration=registration,
-                method=IdentityVerificationMethod.MANUAL_DOCUMENT,
+                method=(
+                    IdentityVerificationMethod.MANUAL_DECISION
+                    if without_document
+                    else IdentityVerificationMethod.MANUAL_DOCUMENT
+                ),
                 provider_code="STAFF",
                 result=IdentityVerificationResult.MATCH,
                 attempted_at=now,
@@ -1180,9 +1281,10 @@ def correct_and_verify_identity(
                 evidence_document=document,
                 applied=True,
             )
-        type(document).objects.filter(pk=document.pk).update(
-            verified_at=now, verified_by_user=actor
-        )
+        if document is not None:
+            type(document).objects.filter(pk=document.pk).update(
+                verified_at=now, verified_by_user=actor
+            )
         _decision(
             locked,
             action=IdentityDecisionAction.CORRECT_AND_VERIFY,
@@ -1205,6 +1307,7 @@ def correct_and_verify_identity(
                 "source": source,
                 # Field names only; the values stay in the encrypted decision.
                 "changed": changed,
+                "document": document is not None,
                 "revision": revision.number,
                 "ministry_recheck": recheck_label,
                 "ministry_reason": attempt_reason,
