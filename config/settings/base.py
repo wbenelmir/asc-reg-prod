@@ -313,6 +313,9 @@ CELERY_BEAT_SCHEDULE = {
         "task": "people.dispatch_due_identity_verification_jobs",
         "schedule": 60,
     },
+    # Temporary export files, not participant records: the 24-hour file of a
+    # verified-identities export must not outlive its expiry.
+    "exports-expire-due-exports": {"task": "exports.expire_due_exports", "schedule": 15 * 60},
 }
 
 # ---------------------------------------------------------------------------

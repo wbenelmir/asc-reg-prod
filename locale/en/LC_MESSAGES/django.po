@@ -5565,3 +5565,18 @@ msgstr "Decline analytics"
 #: templates/layouts/base_public.html
 msgid "Analytics preferences"
 msgstr "Analytics preferences"
+
+msgid "Dataset"
+msgstr ""
+
+msgid "Registrations summary"
+msgstr ""
+
+msgid "Verified identities (full values)"
+msgstr ""
+
+msgid "Select a dataset."
+msgstr ""
+
+msgid "The registrations summary contains a minimized set of fields. The verified identities dataset contains full emails, national identity numbers and passport numbers: only you can download it, every download is audited, and its file is deleted after 24 hours."
+msgstr ""

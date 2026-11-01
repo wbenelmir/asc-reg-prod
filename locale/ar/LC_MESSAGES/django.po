@@ -11923,3 +11923,15 @@ msgstr "أو اختر «دون وثيقة» مع سبب التحقق دون وث
 
 msgid "No reviewable document for this case. You can still verify now as a manual reviewer decision: choose no document, the reason for a verification without a document, and write the justification. Return the case only when the participant must provide something."
 msgstr "لا توجد وثيقة قابلة للمراجعة لهذا الملف. يمكنك مع ذلك التحقق الآن بقرار يدوي من المراجع: اختر «دون وثيقة» وسبب التحقق دون وثيقة، واكتب التبرير. لا تُعِد الملف إلا إذا كان على المشارك تقديم شيء ما."
+
+msgid "Registrations summary"
+msgstr "ملخص التسجيلات"
+
+msgid "Verified identities (full values)"
+msgstr "الهويات المؤكَّدة (القيم الكاملة)"
+
+msgid "Select a dataset."
+msgstr "اختر مجموعة البيانات."
+
+msgid "The registrations summary contains a minimized set of fields. The verified identities dataset contains full emails, national identity numbers and passport numbers: only you can download it, every download is audited, and its file is deleted after 24 hours."
+msgstr "يحتوي ملخص التسجيلات على الحد الأدنى من الحقول. أما مجموعة الهويات المؤكَّدة فتحتوي على عناوين البريد الإلكتروني وأرقام التعريف الوطني وأرقام جوازات السفر كاملة: يمكنك أنت فقط تنزيلها، ويُسجَّل كل تنزيل في سجل التدقيق، ويُحذف ملفها بعد 24 ساعة."

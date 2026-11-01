@@ -15,7 +15,7 @@ from django.utils.translation import gettext_lazy as _
 from apps.core.display_labels import code_choices
 from apps.core.forms import ScopedModelChoiceField
 
-from .models import ALLOWED_EXPORT_PURPOSE_CODES
+from .models import ALLOWED_EXPORT_PURPOSE_CODES, ExportDatasetKind
 
 SCOPE_FIELDS = ("event_edition_id", "organization_id", "campaign_id")
 
@@ -71,8 +71,31 @@ class ExportRequestForm(forms.Form):
         error_messages={"required": _("A reason is required to request an export.")},
     )
 
-    def __init__(self, *args, events=None, organizations=None, campaigns=None, **kwargs):
+    def __init__(
+        self,
+        *args,
+        events=None,
+        organizations=None,
+        campaigns=None,
+        allow_verified_identities=False,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
+        if allow_verified_identities:
+            # Only for the permission's holder: for anyone else the field does
+            # not exist, so a forged value still yields the minimized summary.
+            self.fields["dataset_kind"] = forms.ChoiceField(
+                label=_("Dataset"),
+                choices=[
+                    (ExportDatasetKind.REGISTRATIONS_SUMMARY, _("Registrations summary")),
+                    (ExportDatasetKind.VERIFIED_IDENTITIES, _("Verified identities (full values)")),
+                ],
+                initial=ExportDatasetKind.REGISTRATIONS_SUMMARY,
+                error_messages={
+                    "required": _("Select a dataset."),
+                    "invalid_choice": _("Select a dataset."),
+                },
+            )
         from apps.events.models import EventEdition
         from apps.organizations.models import Organization
 

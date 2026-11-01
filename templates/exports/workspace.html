@@ -22,11 +22,16 @@
           {% include "components/picker.html" with field=form.organization_id %}
           {% include "components/field.html" with field=form.campaign_id mark_optional=True %}
           {% include "components/field.html" with field=form.purpose_code %}
+          {% if can_export_verified_identities %}{% include "components/field.html" with field=form.dataset_kind %}{% endif %}
         </div>
         {% include "components/field.html" with field=form.reason %}
         <div class="asc-notice asc-notice-neutral mb-3">
           {% include "components/icon.html" with name="lock" %}
-          <p>{% trans "Exports contain a minimized set of fields: never identity document numbers, contact details or internal review notes." %}</p>
+          {% if can_export_verified_identities %}
+            <p>{% trans "The registrations summary contains a minimized set of fields. The verified identities dataset contains full emails, national identity numbers and passport numbers: only you can download it, every download is audited, and its file is deleted after 24 hours." %}</p>
+          {% else %}
+            <p>{% trans "Exports contain a minimized set of fields: never identity document numbers, contact details or internal review notes." %}</p>
+          {% endif %}
         </div>
         <button type="submit" class="btn btn-primary">{% include "components/icon.html" with name="download" %}<span>{% trans "Generate export" %}</span></button>
       </form>

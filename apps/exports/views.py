@@ -20,7 +20,9 @@ from django.views.decorators.http import require_http_methods
 from apps.accounts.policies import has_scoped_permission, operational_permission_required
 
 from .forms import ExportRequestForm
+from .models import VERIFIED_IDENTITIES_CODENAME, ExportDatasetKind
 from .selectors import (
+    can_export_verified_identities,
     export_campaign_choices,
     export_requests_visible_to,
     export_scope_choices,
@@ -63,18 +65,21 @@ def export_workspace(request):
         )
         if request.GET.get(key)
     }
+    allow_verified_identities = can_export_verified_identities(request.user)
     form = ExportRequestForm(
         request.POST if request.method == "POST" else None,
         initial=initial,
         events=events,
         organizations=organizations,
         campaigns=campaigns,
+        allow_verified_identities=allow_verified_identities,
     )
     context = {
         "exports": export_requests_visible_to(request.user)
         .select_related("event_edition")
         .order_by("-created_at")[:50],
         "form": form,
+        "can_export_verified_identities": allow_verified_identities,
     }
     if request.method != "POST":
         return render(request, "exports/workspace.html", context)
@@ -99,9 +104,15 @@ def export_workspace(request):
         messages.error(request, _("You are not authorized to request an export for this scope."))
         return render(request, "exports/workspace.html", context, status=409)
 
-    scoped_registrations = registrations_visible_for_export(request.user).filter(
-        event_edition=event_edition
-    )
+    dataset_kind = form.cleaned_data.get("dataset_kind") or ExportDatasetKind.REGISTRATIONS_SUMMARY
+    scoped_registrations = registrations_visible_for_export(
+        request.user,
+        codename=(
+            VERIFIED_IDENTITIES_CODENAME
+            if dataset_kind == ExportDatasetKind.VERIFIED_IDENTITIES
+            else "add_exportrequest"
+        ),
+    ).filter(event_edition=event_edition)
     if organization is not None:
         scoped_registrations = scoped_registrations.filter(source_organization=organization)
     if campaign is not None:
@@ -113,11 +124,15 @@ def export_workspace(request):
             event_edition=event_edition,
             organization=organization,
             campaign=campaign,
+            dataset_kind=dataset_kind,
             purpose_code=form.cleaned_data["purpose_code"],
             reason=form.cleaned_data["reason"],
             requested_by=request.user,
             registration_ids=registration_ids,
         )
+    except ExportAuthorizationError:
+        messages.error(request, _("You are not authorized to request an export for this scope."))
+        return render(request, "exports/workspace.html", context, status=409)
     except InvalidExportPurposeError:
         messages.error(request, _("Select an approved export purpose."))
         return render(request, "exports/workspace.html", context)

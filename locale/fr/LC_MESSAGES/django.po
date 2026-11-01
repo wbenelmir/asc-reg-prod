@@ -11767,3 +11767,15 @@ msgstr "Ou choisissez « aucun document », avec le motif d'une vérification sa
 
 msgid "No reviewable document for this case. You can still verify now as a manual reviewer decision: choose no document, the reason for a verification without a document, and write the justification. Return the case only when the participant must provide something."
 msgstr "Aucun document examinable pour ce dossier. Vous pouvez tout de même vérifier maintenant par une décision manuelle de l'examinateur : choisissez « aucun document », le motif d'une vérification sans document, et rédigez la justification. Ne renvoyez le dossier que si le participant doit fournir quelque chose."
+
+msgid "Registrations summary"
+msgstr "Synthèse des inscriptions"
+
+msgid "Verified identities (full values)"
+msgstr "Identités vérifiées (valeurs complètes)"
+
+msgid "Select a dataset."
+msgstr "Sélectionnez un jeu de données."
+
+msgid "The registrations summary contains a minimized set of fields. The verified identities dataset contains full emails, national identity numbers and passport numbers: only you can download it, every download is audited, and its file is deleted after 24 hours."
+msgstr "La synthèse des inscriptions contient un ensemble réduit de champs. Le jeu de données des identités vérifiées contient les adresses e-mail, les numéros d’identité nationale et les numéros de passeport complets : vous seul pouvez le télécharger, chaque téléchargement est tracé et son fichier est supprimé après 24 heures."

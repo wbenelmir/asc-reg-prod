@@ -18,6 +18,14 @@ from apps.core.models import TimestampedModel, UUIDPrimaryKeyModel
 
 class ExportDatasetKind(models.TextChoices):
     REGISTRATIONS_SUMMARY = "REGISTRATIONS_SUMMARY", "Registrations summary"
+    # Full email and identifier values of verified participants. Only for the
+    # holder of `export_verified_identities`; downloadable only by its
+    # requester; its file is deleted after VERIFIED_IDENTITIES_RETENTION_HOURS.
+    VERIFIED_IDENTITIES = "VERIFIED_IDENTITIES", "Verified identities (full values)"
+
+
+VERIFIED_IDENTITIES_CODENAME = "export_verified_identities"
+VERIFIED_IDENTITIES_RETENTION_HOURS = 24
 
 
 class ExportStatus(models.TextChoices):
@@ -51,6 +59,18 @@ EXPORT_DATASET_FIELD_SCHEMAS: dict[str, tuple[str, ...]] = {
         "organization_name",
         "preferred_language",
         "submitted_at",
+    ),
+    # The one reviewed exception to the rule above: an explicit, separately
+    # granted dataset that is never part of `Export Administrators`.
+    ExportDatasetKind.VERIFIED_IDENTITIES: (
+        "registration_reference",
+        "first_name",
+        "family_name",
+        "email",
+        "nin_or_national_id",
+        "passport_number",
+        "verification_method",
+        "verification_date",
     ),
 }
 
@@ -98,6 +118,12 @@ class ExportRequest(UUIDPrimaryKeyModel, TimestampedModel):
 
     class Meta:
         db_table = "exports_export_request"
+        permissions = [
+            (
+                VERIFIED_IDENTITIES_CODENAME,
+                "Can export the full identity values of verified participants",
+            ),
+        ]
         indexes = [
             models.Index(fields=["event_edition", "status"], name="exp_request_event_status_idx"),
         ]

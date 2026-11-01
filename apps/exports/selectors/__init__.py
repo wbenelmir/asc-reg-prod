@@ -3,8 +3,10 @@ Prompt 5 §4.5)."""
 
 from __future__ import annotations
 
+from django.db.models import Q
+
 from apps.accounts.selectors import scope_filtered_queryset
-from apps.exports.models import ExportRequest
+from apps.exports.models import VERIFIED_IDENTITIES_CODENAME, ExportDatasetKind, ExportRequest
 
 
 def export_requests_visible_to(user, *, codename: str = "view_exportrequest"):
@@ -13,7 +15,8 @@ def export_requests_visible_to(user, *, codename: str = "view_exportrequest"):
     A `ScopedGroupMembership` only contributes scope when its OWN `Group`
     grants `exports.<codename>` (Prompt 4 final closure pass §6's rule,
     reused unchanged) -- an unauthorized caller gets an EMPTY queryset,
-    never an exception.
+    never an exception. A verified-identities export is visible only to its
+    requester, whatever the caller's scope.
     """
     return scope_filtered_queryset(
         user,
@@ -22,6 +25,9 @@ def export_requests_visible_to(user, *, codename: str = "view_exportrequest"):
         codename=codename,
         event_field="event_edition_id",
         organization_field="organization_id",
+    ).exclude(
+        Q(dataset_kind=ExportDatasetKind.VERIFIED_IDENTITIES)
+        & ~Q(requested_by_id=getattr(user, "pk", None))
     )
 
 
@@ -40,6 +46,11 @@ def registrations_visible_for_export(user, *, codename: str = "add_exportrequest
         codename=codename,
         organization_field="source_organization_id",
     )
+
+
+def can_export_verified_identities(user) -> bool:
+    """True if `user` holds the dedicated permission over any registration."""
+    return registrations_visible_for_export(user, codename=VERIFIED_IDENTITIES_CODENAME).exists()
 
 
 def export_scope_choices(user):

@@ -39,6 +39,8 @@ from apps.exports.models import (
     ALLOWED_EXPORT_PURPOSE_CODES,
     EXPORT_DATASET_FIELD_SCHEMAS,
     EXPORT_SCHEMA_VERSION,
+    VERIFIED_IDENTITIES_CODENAME,
+    VERIFIED_IDENTITIES_RETENTION_HOURS,
     ExportDatasetKind,
     ExportRequest,
     ExportStatus,
@@ -88,16 +90,83 @@ def _registration_row(registration: Registration) -> dict[str, str]:
     return {key: neutralize_for_spreadsheet(str(value)) for key, value in raw.items()}
 
 
+def _verified_identity_rows(registrations) -> list[dict[str, str]]:
+    """Decrypted values, read through the fields' own attribute decryption.
+    The email follows the rule of `identity_review`'s participant notices."""
+    from apps.people.models import (
+        ContactPoint,
+        ContactPointStatus,
+        ContactPointType,
+        IdentifierType,
+    )
+
+    person_ids = [registration.person_id for registration in registrations]
+    # Ascending, so the primary and then the newest contact wins per person.
+    emails = {
+        contact.person_id: contact.value_encrypted
+        for contact in ContactPoint.objects.filter(
+            person_id__in=person_ids,
+            type=ContactPointType.EMAIL,
+            status=ContactPointStatus.ACTIVE,
+            login_enabled=True,
+            is_verified=True,
+        ).order_by("is_primary", "created_at")
+    }
+    rows = []
+    for registration in registrations:
+        verification = registration.identity_verification
+        profile = getattr(registration, "profile", None)
+        revision = verification.current_revision
+        identifier = revision.identifier if revision else None
+        is_passport = bool(identifier) and identifier.identifier_type == IdentifierType.PASSPORT
+        identifier_value = identifier.value_encrypted if identifier else ""
+        verified_at = verification.decided_at or verification.status_changed_at
+        raw = {
+            "registration_reference": registration.public_reference,
+            "first_name": profile.submitted_given_names if profile else "",
+            "family_name": profile.submitted_family_name if profile else "",
+            "email": emails.get(registration.person_id, ""),
+            "nin_or_national_id": "" if is_passport else identifier_value,
+            "passport_number": identifier_value if is_passport else "",
+            "verification_method": verification.verification_source,
+            "verification_date": verified_at.isoformat(),
+        }
+        rows.append({key: neutralize_for_spreadsheet(str(value)) for key, value in raw.items()})
+    return rows
+
+
 def _generate_csv_bytes(*, dataset_kind: str, registrations) -> tuple[bytes, int]:
     fieldnames = EXPORT_DATASET_FIELD_SCHEMAS[dataset_kind]
     buffer = io.StringIO()
     writer = csv.DictWriter(buffer, fieldnames=fieldnames, extrasaction="ignore")
     writer.writeheader()
+    if dataset_kind == ExportDatasetKind.VERIFIED_IDENTITIES:
+        rows = _verified_identity_rows(registrations)
+        writer.writerows(rows)
+        # With a BOM, so spreadsheet software reads Arabic names correctly.
+        return buffer.getvalue().encode("utf-8-sig"), len(rows)
     row_count = 0
     for registration in registrations:
         writer.writerow(_registration_row(registration))
         row_count += 1
     return buffer.getvalue().encode("utf-8"), row_count
+
+
+def _purge_expired_verified_identity_files() -> int:
+    """Delete the stored files of expired verified-identities exports. The
+    request row stays as evidence. A failed delete keeps its key for a retry."""
+    purged = 0
+    expired = ExportRequest.objects.filter(
+        dataset_kind=ExportDatasetKind.VERIFIED_IDENTITIES, status=ExportStatus.EXPIRED
+    ).exclude(storage_key="")
+    for export_request in expired:
+        try:
+            get_private_storage().delete(export_request.storage_key)
+        except PrivateStorageError:
+            continue
+        ExportRequest.objects.filter(pk=export_request.pk).update(storage_key="")
+        purged += 1
+    return purged
 
 
 def request_export(
@@ -122,6 +191,14 @@ def request_export(
     if not has_scoped_permission(
         requested_by,
         "exports.add_exportrequest",
+        event_edition_id=event_edition.pk,
+        organization_id=getattr(organization, "pk", None),
+    ):
+        raise ExportAuthorizationError("The requester is not authorized for this export scope.")
+    is_verified_identities = dataset_kind == ExportDatasetKind.VERIFIED_IDENTITIES
+    if is_verified_identities and not has_scoped_permission(
+        requested_by,
+        f"exports.{VERIFIED_IDENTITIES_CODENAME}",
         event_edition_id=event_edition.pk,
         organization_id=getattr(organization, "pk", None),
     ):
@@ -153,11 +230,25 @@ def request_export(
     # never trust the caller-supplied id list beyond this filter (§4.5).
     from apps.exports.selectors import registrations_visible_for_export
 
-    scoped_registrations = (
-        registrations_visible_for_export(requested_by)
-        .select_related("event_edition", "source_organization")
-        .filter(pk__in=registration_ids, event_edition=event_edition)
-    )
+    if is_verified_identities:
+        from apps.people.models import IdentityStatus, VerificationSource
+
+        scoped_registrations = (
+            registrations_visible_for_export(requested_by, codename=VERIFIED_IDENTITIES_CODENAME)
+            .select_related("profile", "identity_verification__current_revision__identifier")
+            .filter(
+                pk__in=registration_ids,
+                event_edition=event_edition,
+                identity_verification__status__in=IdentityStatus.verified_statuses(),
+            )
+            .exclude(identity_verification__verification_source=VerificationSource.SIMULATED_API)
+        )
+    else:
+        scoped_registrations = (
+            registrations_visible_for_export(requested_by)
+            .select_related("event_edition", "source_organization")
+            .filter(pk__in=registration_ids, event_edition=event_edition)
+        )
     if organization is not None:
         scoped_registrations = scoped_registrations.filter(source_organization=organization)
     if campaign is not None:
@@ -173,6 +264,11 @@ def request_export(
     storage_key = get_private_storage().save(io.BytesIO(content_bytes), content_type="text/csv")
 
     now = timezone.now()
+    retention = (
+        timedelta(hours=VERIFIED_IDENTITIES_RETENTION_HOURS)
+        if is_verified_identities
+        else timedelta(days=retention_days)
+    )
     try:
         with transaction.atomic():
             export_request = ExportRequest.objects.create(
@@ -190,7 +286,7 @@ def request_export(
                 row_count=row_count,
                 storage_key=storage_key,
                 content_sha256=content_sha256,
-                expires_at=now + timedelta(days=retention_days),
+                expires_at=now + retention,
                 ready_at=now,
             )
     except IntegrityError:
@@ -266,6 +362,18 @@ def retrieve_export(
         _deny("unauthorized")
         raise ExportAuthorizationError("The actor is not authorized to retrieve this export.")
 
+    if export_request.dataset_kind == ExportDatasetKind.VERIFIED_IDENTITIES and (
+        export_request.requested_by_id != actor.pk
+        or not has_scoped_permission(
+            actor,
+            f"exports.{VERIFIED_IDENTITIES_CODENAME}",
+            event_edition_id=export_request.event_edition_id,
+            organization_id=export_request.organization_id,
+        )
+    ):
+        _deny("unauthorized")
+        raise ExportAuthorizationError("The actor is not authorized to retrieve this export.")
+
     from apps.exports.selectors import export_requests_visible_to
 
     if not export_requests_visible_to(actor).filter(pk=export_request.pk).exists():
@@ -279,6 +387,7 @@ def retrieve_export(
         ExportRequest.objects.filter(pk=export_request.pk, status=ExportStatus.READY).update(
             status=ExportStatus.EXPIRED
         )
+        _purge_expired_verified_identity_files()
         _deny("expired")
         raise ExportExpiredError("This export has expired.")
 
@@ -309,8 +418,11 @@ def retrieve_export(
 def expire_due_exports(*, now=None) -> int:
     """Idempotent sweep: transition every READY export past `expires_at` to
     EXPIRED. Safe to call repeatedly (a management command, e.g.) -- rows
-    already EXPIRED are simply not matched again."""
+    already EXPIRED are simply not matched again. Also deletes the files of
+    expired verified-identities exports."""
     now = now or timezone.now()
-    return ExportRequest.objects.filter(status=ExportStatus.READY, expires_at__lte=now).update(
+    expired = ExportRequest.objects.filter(status=ExportStatus.READY, expires_at__lte=now).update(
         status=ExportStatus.EXPIRED
     )
+    _purge_expired_verified_identity_files()
+    return expired
